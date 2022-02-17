@@ -1,4 +1,4 @@
-Geforp2
+Geforp2 : gestion des formations
 ======
 
 Geforp2 : nouvelle version sous Symfony 5.4
@@ -36,7 +36,7 @@ Installation
 
 ### Prérequis
 
-- Composer installé : http://www.coolcoyote.net/php-mysql/installation-de-composer-sous-linux-et-windows
+- Composer installé 
 
 -----------------
 Installation
