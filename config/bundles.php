@@ -14,4 +14,5 @@ return [
     Twig\Extra\TwigExtraBundle\TwigExtraBundle::class => ['all' => true],
     JMS\SerializerBundle\JMSSerializerBundle::class => ['all' => true],
     MBence\OpenTBSBundle\OpenTBSBundle::class => ['all' => true],
+    Knp\Bundle\MenuBundle\KnpMenuBundle::class => ['all' => true],
 ];

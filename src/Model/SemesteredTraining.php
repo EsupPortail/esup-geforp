@@ -8,12 +8,12 @@
  * Time: 11:13.
  */
 
-namespace CoreBundle\Model;
+namespace App\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
-use CoreBundle\Entity\AbstractSession;
-use CoreBundle\Entity\AbstractTraining;
+use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTraining;
 
 class SemesteredTraining
 {

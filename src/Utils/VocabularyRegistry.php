@@ -1,11 +1,11 @@
 <?php
 
-namespace CoreBundle\Utils;
+namespace App\Utils;
 
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use CoreBundle\Entity\Term\VocabularyInterface;
+use App\Entity\Core\Term\VocabularyInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**

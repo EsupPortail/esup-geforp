@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\Utils;
+namespace App\Utils;
 
 class TrainingTypeRegistry
 {

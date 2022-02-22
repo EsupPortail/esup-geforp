@@ -1,22 +1,21 @@
 <?php
 
-/**
- * Auteur: Blaise de Carné - blaise@concretis.com.
- */
 
-namespace CoreBundle\Utils;
+namespace App\Utils;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Util\MenuManipulator;
-use CoreBundle\Event\ConfigureMenuEvent;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use App\Event\ConfigureMenuEvent;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Class MenuBuilder.
  */
-class MenuBuilder extends ContainerAware
+class MenuBuilder implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
     /**
      * @param FactoryInterface $factory
      */

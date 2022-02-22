@@ -7,10 +7,10 @@
  * Time: 10:41.
  */
 
-namespace CoreBundle\BatchOperations\SemesteredTraining;
+namespace App\BatchOperations\SemesteredTraining;
 
-use CoreBundle\BatchOperations\Generic\MailingBatchOperation as BaseMailingBatchOperation;
-use CoreBundle\Model\SemesteredTraining;
+use App\BatchOperations\Generic\MailingBatchOperation as BaseMailingBatchOperation;
+use App\Model\SemesteredTraining;
 
 /**
  * Class MailingBatchOperation.

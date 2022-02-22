@@ -7,7 +7,7 @@
  * Time: 11:16.
  */
 
-namespace CoreBundle\BatchOperations;
+namespace App\BatchOperations;
 
 interface BatchOperationInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\Utils\Transformer;
+namespace App\Utils\Transformer;
 
 use Elastica\Document;
 use FOS\ElasticaBundle\Transformer\ModelToElasticaAutoTransformer;

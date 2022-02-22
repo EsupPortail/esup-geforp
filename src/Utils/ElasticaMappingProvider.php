@@ -7,7 +7,7 @@
  * Time: 14:43.
  */
 
-namespace CoreBundle\Utils;
+namespace App\Utils;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;

@@ -1,9 +1,9 @@
 <?php
 
-namespace CoreBundle\BatchOperations\SemesteredTraining;
+namespace App\BatchOperations\SemesteredTraining;
 
-use CoreBundle\BatchOperations\Training\ConvertTypeBatchOperation as BaseConvertTypeBatchOperation;
-use CoreBundle\Model\SemesteredTraining;
+use App\BatchOperations\Training\ConvertTypeBatchOperation as BaseConvertTypeBatchOperation;
+use App\Model\SemesteredTraining;
 
 class SemesteredTrainingConvertTypeBatchOperation extends BaseConvertTypeBatchOperation
 {

@@ -7,13 +7,13 @@
  * Time: 11:30.
  */
 
-namespace CoreBundle\Utils;
+namespace App\Utils;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use FOS\ElasticaBundle\Doctrine\ORM\Provider;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 use FOS\ElasticaBundle\Provider\IndexableInterface;
-use CoreBundle\Model\SemesteredTraining;
+use App\Model\SemesteredTraining;
 
 /**
  * Class SemesteredTrainingProvider.

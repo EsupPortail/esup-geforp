@@ -7,10 +7,10 @@
  * Time: 10:43.
  */
 
-namespace CoreBundle\BatchOperations\SemesteredTraining;
+namespace App\BatchOperations\SemesteredTraining;
 
-use CoreBundle\BatchOperations\Generic\CSVBatchOperation as BaseCSVBatchOperation;
-use CoreBundle\Model\SemesteredTraining;
+use App\BatchOperations\Generic\CSVBatchOperation as BaseCSVBatchOperation;
+use App\Model\SemesteredTraining;
 
 class SemesteredTrainingCSVBatchOperation extends BaseCSVBatchOperation
 {
