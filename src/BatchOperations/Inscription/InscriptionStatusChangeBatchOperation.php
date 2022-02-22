@@ -7,14 +7,14 @@
  * Time: 10:41.
  */
 
-namespace CoreBundle\BatchOperations\Inscription;
+namespace App\BatchOperations\Inscription;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\Entity\AbstractInscription;
-use CoreBundle\Entity\Term\InscriptionStatus;
-use CoreBundle\Entity\Term\PresenceStatus;
+use App\BatchOperations\AbstractBatchOperation;
+use Aoo\Entity\Core\AbstractInscription;
+use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\PresenceStatus;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;

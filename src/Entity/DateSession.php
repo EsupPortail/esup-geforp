@@ -56,13 +56,13 @@ class DateSession
     protected $scheduleAfter;
 
     /**
-     * @ORM\Column(type="decimal", scale=2, nullable=true)
+     * @ORM\Column(name="hourNumberMorn", type="decimal", scale=2, nullable=true)
      * @var String
      */
     protected $hourNumberMorn;
 
     /**
-     * @ORM\Column(type="decimal", scale=2, nullable=true)
+     * @ORM\Column(name="hourNumberAfter", type="decimal", scale=2, nullable=true)
      * @var String
      */
     protected $hourNumberAfter;
