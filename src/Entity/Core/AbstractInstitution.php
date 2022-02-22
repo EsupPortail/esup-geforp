@@ -5,13 +5,13 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
 use App\Entity\Core\AbstractOrganization;
 use App\Security\Authorization\AccessRight\SerializedAccessRights;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Sygefor\Bundle\InstitutionBundle\Form\BaseInstitutionType as FormType;
+use App\Form\BaseInstitutionType as FormType;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Institution.
@@ -23,7 +23,9 @@ use Sygefor\Bundle\InstitutionBundle\Form\BaseInstitutionType as FormType;
  */
 abstract class AbstractInstitution implements SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
+
     use CoordinatesTrait;
 
     /**

@@ -3,9 +3,9 @@
 namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use App\Form\Type\AbstractTrainingType;
 use App\Entity\Core\AbstractInstitution;
 use App\Entity\Core\Material;
@@ -25,7 +25,9 @@ use App\Security\Authorization\AccessRight\SerializedAccessRights;
  */
 abstract class AbstractTraining implements SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
+
     use MaterialTrait;
 
     /**

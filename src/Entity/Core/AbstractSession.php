@@ -5,13 +5,12 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-#use Knp\DoctrineBehaviors\Model as ORMBehaviors;
-use Knp\DoctrineBehaviors as ORMBehaviors;
 use App\Entity\Core\Term\SessionType;
 use App\Form\Type\AbstractSessionType;
 use App\Security\Authorization\AccessRight\SerializedAccessRights;
 use App\Entity\Core\Term\InscriptionStatus;
 use Symfony\Component\Validator\Constraints as Assert;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Session.
@@ -26,7 +25,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 abstract class AbstractSession implements SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
+
     use MaterialTrait;
 
     // registration states

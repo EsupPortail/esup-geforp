@@ -13,6 +13,7 @@
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.10",
         "friendsofsymfony/rest-bundle": "^3.3.0",
+        "gedmo/doctrine-extensions": "^3.5",
         "jms/serializer-bundle": "^4.0",
         "knplabs/knp-menu-bundle": "^3.2",
         "mbence/opentbs-bundle": "dev-master",

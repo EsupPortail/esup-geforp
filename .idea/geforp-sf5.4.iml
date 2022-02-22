@@ -147,6 +147,8 @@
       <excludeFolder url="file://$MODULE_DIR$/vendor/willdurand/jsonp-callback-validator" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-menu-bundle" />
       <excludeFolder url="file://$MODULE_DIR$/vendor/knplabs/knp-menu" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/behat/transliterator" />
+      <excludeFolder url="file://$MODULE_DIR$/vendor/gedmo/doctrine-extensions" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

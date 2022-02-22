@@ -6,13 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use JMS\Serializer\Annotation as Serializer;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Core\Term\PresenceStatus;
 use App\Entity\Core\Term\InscriptionStatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Form\Type\AbstractInscriptionType;
 use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Trainee.
@@ -26,7 +26,8 @@ use App\Security\Authorization\AccessRight\SerializedAccessRights;
  */
 abstract class AbstractInscription implements SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
 
     /**
      * @var int id

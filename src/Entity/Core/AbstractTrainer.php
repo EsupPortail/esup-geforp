@@ -5,7 +5,6 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use App\Security\Authorization\AccessRight\SerializedAccessRights;
 use App\Form\Type\AbstractTrainerType;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
@@ -15,6 +14,7 @@ use App\Entity\Core\Term\TrainerType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Trainer.
@@ -27,7 +27,9 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
  */
 abstract class AbstractTrainer implements SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
+
     use PersonTrait;
     use CoordinatesTrait;
     use ProfessionalSituationTrait;

@@ -5,7 +5,6 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use App\Entity\Core\PersonTrait\AccountTrait;
 use App\Entity\Core\AbstractOrganization;
 use App\Security\Authorization\AccessRight\SerializedAccessRights;
@@ -15,6 +14,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\BaseTraineeType;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Trainee.
@@ -28,7 +28,9 @@ use App\Form\BaseTraineeType;
  */
 abstract class AbstractTrainee implements UserInterface, \Serializable, SerializedAccessRights
 {
-//    use ORMBehaviors\Timestampable\Timestampable;
+    // Hook timestampable behavior : updates createdAt, updatedAt fields
+    use TimestampableEntity;
+
     use AccountTrait;
     use ProfessionalSituationTrait;
 
