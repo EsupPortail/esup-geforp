@@ -1,0 +1,46 @@
+{% extends "bootstrap_3_horizontal_layout.html.twig" %}
+
+{% block form_row -%}
+    {% set widget_form_group_attr = widget_form_group_attr|merge({class: (widget_form_group_attr.class|default('') ~ ' ' ~ block('form_group_container_class'))|trim}) %}
+    <div{% for attrname, attrvalue in widget_form_group_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
+        {{- form_label(form) -}}
+        <div class="{{ block('form_group_class') }}">
+            {{- form_widget(form) -}}
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+{%- endblock form_row %}
+
+{% block form_group_container_class -%}
+    form-group{% if (not compound or force_error|default(false)) and not valid %} has-error{% endif %}{{ form.vars.required ? ' required': '' }}
+{%- endblock form_group_container_class %}
+
+{%- block form -%}
+    {{ form_start(form) }}
+    {% if form._token is defined %}
+        {{ form_widget(form._token) }}
+    {% endif %}
+    {{- form_errors(form) -}}
+    {#{{- form_widget(form) -}}#}
+    {{- block('form_rows') -}}
+    {{- form_rest(form) -}}
+
+    <div class="row">
+        <div class="col-sm-offset-2 {{ block('form_group_class') }}">
+            <input type="submit" class="btn btn-primary" value="{{ submit is defined ? submit : 'Enregistrer' }}">
+        </div>
+    </div>
+    {{ form_end(form) }}
+{%- endblock form -%}
+
+{% block form_errors -%}
+    {% if errors|length > 0 -%}
+        {% if form.parent %}<span class="error">{% else %}<div class="alert alert-danger">{% endif %}
+        <ul class="list-unstyled">
+        {%- for error in errors -%}
+            <li><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
+        {%- endfor -%}
+    </ul>
+        {% if form.parent %}</span>{% else %}</div>{% endif %}
+    {%- endif %}
+{%- endblock form_errors %}

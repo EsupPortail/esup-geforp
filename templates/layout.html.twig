@@ -1,0 +1,69 @@
+{% extends "SygeforCoreBundle::html.html.twig" %}
+{% from 'MopaBootstrapBundle::flash.html.twig' import session_flash %}
+{% set ngApp = ngApp is defined ? ngApp : 0 %}
+{% block body %}
+<div class="full-height-container is-full-width is-absolute is-direction-column">
+    <div role="navigation" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button aria-controls="bs-navbar" aria-expanded="false" class="navbar-toggle collapsed"
+                        data-target="#bs-navbar" data-toggle="collapse" type="button"><span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+                </button>
+                <span class="sr-only">Afficher la navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <a class="navbar-brand" href="/">Sygefor<sup>3</sup></a>
+            </div>
+            <nav class="navbar-collapse collapse" id="bs-navbar" aria-expanded="false">
+                {{ mopa_bootstrap_menu(knp_menu_get('main'), {'automenu': 'navbar'}) }}
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ app.user.username }}<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="{{ path('user.account') }}">Mon compte</a></li>
+                            <li><a href="{{ path('fos_user_security_logout') }}">Déconnexion</a></li>
+                        </ul>
+                    </li>
+                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+                        {% for role in app.security.token.roles %}
+                            {% if role.role == 'ROLE_PREVIOUS_ADMIN' %}
+                                <li>
+                                    <a href="{{ path('core.index', {'_switch_user': '_exit'}) }}">
+                                        <i class="fa fa-step-backward"></i>&nbsp;Arrêter la substitution
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div class="full-height-item is-full-width is-grow">
+        <div class="container-fluid" {% if ngApp %}ng-app="conjecto.sygefor.app"{% endif %}>
+            <div class="row">
+                <div class="col-md-12 main-content full-height-container is-absolute is-full-width">
+
+                    <!-- breadcrumb -->
+                    {% block breadcrumbs %}{% endblock %}
+
+                    <!-- flashes -->
+                    {% block flashes %}
+                        {% if app.session.flashbag.peekAll|length > 0 %}
+                            <div class="full-height-item">{{ session_flash() }}</div>
+                        {% endif %}
+                    {% endblock flashes %}
+
+                    <!-- content -->
+                    {% block content %}{% endblock %}
+
+                </div>
+            </div>
+            <div growl></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
