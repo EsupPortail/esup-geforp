@@ -7,7 +7,7 @@
  * Time: 15:13.
  */
 
-namespace CoreBundle\Utils\HumanReadable;
+namespace App\Utils\HumanReadable;
 
 use Doctrine\Common\Persistence\Mapping\MappingException;
 use Doctrine\ORM\EntityManager;

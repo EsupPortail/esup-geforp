@@ -6,7 +6,7 @@
  * Time: 4:13 PM.
  */
 
-namespace CoreBundle\Utils\Email;
+namespace App\Utils\Email;
 
 /**
  * Interface EmailResolverInterface.

@@ -1,10 +1,6 @@
 <?php
 
-/**
- * Auteur: Blaise de Carné - blaise@concretis.com.
- */
-
-namespace CoreBundle\Security\Authorization\AccessRight;
+namespace App\Security\Authorization\AccessRight;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 

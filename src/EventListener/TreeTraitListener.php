@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;

@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
 use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;

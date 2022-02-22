@@ -1,10 +1,6 @@
 <?php
 
-/**
- * Auteur: Blaise de Carné - blaise@concretis.com.
- */
-
-namespace CoreBundle\Event;
+namespace App\Event;
 
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\ItemInterface;

@@ -1,11 +1,11 @@
 <?php
 
-namespace Sygefor\Bundle\CoreBundle\Security\Authorization\Voter;
+namespace App\Security\Authorization\Voter;
 
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
-use Sygefor\Bundle\CoreBundle\Security\Authorization\AccessRight\AccessRightRegistry;
-use Sygefor\Bundle\CoreBundle\Entity\User;
+use App\Security\Authorization\AccessRight\AccessRightRegistry;
+use App\Entity\Core\User;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 

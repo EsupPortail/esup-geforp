@@ -1,11 +1,11 @@
 <?php
 
-namespace CoreBundle\EventListener\ORM;
+namespace App\EventListener\ORM;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
 use Doctrine\ORM\Events;
-use CoreBundle\Entity\AbstractSession;
+use App\Entity\Core\AbstractSession;
 
 /**
  * Populate the Training discriminator map

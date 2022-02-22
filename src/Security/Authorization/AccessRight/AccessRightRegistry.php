@@ -9,7 +9,7 @@
 
 namespace App\Security\Authorization\AccessRight;
 
-use App\Entity\User;
+use App\Entity\Core\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 

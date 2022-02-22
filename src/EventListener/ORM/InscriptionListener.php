@@ -1,14 +1,14 @@
 <?php
 
-namespace CoreBundle\EventListener\ORM;
+namespace App\EventListener\ORM;
 
 use Doctrine\ORM\Events;
 use Html2Text\Html2Text;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\DependencyInjection\Container;
-use CoreBundle\Entity\Term\EmailTemplate;
-use CoreBundle\Entity\AbstractInscription;
+use App\Entity\Core\Term\EmailTemplate;
+use App\Entity\Core\AbstractInscription;
 
 /**
  * Inscription listener to perfom some operation on persist/update

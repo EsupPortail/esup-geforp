@@ -6,7 +6,7 @@
  * Time: 12:47 PM.
  */
 
-namespace CoreBundle\BatchOperations;
+namespace App\BatchOperations;
 
 /**
  * Class AttachEmailPublipostAttachment.

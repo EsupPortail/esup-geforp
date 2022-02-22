@@ -7,19 +7,19 @@
  * Time: 11:54.
  */
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
-use CoreBundle\Entity\AbstractOrganization;
-use CoreBundle\Entity\AbstractInscription;
-use CoreBundle\Entity\AbstractTrainee;
-use CoreBundle\Entity\AbstractTrainer;
-use CoreBundle\Entity\Term\AbstractTerm;
-use CoreBundle\Entity\AbstractTraining;
-use CoreBundle\Entity\User;
-use CoreBundle\Event\ConfigureMenuEvent;
-use CoreBundle\Entity\Term\VocabularyInterface;
+use App\Entity\Core\AbstractOrganization;
+use App\Entity\Core\AbstractInscription;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\AbstractTrainer;
+use App\Entity\Core\Term\AbstractTerm;
+use App\Entity\Core\AbstractTraining;
+use App\Entity\Core\User;
+use App\Event\ConfigureMenuEvent;
+use App\Entity\Core\Term\VocabularyInterface;
 use Symfony\Component\Routing\Router;
-use CoreBundle\Utils\TrainingTypeRegistry;
+use App\Utils\TrainingTypeRegistry;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Security\Core\SecurityContext;
 

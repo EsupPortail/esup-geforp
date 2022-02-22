@@ -1,13 +1,13 @@
 <?php
 
-namespace CoreBundle\EventListener\ORM;
+namespace App\EventListener\ORM;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\ORM\PersistentCollection;
-use CoreBundle\Entity\AbstractTrainer;
+use App\Entity\Core\AbstractTrainer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 class OrganizationChangedListener implements EventSubscriber

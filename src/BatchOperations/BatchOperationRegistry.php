@@ -7,7 +7,7 @@
  * Time: 11:15.
  */
 
-namespace CoreBundle\BatchOperations;
+namespace App\BatchOperations;
 
 /**
  * Class BatchOperationRegistry.

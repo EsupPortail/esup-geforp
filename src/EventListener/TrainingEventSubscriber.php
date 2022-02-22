@@ -1,11 +1,11 @@
 <?php
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Exception\InvalidArgumentException;
-use CoreBundle\Entity\AbstractTraining;
+use App\Entity\Core\AbstractTraining;
 
 /**
  * Training serialization event subscriber.

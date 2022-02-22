@@ -7,11 +7,11 @@
  * Time: 10:13.
  */
 
-namespace CoreBundle\BatchOperations\Session;
+namespace App\BatchOperations\Session;
 
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\Entity\AbstractInscription;
-use CoreBundle\Entity\AbstractSession;
+use App\BatchOperations\AbstractBatchOperation;
+use App\Entity\Core\AbstractInscription;
+use App\Entity\Core\AbstractSession;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

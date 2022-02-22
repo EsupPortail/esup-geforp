@@ -1,10 +1,10 @@
 <?php
 
-namespace CoreBundle\Utils\Transformer;
+namespace App\Utils\Transformer;
 
 use Doctrine\ORM\EntityManager;
 use Elastica\Document;
-use CoreBundle\Entity\AbstractSession;
+use App\Entity\Core\AbstractSession;
 use Symfony\Component\DependencyInjection\Container;
 
 /**

@@ -7,19 +7,19 @@
  * Time: 18:13.
  */
 
-namespace CoreBundle\BatchOperations\Generic;
+namespace App\BatchOperations\Generic;
 
 use Doctrine\ORM\EntityManager;
-use CoreBundle\Entity\User;
-use CoreBundle\Entity\AbstractTrainee;
-use CoreBundle\Entity\Term\PresenceStatus;
-use CoreBundle\Entity\AbstractOrganization;
+use App\Entity\Core\User;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\AbstractOrganization;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use CoreBundle\Entity\Term\InscriptionStatus;
+use App\Entity\Core\Term\InscriptionStatus;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\BatchOperations\AttachEmailPublipostAttachment;
-use CoreBundle\Utils\HumanReadable\HumanReadablePropertyAccessor;
+use App\BatchOperations\AbstractBatchOperation;
+use App\BatchOperations\AttachEmailPublipostAttachment;
+use App\Utils\HumanReadable\HumanReadablePropertyAccessor;
 
 class EmailingBatchOperation extends AbstractBatchOperation
 {

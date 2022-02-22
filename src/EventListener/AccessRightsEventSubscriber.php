@@ -1,11 +1,11 @@
 <?php
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
 use JMS\Serializer\Context;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use CoreBundle\Security\Authorization\AccessRight\SerializedAccessRights;
+use App\Security\Authorization\AccessRight\SerializedAccessRights;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**

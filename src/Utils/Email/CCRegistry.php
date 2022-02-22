@@ -6,7 +6,7 @@
  * Time: 4:11 PM.
  */
 
-namespace CoreBundle\Utils\Email;
+namespace App\Utils\Email;
 
 /**
  * Class CCRegistry.

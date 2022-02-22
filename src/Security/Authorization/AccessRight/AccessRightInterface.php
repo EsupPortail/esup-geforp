@@ -1,9 +1,5 @@
 <?php
 
-/**
- * Auteur: Blaise de Carné - blaise@concretis.com.
- */
-
 namespace App\Security\Authorization\AccessRight;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;

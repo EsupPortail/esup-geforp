@@ -7,11 +7,11 @@
  * Time: 16:56.
  */
 
-namespace CoreBundle\BatchOperations\Generic;
+namespace App\BatchOperations\Generic;
 
 use Doctrine\ORM\EntityManager;
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\Entity\User;
+use App\BatchOperations\AbstractBatchOperation;
+use App\Entity\Core\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;

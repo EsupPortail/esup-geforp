@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\BatchOperations\Training;
+namespace App\BatchOperations\Training;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
@@ -10,11 +10,11 @@ use Elastica\Client;
 use Elastica\Filter\Terms;
 use Elastica\Type;
 use FOS\ElasticaBundle\Elastica\Index;
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\Utils\Search\SearchService;
-use CoreBundle\Model\SemesteredTraining;
-use CoreBundle\Entity\AbstractTraining;
-use CoreBundle\Utils\TrainingTypeRegistry;
+use App\BatchOperations\AbstractBatchOperation;
+use App\Utils\Search\SearchService;
+use App\Model\SemesteredTraining;
+use App\Entity\Core\AbstractTraining;
+use App\Utils\TrainingTypeRegistry;
 use Symfony\Component\Security\Core\SecurityContext;
 
 class ConvertTypeBatchOperation extends AbstractBatchOperation

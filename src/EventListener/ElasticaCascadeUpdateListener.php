@@ -1,13 +1,13 @@
 <?php
 
-namespace CoreBundle\EventListener;
+namespace App\EventListener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Events;
-use CoreBundle\Utils\ElasticaMappingProvider;
+use App\Utils\ElasticaMappingProvider;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;

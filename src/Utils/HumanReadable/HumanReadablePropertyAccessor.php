@@ -6,7 +6,7 @@
  * Time: 14:54.
  */
 
-namespace CoreBundle\Utils\HumanReadable;
+namespace App\Utils\HumanReadable;
 
 use Html2Text\Html2Text;
 use Symfony\Component\PropertyAccess\PropertyAccessor;

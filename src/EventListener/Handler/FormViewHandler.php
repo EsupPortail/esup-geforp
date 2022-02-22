@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\EventListener\Handler;
+namespace App\EventListener\Handler;
 
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;

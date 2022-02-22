@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\Form\DataTransformer;
+namespace App\Form\DataTransformer;
 
 /*
  * Auteur: Blaise de Carné - blaise@concretis.com

@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\Validator\Constraints;
+namespace App\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Security\Core\Encoder\BasePasswordEncoder;

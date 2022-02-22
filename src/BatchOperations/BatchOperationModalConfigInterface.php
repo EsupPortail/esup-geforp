@@ -7,7 +7,7 @@
  * Time: 11:11.
  */
 
-namespace CoreBundle\BatchOperations;
+namespace App\BatchOperations;
 
 /**
  * Interface BatchOperationModalConfigInterface.

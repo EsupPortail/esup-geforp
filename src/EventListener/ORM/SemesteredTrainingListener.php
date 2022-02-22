@@ -7,7 +7,7 @@
  * Time: 10:06.
  */
 
-namespace CoreBundle\EventListener\ORM;
+namespace App\EventListener\ORM;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Events;
@@ -16,9 +16,9 @@ use Elastica\Type;
 use FOS\ElasticaBundle\Doctrine\Listener;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 use FOS\ElasticaBundle\Provider\IndexableInterface;
-use CoreBundle\Entity\AbstractTraining;
-use CoreBundle\Entity\AbstractSession;
-use CoreBundle\Model\SemesteredTraining;
+use App\Entity\Core\AbstractTraining;
+use App\Entity\Core\AbstractSession;
+use App\Model\SemesteredTraining;
 
 /**
  * Class SemesteredTrainingListener.

@@ -7,7 +7,7 @@
  * Time: 16:47.
  */
 
-namespace Sygefor\Bundle\CoreBundle\Security\Authorization\Voter;
+namespace App\Security\Authorization\Voter;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;

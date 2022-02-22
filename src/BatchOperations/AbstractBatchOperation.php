@@ -1,6 +1,6 @@
 <?php
 
-namespace CoreBundle\BatchOperations;
+namespace App\BatchOperations;
 
 use Doctrine\ORM\EntityManager;
 

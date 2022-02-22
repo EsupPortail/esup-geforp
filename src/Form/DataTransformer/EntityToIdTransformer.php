@@ -7,7 +7,7 @@
  * Time: 15:02.
  */
 
-namespace CoreBundle\Form\DataTransformer;
+namespace App\Form\DataTransformer;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
