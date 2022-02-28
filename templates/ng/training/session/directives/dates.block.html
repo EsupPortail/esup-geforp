@@ -1,0 +1,44 @@
+<div class="block block-dates">
+    <div class="block-body">
+        <div class="mb-1">
+            <div class="pull-left">
+                <a class="btn btn-xs btn-default" href="" ng-click="addDates()"><span class="fa fa-plus"></span> Ajouter une date</a>
+            </div>
+        </div>
+
+        <br><br>
+
+        <div ng-if="!session.dates.length" class="well well-empty well-sm">
+            {{ emptyMsg }}
+        </div>
+
+        <div ng-if="session.dates.length">
+            <table class="table table-hover table-search table-condensed">
+                <thead>
+                <tr>
+                    <th>Date début</th>
+                    <th>Date fin</th>
+                    <th>Horaires matin</th>
+                    <th>Horaires après-midi</th>
+                    <th>Nombres d'heures</th>
+                    <th>Lieu</th>
+                    <th>Modifier</th>
+                    <th>Supprimer</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="date in session.dates | orderBy:'dateBegin':false" >
+                    <td>{{ date.dateBegin | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.dateEnd | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.scheduleMorn }}</td>
+                    <td>{{ date.scheduleAfter }}</td>
+                    <td>{{ date.hourNumber }}</td>
+                    <td>{{ date.place }}</td>
+                    <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>
+                    <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span class="fa fa-trash-o"></span></a></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

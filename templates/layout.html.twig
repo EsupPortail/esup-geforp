@@ -1,5 +1,5 @@
-{% extends "SygeforCoreBundle::html.html.twig" %}
-{% from 'MopaBootstrapBundle::flash.html.twig' import session_flash %}
+{% extends "html.html.twig" %}
+{% from '@MopaBootstrap/flash.html.twig' import session_flash %}
 {% set ngApp = ngApp is defined ? ngApp : 0 %}
 {% block body %}
 <div class="full-height-container is-full-width is-absolute is-direction-column">
@@ -17,16 +17,16 @@
                 <a class="navbar-brand" href="/">Sygefor<sup>3</sup></a>
             </div>
             <nav class="navbar-collapse collapse" id="bs-navbar" aria-expanded="false">
-                {{ mopa_bootstrap_menu(knp_menu_get('main'), {'automenu': 'navbar'}) }}
+{#                 {{ mopa_bootstrap_menu(knp_menu_get('main'), {'automenu': 'navbar'}) }} #}
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> {{ app.user.username }}<span class="caret"></span></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> TEST<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="{{ path('user.account') }}">Mon compte</a></li>
-                            <li><a href="{{ path('fos_user_security_logout') }}">Déconnexion</a></li>
+{#                             <li><a href="{{ path('fos_user_security_logout') }}">Déconnexion</a></li> #}
                         </ul>
                     </li>
-                    {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
+{#                     {% if is_granted('ROLE_PREVIOUS_ADMIN') %}
                         {% for role in app.security.token.roles %}
                             {% if role.role == 'ROLE_PREVIOUS_ADMIN' %}
                                 <li>
@@ -36,7 +36,7 @@
                                 </li>
                             {% endif %}
                         {% endfor %}
-                    {% endif %}
+                    {% endif %} #}
                 </ul>
             </nav>
         </div>

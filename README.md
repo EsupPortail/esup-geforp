@@ -63,4 +63,7 @@ Installation
 * Commandes : 
   * bower install (bower.json)
   * npm install (package.json)
+  * Exposer les routes pour js :
+    * php bin/console fos:js-routing:dump --format=json --target=public/js/fos_js_routes.json
+    * php bin/console fos:js-routing:dump --target=public/js/fos_js_routes.js
   * gulp 

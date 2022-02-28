@@ -91,7 +91,7 @@ gulp.task('cssDemo', ['minify'], function(){
  * Templates
  */
 gulp.task('templates', function(){
-    return gulp.src(assets.templates)
+/*    return gulp.src(assets.templates)
         .pipe(templateCache({
             module: 'conjecto.sygefor.app',
             base: function(file) {
@@ -100,7 +100,7 @@ gulp.task('templates', function(){
                     path = path.replace(/\\/g, '/');
                 }
                 //return path.replace(/^.+\/(\w+Bundle)\/Resources\/public\/ng\//g, '$1/');
-                var regex = /^.+\/(\w+Bundle)\/Resources\/public\/ng\/(.*)$/g;
+                var regex = /^.+\/templates\/ng\/(.*)$/g;
                 var result = regex.exec(path);
                 if(result) {
                     return result[1].toLowerCase() + '/' + result[2];
@@ -109,7 +109,12 @@ gulp.task('templates', function(){
                 }
             }
         }))
-        .pipe(gulp.dest('public/build/'));
+        .pipe(gulp.dest('public/build/'));*/
+
+    return gulp.src(assets.templates)
+        .pipe(concat('templates.js'))
+        .pipe(gulp.dest('public/build'));
+
     //.pipe(notify({ message: 'templated!' }));
 });
 

@@ -1,0 +1,43 @@
+<div>
+    <div class="mb-1">
+        <a class="btn btn-xs btn-default" href="" ng-click="addDates()"><span class="fa fa-plus"></span> Ajouter une date</a>
+        <br><br>
+
+        <div ng-if="!session.dates.length" class="well well-empty well-sm">
+            Il n'y a aucune date pour cette session.
+        </div>
+
+        <table ng-if="session.dates.length" class="table table-hover table-search table-condensed">
+            <thead>
+            <tr>
+                <th>Date début</th>
+                <th>Date fin</th>
+                <th>Horaires matin</th>
+                <th>Nombres d'heures matin</th>
+                <th>Horaires après-midi</th>
+                <th>Nombres d'heures après-midi</th>
+                <th>Lieu</th>
+                <th>Modifier</th>
+                <th>Supprimer</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="date in session.dates | orderBy:'dateBegin':false" >
+                <!--form sf-xeditable-form="form" sf-href='dates.edit({dates: date })' on-success="onSuccess(data)"-->
+                    <td>{{ date.dateBegin|date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.dateEnd|date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.scheduleMorn }}</td>
+                    <td>{{ date.hourNumberMorn }}</td>
+                    <td>{{ date.scheduleAfter }}</td>
+                    <td>{{ date.hourNumberAfter }}</td>
+                    <td>{{ date.place }}</td>
+                    <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>
+                    <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span class="fa fa-trash-o"></span></a></td>
+                <!--/form-->
+            </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+</div>

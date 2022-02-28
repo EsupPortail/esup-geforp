@@ -89,8 +89,8 @@
         ]
     },
     "templates": [
-        "vendor/sygefor/core-bundle/Resources/public/ng/**/*.html",
-        "src/**/Resources/public/ng/**/*.html"
+        "templates/Core/ng/**/*.html",
+        "templates/ng/**/*.html"
     ],
     "images": [
         "node_modules/X-editable/src/inputs/select2/lib/select2-spinner.gif"

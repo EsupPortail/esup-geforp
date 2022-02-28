@@ -1,0 +1,69 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="dialog.dismiss()">×</button>
+    <h4 class="modal-title"><i class="fa fa-envelope-o"></i> Envoyer un email</h4>
+</div>
+<div class="modal-body">
+    <form novalidate class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">Destinataires </label>
+            <div class="col-sm-10">
+                <span class="form-control">{{ items.length }}</span>
+            </div>
+        </div>
+        <div class="form-group" ng-if="templates.length">
+            <label for="subject" class="col-sm-2 control-label">Modèle </label>
+            <div class="col-sm-10">
+                <select type="text" class="form-control" id="template" ng-options="template.label for template in templates" ng-model="message.template" placeholder="Modèle du mail">
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="subject" class="col-sm-2 control-label">Sujet </label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="subject" ng-model="message.subject" placeholder="Sujet du mail" autofocus>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="message" class="col-sm-2 control-label">Message </label>
+            <div class="col-sm-10">
+                <textarea class="form-control" rows="10" id="message" ng-model="message.body"  placeholder="Message du mail"></textarea>
+            </div>
+        </div>
+        <div class="form-group" ng-if="message.templateAttachments.length > 0">
+            <label for="attachmentTemplate" class="col-sm-2 control-label">Pièces jointes du modèle</label>
+            <div class="col-sm-10">
+                <div ng-if="attachmentTemplate && isAObject(attachmentTemplate)" ng-repeat="attachmentTemplate in message.templateAttachments track by $index">
+                    <input type="checkbox" ng-model="message.templateAttachmentChecklist[attachmentTemplate.id]" ng-checked="true" id="attachmentTemplate_{{ attachmentTemplate.id }}">
+                    <label class="control-label" for="attachmentTemplate_{{ attachmentTemplate.id }}">{{attachmentTemplate.name}}</label>&nbsp;
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-if="message.attachments.length > 0">
+            <label for="attachments" class="col-sm-2 control-label">Pièce{{ message.attachments.length > 1 ? 's' : '' }} jointe{{ message.attachments.length > 1 ? 's' : '' }} supplémentaire{{ message.attachments.length > 1 ? 's' : '' }}</label>
+            <div class="col-sm-10">
+                <div ng-repeat="(id, attachment) in message.attachments track by $index">
+                    <label class="control-label" for="attachment_{{ id }}">{{attachment.name}}</label>&nbsp;
+                    <a href="" ng-click="removeAttachment(id)">&nbsp;x&nbsp;</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputTplFile" class="col-sm-2 control-label">Ajouter des pièces jointes</label>
+            <div class="col-sm-10">
+                <input multiple type="file" class="form-control" onChange="angular.element(this).scope().fileChanged(this,angular.element(this).scope())" id="inputAttachment"/>
+            </div>
+        </div>
+        <div class="form-group" >
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-10">
+                <button type="button" class="btn" ng-click="preview()">Prévisualiser</button>
+            </div>
+        </div>
+        <div class="alert alert-danger" ng-show="formError != ''">{{ formError }}</div>
+    </form>
+</div>
+<div class="modal-footer">
+    <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>
+    <a class="btn btn-primary" ng-click="ok()">Envoyer</a>
+</div>
