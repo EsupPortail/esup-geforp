@@ -363,7 +363,7 @@ class Session extends AbstractSession
             }
         }
 
-        // return public URL
+        // return public_old URL
         return $url . $this->getId();
     }
 

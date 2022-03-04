@@ -5,6 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\UserRepository;
+use App\Entity\Core\AbstractOrganization;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -28,7 +29,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $email;
 
     /**
-     * @ORM\Column(type="json")
+     * @ORM\Column(type="string", length=180, unique=true)
+     */
+    private $username;
+
+    /**
+     * @ORM\Column(type="simple_array")
      */
     private $roles = [];
 
@@ -57,10 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function __construct()
     {
-        parent::__construct();
-
         $this->accessRights = array();
-        $this->enabled = true;
     }
 
     public function getId(): ?int
@@ -87,7 +90,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->email;
+        return (string) $this->username;
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
     }
 
     /**
@@ -95,7 +105,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->email;
+        return (string) $this->username;
     }
 
     /**
@@ -115,6 +125,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = $roles;
 
         return $this;
+    }
+
+    public function hasRole($role)
+    {
+        return in_array(strtoupper($role), $this->getRoles(), true);
     }
 
     /**
@@ -154,7 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @param AbstractOrganization $organization
      */
-    public function setOrganization($organization)
+    public function setOrganization(AbstractOrganization $organization)
     {
         $this->organization = $organization;
     }

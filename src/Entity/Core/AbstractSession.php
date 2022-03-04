@@ -623,7 +623,7 @@ abstract class AbstractSession implements SerializedAccessRights
     }
 
     /**
-     * Return true if the session is available on the website (private or public registration).
+     * Return true if the session is available on the website (private or public_old registration).
      *
      * @return mixed
      */
@@ -633,7 +633,7 @@ abstract class AbstractSession implements SerializedAccessRights
     }
 
     /**
-     * Return true if the session registration is public.
+     * Return true if the session registration is public_old.
      *
      * @return mixed
      * @Serializer\VirtualProperty

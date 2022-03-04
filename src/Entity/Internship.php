@@ -106,7 +106,7 @@ class Internship extends AbstractTraining
     }
 
     /**
-     * HumanReadablePropertyAccessor helper : provides a list of public types as string
+     * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
      * @return String
      */
     public function getPublicTypesListString()
@@ -157,7 +157,7 @@ class Internship extends AbstractTraining
     }
 
     /**
-     * HumanReadablePropertyAccessor helper : provides a list of public types as string
+     * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
      * @return String
      */
     public function getPublicTypesRestrictListString()
