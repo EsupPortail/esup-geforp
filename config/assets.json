@@ -16,16 +16,15 @@
             "node_modules/angular-growl/build/angular-growl.css",
             "node_modules/blueimp-file-upload/css/jquery.fileupload.css",
             "node_modules/blueimp-file-upload/css/jquery.fileupload-ui.css",
-            "app/Resources/scss/**/*",
-            "!app/Resources/scss/pdf.scss",
-            "src/Sygefor/Bundle/MyCompanyBundle/Resources/public/scss/*.scss"
+            "assets/scss/**/*",
+            "!assets/scss/pdf.scss"
         ],
         "pdf": [
-            "app/Resources/scss/pdf.scss"
+            "assets/scss/pdf.scss"
         ],
         "front": [
-            "src/Sygefor/Bundle/FrontBundle/Resources/assets/css/*.css",
-            "src/Sygefor/Bundle/FrontBundle/Resources/views/scss/**/*.scss"
+            "assets/front/css/*.css",
+            "assets/front/scss/**/*.scss"
         ]
     },
     "scripts": {
@@ -76,15 +75,14 @@
             "node_modules/timepicker/jquery.timepicker.js",
 
             "vendor/friendsofsymfony/jsrouting-bundle/FOS/JsRoutingBundle/Resources/public/js/router.js",
-            "web/js/fos_js_routes.js",
-            "vendor/sygefor/core-bundle/Resources/public/js/modernizr-custom.js",
-            "vendor/sygefor/core-bundle/Resources/public/ng/**/*.js",
-            "src/Sygefor/Bundle/MyCompanyBundle/Resources/public/ng/**/*.js",
-            "src/Sygefor/Bundle/ActivityReportBundle/Resources/public/ng/**/*.js"
+            "public/js/fos_js_routes.js",
+            "assets/js/modernizr-custom.js",
+            "templates/Core/ng/**/*.js",
+            "templates/ng/**/*.js"
         ],
         "front": [
             "node_modules/jquery/dist/jquery.js",
-            "src/Sygefor/Bundle/FrontBundle/Resources/assets/js/*.js",
+            "assets/front/js/*.js",
             "node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
         ]
     },
@@ -92,7 +90,15 @@
         "templates/Core/ng/**/*.html",
         "templates/ng/**/*.html"
     ],
-    "images": [
-        "node_modules/X-editable/src/inputs/select2/lib/select2-spinner.gif"
+    "images": {
+        "favicon": [
+            "assets/images/favicon.ico"
+        ],
+        "img": [
+            "node_modules/X-editable/src/inputs/select2/lib/select2-spinner.gif"
+        ]
+    },
+    "fonts": [
+        "assets/fonts/**/*"
     ]
 }

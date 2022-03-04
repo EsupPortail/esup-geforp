@@ -21,7 +21,28 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    app.menu_builder:
+        class: App\Menu\MenuBuilder
+        arguments:
+            - "@knp_menu.factory"
+            - "@security.authorization_checker"
+            - "@router"
+        tags:
+            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
 
+#    app.menu_builder:
+#        class: App\Menu\MenuBuilder
+#        arguments: [ "@knp_menu.factory" ]
+#        tags:
+#            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
 
+#    app.configure_menu_listener:
+#        class: App\EventListener\ConfigureMenuListener
+#        arguments:
+#            - "@security.authorization_checker"
+#            - "@router"
+#        tags:
+#            - { name: kernel.event_listener, event: app.menu_configure, method: onMenuConfigure }

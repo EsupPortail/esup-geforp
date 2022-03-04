@@ -9,7 +9,7 @@ sygeforApp.controller('SessionParticipantsSummaryController', ['$scope', '$taxon
     });
 
     /**
-     * Get the public count
+     * Get the public_old count
      *
      * @param publicType
      * @returns {*}
@@ -25,7 +25,7 @@ sygeforApp.controller('SessionParticipantsSummaryController', ['$scope', '$taxon
     }
 
     /**
-     * Get the public count form element
+     * Get the public_old count form element
      *
      * @param publicType
      * @returns {*}

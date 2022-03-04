@@ -17,32 +17,32 @@ var assets = require('./config/assets');
  * Scripts
  */
 gulp.task('scripts', ['templates'], function(){
-    gulp.src(assets.scripts.scripts.concat(['public/build/templates.js']))
+    gulp.src(assets.scripts.scripts.concat(['public_old/build/templates.js']))
         .pipe(concat('scripts.js'))
-        .pipe(gulp.dest('public/build'));
+        .pipe(gulp.dest('public_old/build'));
 
     gulp.src(assets.scripts.front)
-        .pipe(concat('front.js'))
-        .pipe(gulp.dest('public/build'));
+        .pipe(concat('scss.js'))
+        .pipe(gulp.dest('public_old/build'));
 
     //.pipe(notify({ message: 'scripted!' }));
 });
 
 gulp.task('uglify', ['scripts'], function() {
-    return gulp.src('public/build/scripts.js')
+    return gulp.src('public_old/build/scripts.js')
         //.pipe(stripDebug())
         .pipe(ngAnnotate())
         .pipe(uglify({
             mangle: false
         }))
-        .pipe(gulp.dest('public/build/'));
+        .pipe(gulp.dest('public_old/build/'));
         //.pipe(notify({ message: 'uglified!' }));
 });
 
 gulp.task('scriptsDemo', ['uglify'], function(){
-	return gulp.src(['public/build/scripts.js', 'demo/bootstrap-tour/build/js/bootstrap-tour.min.js', 'demo/feedback.js', 'demo/bootstrap-tour.js', 'demo/video.js'])
+	return gulp.src(['public_old/build/scripts.js', 'demo/bootstrap-tour/build/js/bootstrap-tour.min.js', 'demo/feedback.js', 'demo/bootstrap-tour.js', 'demo/video.js'])
 		.pipe(concat('scripts.js'))
-		.pipe(gulp.dest('public/build'));
+		.pipe(gulp.dest('public_old/build'));
 });
 
 /***
@@ -63,7 +63,7 @@ for (var key in assets.sass) {
                 }))
                 .pipe(prefix("last 1 version", "> 1%", "ie 8"))
                 .pipe(concat( _key + '.css'))
-                .pipe(gulp.dest('public/build'));
+                .pipe(gulp.dest('public_old/build'));
             //.pipe(notify({ message: 'stylized!' }));
         });
         sassTasks.push('sass.' + _key);
@@ -73,18 +73,18 @@ gulp.task('sass', sassTasks);
 
 
 gulp.task('minify', ['sass'], function() {
-	return gulp.src('public/build/styles.css')
+	return gulp.src('public_old/build/styles.css')
 		.pipe(cssmin({
 			keepSpecialComments: 0
 		}))
-		.pipe(gulp.dest('public/build/'));
+		.pipe(gulp.dest('public_old/build/'));
 	//.pipe(notify({ message: 'minified!' }));
 });
 
 gulp.task('cssDemo', ['minify'], function(){
-	return gulp.src(['public/build/styles.css', 'demo/bootstrap-tour/build/css/bootstrap-tour.min.css'])
+	return gulp.src(['public_old/build/styles.css', 'demo/bootstrap-tour/build/css/bootstrap-tour.min.css'])
 		.pipe(concat('styles.css'))
-		.pipe(gulp.dest('public/build'));
+		.pipe(gulp.dest('public_old/build'));
 });
 
 /***
@@ -99,7 +99,7 @@ gulp.task('templates', function(){
                 if (process.platform === 'win32') {
                     path = path.replace(/\\/g, '/');
                 }
-                //return path.replace(/^.+\/(\w+Bundle)\/Resources\/public\/ng\//g, '$1/');
+                //return path.replace(/^.+\/(\w+Bundle)\/Resources\/public_old\/ng\//g, '$1/');
                 var regex = /^.+\/templates\/ng\/(.*)$/g;
                 var result = regex.exec(path);
                 if(result) {
@@ -109,11 +109,11 @@ gulp.task('templates', function(){
                 }
             }
         }))
-        .pipe(gulp.dest('public/build/'));*/
+        .pipe(gulp.dest('public_old/build/'));*/
 
     return gulp.src(assets.templates)
         .pipe(concat('templates.js'))
-        .pipe(gulp.dest('public/build'));
+        .pipe(gulp.dest('public_old/build'));
 
     //.pipe(notify({ message: 'templated!' }));
 });
@@ -121,12 +121,32 @@ gulp.task('templates', function(){
 /**
  * Images
  */
-gulp.task('images', function() {
-    if(assets.images.lenght > 0) {
+/*gulp.task('images', function() {
+    if(assets.images.length > 0) {
         return gulp.src(assets.images)
             //.pipe(imagemin({optimizationLevel: 5}))
-            .pipe(gulp.dest('public/build'));
+            .pipe(gulp.dest('public_old/build'));
     }
+});*/
+gulp.task('images', function(){
+    gulp.src(assets.images.favicon)
+        .pipe(gulp.dest('public'));
+
+    if(assets.images.img.length > 0) {
+        gulp.src(assets.images.img)
+            .pipe(gulp.dest('public_old/build'));
+    }
+});
+
+/**
+ * Fonts
+ */
+gulp.task('fonts', function () {
+    gulp.src(assets.fonts)
+        .pipe(gulp.dest('public_old/fonts'));
+/*    return gulp.src('assets.fonts')
+        .pipe(gulp.dest('public_old/build'))
+        .pipe($.size());*/
 });
 
 /**
@@ -139,7 +159,7 @@ gulp.task('watch', function() {
         (function() {
             const _key = key;
             gulp.watch(assets.scripts[_key], ['scripts']);
-            gulp.watch('public/build/' + _key + '.js').on('change', livereload.changed);
+            gulp.watch('public_old/build/' + _key + '.js').on('change', livereload.changed);
         })();
     }
 
@@ -150,7 +170,7 @@ gulp.task('watch', function() {
         (function() {
             const _key = key;
             gulp.watch(assets.sass[_key], ['sass.' + _key]);
-            gulp.watch('public/build/'+ _key +'.css').on('change', livereload.changed);
+            gulp.watch('public_old/build/'+ _key +'.css').on('change', livereload.changed);
         })();
     }
 });
@@ -158,17 +178,17 @@ gulp.task('watch', function() {
 /**
  * Serve
  */
-gulp.task('serve', ['scripts', 'sass', 'images', 'watch']);
+gulp.task('serve', ['scripts', 'sass', 'images', 'watch', 'fonts']);
 
 /**
  * Build
  */
-gulp.task('build', ['uglify', 'minify', 'images']);
+gulp.task('build', ['uglify', 'minify', 'images', 'fonts']);
 
 /**
  * Build Demo
  */
-gulp.task('demo', ['scriptsDemo', 'cssDemo', 'images']);
+gulp.task('demo', ['scriptsDemo', 'cssDemo', 'images', 'fonts']);
 
 /**
  * Default

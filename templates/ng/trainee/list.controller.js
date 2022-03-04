@@ -65,7 +65,7 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
             type: 'range'
         },
         'publicType.source': {
-            label: 'Catégorie de public'
+            label: 'Catégorie de public_old'
         },
         'isPaying': {
             label: 'Payant',

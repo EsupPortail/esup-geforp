@@ -1,0 +1,14 @@
+
+#MOPA
+mopa_bootstrap:
+    icons:
+        icon_set: fontawesome4
+    form:
+        #        render_required_asterisk: true
+        render_optional_text: false
+        horizontal: true
+        horizontal_label_class:  col-sm-2 control-label
+        horizontal_label_offset_class:  col-sm-offset-2
+        horizontal_input_wrapper_class:  col-sm-10
+        checkbox_label: both
+    menu: ~  # enables twig helpers for menu

@@ -8,7 +8,7 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
     $scope.form = data.form ? data.form : false;
 
     /**
-     * Get the public count
+     * Get the public_old count
      *
      * @returns int
      */
