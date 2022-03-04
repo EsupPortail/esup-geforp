@@ -17,6 +17,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Core\User;
+use App\Repository\UserRepository;
 use App\Form\Type\AccountType;
 use App\Form\Type\UserType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -33,7 +34,6 @@ class UserController extends AbstractController
 {
     /**
      * @Route("/", name="user.index")
-     * @Security("is_granted('VIEW', 'SygeforCoreBundle:User')")
      */
     public function indexAction()
     {
@@ -41,21 +41,22 @@ class UserController extends AbstractController
         $em = $this->get('doctrine')->getManager();
         $repository = $em->getRepository(User::class);
 
-        $organization = $this->get('security.context')->getToken()->getUser()->getOrganization();
-        $hasAccessRightForAll = $this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.user.all');
+//        $organization = $this->get('security.context')->getToken()->getUser()->getOrganization();
+//        $hasAccessRightForAll = $this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.user.all');
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $repository->createQueryBuilder('u');
-
-        if (!$hasAccessRightForAll) {
+/*        if (!$hasAccessRightForAll) {
             $queryBuilder->where('u.organization = :organization')
                 ->setParameter('organization', $organization);
-        }
+        } */
 
         $users = $queryBuilder->orderBy('u.username')->getQuery()->getResult();
+        dump($users[0]);
+        dump($users);
 
-        return $this->render('user/index.html.twig', array(
+        return $this->render('Core/views/User/index.html.twig', array(
             'users' => $users,
-            'isAdmin' => $this->getUser()->isAdmin(),
+            'isAdmin' => 1, //$this->getUser()->isAdmin(),
         ));
     }
 
@@ -64,7 +65,7 @@ class UserController extends AbstractController
      *
      * @Route("/{id}", requirements={"id" = "\d+"}, name="user.view", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerEnableMaxDepthChecks=true)
-     * @ParamConverter("user", class="SygeforCoreBundle:User", options={"id" = "id"})
+     * @ParamConverter("user", class="App:Core:User", options={"id" = "id"})
      *
      * @return User
      */
@@ -77,14 +78,13 @@ class UserController extends AbstractController
      * @param Request $request
      *
      * @Route("/add", name="user.add")
-     * @Security("is_granted('ADD', 'SygeforCoreBundle:User')")
      *
      * @return array|RedirectResponse
      */
     public function addAction(Request $request)
     {
         $user = new User();
-        $user->setOrganization($this->getUser()->getOrganization());
+//        $user->setOrganization($this->getUser()->getOrganization());
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
@@ -138,9 +138,10 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->render('user/edit.html.twig', array(
+        return $this->render('Core/views/User/edit.html.twig', array(
             'form' => $form->createView(),
-            'user' => $user, 'isAdmin' => $user->isAdmin(),
+            'user' => $user,
+            'isAdmin' => 1, //$user->isAdmin(),
         ));
     }
 
@@ -175,7 +176,7 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->render('user/edit.html.twig', array(
+        return $this->render('Core/views/User/edit.html.twig', array(
             'form' => $form->createView(),
             'user' => $user,
             'isAdmin' => $user->isAdmin(),

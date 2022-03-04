@@ -193,7 +193,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
 	/**
 	 * @param array $options
 	 *
-	 * @return array configuration element for front-end modal window
+	 * @return array configuration element for scss-end modal window
 	 *
 	 * @throws \Exception
 	 */

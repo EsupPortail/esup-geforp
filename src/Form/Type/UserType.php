@@ -9,17 +9,21 @@
 
 namespace App\Form\Type;
 
+use App\Entity\Organization;
 use Doctrine\ORM\EntityRepository;
 use App\Security\Authorization\AccessRight\AccessRightRegistry;
-use App\Entity\AbstractOrganization;
-use App\Entity\User;
+use App\Entity\Core\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 /**
  * Class UserType.
@@ -45,42 +49,41 @@ class UserType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('username', 'text', array(
+        $builder->add('username', TextType::class, array(
             'constraints' => new Length(array('min' => 5)),
             'invalid_message' => 'Le nom d\'utilisateur est trop court',
             'label' => 'Nom d\'utilisateur',
         ))
-            ->add('email', 'email', array(
+            ->add('email', EmailType::class, array(
                 'constraints' => new Email(array('message' => 'Invalid email address')),
                 'label' => 'Email',
             ));
 
-        $builder->add('plainPassword', 'repeated', array(
-            'type' => 'password',
+        $builder->add('password', RepeatedType::class, array(
+            'type' =>  PasswordType::class,
             'constraints' => new Length(array('min' => 8)),
-            'required' => !$builder->getForm()->getData()->getId(),
+            'required' => true,
             'invalid_message' => 'Les mots de passe doivent correspondre',
             'first_options' => array('label' => 'Mot de passe'),
             'second_options' => array('label' => 'Confirmation'),
         ));
 
-        $builder->add('enabled', 'checkbox', array(
-            'required' => false,
-            'label' => 'Compte activé',
-        ));
 
-        $builder->add('organization', 'entity', array(
+        $builder->add('organization', EntityType::class, array(
             'required' => true,
-            'class' => AbstractOrganization::class,
+            'class' => Organization::class,
             'label' => 'Centre',
             'query_builder' => function (EntityRepository $er) {
-                return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
+                $res = $er->createQueryBuilder('o');
+                return $res;
+
+//                return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
             },
         ));
 
         // add choice list for user creation
         if (!$options['data']->getId()) {
-            $builder->add('accessRightScope', 'choice', array(
+            $builder->add('accessRightScope', ChoiceType::class, array(
                 'label' => 'Droits d\'accès',
                 'mapped' => false,
                 'choices' => array(
@@ -94,7 +97,7 @@ class UserType extends AbstractType
         }
 
         // If the user does not have the rights, remove the organization field and force the value
-        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_core.access_right.user.all');
+/*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_core.access_right.user.all');
         if (!$hasAccessRightForAll) {
             $securityContext = $this->accessRightsRegistry->getSecurityContext();
             $user = $securityContext->getToken()->getUser();
@@ -103,7 +106,7 @@ class UserType extends AbstractType
                 $trainer->setOrganization($user->getOrganization());
                 $event->getForm()->remove('organization');
             });
-        }
+        } */
     }
 
 	/**

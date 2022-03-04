@@ -20,7 +20,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 /**
- * This controller regroup all public actions relative to account.
+ * This controller regroup all public_old actions relative to account.
  *
  * @Route("/api/account")
  */

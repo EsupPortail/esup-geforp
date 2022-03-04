@@ -18,7 +18,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 class TaxonomyController extends AbstractController
 {
     /**
-     * Return a public list of terms for a specific(s) vocabulary(ies).
+     * Return a public_old list of terms for a specific(s) vocabulary(ies).
      *
      * @Route("/get/{vocabularies}", name="api.taxonomy.get", defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"api"})
