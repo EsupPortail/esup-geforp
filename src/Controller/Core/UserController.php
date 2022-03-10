@@ -9,6 +9,8 @@
 
 namespace App\Controller\Core;
 
+use App\Form\Type\AccessRightType;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -26,6 +28,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 /**
  * @Route("/admin/users")
@@ -35,10 +38,10 @@ class UserController extends AbstractController
     /**
      * @Route("/", name="user.index")
      */
-    public function indexAction()
+    public function indexAction(ManagerRegistry $doctrine)
     {
         /* @var EntityManager */
-        $em = $this->get('doctrine')->getManager();
+        $em = $doctrine->getManager();
         $repository = $em->getRepository(User::class);
 
 //        $organization = $this->get('security.context')->getToken()->getUser()->getOrganization();
@@ -81,7 +84,7 @@ class UserController extends AbstractController
      *
      * @return array|RedirectResponse
      */
-    public function addAction(Request $request)
+    public function addAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
     {
         $user = new User();
 //        $user->setOrganization($this->getUser()->getOrganization());
@@ -90,11 +93,13 @@ class UserController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $factory = $this->get('security.encoder_factory');
-                $encoder = $factory->getEncoder($user);
-                $user->setPassword($encoder->encodePassword($user->getPassword(), $user->getSalt()));
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $user,
+                    $user->getPassword()
+                );
+                $user->setPassword($hashedPassword);
 
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->persist($user);
 
                 $scope = $form->get('accessRightScope')->getData();
@@ -124,11 +129,16 @@ class UserController extends AbstractController
                         return $userAccessRights;
                     };
 
-                    $accessRights = array_keys($this->get('sygefor_core.access_right_registry')->getAccessRights());
-                    $userAccessRights = $getUserAccessRights($scope, $accessRights);
-
-                    $user->setAccessRights($userAccessRights);
+                    //$accessRights = array_keys($this->get('sygefor_core.access_right_registry')->getAccessRights());
+                    //$userAccessRights = $getUserAccessRights($scope, $accessRights);
                 }
+
+                // Droits et roles pour test
+                $userAccessRights = ['a:0:{}'];
+                $user->setAccessRights($userAccessRights);
+
+                $roles = ['a:0:{}'];
+                $user->setRoles($roles);
 
                 $em->flush();
 
@@ -150,11 +160,11 @@ class UserController extends AbstractController
      * @param User    $user
      *
      * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="user.edit", options={"expose"=true})
-     * @ParamConverter("user", class="SygeforCoreBundle:User", options={"id" = "id"})
+     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      *
      * @return array|RedirectResponse
      */
-    public function editAction(Request $request, User $user)
+    public function editAction(ManagerRegistry $doctrine, Request $request, User $user, UserPasswordHasherInterface $passwordHasher)
     {
         $oldPwd = $user->getPassword();
         $form = $this->createForm(UserType::class, $user);
@@ -162,14 +172,21 @@ class UserController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $newPwd = $form->get('plainPassword')->getData();
+                $newPwd = $form->get('password')->getData();
                 if (isset($newPwd)) {
-                    $user->setPassword(null);
-                    $user->setPlainPassword($newPwd);
+                    $hashedPassword = $passwordHasher->hashPassword(
+                        $user,
+                        $newPwd
+                    );
+                    $user->setPassword($hashedPassword);
+
                 } else {
                     $user->setPassword($oldPwd);
                 }
-                $this->getDoctrine()->getManager()->flush();
+
+                $em = $doctrine->getManager();
+                $em->persist($user);
+                $em->flush();
                 $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été mis à jour.');
 
                 return $this->redirect($this->generateUrl('user.index'));
@@ -190,40 +207,37 @@ class UserController extends AbstractController
      *
      * @return array|RedirectResponse
      */
-    public function accountAction(Request $request)
+    public function accountAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
     {
-        $factory = $this->get('security.encoder_factory');
-        $encoder = $factory->getEncoder($this->getUser());
-        $oldUsername = $this->getUser()->getUsername();
-        $oldPwd = $this->getUser()->getPassword();
-
-        $form = $this->createForm(AccountType::class, $this->getUser());
+        $user = $this->getUser();
+        $oldPwd = $user->getPassword();
+        $form = $this->createForm(AccountType::class, $user);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
 
-            // verify password is set if username has changed
-            $newPwd = $form->get('plainPassword')->getData();
-            if ($form->get('username')->getData() !== $oldUsername && $encoder->encodePassword($newPwd, $this->getUser()->getSalt()) !== $oldPwd) {
-                $form->get('plainPassword')->get('first')->addError(new FormError('Le mot de passe est invalide'));
-            }
-
             if ($form->isValid()) {
+                $newPwd = $form->get('password')->getData();
                 if (isset($newPwd)) {
-                    $this->getUser()->setPassword(null);
-                    $this->getUser()->setPlainPassword($newPwd);
+                    $hashedPassword = $passwordHasher->hashPassword(
+                        $user,
+                        $newPwd
+                    );
+                    $user->setPassword($hashedPassword);
+
                 } else {
-                    $this->getUser()->setPassword($oldPwd);
+                    $user->setPassword($oldPwd);
                 }
 
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->persist($user);
+                $doctrine->getManager()->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été mis à jour.');
 
                 return $this->redirect($this->generateUrl('user.account'));
             }
         }
 
-        return $this->render('user/profil.html.twig', array(
+        return $this->render('Core/views/User/profil.html.twig', array(
             'form' => $form->createView(),
             'user' => $this->getUser(),
         ));
@@ -231,12 +245,12 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}/access-rights", requirements={"id" = "\d+"}, name="user.access_rights", options={"expose"=true})
-     * @ParamConverter("user", class="SygeforCoreBundle:User", options={"id" = "id"})
+     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      */
     public function accessRightsAction(Request $request, User $user)
     {
         $builder = $this->createFormBuilder($user);
-        $builder->add('accessRights', 'access_rights', array('label' => 'Droits d\'accès'));
+        $builder->add('accessRights', AccessRightType::class, array('label' => 'Droits d\'accès'));
         $form = $builder->getForm();
 
         if ($request->getMethod() === 'POST') {
@@ -249,7 +263,7 @@ class UserController extends AbstractController
             }
         }
 
-        return $this->render('user/accessRights.html.twig', array(
+        return $this->render('Core/views/User/accessRights.html.twig', array(
             'form' => $form->createView(),
             'user' => $user,
         ));
@@ -257,9 +271,9 @@ class UserController extends AbstractController
 
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="user.remove")
-     * @ParamConverter("user", class="SygeforCoreBundle:User", options={"id" = "id"})
+     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      */
-    public function removeAction(Request $request, User $user)
+    public function removeAction(ManagerRegistry $doctrine,Request $request, User $user)
     {
         if ($request->getMethod() === 'POST') {
             if ($user->isAdmin()) {
@@ -267,7 +281,7 @@ class UserController extends AbstractController
 
                 return $this->redirect($this->generateUrl('user.edit', array('id' => $user->getId())));
             }
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($user);
             $em->flush();
             $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été supprimé.');
@@ -275,7 +289,7 @@ class UserController extends AbstractController
             return $this->redirect($this->generateUrl('user.index'));
         }
 
-        return $this->render('user/remove.html.twig', array(
+        return $this->render('Core/views/User/remove.html.twig', array(
             'user' => $user,
         ));
     }

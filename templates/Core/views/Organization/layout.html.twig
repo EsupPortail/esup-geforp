@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
     <ol class="breadcrumb full-height-item">
-        <li><a href="{{ path('test') }}">Accueil</a></li>
+        <li><a href="{{ path('core.index') }}">Accueil</a></li>
         <li><a href="#">Administration</a></li>
         <li><a href="{{ path('organization.index') }}">Centres</a></li>
         {% if not organization.id %}

@@ -1,7 +1,7 @@
 {% extends "layout.html.twig" %}
 {% block breadcrumbs %}
     <ol class="breadcrumb full-height-item">
-        <li><a href="{{ path('test') }}">Accueil</a></li>
+        <li><a href="{{ path('core.index') }}">Accueil</a></li>
         <li><a href="#">Administration</a></li>
         <li class="active"><a href="{{ path('user.index') }}">Utilisateurs</a></li>
     </ol>
@@ -15,7 +15,7 @@
                     <tr>
                         <th>Identifiant</th>
                         <th>Centre</th>
-                        <th>Activ&#233;</th>
+{#                         <th>Activ&#233;</th> #}
                         <th>Date de dernier acc&#232;s</th>
                         {% if isAdmin %}
                             <th>Se connecter</th>
@@ -27,8 +27,8 @@
                         <tr>
                             <td><a href="{{ path('user.edit', { 'id': user.id }) }}">{{ user.getUserName() }}</a></td>
                             <td>{{ user.organization }}</td>
-                            {#                             <td><span class="label label-{{ user.enabled ? 'success' : 'danger' }}">{{ user.enabled ? 'Actif' : 'Inactif' }}</span></td>
-                             <td>{{ user.getLastLogin|date("d/m/Y H:i") }}</td> #}
+                            {#                             <td><span class="label label-{{ user.enabled ? 'success' : 'danger' }}">{{ user.enabled ? 'Actif' : 'Inactif' }}</span></td> #}
+                             <td>{{ user.getLastLogin|date("d/m/Y H:i") }}</td>
                             {% if isAdmin %}
                                 <td><a href="{{ path('user.login', {'id': user.id}) }}" title="{{ user.email }}"><i class="fa fa-user"></i></a></td>
                             {% endif %}
