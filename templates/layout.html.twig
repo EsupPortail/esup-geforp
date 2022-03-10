@@ -1,6 +1,7 @@
 {% extends "html.html.twig" %}
 {% from '@MopaBootstrap/flash.html.twig' import session_flash %}
-{% set ngApp = ngApp is defined ? ngApp : 0 %}
+{#  {% set ngApp = ngApp is defined ? ngApp : 0 %} #}
+{% set ngApp = 1 %}
 {% block body %}
 <div class="full-height-container is-full-width is-absolute is-direction-column">
     <div role="navigation" class="navbar navbar-default navbar-fixed-top">
@@ -17,8 +18,11 @@
                 <a class="navbar-brand" href="/">Geforp</a>
             </div>
             <nav class="navbar-collapse collapse" id="bs-navbar" aria-expanded="false">
-                  {{ mopa_bootstrap_menu(knp_menu_get('main'), {'automenu': 'navbar'}) }}
+                   {{ mopa_bootstrap_menu(knp_menu_get('main'), {'automenu': 'navbar'}) }}
 {#                 {{ knp_menu_render('main') }} #}
+{#                 {{ pd_menu_render('App\\Menu\\FirstMenu', {
+                    'custom': 'variable or options'
+                }) }} #}
                 <ul class="nav navbar-nav navbar-right">
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-user"></i> TEST<span class="caret"></span></a>

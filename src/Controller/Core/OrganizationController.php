@@ -12,7 +12,8 @@ namespace App\Controller\Core;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use App\Entity\Core\AbstractOrganization;
+use App\Entity\Organization;
+use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,13 +23,12 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @Route("/admin/organizations")
  */
-abstract class AbstractOrganizationController extends AbstractController
+class OrganizationController extends AbstractController
 {
-    protected $organizationClass = AbstractOrganization::class;
+    protected $organizationClass = Organization::class;
 
     /**
      * @Route("/", name="organization.index")
-     * @Security("is_granted('VIEW', 'SygeforCoreBundle:Organization')")
      */
     public function indexAction()
     {
@@ -36,7 +36,7 @@ abstract class AbstractOrganizationController extends AbstractController
             ->getRepository($this->organizationClass)->findBy(array(), array('name' => 'ASC'))
         ;
 
-        return $this->render('organization/index.html.twig', array(
+        return $this->render('Core/views/Organization/index.html.twig', array(
             'organizations' => $organizations,
         ));
     }
@@ -45,14 +45,13 @@ abstract class AbstractOrganizationController extends AbstractController
      * @param Request $request
      *
      * @Route("/add", name="organization.add")
-     * @Security("is_granted('ADD', 'SygeforCoreBundle:AbstractOrganization')")
      *
      * @return array|RedirectResponse
      */
     public function addAction(Request $request)
     {
         $organization = new $this->organizationClass();
-        $form = $this->createForm($organization::getFormType(), $organization);
+        $form = $this->createForm(OrganizationType::class, $organization);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -67,7 +66,7 @@ abstract class AbstractOrganizationController extends AbstractController
             }
         }
 
-        return $this->render('organization/edit.html.twig', array(
+        return $this->render('Core/views/Organization/edit.html.twig', array(
             'form' => $form->createView(),
             'organization' => $organization,
         ));
@@ -78,14 +77,13 @@ abstract class AbstractOrganizationController extends AbstractController
      * @param AbstractOrganization $organization
      *
      * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="organization.edit", options={"expose"=true})
-     * @ParamConverter("organization", class="SygeforCoreBundle:AbstractOrganization", options={"id" = "id"})
-     * @Security("is_granted('EDIT', 'SygeforCoreBundle:AbstractOrganization')")
+     * @ParamConverter("organization", class="App\Entity\Organization", options={"id" = "id"})
      *
      * @return array|RedirectResponse
      */
-    public function editAction(Request $request, AbstractOrganization $organization)
+    public function editAction(Request $request, Organization $organization)
     {
-        $form = $this->createForm($organization::getFormType(), $organization);
+        $form = $this->createForm(OrganizationType::class, $organization);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -96,7 +94,7 @@ abstract class AbstractOrganizationController extends AbstractController
             }
         }
 
-        return $this->render('organization/edit.html.twig', array(
+        return $this->render('Core/views/Organization/edit.html.twig', array(
             'form' => $form->createView(),
             'organization' => $organization,
         ));
