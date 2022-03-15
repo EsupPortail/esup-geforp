@@ -1,21 +1,30 @@
-{% extends "SygeforCoreBundle::html.html.twig" %}
+
+{% extends "html.html.twig" %}
 {% set body_classes = ['login'] %}
 {% block body %}
     <div class="container">
-        <form class="form-login" action="{{ path('fos_user_security_check') }}" method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+        <form class="form-login" method="post">
+
             <div class="login-wrap">
                 {% if error %}
-                    <div class="alert alert-danger">{{ error|trans([], 'FOSUserBundle') }}</div>
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
                 {% endif %}
-                <input id="username" name="_username" type="text" class="form-control" placeholder="Nom d'utilisateur">
-                <input id="password" name="_password" type="password" class="form-control" placeholder="Mot de passe">
+                {% if app.user %}
+                    <div class="mb-3">
+                        You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
+                <input type="text" value="{{ last_username }}" name="username" id="username" class="form-control" autocomplete="username" placeholder="Nom d'utilisateur" required autofocus>
+                <input type="password" name="password" id="password" class="form-control" autocomplete="current-password" placeholder="Mot de passe" required>
+                <input type="hidden" name="_csrf_token"
+                       value="{{ csrf_token('authenticate') }}"
+                >
                 <button class="btn btn-lg btn-login btn-block btn-primary" type="submit">
                     <i class="fa fa-power-off"></i>
                 </button>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" id="remember_me" name="_remember_me" value="on"> {{ 'security.login.remember_me'|trans([], 'FOSUserBundle') }}
+                        <input type="checkbox" id="remember_me" name="_remember_me" value="on"> Se souvenir de moi
                     </label>
                 </div>
             </div>

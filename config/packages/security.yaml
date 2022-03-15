@@ -1,14 +1,11 @@
 security:
-    enable_authenticator_manager: true
-    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
-    password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
-    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    encoders:
+        App\Entity\Core\User:
+            algorithm: auto
     providers:
-        users_in_memory: { memory: null }
         app_user_provider:
             entity:
-                class: App\Entity\User
+                class: App\Entity\Core\User
                 property: email
 
     firewalls:
@@ -16,8 +13,15 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            anonymous: lazy
+            guard:
+                authenticators:
+                    - App\Security\LogInFormAuthenticator
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall

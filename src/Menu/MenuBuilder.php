@@ -26,6 +26,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Routing\Router;
+use App\Event\ConfigureMenuEvent;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+
 
 
 class MenuBuilder
@@ -50,12 +53,12 @@ class MenuBuilder
         $adminMenu = $menu->addChild('administration', array(
             'label' => 'Administration',
             'icon' => 'gear',
-            'uri' => $this->router->generate('test'),
+            'uri' => $this->router->generate('core.index'),
         ));
 //        if ($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Entity\Organization')) {
             $adminMenu->addChild('organizations', array(
                     'label' => 'Centres',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('organization.index'),
                 )
             );
 //        }
@@ -63,7 +66,7 @@ class MenuBuilder
 //        if ($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Entity\Term\AbstractTerm') || $this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Vocabulary\VocabularyInterface') ) {
             $adminMenu->addChild('taxonomy', array(
                     'label' => 'Vocabulaires',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('taxonomy.index'),
                 )
             );
 //        }
@@ -82,20 +85,20 @@ class MenuBuilder
                 $item = $menu->addChild('trainings', array(
                     'label' => 'Événements',
                     'icon'  => 'calendar',
-//                    'uri'   => $this->router->generate('core.index') . '#/training',
-                    'uri' => $this->router->generate('test'),
+                    'uri'   => $this->router->generate('core.index') . '#/training',
+//                    'uri' => $this->router->generate('core.index'),
                 ));
 
                 $item->addChild('internships', array(
                     'label' => 'Stages',
 //                    'uri'   => $this->router->generate('core.index') . '#/training?type=internship',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('core.index'),
                 ));
 
                 $item->addChild('sessions', array(
                     'label' => 'Toutes les sessions',
 //                    'uri'   => $this->router->generate('core.index') . '#/training/session',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('core.index'),
                 ))->setAttribute('divider_prepend', true);
 
 //            }
@@ -105,7 +108,7 @@ class MenuBuilder
                     'label' => 'Publics',
                     'icon'  => 'group',
 //                    'uri'   => $this->router->generate('core.index') . '#/trainee',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
@@ -114,7 +117,7 @@ class MenuBuilder
                     'label' => 'Etablissements',
                     'icon'  => 'university',
 //                    'uri'   => $this->router->generate('core.index') . '#/institution',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
@@ -123,7 +126,7 @@ class MenuBuilder
                     'label' => 'Intervenants',
                     'icon'  => 'user',
 //                    'uri'   => $this->router->generate('core.index') . '#/trainer',
-                    'uri' => $this->router->generate('test'),
+                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
@@ -142,3 +145,4 @@ class MenuBuilder
         return $menu;
     }
 }
+

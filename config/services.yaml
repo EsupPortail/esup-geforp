@@ -35,7 +35,9 @@ services:
 
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder
-#        arguments: [ "@knp_menu.factory" ]
+#        arguments:
+#            - "@knp_menu.factory"
+#            - "@event_dispatcher"
 #        tags:
 #            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
 
@@ -46,3 +48,7 @@ services:
 #            - "@router"
 #        tags:
 #            - { name: kernel.event_listener, event: app.menu_configure, method: onMenuConfigure }
+
+#    App\EventListener\MenuListener:
+#        tags:
+#            - { name: kernel.event_listener, event: settings_menu.event, method: onCreate }

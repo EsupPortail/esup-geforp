@@ -6,15 +6,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\UserRepository;
 use App\Entity\Core\AbstractOrganization;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * BaseUser.
  *
  * @ORM\Entity(repositoryClass=UserRepository::class)
  */
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface
 {
     /**
      * @ORM\Id
@@ -55,6 +55,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\ManyToOne(targetEntity="AbstractOrganization", inversedBy="users", cascade={"persist", "merge"})
      * @ORM\JoinColumn(nullable=true)
      * @Assert\NotNull(message="Vous devez renseigner un centre de rattachement.", groups={"organization"})
+     * @MaxDepth(2)
+     *
      */
     protected $organization;
 
@@ -240,4 +242,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return parent::setEmailCanonical(strval(uniqid()).$emailCanonical);
     }
+
 }
