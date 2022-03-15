@@ -157,7 +157,7 @@ class EmailTemplate extends AbstractTerm implements VocabularyInterface
      */
     public function getVocabularyName()
     {
-        return 'Modèles d\'emails stagiaires';
+        return 'Modèles d\'emails';
     }
 
     /**

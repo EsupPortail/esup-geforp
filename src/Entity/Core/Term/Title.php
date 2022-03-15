@@ -36,6 +36,6 @@ class Title extends AbstractTerm implements VocabularyInterface
 
     public static function getVocabularyStatus()
     {
-        return VOCABULARY_NATIONAL;
+        return VocabularyInterface::VOCABULARY_NATIONAL;
     }
 }

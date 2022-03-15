@@ -4,9 +4,9 @@ namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
-use App\Entity\Core\AbstractInstitution;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
+
 
 /**
  * Organization.
@@ -52,6 +52,7 @@ abstract class AbstractOrganization
     /**
      * @var ArrayCollection
      * @ORM\OneToMany(targetEntity="User", mappedBy="organization", cascade={"persist", "merge"})
+     * @MaxDepth(2)
      */
     private $users;
 
