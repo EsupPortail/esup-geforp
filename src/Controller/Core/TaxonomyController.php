@@ -115,7 +115,7 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        $terms = $this->getRootTerms($abstractVocabulary, $organization);
+        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization);
         if ($organization) {
             foreach ($terms as $key => $term) {
                 if (!$term->getOrganization()) {
@@ -124,7 +124,7 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return $this->render('Core/views/taxonomy/view.html.twig', array(
+        return $this->render('Core/views/Taxonomy/view.html.twig', array(
             'organization' => $organization,
             'organizations' => $organizations,
             'userVocabularyAccessRights' => true, //$userVocabularyAccessRights,
@@ -138,19 +138,18 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/edit/{id}/{organizationId}", name="taxonomy.edit", defaults={"id" = null, "organizationId" = null})
-     * @Security("is_granted('EDIT', 'Sygefor\\Bundle\\CoreBundle\\Entity\\Term\\VocabularyInterface')")
      */
-    public function editVocabularyTermAction(Request $request, $vocabularyId, $organizationId, $id = null)
+    public function editVocabularyTermAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organizationId, $id = null)
     {
         $organization = null;
         if ($organizationId) {
-            $organization = $this->getDoctrine()->getManager()->getRepository(AbstractOrganization::class)->find($organizationId);
+            $organization = $doctrine->getManager()->getRepository(AbstractOrganization::class)->find($organizationId);
         }
         $term = null;
-        $abstractVocabulary = $this->get('sygefor_core.vocabulary_registry')->getVocabularyById($vocabularyId);
+        $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
         $termClass = get_class($abstractVocabulary);
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
 
         // find term
         if ($id) {
@@ -162,21 +161,22 @@ class TaxonomyController extends AbstractController
             $term = new $termClass();
             $term->setOrganization($organization);
         }
-
+/*
         if (!$this->get('security.context')->isGranted('EDIT', $term)) {
             throw new AccessDeniedException();
-        }
+        } */
 
         // get term from
         $formType = VocabularyType::class;
         if (method_exists($abstractVocabulary, 'getFormType')) {
             $formType = $abstractVocabulary::getFormType();
         }
+        dump($formType);
 
         if ($this->container->has($formType)) {
             $form = $this->createForm($this->container->get($formType), $term);
         } else {
-            $form = $this->createForm(new $formType($this->container->get('security.context')), $term);
+            $form = $this->createForm(VocabularyType::class, $term);
         }
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -195,26 +195,25 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return $this->render('taxonomy/edit.html.twig', array(
+        return $this->render('Core/views/Taxonomy/edit.html.twig', array(
             'vocabulary' => $abstractVocabulary,
             'organization' => $organization,
             'term' => $term,
             'id' => $id,
             'form' => $form->createView(),
-            'vocabularies' => $this->getVocabulariesList(),
+            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
         ));
     }
 
     /**
      * @Route("/{vocabularyId}/remove/{id}", name="taxonomy.remove")
-     * @Security("is_granted('REMOVE', 'Sygefor\\Bundle\\CoreBundle\\Entity\\Term\\VocabularyInterface')")
      */
-    public function removeAction(Request $request, $vocabularyId, $id)
+    public function removeAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $id)
     {
-        $abstractVocabulary = $this->get('sygefor_core.vocabulary_registry')->getVocabularyById($vocabularyId);
+        $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
         $termClass = get_class($abstractVocabulary);
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
 
         // find term
         $term = $em->find($termClass, $id);
@@ -226,13 +225,13 @@ class TaxonomyController extends AbstractController
         if ($term->isLocked()) {
             throw new AccessDeniedException("This term can't be removed");
         }
-
+/*
         if (!$this->get('security.context')->isGranted('REMOVE', $term)) {
             throw new AccessDeniedException();
         }
-
+*/
         // get term usage
-        $count = $this->get('sygefor_core.vocabulary_registry')->getTermUsages($em, $term);
+        $count = $vocRegistry->getTermUsages($em, $term);
 
         $formB = $this->createFormBuilder(null, array('validation_groups' => array('taxonomy_term_remove')));
         $constraint = new NotBlank(array('message' => 'Vous devez sélectionner un terme de substitution'));
@@ -280,7 +279,7 @@ class TaxonomyController extends AbstractController
                 if ($form->has('term')) {
                     $newTerm = $form->get('term')->getData();
                     if ($newTerm) {
-                        $this->get('sygefor_core.vocabulary_registry')->replaceTermInUsages(
+                        $vocRegistry->replaceTermInUsages(
                             $em,
                             $term,
                             $newTerm);
@@ -294,12 +293,12 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return $this->render('taxonomy/remove.html.twig', array(
+        return $this->render('Core/views/Taxonomy/remove.html.twig', array(
             'vocabulary' => $abstractVocabulary,
             'organization' => $term->getOrganization(),
             'organization_id' => $organization_id,
             'term' => $term,
-            'vocabularies' => $this->getVocabulariesList(),
+            'vocabularies' => $this->getVocabulariesList($doctrine, $vocRegistry),
             'count' => $count,
             'form' => $form->createView(),
         ));
@@ -310,13 +309,13 @@ class TaxonomyController extends AbstractController
      * @Method({"POST"})
      * @Rest\View
      */
-    public function termsOrderAction($vocabulary, Request $request)
+    public function termsOrderAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabulary, Request $request)
     {
-        $abstractVocabulary = $this->get('sygefor_core.vocabulary_registry')->getVocabularyById($vocabulary);
+        $abstractVocabulary = $$vocRegistry->getVocabularyById($vocabulary);
         $abstractVocabulary->setVocabularyId($vocabulary);
         $termClass = get_class($abstractVocabulary);
 
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $repository = $em->getRepository($termClass);
         $serialized = $request->get('serialized');
         $process = function ($objects, $parent = null) use ($em, $repository, &$process) {
@@ -351,10 +350,10 @@ class TaxonomyController extends AbstractController
      *
      * @return mixed
      */
-    private function getRootTerms($vocabulary, $organization)
+    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization)
     {
         $class = get_class($vocabulary);
-        $repository = $this->getDoctrine()->getManager()->getRepository($class);
+        $repository = $doctrine->getManager()->getRepository($class);
 
         if ($repository instanceof NestedTreeRepository) {
             $qb = $repository->getRootNodesQueryBuilder('position');
@@ -445,12 +444,12 @@ class TaxonomyController extends AbstractController
      * @Route("/get_terms/{vocabularyId}", name="taxonomy.get", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View
      */
-    public function getTermsAction($vocabularyId)
+    public function getTermsAction(VocabularyRegistry $vocRegistry, $vocabularyId)
     {
         /*
          * @var AbstractTerm
          */
-        $vocabulary = $this->get('sygefor_core.vocabulary_registry')->getVocabularyById($vocabularyId);
+        $vocabulary = $vocRegistry->getVocabularyById($vocabularyId);
         if (!$vocabulary) {
             throw new \InvalidArgumentException('This vocabulary does not exists.');
         }

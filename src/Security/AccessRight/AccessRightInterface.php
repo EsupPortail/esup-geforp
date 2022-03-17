@@ -1,6 +1,6 @@
 <?php
 
-namespace App\AccessRight;
+namespace App\Security\AccessRight;
 
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 

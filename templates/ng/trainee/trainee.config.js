@@ -28,7 +28,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 label: "Tableau",
                 weight: 0,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/trainee/states/table/table.html"
+                templateUrl: "trainee/states/table/table.html"
             },
             detail: {
                 url: "/detail",
@@ -38,12 +38,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
                 data:{
-                    resultTemplateUrl: "mycompanybundle/trainee/states/detail/result.html"
+                    resultTemplateUrl: "trainee/states/detail/result.html"
                 },
                 states: {
                     view: {
                         url: "/:id",
-                        templateUrl: "mycompanybundle/trainee/states/detail/trainee.html",
+                        templateUrl: "trainee/states/detail/trainee.html",
                         controller: 'TraineeDetailViewController',
                         resolve: {
                             data: function($http, $stateParams) {
@@ -64,7 +64,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * DIALOGS
      */
     $dialogProvider.dialog('trainee.create', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainee/dialogs/create.html',
+        templateUrl: 'trainee/dialogs/create.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -87,7 +87,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainee deletion modal window
      */
     $dialogProvider.dialog('trainee.delete', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainee/dialogs/delete.html',
+        templateUrl: 'trainee/dialogs/delete.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -106,7 +106,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainee change password modal window
      */
     $dialogProvider.dialog('trainee.changePwd', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainee/dialogs/change-password.html',
+        templateUrl: 'trainee/dialogs/change-password.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -130,7 +130,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainee change organization modal window
      */
     $dialogProvider.dialog('trainee.changeOrg', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainee/dialogs/change-organization.html',
+        templateUrl: 'trainee/dialogs/change-organization.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -154,7 +154,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * change trainee activation modal window
      */
     $dialogProvider.dialog('trainee.toggleActivation', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainee/dialogs/activation.html',
+        templateUrl: 'trainee/dialogs/activation.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -175,7 +175,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
     date.setMonth(date.getMonth() - 2);
     $widgetProvider.widget("trainee", /* @ngInject */ {
         controller: 'WidgetListController',
-        templateUrl: 'mycompanybundle/trainee/widget/trainee.html',
+        templateUrl: 'trainee/widget/trainee.html',
         options: function($user, $filter) {
             return {
                 route: 'trainee.search',

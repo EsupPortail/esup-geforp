@@ -48,7 +48,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 weight: 0,
                 //reloadOnSearch:false,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/training/session/states/table/table.html"
+                templateUrl: "training/session/states/table/table.html"
             },
             detail: {
                 url: "/detail",
@@ -59,12 +59,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 //reloadOnSearch:false,
                 controller: 'ListDetailController',
                 data: {
-                    resultTemplateUrl: "mycompanybundle/training/session/states/detail/result.html"
+                    resultTemplateUrl: "training/session/states/detail/result.html"
                 },
                 states: {
                     view: {
                         url: "/:id",
-                        templateUrl: "mycompanybundle/training/session/states/detail/session.html",
+                        templateUrl: "training/session/states/detail/session.html",
                         controller: 'SessionDetailViewController',
                         resolve: {
                             data: function ($http, $stateParams) {
@@ -103,7 +103,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 $scope.dialog.close(data);
             };
         },
-        templateUrl: 'mycompanybundle/training/session/dialogs/crud/create.html',
+        templateUrl: 'training/session/dialogs/crud/create.html',
         resolve:{
             form: function ($http, $dialogParams){
                 return $http.get(Routing.generate('session.create', {training: $dialogParams.training.id })).then(function(response) {
@@ -125,7 +125,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 $scope.dialog.close(response.session);
             };
         },
-        templateUrl: 'mycompanybundle/training/session/dialogs/crud/duplicate.html',
+        templateUrl: 'training/session/dialogs/crud/duplicate.html',
         resolve:{
             form: function ($http, $dialogParams){
                 return $http.get(Routing.generate('session.duplicate', {id: $dialogParams.session.id })).then(function(response) {
@@ -147,13 +147,13 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 });
             };
         },
-        templateUrl: 'mycompanybundle/training/session/dialogs/crud/delete.html'
+        templateUrl: 'training/session/dialogs/crud/delete.html'
     });
 
     // update programmation dialog to send emails
     $dialogProvider.dialog("session.programmationChange", /* @ngInject */ {
         controller: 'ProgrammationChange',
-        templateUrl: 'mycompanybundle/training/session/batch/ProgrammationChange/programmationChange.html',
+        templateUrl: 'training/session/batch/ProgrammationChange/programmationChange.html',
         size: 'lg',
         resolve: {
             config: function ($http, $dialogParams) {
@@ -171,7 +171,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainer.add: modal for adding a trainer to a session
      */
     $dialogProvider.dialog('trainer.add', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/trainer/trainer-add.html',
+        templateUrl: 'training/session/dialogs/trainer/trainer-add.html',
         controller: 'TrainerAddController',
         resolve:{
             form: function ($http, $dialogParams){
@@ -186,7 +186,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainer.edit
      */
     $dialogProvider.dialog('participation.edit', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/trainer/participation-edit.html',
+        templateUrl: 'training/session/dialogs/trainer/participation-edit.html',
         controller: function($scope, $modalInstance, $dialogParams, $http, data, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -211,13 +211,13 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * trainer.remove : simple confirmation modal for trainer remove
      */
     $dialogProvider.dialog('trainer.remove', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/trainer/trainer-remove.html',
+        templateUrl: 'training/session/dialogs/trainer/trainer-remove.html',
         controller: 'TrainerRemoveController'
     });
 
     // update status dialog
     $dialogProvider.dialog("session.registrationChange", /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/batch/registrationChange/registrationChange.html',
+        templateUrl: 'training/session/batch/registrationChange/registrationChange.html',
         controller: 'SessionRegistrationChange'
     });
 
@@ -225,7 +225,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * dates.add: modal for adding dates to a session
      */
     $dialogProvider.dialog('dates.add', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/dates/add.html',
+        templateUrl: 'training/session/dialogs/dates/add.html',
         controller: 'DatesAddController',
         resolve:{
             form: function ($http, $dialogParams){
@@ -240,7 +240,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * dates.remove : simple confirmation modal for dates remove
      */
     $dialogProvider.dialog('dates.remove', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/dates/remove.html',
+        templateUrl: 'training/session/dialogs/dates/remove.html',
         controller: 'DatesRemoveController'
     });
 
@@ -248,7 +248,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * dates.edit
      */
     $dialogProvider.dialog('dates.edit', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/training/session/dialogs/dates/edit.html',
+        templateUrl: 'training/session/dialogs/dates/edit.html',
         controller: 'DatesEditController',
         resolve:{
             data: function ($http, $dialogParams){
@@ -265,7 +265,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      */
     $widgetProvider.widget("session", /* @ngInject */ {
         controller: 'WidgetListController',
-        templateUrl: 'mycompanybundle/training/session/widget/session.html',
+        templateUrl: 'training/session/widget/session.html',
         options: function($user) {
             return {
                 route: 'session.search',

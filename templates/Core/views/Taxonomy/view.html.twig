@@ -16,6 +16,7 @@
 {% endblock %}
 
 {# JAVASCRIPTS  #}
+
 {% block javascripts %}
     <script type="text/javascript" src="{{ asset('bundles/libs/nestable/jquery.nestable.js') }}"></script>
     <script type="text/javascript">
@@ -39,18 +40,19 @@
     </script>
 {% endblock %}
 
+
 {% block tabs %}
     {#display organization tabs if not a national vocabulary #}
-    {% if vocabulary.vocabularyStatus != 0 %}
+     {% if vocabulary.vocabularyStatus != 0 %}
         <ul class="nav nav-tabs">
             {#if mixed add national tab#}
-            {% if (vocabulary.vocabularyStatus == 2)  %}
+             {% if (vocabulary.vocabularyStatus == 2)  %}
                 <li {% if organization is null %} class="active" {% endif %} >
                     <a href="{{ path('taxonomy.view', {'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a>
                 </li>
             {% endif %}
             {#organizations tabs#}
-            {% if (organizations | length > 1)  %}
+             {% if (organizations | length > 1)  %}
                 {% for org in organizations %}
                     <li {% if organization is not null and org is defined and org.id == organization.id %} class="active" {% endif %}>
                         <a href="{{ path('taxonomy.view', {'vocabularyId': vocabulary.vocabularyId, 'organizationId': org.id}) }}">{{ org.name }}</a>
@@ -78,6 +80,7 @@
 {% endblock %}
 
 {# MACRO : PANEL  #}
+
 {% macro nested_tree(vocabulary, terms, sortable, organization) %}
     {% if terms | length > 0 %}
         <ol class="dd-list {% if not sortable %} dd-unsortable{% endif %}">

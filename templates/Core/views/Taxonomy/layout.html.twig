@@ -5,6 +5,7 @@
             <div class="full-height-container is-absolute is-full-width is-direction-row">
 
                 <!-- left col -->
+
                 <div class="full-height-item grid-list-detail-results bg-white">
                     <div class="full-height-container is-full-width is-absolute is-direction-column">
                         <div class="full-height-item is-full-width is-grow is-overflow-y">
@@ -35,7 +36,7 @@
                 <!-- right col -->
                 <div class="full-height-item grid-list-detail-view">
                     <div class="full-height-container is-full-width is-absolute is-direction-column">
-                        {{ block('tabs') }}
+                        {{ (block("tabs")) ?? '' }}
                         <div class="full-height-item is-overflow-y is-grow view bg-white">
                             <div ui-view>
                                 {% block subcontent %}{% endblock %}

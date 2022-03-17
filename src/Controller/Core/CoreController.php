@@ -30,24 +30,10 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use App\Controller\Core\AbstractCoreController;
 
 
-class CoreController extends AbstractController
+class CoreController extends AbstractCoreController
 {
-    /**
-     * @Route("/", name="core.index")
-     */
-    public function indexAction()
-    {
-        /*$encoders = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoders);
-
-        $user = $this->getUser();
-        $ser = $serializer->serialize($user, 'json');
-        dump($ser);*/
-//        return array();
-        return $this->render('ng/accueil.html.twig');
-    }
 
 }

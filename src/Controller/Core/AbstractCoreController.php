@@ -5,21 +5,27 @@ namespace App\Controller\Core;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\Serializer\SerializationContext;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractTraining;
+use App\Entity\Organization;
+use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use JMS\SecurityExtraBundle\Annotation\Secure;
 
 abstract class AbstractCoreController extends AbstractController
 {
     /**
      * @Route("/", name="core.index")
+     * @Template("Core/index.html.twig")
      */
     public function indexAction()
     {
-        return $this->render('SygeforCoreBundle:Core:index.html.twig', array());
+        return array();
     }
 
     /**

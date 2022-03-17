@@ -11,7 +11,7 @@ use App\Entity\Core\Term\PresenceStatus;
 use App\Entity\Core\Term\InscriptionStatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Form\Type\AbstractInscriptionType;
-use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use App\Security\AccessRight\SerializedAccessRights;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**

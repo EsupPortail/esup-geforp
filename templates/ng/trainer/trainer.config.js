@@ -38,7 +38,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
                 label: "Tableau",
                 weight: 0,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/trainer/states/table/table.html"
+                templateUrl: "trainer/states/table/table.html"
             },
             detail: {
                 url: "/detail",
@@ -48,12 +48,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
                 data:{
-                    resultTemplateUrl: "mycompanybundle/trainer/states/detail/result.html"
+                    resultTemplateUrl: "trainer/states/detail/result.html"
                 },
                 states: {
                     view: {
                         url: "/:id",
-                        templateUrl: "mycompanybundle/trainer/states/detail/trainer.html",
+                        templateUrl: "trainer/states/detail/trainer.html",
                         controller: 'TrainerDetailViewController',
                         resolve: {
                             data: function($http, $stateParams) {
@@ -74,7 +74,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      * DIALOGS
      */
     $dialogProvider.dialog('trainer.create', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainer/dialogs/create.html',
+        templateUrl: 'trainer/dialogs/create.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -97,7 +97,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      * trainer deletion modal window
      */
     $dialogProvider.dialog('trainer.delete', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainer/dialogs/delete.html',
+        templateUrl: 'trainer/dialogs/delete.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -117,7 +117,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      * trainer change organization modal window
      */
     $dialogProvider.dialog('trainer.changeOrg', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/trainer/dialogs/change-organization.html',
+        templateUrl: 'trainer/dialogs/change-organization.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;

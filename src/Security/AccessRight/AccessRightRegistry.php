@@ -6,10 +6,9 @@
  * Date: 14/03/14
  * Time: 16:52.
  */
+namespace App\Security\AccessRight;
 
-namespace App\Security\Authorization\AccessRight;
-
-use App\Entity\Core\User;
+use Sygefor\Bundle\CoreBundle\Entity\User\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
@@ -54,7 +53,7 @@ class AccessRightRegistry
      *
      * @param $id
      * @param AbstractAccessRight $accessRight
-     * @param string              $group
+     * @param string $group
      */
     public function addAccessRight($id, AbstractAccessRight $accessRight, $group = 'Misc')
     {

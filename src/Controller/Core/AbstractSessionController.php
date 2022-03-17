@@ -6,7 +6,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractParticipation;
 use App\Entity\Core\AbstractSession;
@@ -33,7 +33,7 @@ abstract class AbstractSessionController extends AbstractController
      */
     public function searchAction(Request $request)
     {
-        $search = $this->get('sygefor_training.session.search');
+/*        $search = $this->get('sygefor_training.session.search');
         $search->handleRequest($request);
 
         // security check
@@ -41,13 +41,18 @@ abstract class AbstractSessionController extends AbstractController
             $search->addTermFilter('training.organization.id', $this->getUser()->getOrganization()->getId());
         }
 
-        return $search->search();
+        return $search->search(); */
+        $ret = array(
+            'total' => 0,
+            'pageSize' => 0,
+            'items' => array(),
+        );
+        return $ret;
     }
 
     /**
      * @Route("/create/{training}", requirements={"id" = "\d+"}, name="session.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="training", permissions="EDIT")
-     * @ParamConverter("training", class="SygeforCoreBundle:AbstractTraining", options={"id" = "training"})
+     * @ParamConverter("training", class="App/Entity/Core/AbstractTraining", options={"id" = "training"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function createAction(Request $request, AbstractTraining $training)
@@ -74,7 +79,6 @@ abstract class AbstractSessionController extends AbstractController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="session.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="session", permissions="VIEW")
      * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
@@ -188,7 +192,6 @@ abstract class AbstractSessionController extends AbstractController
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="session.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
      * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "id"})
-     * @SecureParam(name="session", permissions="DELETE")
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function removeAction(AbstractSession $session)

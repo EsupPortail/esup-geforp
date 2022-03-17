@@ -41,7 +41,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 label: "Tableau",
                 weight: 0,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/training/training/states/table/table.html"
+                templateUrl: "training/training/states/table/table.html"
             },
             detail: {
                 url: "/detail",
@@ -51,7 +51,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
                 data:{
-                    resultTemplateUrl: "mycompanybundle/training/training/states/detail/result.html"
+                    resultTemplateUrl: "training/training/states/detail/result.html"
                 },
                 states: {
                     view: {
@@ -140,7 +140,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 $scope.dialog.close(response);
             };
         },
-        templateUrl: 'mycompanybundle/training/training/dialogs/duplicate/choose-type.html',
+        templateUrl: 'training/training/dialogs/duplicate/choose-type.html',
         resolve:{
             form: function ($http, $dialogParams){
                 return $http.get(Routing.generate('training.choosetypeduplicate')).then(function(response) {
@@ -196,7 +196,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 });
             };
         },
-        templateUrl: 'mycompanybundle/training/training/dialogs/remove/training.html'
+        templateUrl: 'training/training/dialogs/remove/training.html'
     });
 
     // edit module
@@ -218,7 +218,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 });
             }
         },
-        templateUrl: 'mycompanybundle/training/training/dialogs/module/edit-module.html'
+        templateUrl: 'training/training/dialogs/module/edit-module.html'
     });
 
     /**
@@ -227,9 +227,9 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
     $trainingBundleProvider.addType('internship', {
         label: 'Stage',
         templates: {
-            view: 'mycompanybundle/training/training/states/detail/internship.html',
-            create: 'mycompanybundle/training/training/dialogs/create/internship.html',
-            duplicate: 'mycompanybundle/training/training/dialogs/duplicate/internship.html'
+            view: 'training/training/states/detail/internship.html',
+            create: 'training/training/dialogs/create/internship.html',
+            duplicate: 'training/training/dialogs/duplicate/internship.html'
         }
     });
 

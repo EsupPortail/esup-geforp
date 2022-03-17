@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Entity\Core\AbstractTrainee;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -34,7 +34,6 @@ abstract class AbstractTraineeController extends AbstractController
      * @param Request $request
      * 
      * @Route("/search", name="trainee.search", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Security("is_granted('VIEW', 'SygeforCoreBundle:AbstractTrainee')")
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
@@ -58,7 +57,6 @@ abstract class AbstractTraineeController extends AbstractController
      * @param Request $request
      *
      * @Route("/create", name="trainee.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Security("is_granted('CREATE', 'SygeforCoreBundle:AbstractTrainee')")
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
@@ -156,7 +154,6 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      *
      * @Route("/{id}/changepwd", name="trainee.changepwd", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="trainee", permissions="EDIT")
      * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
@@ -195,7 +192,6 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      *
      * @Route("/{id}/changeorg", name="trainee.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="trainee", permissions="EDIT")
      * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      *
@@ -224,7 +220,6 @@ abstract class AbstractTraineeController extends AbstractController
      *
      * @Route("/{id}/remove", name="trainee.delete", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @SecureParam(name="trainee", permissions="DELETE")
      * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 

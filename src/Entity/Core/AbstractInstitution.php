@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
 use App\Entity\Core\AbstractOrganization;
-use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use App\Security\AccessRight\SerializedAccessRights;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\BaseInstitutionType as FormType;

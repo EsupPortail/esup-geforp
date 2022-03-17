@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\SessionType;
 use App\Form\Type\AbstractSessionType;
-use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use App\Security\AccessRight\SerializedAccessRights;
 use App\Entity\Core\Term\InscriptionStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Timestampable\Traits\TimestampableEntity;

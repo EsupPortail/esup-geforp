@@ -75,7 +75,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 label: "Tableau",
                 weight: 0,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/inscription/states/table/table.html"
+                templateUrl: "inscription/states/table/table.html"
             },
             detail: {
                 url: "/detail",
@@ -85,12 +85,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
                 data:{
-                    resultTemplateUrl: "mycompanybundle/inscription/states/detail/result.html"
+                    resultTemplateUrl: "inscription/states/detail/result.html"
                 },
                 states: {
                     view: {
                         url: "/:id",
-                        templateUrl: "mycompanybundle/inscription/states/detail/inscription.html",
+                        templateUrl: "inscription/states/detail/inscription.html",
                         controller: 'InscriptionDetailViewController',
                         resolve: {
                             data: function($http, $stateParams) {
@@ -112,7 +112,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      */
     $dialogProvider.dialog('inscription.create', /* @ngInject */ {
         controller: 'InscriptionCreate',
-        templateUrl: "mycompanybundle/inscription/dialogs/create.html",
+        templateUrl: "inscription/dialogs/create.html",
         resolve:{
             form: function ($http, $dialogParams){
                 return $http.get(Routing.generate('inscription.create', {session: $dialogParams.session.id })).then(function (response) {
@@ -125,7 +125,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
     // update status dialog
                 $dialogProvider.dialog("inscription.changeStatus", /* @ngInject */ {
                     controller: 'InscriptionStatusChange',
-                    templateUrl: 'mycompanybundle/inscription/batch/inscriptionStatusChange/programmationChange.html',
+                    templateUrl: 'inscription/batch/inscriptionStatusChange/programmationChange.html',
                     size: 'lg',
                     resolve: {
                         config: function ($http, $dialogParams) {
@@ -146,7 +146,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
 
     // delete dialog
     $dialogProvider.dialog('inscription.delete', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/inscription/dialogs/delete.html',
+        templateUrl: 'inscription/dialogs/delete.html',
         resolve:{
             data: function ($http, $dialogParams) {
                 var url = Routing.generate('inscription.view', {id: $dialogParams.id});
@@ -200,7 +200,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * presence.edit
      */
     $dialogProvider.dialog('presence.edit', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/inscription/dialogs/presences/edit.html',
+        templateUrl: 'inscription/dialogs/presences/edit.html',
         controller: 'PresenceEditController',
         resolve:{
             data: function ($http, $dialogParams){
@@ -216,7 +216,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      */
     $widgetProvider.widget("inscription", /* @ngInject */ {
         controller: 'WidgetListController',
-        templateUrl: 'mycompanybundle/inscription/widget/inscription.html',
+        templateUrl: 'inscription/widget/inscription.html',
         options: function($user) {
             return {
                 route: 'inscription.search',
@@ -237,7 +237,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
     date.setMonth(date.getMonth() - 1);
     $widgetProvider.widget("disclaimer", /* @ngInject */ {
         controller: 'WidgetListController',
-        templateUrl: 'mycompanybundle/inscription/widget/disclaimer.html',
+        templateUrl: 'inscription/widget/disclaimer.html',
         options: function($user, $filter) {
             return {
                 route: 'inscription.search',

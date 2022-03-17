@@ -7,7 +7,7 @@ sygeforApp.config(["$dialogProvider", function($dialogProvider) {
      */
     $dialogProvider.dialog('material.manage', /* @ngInject */ {
         controller: 'ManageMaterialsController',
-        templateUrl: 'mycompanybundle/training/material/dialogs/material/manage-materials.html'
+        templateUrl: 'training/material/dialogs/material/manage-materials.html'
     });
 
     /**
@@ -34,7 +34,7 @@ sygeforApp.config(["$dialogProvider", function($dialogProvider) {
                 });
             }
         },
-        templateUrl: 'mycompanybundle/training/material/dialogs/material/add-link-material.html'
+        templateUrl: 'training/material/dialogs/material/add-link-material.html'
     });
 
     /**
@@ -52,6 +52,6 @@ sygeforApp.config(["$dialogProvider", function($dialogProvider) {
                 });
             }
         },
-        templateUrl: 'mycompanybundle/training/material/dialogs/material/remove-material.html'
+        templateUrl: 'training/material/dialogs/material/remove-material.html'
     });
 }]);

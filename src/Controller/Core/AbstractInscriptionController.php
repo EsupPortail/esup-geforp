@@ -8,7 +8,7 @@ use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractInscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\Term\InscriptionStatus;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use App\Form\Type\AbstractInscriptionType;
@@ -43,7 +43,6 @@ abstract class AbstractInscriptionController extends AbstractController
 
     /**
      * @Route("/create/{session}", name="inscription.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="session", permissions="EDIT")
      * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
@@ -69,7 +68,6 @@ abstract class AbstractInscriptionController extends AbstractController
 
     /**
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="inscription.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="inscription", permissions="VIEW")
      * @ParamConverter("inscription", class="SygeforCoreBundle:AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
@@ -100,7 +98,6 @@ abstract class AbstractInscriptionController extends AbstractController
     /**
      * @Route("/{id}/remove", name="inscription.delete", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @SecureParam(name="inscription", permissions="DELETE")
      * @ParamConverter("inscription", class="SygeforCoreBundle:AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
