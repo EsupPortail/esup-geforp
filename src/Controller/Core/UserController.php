@@ -10,6 +10,7 @@
 namespace App\Controller\Core;
 
 use App\Form\Type\AccessRightType;
+use ClassesWithParents\D;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -98,6 +99,8 @@ class UserController extends AbstractController
                     $user->getPassword()
                 );
                 $user->setPassword($hashedPassword);
+                $currentDate = new \DateTime('now');
+                $user->setLastLogin($currentDate);
 
                 $em = $doctrine->getManager();
                 $em->persist($user);

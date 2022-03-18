@@ -91,8 +91,8 @@ class MenuBuilder
 
                 $item->addChild('internships', array(
                     'label' => 'Stages',
-//                    'uri'   => $this->router->generate('core.index') . '#/training?type=internship',
-                    'uri' => $this->router->generate('core.index'),
+                    'uri'   => $this->router->generate('core.index') . '#/training?type=internship',
+//                    'uri' => $this->router->generate('core.index'),
                 ));
 
                 $item->addChild('sessions', array(
