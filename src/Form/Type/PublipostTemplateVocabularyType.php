@@ -15,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\Entity\Core\Term\PublipostTemplate;
 
 class PublipostTemplateVocabularyType extends VocabularyType
 {
@@ -23,7 +24,7 @@ class PublipostTemplateVocabularyType extends VocabularyType
      */
     protected $HRPAFactory;
 
-    public function setHRPAFactory(HumanReadablePropertyAccessorFactory $HRPAfactory)
+    public function __construct(HumanReadablePropertyAccessorFactory $HRPAfactory)
     {
         $this->HRPAFactory = $HRPAfactory;
     }
@@ -40,7 +41,7 @@ class PublipostTemplateVocabularyType extends VocabularyType
 
         $builder->add('entity', ChoiceType::class, array(
             'label' => 'Entité associée',
-            'choices' => $this->HRPAFactory->getKnownEntities(false),
+            'choices' =>array('Stagiaire'=> 'Stagiaire') //$this->HRPAFactory->getKnownEntities(false),
         ));
 
         $builder->add('file', FileType::class, array(

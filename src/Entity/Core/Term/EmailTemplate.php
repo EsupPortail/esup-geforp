@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core\Term;
 
+use App\Form\Type\EmailTemplateVocabularyType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -167,7 +168,7 @@ class EmailTemplate extends AbstractTerm implements VocabularyInterface
      */
     public static function getFormType()
     {
-        return 'sygefor_core.form_type.emailing_template';
+        return EmailTemplateVocabularyType::class;
     }
 
     public static function getVocabularyStatus()

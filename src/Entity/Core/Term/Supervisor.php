@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\AbstractTerm;
 use App\Entity\Core\Term\VocabularyInterface;
-use App\Form\SupervisorType;
+use App\Form\Type\SupervisorType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

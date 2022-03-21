@@ -3,7 +3,7 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Security\Authorization\AccessRight\AccessRightRegistry;
+use App\Security\AccessRight\AccessRightRegistry;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\Term\Title;
 use App\Entity\Core\AbstractTrainer;

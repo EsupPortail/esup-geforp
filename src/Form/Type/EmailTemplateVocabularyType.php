@@ -15,18 +15,26 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 class EmailTemplateVocabularyType extends VocabularyType
 {
     /** @var CCRegistry */
-    protected $ccRegistry;
+//    protected $ccRegistry;
 
     /**
      * @param CCRegistry
      */
-    public function setCCRegistry($ccRegistry)
+ /*   public function setCCRegistry($ccRegistry)
     {
         $this->ccRegistry = $ccRegistry;
+    }
+ */
+    private $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
     }
 
     /**
@@ -36,23 +44,23 @@ class EmailTemplateVocabularyType extends VocabularyType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         parent::buildForm($builder, $options);
-        $ccResolvers = $this->ccRegistry->getSupportedResolvers();
+/*        $ccResolvers = $this->ccRegistry->getSupportedResolvers();
         $choices = array();
         foreach ($ccResolvers as $ccResolver) {
             $choices[] = $ccResolver['name'];
-        }
+        }*/
 
         $builder
             ->add('subject', TextType::class, array(
                 'label' => 'Sujet',
             ))
-            ->add('cc', ChoiceType::class, array(
+/*            ->add('cc', ChoiceType::class, array(
                 'label' => 'CC',
                 'multiple' => true,
                 'expanded' => true,
                 'choices' => $choices,
                 'required' => false,
-            ))
+            ))*/
             ->add('body', TextareaType::class, array(
                 'label' => 'Corps',
                 'attr' => array(
@@ -60,11 +68,11 @@ class EmailTemplateVocabularyType extends VocabularyType
                     'ckeditor' => 'ckeditor',
                 ),
             ))
-	        ->add('forceEmailSending', CheckboxType::class, array(
+/*	        ->add('forceEmailSending', CheckboxType::class, array(
 		        'label' => 'Abonnement',
 		        'widget_suffix' => 'Envoi le courriel même si le stagiaire a désactivé les lettres d\'informations',
 		        'required' => false,
-	        ))
+	        ))*/
             ->add('inscriptionStatus', EntityType::class, array(
                 'label' => "Status d'inscription",
                 'class' => InscriptionStatus::class,
@@ -73,7 +81,7 @@ class EmailTemplateVocabularyType extends VocabularyType
                         ->where('i.organization = :orgId')
                         ->orWhere('i.organization is null')
                         ->orderBy('i.name')
-                        ->setParameter('orgId', $this->securityContext->getToken()->getUser()->getOrganization()->getId());
+                        ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId());
                 },
                 'required' => false,
             ))
@@ -103,7 +111,7 @@ class EmailTemplateVocabularyType extends VocabularyType
                     return $er->createQueryBuilder('p')
                         ->where('p.organization = :orgId')
                         ->orWhere('p.organization is null')
-                        ->setParameter('orgId', $this->securityContext->getToken()->getUser()->getOrganization()->getId());
+                        ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId());
                 },
                 'required' => false,
             ))
@@ -111,7 +119,7 @@ class EmailTemplateVocabularyType extends VocabularyType
     }
 
     /**
-     * @param OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
     public function configureOptions(OptionsResolver $resolver)
     {

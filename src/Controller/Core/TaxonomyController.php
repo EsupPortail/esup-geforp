@@ -171,16 +171,12 @@ class TaxonomyController extends AbstractController
         if (method_exists($abstractVocabulary, 'getFormType')) {
             $formType = $abstractVocabulary::getFormType();
         }
-        dump($formType);
 
-        if ($this->container->has($formType)) {
-            $form = $this->createForm($this->container->get($formType), $term);
-        } else {
-            $form = $this->createForm(VocabularyType::class, $term);
-        }
+        $form = $this->createForm($formType, $term);
+
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if (($form->isSubmitted()) && ($form->isValid())) {
                 $term->setOrganization($organization);
                 $em->persist($term);
                 $em->flush();

@@ -10,7 +10,7 @@
 namespace App\Utils\HumanReadable;
 
 use Doctrine\Common\Persistence\Mapping\MappingException;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Class HumanReadablePropertyAccessorFactory.
@@ -19,13 +19,13 @@ class HumanReadablePropertyAccessorFactory
 {
     protected $termCatalog;
 
-    /** @var EntityManager */
+    /** @var EntityManagerInterface */
     protected $em;
 
     /**
-     * @param EntityManager $em
+     * @param EntityManagerInterface $em
      */
-    public function __construct($em)
+    public function __construct(EntityManagerInterface $em)
     {
         $this->em = $em;
     }
@@ -92,6 +92,7 @@ class HumanReadablePropertyAccessorFactory
      */
     public function getKnownEntities($includeExcludedEntities = true)
     {
+        dump($this->termCatalog);
         $entityTypes = array();
         foreach ($this->termCatalog as $entity) {
             if ($includeExcludedEntities || (!isset($entity['excludeFromFormType']) || $entity['excludeFromFormType'] !== true)) {
