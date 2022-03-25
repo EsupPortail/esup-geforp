@@ -59,7 +59,6 @@ class TrainingListener implements EventSubscriber
      */
     public function prePersist(LifecycleEventArgs $eventArgs)
     {
-        dump('prepersist');
         $training = $eventArgs->getEntity();
         if($training instanceof AbstractTraining && ! $training->getNumber()) {
             $em    = $eventArgs->getEntityManager();

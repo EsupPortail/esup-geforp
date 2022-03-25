@@ -35,7 +35,7 @@ abstract class AbstractTrainingController extends AbstractController
      * @Route("/search", name="training.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
 /*        $search = $this->get('sygefor_training.semestered.search');
         $search->handleRequest($request);
@@ -46,12 +46,13 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         return $search->search(); */
-
+        $trainings = $doctrine->getRepository(Internship::class)->findAll();
+        $nbTrainings  = count($trainings);
 
         $ret = array(
-            'total' => 0,
+            'total' => $nbTrainings,
             'pageSize' => 0,
-            'items' => array(),
+            'items' => $trainings,
         );
         return $ret;
     }
@@ -115,6 +116,7 @@ abstract class AbstractTrainingController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
+                $training->setUpdatedAt(new \DateTime('now'));
                 $em = $doctrine->getManager();
                 $em->flush();
             }
@@ -143,7 +145,7 @@ abstract class AbstractTrainingController extends AbstractController
         $em = $doctrine->getManager();
         $em->remove($training);
         $em->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('training.search'));
     }
