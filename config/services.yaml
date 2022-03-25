@@ -33,6 +33,10 @@ services:
         tags:
             - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
 
+    App\Listener\TrainingListener:
+        tags:
+            - { name: doctrine.event_subscriber }
+
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder
 #        arguments:
