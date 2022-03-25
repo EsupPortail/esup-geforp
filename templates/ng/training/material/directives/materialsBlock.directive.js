@@ -30,6 +30,6 @@ sygeforApp.directive('materialsBlock', ['$dialog', '$window', function($dialog, 
                 $window.location = Routing.generate('material.get', {id: file.id});
             };
         },
-        templateUrl: 'mycompanybundle/training/material/directives/materials.block.html'
+        templateUrl: 'training/material/directives/materials.block.html'
     }
 }]);

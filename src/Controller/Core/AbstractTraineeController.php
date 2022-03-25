@@ -42,7 +42,7 @@ abstract class AbstractTraineeController extends AbstractController
      */
     public function searchAction(Request $request)
     {
-        $search = $this->get('sygefor_trainee.search');
+/*        $search = $this->get('sygefor_trainee.search');
         $search->handleRequest($request);
 
         // security check
@@ -50,7 +50,13 @@ abstract class AbstractTraineeController extends AbstractController
             $search->addTermFilter('organization.id', $this->getUser()->getOrganization()->getId());
         }
 
-        return $search->search();
+        return $search->search(); */
+        $ret = array(
+            'total' => 0,
+            'pageSize' => 0,
+            'items' => array(),
+        );
+        return $ret;
     }
 
     /**

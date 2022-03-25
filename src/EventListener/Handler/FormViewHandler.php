@@ -2,7 +2,7 @@
 
 namespace App\EventListener\Handler;
 
-use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\GraphNavigatorInterface;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\SerializationContext;
@@ -25,7 +25,7 @@ class FormViewHandler implements SubscribingHandlerInterface
     {
         return array(
             array(
-                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
+                'direction' => GraphNavigatorInterface::DIRECTION_SERIALIZATION,
                 'format' => 'json',
                 'type' => 'Symfony\Component\Form\FormView',
                 'method' => 'serializeToJson',
@@ -99,7 +99,7 @@ class FormViewHandler implements SubscribingHandlerInterface
             }
         }
 
-        return $visitor->getNavigator()->accept($element, array('name' => 'array'), $context);
+        return $context->getNavigator()->accept($element, array('name' => 'array'), $context);
     }
 
     /**

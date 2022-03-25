@@ -25,7 +25,7 @@ sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$con
 
                 //checking user right. If some rights are defined for widget, we need to check them for user
 
-                if (typeof options.rights != 'undefined' && (options.rights.length > 0)  ) {
+/*                if (typeof options.rights != 'undefined' && (options.rights.length > 0)  ) {
                     var hasRight = false;
                     for(var right in options.rights) {
                         if($user.hasAccessRight(options.rights[right])){hasRight = true;}
@@ -35,7 +35,7 @@ sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$con
                         element.html('');
                         return 0;
                     }
-                }
+                } */
 
                 // extends the base filters
                 var filters = angular.extend({}, options.filters, scope.widgetOptions ? scope.widgetOptions.filters : {});

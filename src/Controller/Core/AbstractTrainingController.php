@@ -2,21 +2,26 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Internship;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
 use Sygefor\Bundle\TrainingBundle\SpreadSheet\TrainingBalanceSheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
@@ -32,7 +37,7 @@ abstract class AbstractTrainingController extends AbstractController
      */
     public function searchAction(Request $request)
     {
-        $search = $this->get('sygefor_training.semestered.search');
+/*        $search = $this->get('sygefor_training.semestered.search');
         $search->handleRequest($request);
 
         // security check
@@ -40,19 +45,28 @@ abstract class AbstractTrainingController extends AbstractController
             $search->addTermFilter('training.organization.id', $this->getUser()->getOrganization()->getId());
         }
 
-        return $search->search();
+        return $search->search(); */
+
+
+        $ret = array(
+            'total' => 0,
+            'pageSize' => 0,
+            'items' => array(),
+        );
+        return $ret;
     }
 
     /**
      * @Route("/create/{type}", name="training.create", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
-    public function createAction(Request $request, $type)
+    public function createAction(Request $request, ManagerRegistry $doctrine, $type)
     {
-        $registry = $this->get('sygefor_training.type.registry');
+/*        $registry = $this->get('sygefor_training.type.registry');
         $type     = $registry->getType($type);
 
-        $class = $type['class'];
+        $class = $type['class'];*/
+        $class = Internship::class;
         /** @var AbstractTraining $training */
         $training = new $class();
         try {
@@ -63,41 +77,45 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         //training can't be created if user has no rights for it
-        if (!$this->get('security.context')->isGranted('CREATE', $training)) {
+/*        if (!$this->get('security.context')->isGranted('CREATE', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $training->setCreatedAt(new \DateTime('now'));
+                $training->setUpdatedAt(new \DateTime('now'));
+                $em = $doctrine->getManager();
                 $em->persist($training);
                 $em->flush();
             }
         }
 
         return array('training' => $training, 'form' => $form->createView());
+        //return new Response(json_encode(array('training' => $training, 'form' => $form->createView())));
+
     }
 
     /**
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="training.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
-    public function viewAction(Request $request, AbstractTraining $training)
+    public function viewAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training)
     {
-        if (!$this->get('security.context')->isGranted('EDIT', $training)) {
+/*        if (!$this->get('security.context')->isGranted('EDIT', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->flush();
             }
         }
@@ -117,44 +135,17 @@ abstract class AbstractTrainingController extends AbstractController
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="training.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeAction(AbstractTraining $training)
+    public function removeAction(ManagerRegistry $doctrine, AbstractTraining $training)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->remove($training);
         $em->flush();
         $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('training.search'));
-    }
-
-    /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param AbstractModule $module
-     *
-     * @Route("/module/{id}/edit", requirements={"id" = "\d+"}, name="module.edit", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("module", class="SygeforTrainingBundle:Training\AbstractModule", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     *
-     * @return array
-     */
-    public function editModuleAction(Request $request, $module)
-    {
-        if (!$this->get('security.context')->isGranted('EDIT', $module->getTraining())) {
-            throw new AccessDeniedException('Action non autorisée');
-        }
-
-        $form = $this->createForm(new BaseModuleType(), $module);
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
-            }
-        }
-
-        return array('form' => $form->createView(), 'modules' => $module->getTraining()->getModules());
     }
 
     /**
@@ -189,15 +180,15 @@ abstract class AbstractTrainingController extends AbstractController
 
     /**
      * @Route("/duplicate/{id}/{type}", name="training.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining")
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining")
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
     public function duplicateAction(Request $request, AbstractTraining $training, $type)
     {
         //training can't be created if user has no rights for it
-        if ( ! $this->get('security.context')->isGranted('CREATE', $training)) {
+/*        if ( ! $this->get('security.context')->isGranted('CREATE', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         /** @var AbstractTraining $cloned */
         $cloned = null;

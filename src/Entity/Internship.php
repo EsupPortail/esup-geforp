@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\PublicType;
 use App\Entity\Core\AbstractTraining;
-use App\Form\InternshipType;
+use App\Form\Type\InternshipType;
 
 /**
  * Stage.

@@ -19,6 +19,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Class TrainingType.
@@ -31,11 +32,17 @@ class TrainingType extends AbstractType
     private $accessRightsRegistry;
 
     /**
+     * @var Security
+     */
+    private $security;
+
+    /**
      * @param AccessRightRegistry $registry
      */
-    public function __construct(AccessRightRegistry $registry)
+    public function __construct(AccessRightRegistry $registry, Security $security)
     {
         $this->accessRightsRegistry = $registry;
+        $this->security = $security;
     }
 
     /**
@@ -114,13 +121,13 @@ class TrainingType extends AbstractType
         // If the user does not have the rights, remove the organization field and force the value
 /*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_training.rights.training.all.create');
         if (!$hasAccessRightForAll) {
-            $securityContext = $this->accessRightsRegistry->getSecurityContext();
-            $user            = $securityContext->getToken()->getUser();
+            $securityContext = $this->accessRightsRegistry->getSecurityContext(); */
+            $user            = $this->security->getUser();
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
                 $training = $event->getData();
                 $training->setOrganization($user->getOrganization());
                 $event->getForm()->remove('organization');
-            });
+            });/*
         }*/
     }
 

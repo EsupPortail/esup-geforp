@@ -66,7 +66,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                                 return $http({method: 'GET', url: url}).then (function (data) { return data.data; });
                             }
                         },
-                        template: '<div training-template="view" type="training.type" default="/bundles/sygefortraining/ng/training/states/detail/training.html"></div>',
+                        template: '<div training-template="view" type="training.type" default="training/states/detail/training.html"></div>',
                         controller: 'TrainingDetailViewController',
                         breadcrumb: function($stateParams, data, $trainingBundle) {
                             var breadcrumb = [];
@@ -107,7 +107,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 $scope.dialog.close(data);
             };
         },
-        template: '<div training-template="create" type="dialog.params.type" default="/bundles/sygefortraining/ng/training/dialogs/create/training.html"></div>',
+        template: '<div training-template="create" type="dialog.params.type" default="training/dialogs/create/internship.html"></div>',
         resolve:{
             form: function ($http, $dialogParams){
                 return $http.get(Routing.generate('training.create', {type: $dialogParams.type })).then(function(response) {
@@ -171,7 +171,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 })
             };
         },
-        template: '<div training-template="duplicate" type="dialog.params.type" default="/bundles/sygefortraining/ng/training/dialogs/duplicate/training.html"></div>',
+        template: '<div training-template="duplicate" type="dialog.params.type" default="training/training/dialogs/duplicate/training.html"></div>',
         resolve:{
             form: function ($http, $dialogParams){
                 var params= {};

@@ -4,7 +4,8 @@
 </div>
 <form sf-href="training.create({type: dialog.params.type})" sf-form="form" json-path="form" on-success="onSuccess(data)" class="form-horizontal" novalidate>
     <div class="modal-body">
-        <ng-include src="'mycompanybundle/training/training/dialogs/common/internship.html'"></ng-include>
+        <ng-include src="'training/training/dialogs/common/internship.html'"></ng-include>
+
     </div>
     <div class="modal-footer">
         <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>

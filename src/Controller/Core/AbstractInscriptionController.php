@@ -30,6 +30,7 @@ abstract class AbstractInscriptionController extends AbstractController
      */
     public function searchAction(Request $request)
     {
+        /*
         $search = $this->get('sygefor_inscription.search');
         $search->handleRequest($request);
 
@@ -39,6 +40,13 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         return $search->search();
+        */
+        $ret = array(
+            'total' => 0,
+            'pageSize' => 0,
+            'items' => array(),
+        );
+        return $ret;
     }
 
     /**

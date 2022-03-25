@@ -14,6 +14,6 @@ sygeforApp.directive('registrationLabel', [function() {
                 'label-lg': (typeof attrs.large !== "undefined")
             }
         },
-        templateUrl: 'mycompanybundle/training/session/directives/registration-label.html'
+        templateUrl: 'training/session/directives/registration-label.html'
     }
 }]);

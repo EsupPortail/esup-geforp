@@ -8,12 +8,12 @@ use JMS\Serializer\Annotation as Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Form\Type\AbstractTrainingType;
 use App\Entity\Core\AbstractInstitution;
-use App\Entity\Core\Material;
+use App\Entity\Core\AbstractMaterial;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\TrainingCategory;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use App\Security\AccessRight\SerializedAccessRights;
 
 /**
  * @ORM\Entity
@@ -28,7 +28,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableEntity;
 
-    use MaterialTrait;
+//    use MaterialTrait;
 
     /**
      * @ORM\Column(name="id", type="integer")

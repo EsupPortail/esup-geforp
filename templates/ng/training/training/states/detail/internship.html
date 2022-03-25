@@ -3,10 +3,10 @@
         <form sf-xeditable-form="form" sf-href='training.view({id: training.id})' on-success="onSuccess(data)">
 
             <!-- training form -->
-            <ng-include src="'mycompanybundle/training/training/states/detail/partials/training.form.html'"></ng-include>
+            <ng-include src="'training/training/states/detail/partials/training.form.html'"></ng-include>
 
-            <h3>Méthodes pédagogiques</h3><hr>
-            <p><span sf-xeditable="form.children.teachingMethods" data-type="textarea">{{ training.teachingMethods }}</span></p>
+<!--            <h3>Méthodes pédagogiques</h3><hr>
+            <p><span sf-xeditable="form.children.teachingMethods" data-type="textarea">{{ training.teachingMethods }}</span></p> -->
 
             <!-- training : intership -->
             <h3><span>{{ training.typeLabel }}</span></h3><hr>
@@ -14,8 +14,8 @@
                 <div class="col-lg-6">
                     <ul class="summary">
                         <li><label>Type de formation</label> <span sf-xeditable="form.children.category">{{ training.category.name }}</span></li>
-                        <li><label>Publics prioritaires</label> <span sf-xeditable="form.children.publicTypes" data-type="select2">{{ training.publicTypes | joinObjects:'machineName' }}</span></li>
-                        <li><label>Publics cibles</label> <span sf-xeditable="form.children.publicTypesRestrict" data-type="select2">{{ training.publicTypesRestrict | joinObjects:'machineName' }}</span></li>
+                        <li><label>Publics prioritaires</label> <span sf-xeditable="form.children.publicTypes" data-type="select2">{{ training.publicTypes.machineName }}</span></li>
+                        <li><label>Publics cibles</label> <span sf-xeditable="form.children.publicTypesRestrict" data-type="select2">{{ training.publicTypesRestrict.machineName }}</span></li>
                         <li><label>Etablissement</label> <span sf-xeditable="form.children.institution">{{ training.institution.name }}</span></li>
                         <li><label>Prérequis</label> <span sf-xeditable="form.children.prerequisites" data-type="textarea">{{ training.prerequisites }}</span></li>
                     </ul>
@@ -42,8 +42,8 @@
     -- SIDEBAR
     -->
     <div class="col-md-4 sidebar">
-        <ng-include src="'mycompanybundle/training/training/states/detail/partials/sessions.block.html'"></ng-include>
+        <ng-include src="'training/training/states/detail/partials/sessions.block.html'"></ng-include>
         <div materials-block="training" entity-type="training.type"></div>
-        <ng-include src="'mycompanybundle/training/training/states/detail/partials/comments.block.html'"></ng-include>
+        <ng-include src="'training/training/states/detail/partials/comments.block.html'"></ng-include>
     </div>
 </div>

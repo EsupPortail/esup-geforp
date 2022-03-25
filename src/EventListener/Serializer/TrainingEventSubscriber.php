@@ -53,8 +53,9 @@ class TrainingEventSubscriber implements EventSubscriberInterface
      */
     public static function isApiGroup(Context $context)
     {
-        $groups = $context->attributes->get('groups');
-        foreach ($groups->getOrElse(array()) as $group) {
+        $groups = $context->getAttribute('groups');
+        foreach ($groups as $group) {
+        //foreach ($groups->getOrElse(array()) as $group) {
             if ($group === 'api' || strpos($group, 'api.') === 0) {
                 return true;
             }

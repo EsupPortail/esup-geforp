@@ -5,7 +5,8 @@ namespace App\EventListener;
 use JMS\Serializer\Context;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
-use App\Security\Authorization\AccessRight\SerializedAccessRights;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
+use App\Security\AccessRight\SerializedAccessRights;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**
@@ -23,7 +24,7 @@ class AccessRightsEventSubscriber implements EventSubscriberInterface
      */
     public function __construct(AuthorizationCheckerInterface $authorizationCheckerInterface)
     {
-        $this->$authorizationCheckerInterface = $authorizationCheckerInterface;
+        $this->authorizationCheckerInterface = $authorizationCheckerInterface;
     }
 
     /**
@@ -47,7 +48,8 @@ class AccessRightsEventSubscriber implements EventSubscriberInterface
         if (!$this->isApiGroup($event->getContext())) {
             $object = $event->getObject();
             if ($object instanceof SerializedAccessRights) {
-                $event->getVisitor()->addData('_accessRights', array(
+                //$event->getVisitor()->addData('_accessRights', array(
+                $event->getVisitor()->visitProperty(new StaticPropertyMetadata('', '_accessRights', null), array(
                     'view' => $this->authorizationCheckerInterface->isGranted('VIEW', $object),
                     'edit' => $this->authorizationCheckerInterface->isGranted('EDIT', $object),
                     'delete' => $this->authorizationCheckerInterface->isGranted('DELETE', $object),
@@ -63,8 +65,10 @@ class AccessRightsEventSubscriber implements EventSubscriberInterface
      */
     protected function isApiGroup(Context $context)
     {
-        $groups = $context->attributes->get('groups');
-        foreach ($groups->getOrElse(array()) as $group) {
+//        $groups = $context->attributes->get('groups');
+//        foreach ($groups->getOrElse(array()) as $group) {
+       $groups = $context->getAttribute('groups');
+       foreach ($groups as $group) {
             if ($group === 'api' || strpos($group, 'api.') === 0) {
                 return true;
             }

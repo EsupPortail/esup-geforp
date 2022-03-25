@@ -8,9 +8,9 @@
  */
 namespace App\Security\AccessRight;
 
-use Sygefor\Bundle\CoreBundle\Entity\User\User;
+use App\Entity\Core\User;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\SecurityContextInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Class AccessRightRegistry.
@@ -33,19 +33,19 @@ class AccessRightRegistry
     private $container;
 
     /**
-     * @var SecurityContextInterface
+     * @var Security
      */
     private $securityContext;
 
     /**
      * class constructor.
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Security $security)
     {
         $this->container = $container;
         $this->rights = array();
         $this->groups = array();
-        $securityContext = null;
+        $securityContext = $security;
     }
 
     /**
@@ -90,7 +90,7 @@ class AccessRightRegistry
         }
 
         if ($user === null) {
-            $user = $this->securityContext->getToken()->getUser();
+            $user = $this->securityContext->getUser();
         }
 
         if (!($user instanceof User)) {
@@ -156,7 +156,7 @@ class AccessRightRegistry
     }
 
     /**
-     * @param \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
+     * @param \Symfony\Component\Security\Core\Security $securityContext
      */
     public function setSecurityContext($securityContext)
     {
@@ -164,7 +164,7 @@ class AccessRightRegistry
     }
 
     /**
-     * @return \Symfony\Component\Security\Core\SecurityContextInterface
+     * @return \Symfony\Component\Security\Core\Security
      */
     public function getSecurityContext()
     {

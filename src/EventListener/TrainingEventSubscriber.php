@@ -6,6 +6,7 @@ use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Exception\InvalidArgumentException;
 use App\Entity\Core\AbstractTraining;
+use JMS\Serializer\Metadata\StaticPropertyMetadata;
 
 /**
  * Training serialization event subscriber.
@@ -32,7 +33,8 @@ class TrainingEventSubscriber implements EventSubscriberInterface
         $training = $event->getObject();
         if ($training instanceof AbstractTraining) {
             try {
-                $event->getVisitor()->addData('type', $training->getType());
+                //$event->getVisitor()->addData('type', $training->getType());
+                $event->getVisitor()->visitProperty(new StaticPropertyMetadata('', 'type', null), $training->getType());
             } catch (InvalidArgumentException $e) {
                 // nothing to do
             }
