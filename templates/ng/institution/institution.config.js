@@ -28,22 +28,22 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
                 label: "Tableau",
                 weight: 0,
                 controller: 'ListTableController',
-                templateUrl: "mycompanybundle/institution/states/table/table.html"
+                templateUrl: "institution/states/table/table.html"
             },
             detail: {
                 url: "/detail",
                 icon: "fa-eye",
                 label: "Liste détaillée",
                 weight: 1,
-                templateUrl: "states/detail/detail.html",
+                templateUrl: "institution/states/detail/institution.html",
                 controller: 'ListDetailController',
                 data:{
-                    resultTemplateUrl: "mycompanybundle/institution/states/detail/result.html"
+                    resultTemplateUrl: "institution/states/detail/result.html"
                 },
                 states: {
                     view: {
                         url: "/:id",
-                        templateUrl: "mycompanybundle/institution/states/detail/institution.html",
+                        templateUrl: "institution/states/detail/institution.html",
                         controller: 'InstitutionDetailViewController',
                         resolve: {
                             data: function($http, $stateParams) {
@@ -64,7 +64,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
      * DIALOGS
      */
     $dialogProvider.dialog('institution.create', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/institution/dialogs/add.html',
+        templateUrl: 'institution/dialogs/create.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -87,7 +87,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
      * institution change organization modal window
      */
     $dialogProvider.dialog('institution.changeOrg', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/institution/dialogs/change-organization.html',
+        templateUrl: 'institution/dialogs/change-organization.html',
         controller: function($scope, $modalInstance, $dialogParams, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
@@ -111,7 +111,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
      * institution deletion modal window
      */
     $dialogProvider.dialog('institution.delete', /* @ngInject */ {
-        templateUrl: 'mycompanybundle/institution/dialogs/delete.html',
+        templateUrl: 'institution/dialogs/delete.html',
         controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;

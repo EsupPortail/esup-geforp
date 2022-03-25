@@ -116,8 +116,8 @@ class MenuBuilder
                 $menu->addChild('institutions', array(
                     'label' => 'Etablissements',
                     'icon'  => 'university',
-//                    'uri'   => $this->router->generate('core.index') . '#/institution',
-                    'uri' => $this->router->generate('core.index'),
+                    'uri'   => $this->router->generate('core.index') . '#/institution',
+//                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
