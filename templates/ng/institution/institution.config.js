@@ -35,7 +35,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
                 icon: "fa-eye",
                 label: "Liste détaillée",
                 weight: 1,
-                templateUrl: "institution/states/detail/institution.html",
+                templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
                 data:{
                     resultTemplateUrl: "institution/states/detail/result.html"

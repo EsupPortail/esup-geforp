@@ -103,21 +103,21 @@ abstract class AbstractInstitutionController extends AbstractController
 
     /**
      * @Route("/{id}/changeorg", name="institution.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("institution", class="SygeforInstitutionBundle:AbstractInstitution", options={"id" = "id"})
+     * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */
-    public function changeOrganizationAction(Request $request, AbstractInstitution $institution)
+    public function changeOrganizationAction(Request $request, ManagerRegistry $doctrine, AbstractInstitution $institution)
     {
         // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_inscription.rights.inscription.all.update')) {
+/*        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_inscription.rights.inscription.all.update')) {
             throw new AccessDeniedException();
-        }
+        }*/
 
         $form = $this->createForm(ChangeOrganizationType::class, $institution);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
             }
         }
 
@@ -127,15 +127,15 @@ abstract class AbstractInstitutionController extends AbstractController
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="institution.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("institution", class="SygeforInstitutionBundle:AbstractInstitution", options={"id" = "id"})
+     * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeAction(AbstractInstitution $institution)
+    public function removeAction(AbstractInstitution $institution, ManagerRegistry $doctrine)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->remove($institution);
         $em->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('institution.search'));
     }

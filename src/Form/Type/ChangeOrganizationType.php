@@ -3,7 +3,7 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\AbstractOrganization;
+use App\Entity\Core\AbstractOrganization;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
