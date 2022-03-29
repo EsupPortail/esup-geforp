@@ -7,10 +7,10 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th search-table-th field="organization.name.source">Centre</th>
-                        <th search-table-th field="lastName.source">Nom</th>
-                        <th search-table-th field="institution.name.source">Etablissement</th>
-                        <th search-table-th field="service.source">Service</th>
+                        <th search-table-th field="organization.name">Centre</th>
+                        <th search-table-th field="lastname">Nom</th>
+                        <th search-table-th field="institution.name">Etablissement</th>
+                        <th search-table-th field="service">Service</th>
                         <th search-table-th field="isOrganization">Statut</th>
                         <th search-table-th field="isArchived">Archivé</th>
                         <th search-table-th field="isPublic">Publié</th>
@@ -20,7 +20,7 @@
                     <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
                         <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
                         <td>{{ item.organization.name }}</td>
-                        <td><a href="" ui-sref="trainer.detail.view({ id: item.id })">{{ item.fullName }}</a></td>
+                        <td><a href="" ui-sref="trainer.detail.view({ id: item.id })">{{ item.fullname }}</a></td>
                         <td>{{ item.institution.name }}</td>
                         <td>{{ item.service }}</td>
                         <td>{{ item.isOrganization ? 'Formateur interne' : 'Formateur externe' }}</td>

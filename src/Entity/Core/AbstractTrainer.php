@@ -285,10 +285,10 @@ abstract class AbstractTrainer implements SerializedAccessRights
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner une civilité.',
         )));
-        $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('firstname', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un prénom.',
         )));
-        $metadata->addPropertyConstraint('lastName', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('lastname', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un nom de famille.',
         )));
     }

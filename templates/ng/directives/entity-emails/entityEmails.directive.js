@@ -13,13 +13,13 @@ sygeforApp.directive('entityEmails', ['$searchFactory', function($searchFactory)
         },
         templateUrl: function(elem, attr) {
             if (attr.trainee && !attr.session) {
-                return 'mycompanybundle/trainee/states/detail/partials/emails.html';
+                return 'trainee/states/detail/partials/emails.html';
             }
             else if (!attr.trainee && attr.session) {
-                return 'mycompanybundle/training/session/states/detail/partials/emails.html';
+                return 'training/session/states/detail/partials/emails.html';
             }
             else if (attr.trainer) {
-                return 'mycompanybundle/trainer/states/detail/partials/emails.html';
+                return 'trainer/states/detail/partials/emails.html';
             }
            else if (attr.trainee && attr.session) {
                 console.log('need to create a template for messages');

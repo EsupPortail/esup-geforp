@@ -97,8 +97,8 @@ class MenuBuilder
 
                 $item->addChild('sessions', array(
                     'label' => 'Toutes les sessions',
-//                    'uri'   => $this->router->generate('core.index') . '#/training/session',
-                    'uri' => $this->router->generate('core.index'),
+                    'uri'   => $this->router->generate('core.index') . '#/training/session',
+//                    'uri' => $this->router->generate('core.index'),
                 ))->setAttribute('divider_prepend', true);
 
 //            }
@@ -125,8 +125,8 @@ class MenuBuilder
                 $menu->addChild('trainers', array(
                     'label' => 'Intervenants',
                     'icon'  => 'user',
-//                    'uri'   => $this->router->generate('core.index') . '#/trainer',
-                    'uri' => $this->router->generate('core.index'),
+                    'uri'   => $this->router->generate('core.index') . '#/trainer',
+//                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 

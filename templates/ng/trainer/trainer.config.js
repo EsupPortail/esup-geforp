@@ -15,7 +15,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
         resolve: {
             session: function($stateParams, $entityManager) {
                 if($stateParams.session) {
-                    return $entityManager('SygeforTrainingBundle:Session\\AbstractSession').find($stateParams.session);
+                    return $entityManager('App\\Entity\\Core\\AbstractSession').find($stateParams.session);
                 }
                 return null;
             },
@@ -62,7 +62,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
                             }
                         },
                         breadcrumb: {
-                            label: "{{ data.trainer.fullName }}"
+                            label: "{{ data.trainer.fullname }}"
                         }
                     }
                 }

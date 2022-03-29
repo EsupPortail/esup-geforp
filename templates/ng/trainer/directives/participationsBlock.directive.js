@@ -28,6 +28,6 @@ sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', functi
                 });
             });
         },
-        templateUrl: 'mycompanybundle/trainer/directives/participations.block.html'
+        templateUrl: 'trainer/directives/participations.block.html'
     }
 }]);

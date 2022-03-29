@@ -11,6 +11,6 @@ sygeforApp.directive('resumeTrainerBlock', [function() {
             year: '=year',
             status: '=status'
         },
-        templateUrl: 'mycompanybundle/trainer/directives/resumeTrainer.block.html'
+        templateUrl: 'trainer/directives/resumeTrainer.block.html'
     }
 }]);
