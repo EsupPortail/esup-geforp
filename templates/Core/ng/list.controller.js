@@ -145,7 +145,7 @@ sygeforApp.factory('BaseListController', ['$location', '$timeout', '$modal', '$l
          */
         $scope.updateActiveItem = function(item, prop) {
             angular.forEach($scope.search.result.items, function(result) {
-                result = prop ? result[prop] : result;
+                //result = prop ? result[prop] : result;
                 if (item.id == result.id) {
                     for (var key in item) {
                         if ((result[key] || typeof result[key] === 'number') && key !== 'id') {

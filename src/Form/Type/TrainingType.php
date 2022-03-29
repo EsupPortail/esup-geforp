@@ -79,41 +79,41 @@ class TrainingType extends AbstractType
                 'label'    => 'Objectifs',
                 'required' => true,
             ))
-/*            ->add('teachingMethods', null, array(
+            ->add('teachingmethods', null, array(
                 'label'    => 'Méthodes pédagogiques',
                 'required' => false,
             ))
-            ->add('interventionType', null, array(
+            ->add('interventiontype', null, array(
                 'label'    => 'Type d\'intervention',
                 'required' => false,
             ))
-                        ->add('externalInitiative', CheckboxType::class, array(
-                            'label'    => 'Initiative externe',
-                            'required' => false,
-                        ))*/
-                        ->add('category', EntityType::class, array(
-                            'label'         => 'Catégorie de formation',
-                            'class'         => TrainingCategory::class,
-                            'query_builder' => $training ? function (EntityRepository $er) use ($training) {
-                                return $er->createQueryBuilder('c')
-                                    ->where('c.trainingType = :trainingType')
-                                    ->setParameter('trainingType', $training->getType());
-                            } : null,
-                            'required' => false,
-                        ))
-/*                        ->add('comments', null, array(
-                            'label'    => 'Commentaires',
-                            'required' => false,
-                        ))
-                        ->add('firstSessionPeriodSemester', ChoiceType::class, array(
-                            'label'    => '1ère session',
-                            'choices'  => array('1' => '1er semestre', '2' => '2nd semestre'),
-                            'required' => true,
-                        ))
-                        ->add('firstSessionPeriodYear', null, array(
-                            'label'    => 'Année',
-                            'required' => true,
-                        ))*/;
+            ->add('externalinitiative', CheckboxType::class, array(
+                'label'    => 'Initiative externe',
+                'required' => false,
+            ))
+            ->add('category', EntityType::class, array(
+                'label'         => 'Catégorie de formation',
+                'class'         => TrainingCategory::class,
+                'query_builder' => $training ? function (EntityRepository $er) use ($training) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.trainingType = :trainingType')
+                        ->setParameter('trainingType', $training->getType());
+                } : null,
+                'required' => false,
+            ))
+            ->add('comments', null, array(
+                'label'    => 'Commentaires',
+                'required' => false,
+            ))
+            ->add('firstsessionperiodsemester', ChoiceType::class, array(
+                'label'    => '1ère session',
+                'choices'  => array('1er semestre' => '1', '2nd semestre' => '2'),
+                'required' => true,
+            ))
+            ->add('firstsessionperiodyear', null, array(
+                'label'    => 'Année',
+                'required' => true,
+            ));
 
         // add listeners to handle conditionals fields
         $this->addEventListeners($builder);

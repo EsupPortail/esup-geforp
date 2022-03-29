@@ -15,10 +15,10 @@ use App\Entity\Core\Term\VocabularyInterface;
 /**
  * Type de personnel.
  *
- * @ORM\Table(name="public_type")
+ * @ORM\Table(name="publictype")
  * @ORM\Entity
  */
-class PublicType extends AbstractTerm implements VocabularyInterface
+class Publictype extends AbstractTerm implements VocabularyInterface
 {
     public static function getVocabularyStatus()
     {

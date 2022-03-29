@@ -1,13 +1,13 @@
 <?php
 
-namespace Sygefor\Bundle\TrainingBundle\Listener;
+namespace App\Listener;
 
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Events;
-use Sygefor\Bundle\TrainingBundle\Entity\Session\AbstractParticipation;
-use Sygefor\Bundle\TrainerBundle\Entity\AbstractTrainer;
+use App\Entity\Core\AbstractParticipation;
+use App\Entity\Core\AbstractTrainer;
 
 /**
  * This listener sync shared informations between Trainee and Inscription.
@@ -102,7 +102,7 @@ class TrainerParticipationListener implements EventSubscriber
             foreach ($this->entities as $entity) {
                 // update current inscriptions
                 $query = $em
-                    ->createQuery('SELECT p FROM SygeforTrainingBundle:Session\\AbstractParticipation p
+                    ->createQuery('SELECT p FROM App\Entity\Core\AbstractParticipation p
                                   JOIN p.session s
                                   WHERE p.trainer = :trainer AND s.dateBegin >= CURRENT_TIMESTAMP()')
                     ->setParameter('trainer', $entity);

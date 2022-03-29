@@ -6,7 +6,7 @@
  * Date: 17/04/14
  * Time: 10:06.
  */
-namespace Sygefor\Bundle\TrainingBundle\Listener;
+namespace App\Listener;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Events;
@@ -16,9 +16,9 @@ use Elastica\Type;
 use FOS\ElasticaBundle\Doctrine\Listener;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 use FOS\ElasticaBundle\Provider\IndexableInterface;
-use Sygefor\Bundle\TrainingBundle\Entity\Session\AbstractSession;
-use Sygefor\Bundle\TrainingBundle\Entity\Training\AbstractTraining;
-use Sygefor\Bundle\TrainingBundle\Model\SemesteredTraining;
+use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTraining;
+use App\Model\SemesteredTraining;
 
 /**
  * Class SemesteredTrainingListener.

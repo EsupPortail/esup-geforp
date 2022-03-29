@@ -99,7 +99,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $teachingMethods;
+    protected $teachingmethods;
 
     /**
      * @var AbstractInstitution Institution
@@ -142,7 +142,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $interventionType;
+    protected $interventiontype;
 
     /**
      * @ORM\Column(name="externalInitiative", type="boolean", nullable=true)
@@ -150,7 +150,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @var bool
      * @Serializer\Groups({"training"})
      */
-    protected $externalInitiative;
+    protected $externalinitiative;
 
     /**
      * @ORM\Column(name="firstSessionPeriodSemester", type="integer")
@@ -159,7 +159,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @var int
      * @Serializer\Groups({"training", "api"})
      */
-    protected $firstSessionPeriodSemester = 1;
+    protected $firstsessionperiodsemester = 1;
 
     /**
      * @ORM\Column(name="firstSessionPeriodYear", type="integer")
@@ -168,7 +168,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @var int
      * @Serializer\Groups({"training", "api"})
      */
-    protected $firstSessionPeriodYear;
+    protected $firstsessionperiodyear;
 
     /**
      * @ORM\Column(name="comments", type="text", nullable=true)
@@ -183,8 +183,8 @@ abstract class AbstractTraining implements SerializedAccessRights
      */
     public function __construct()
     {
-        $this->firstSessionPeriodYear = (new \DateTime())->format('Y');
-        $this->firstSessionPeriodSemester = ((new \DateTime())->format('m') > 6 ? 2 : 1);
+        $this->firstsessionperiodyear = (new \DateTime())->format('Y');
+        $this->firstsessionperiodsemester = ((new \DateTime())->format('m') > 6 ? 2 : 1);
         $this->sessions = new ArrayCollection();
         $this->materials = new ArrayCollection();
         $this->tags     = new ArrayCollection();
@@ -388,17 +388,17 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @return string
      */
-    public function getTeachingMethods()
+    public function getTeachingmethods()
     {
-        return $this->teachingMethods;
+        return $this->teachingmethods;
     }
 
     /**
      * @param string $teachingMethods
      */
-    public function setTeachingMethods($teachingMethods)
+    public function setTeachingmethods($teachingmethods)
     {
-        $this->teachingMethods = $teachingMethods;
+        $this->teachingmethods = $teachingmethods;
     }
 
     /**
@@ -484,33 +484,33 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @return string
      */
-    public function getInterventionType()
+    public function getInterventiontype()
     {
-        return $this->interventionType;
+        return $this->interventiontype;
     }
 
     /**
-     * @param string $interventionType
+     * @param string $interventiontype
      */
-    public function setInterventionType($interventionType)
+    public function setInterventiontype($interventiontype)
     {
-        $this->interventionType = $interventionType;
+        $this->interventiontype = $interventiontype;
     }
 
     /**
      * @return boolean
      */
-    public function isExternalInitiative()
+    public function isexternalinitiative()
     {
-        return $this->externalInitiative;
+        return $this->externalinitiative;
     }
 
     /**
-     * @param boolean $externalInitiative
+     * @param boolean $externalinitiative
      */
-    public function setExternalInitiative($externalInitiative)
+    public function setExternalinitiative($externalinitiative)
     {
-        $this->externalInitiative = $externalInitiative;
+        $this->externalinitiative = $externalinitiative;
     }
 
     /**
@@ -532,33 +532,33 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @return int
      */
-    public function getFirstSessionPeriodSemester()
+    public function getFirstsessionperiodsemester()
     {
-        return $this->firstSessionPeriodSemester;
+        return $this->firstsessionperiodsemester;
     }
 
     /**
-     * @param int $firstSessionPeriodSemester
+     * @param int $firstsessionperiodsemester
      */
-    public function setFirstSessionPeriodSemester($firstSessionPeriodSemester)
+    public function setFirstsessionperiodsemester($firstsessionperiodsemester)
     {
-        $this->firstSessionPeriodSemester = $firstSessionPeriodSemester;
+        $this->firstsessionperiodsemester = $firstsessionperiodsemester;
     }
 
     /**
      * @return int
      */
-    public function getFirstSessionPeriodYear()
+    public function getFirstsessionperiodyear()
     {
-        return $this->firstSessionPeriodYear;
+        return $this->firstsessionperiodyear;
     }
 
     /**
      * @param int $firstSessionPeriodYear
      */
-    public function setFirstSessionPeriodYear($firstSessionPeriodYear)
+    public function setFirstsessionperiodyear($firstSessionPeriodYear)
     {
-        $this->firstSessionPeriodYear = $firstSessionPeriodYear;
+        $this->firstsessionperiodyear = $firstSessionPeriodYear;
     }
 
     /**

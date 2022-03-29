@@ -17,7 +17,7 @@ trait CoordinatesTrait
      * @ORM\Column(name="address_type", type="integer", nullable=true)
      * @Serializer\Groups({"Default", "trainee", "api.profile"})
      */
-    protected $addressType;
+    protected $addresstype;
 
     /**
      * @var string address
@@ -57,7 +57,7 @@ trait CoordinatesTrait
      * @ORM\Column(name="phone_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"trainee", "inscription", "trainer", "api.profile"})
      */
-    protected $phoneNumber;
+    protected $phonenumber;
 
     /**
      * @var string
@@ -65,7 +65,7 @@ trait CoordinatesTrait
      * @ORM\Column(name="fax_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"organization", "trainee", "trainer", "api.profile"})
      */
-    protected $faxNumber;
+    protected $faxnumber;
 
     /**
      * @var string
@@ -83,7 +83,7 @@ trait CoordinatesTrait
     public function copyCoordinates($entity, $force = true)
     {
         $propertyAccessor = new PropertyAccessor();
-        foreach (array('addressType', 'address', 'zip', 'city', 'email', 'phoneNumber', 'faxNumber', 'website') as $property) {
+        foreach (array('addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website') as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
             if ($force || ! $thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
@@ -92,20 +92,20 @@ trait CoordinatesTrait
     }
 
 
-    /**
+    /*
      * @param boolean $addressType
      */
-    public function setAddressType($addressType)
+    public function setAddresstype($addressType)
     {
-        $this->addressType = $addressType;
+        $this->addresstype = $addressType;
     }
 
     /**
      * @return boolean
      */
-    public function getAddressType()
+    public function getAddresstype()
     {
-        return $this->addressType;
+        return $this->addresstype;
     }
 
     /**
@@ -175,33 +175,33 @@ trait CoordinatesTrait
     /**
      * @param string $phoneNumber
      */
-    public function setPhoneNumber($phoneNumber)
+    public function setPhonenumber($phoneNumber)
     {
-        $this->phoneNumber = $phoneNumber;
+        $this->phonenumber = $phoneNumber;
     }
 
     /**
      * @return string
      */
-    public function getPhoneNumber()
+    public function getPhonenumber()
     {
-        return $this->phoneNumber;
+        return $this->phonenumber;
     }
 
     /**
      * @return string
      */
-    public function getFaxNumber()
+    public function getFaxnumber()
     {
-        return $this->faxNumber;
+        return $this->faxnumber;
     }
 
     /**
      * @param string $faxNumber
      */
-    public function setFaxNumber($faxNumber)
+    public function setFaxnumber($faxNumber)
     {
-        $this->faxNumber = $faxNumber;
+        $this->faxnumber = $faxNumber;
     }
 
     /**

@@ -20,14 +20,14 @@ trait PersonTrait
      * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $firstName;
+    protected $firstname;
 
     /**
      * @var string
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $lastName;
+    protected $lastname;
 
     /**
      * @param mixed $title
@@ -48,33 +48,33 @@ trait PersonTrait
     /**
      * @param string $firstName
      */
-    public function setFirstName($firstName)
+    public function setFirstname($firstName)
     {
-        $this->firstName = $firstName;
+        $this->firstname = $firstName;
     }
 
     /**
      * @return string
      */
-    public function getFirstName()
+    public function getFirstname()
     {
-        return $this->firstName;
+        return $this->firstname;
     }
 
     /**
      * @param string $lastName
      */
-    public function setLastName($lastName)
+    public function setLastname($lastName)
     {
-        $this->lastName = $lastName;
+        $this->lastname = $lastName;
     }
 
     /**
      * @return string
      */
-    public function getLastName()
+    public function getLastname()
     {
-        return $this->lastName;
+        return $this->lastname;
     }
 
     /**
@@ -82,9 +82,9 @@ trait PersonTrait
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
-    public function getFullName()
+    public function getFullname()
     {
-        return $this->getFirstName().' '.$this->getLastName();
+        return $this->getFirstname().' '.$this->getLastname();
     }
 
     /**
@@ -102,6 +102,6 @@ trait PersonTrait
      */
     public function __toString()
     {
-        return $this->getFullName();
+        return $this->getFullname();
     }
 }

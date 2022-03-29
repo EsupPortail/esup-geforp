@@ -85,7 +85,7 @@ abstract class AbstractTrainingController extends AbstractController
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $training->setCreatedAt(new \DateTime('now'));
                 $training->setUpdatedAt(new \DateTime('now'));
                 $em = $doctrine->getManager();
@@ -115,7 +115,7 @@ abstract class AbstractTrainingController extends AbstractController
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $training->setUpdatedAt(new \DateTime('now'));
                 $em = $doctrine->getManager();
                 $em->flush();

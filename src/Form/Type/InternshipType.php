@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 use App\Form\Type\TrainingType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -20,28 +20,28 @@ class InternshipType extends TrainingType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            /*            ->add('publicTypes', EntityType::class, array(
-                            'label' => 'Publics prioritaires',
-                            'class' => PublicType::class,
-                            'choice_label' => 'machineName',
-                            'multiple' => true,
-                            'required' => false,
-                        ))
-                        ->add('publicTypesRestrict', EntityType::class, array(
-                            'label' => 'Publics cibles',
-                            'class' => PublicType::class,
-                            'choice_label' => 'machineName',
-                            'multiple' => true,
-                            'required' => false,
-                        ))
-*/                        ->add('prerequisites', null, array(
+                                    ->add('publictypes', EntityType::class, array(
+                                        'label' => 'Publics prioritaires',
+                                        'class' => Publictype::class,
+                                        'choice_label' => 'name',
+                                        'multiple' => true,
+                                        'required' => false,
+                                    ))
+                                   ->add('publictypesrestrict', EntityType::class, array(
+                                       'label' => 'Publics cibles',
+                                       'class' => Publictype::class,
+                                       'choice_label' => 'name',
+                                       'multiple' => true,
+                                       'required' => false,
+                                   ))
+                                   ->add('prerequisites', null, array(
                             'label'    => 'Pré-requis',
                             'required' => false,
                         ))
- /*                       ->add('designatedPublic', CheckboxType::class, array(
+                       ->add('designatedpublic', CheckboxType::class, array(
                             'label'    => 'Public désigné',
                             'required' => false,
-                        ))*/;
+                        ));
 
         parent::buildForm($builder, $options);
     }

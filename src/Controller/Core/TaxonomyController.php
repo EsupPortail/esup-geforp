@@ -8,7 +8,7 @@ use App\Entity\Core\Term\EvaluationCriterion;
 use App\Entity\Core\Term\InscriptionStatus;
 use App\Entity\Core\Term\MenuItem;
 use App\Entity\Core\Term\PresenceStatus;
-use App\Entity\Core\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\Term\SessionType;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;

@@ -128,33 +128,33 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
     $scope.addSession = function () {
         $dialog.open('session.create', {training: $scope.training}).then(function(data) {
             $scope.training.sessions.push(data.session);
-            if ($scope.training.modules) {
-                if ($scope.training.modules.length !== data.training.modules.length) {
-                    for (var keyUpdatedModules in data.training.modules) {
-                        var found = false;
-                        for (var keyInitialModules in $scope.training.modules) {
-                            if (data.training.modules[keyUpdatedModules].id === $scope.training.modules[keyInitialModules].id) {
-                                found = true;
-                                break;
+            /*            if ($scope.training.modules) {
+                            if ($scope.training.modules.length !== data.training.modules.length) {
+                                for (var keyUpdatedModules in data.training.modules) {
+                                    var found = false;
+                                    for (var keyInitialModules in $scope.training.modules) {
+                                        if (data.training.modules[keyUpdatedModules].id === $scope.training.modules[keyInitialModules].id) {
+                                            found = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!found) {
+                                        data.training.modules[keyUpdatedModules].sessions = [data.session];
+                                        $scope.training.modules.push(data.training.modules[keyUpdatedModules]);
+                                        break;
+                                    }
+                                }
                             }
-                        }
-                        if (!found) {
-                            data.training.modules[keyUpdatedModules].sessions = [data.session];
-                            $scope.training.modules.push(data.training.modules[keyUpdatedModules]);
-                            break;
-                        }
-                    }
-                }
-                else if (data.session.module) {
-                    var sessionModuleId = data.session.module.id;
-                    for (var keyModule in $scope.training.modules) {
-                        if ($scope.training.modules[keyModule].id === sessionModuleId) {
-                            $scope.training.modules[keyModule].sessions.push(data.session);
-                        }
-                    }
-                }
-                $scope.sessionsWithoutModule = $scope.getSessionWithoutModule();
-            }
+                            else if (data.session.module) {
+                                var sessionModuleId = data.session.module.id;
+                                for (var keyModule in $scope.training.modules) {
+                                    if ($scope.training.modules[keyModule].id === sessionModuleId) {
+                                        $scope.training.modules[keyModule].sessions.push(data.session);
+                                    }
+                                }
+                            }
+                            $scope.sessionsWithoutModule = $scope.getSessionWithoutModule();
+                        }*/
         });
     };
 

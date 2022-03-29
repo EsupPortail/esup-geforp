@@ -8,7 +8,7 @@ use App\Entity\Core\Term\EvaluationCriterion;
 use App\Entity\Core\Term\InscriptionStatus;
 use App\Entity\Core\Term\MenuItem;
 use App\Entity\Core\Term\PresenceStatus;
-use App\Entity\Core\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\Term\PublipostTemplate;
 use App\Entity\Core\Term\SessionType;
 use App\Entity\Core\Term\Supervisor;
@@ -95,7 +95,7 @@ class VocabularyRegistry
         $voc = new TrainerType();
         $this->addVocabulary($voc, $i);
         $i++;
-        $voc = new PublicType();
+        $voc = new Publictype();
         $this->addVocabulary($voc, $i);
     }
 

@@ -5,7 +5,7 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\AbstractTraining;
 use App\Form\Type\InternshipType;
 
@@ -18,24 +18,24 @@ use App\Form\Type\InternshipType;
 class Internship extends AbstractTraining
 {
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\PublicType")
-     * @ORM\JoinTable(name="internship__internship_public_type",
+     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\Publictype")
+     * @ORM\JoinTable(name="internship__internship_publictype",
      *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="public_type_id", referencedColumnName="id")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="publictype_id", referencedColumnName="id")}
      * )
      * @Serializer\Groups({"training", "inscription", "api"})
      */
-    protected $publicTypes;
+    protected $publictypes;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\PublicType")
-     * @ORM\JoinTable(name="internship__internship_public_type_restrict",
+     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\Publictype")
+     * @ORM\JoinTable(name="internship__internship_publictyperestrict",
      *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="public_type_restrict_id", referencedColumnName="id")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="publictyperestrict_id", referencedColumnName="id")}
      * )
      * @Serializer\Groups({"training", "inscription", "api"})
      */
-    protected $publicTypesRestrict;
+    protected $publictypesrestrict;
 
     /**
      * @var string
@@ -50,58 +50,58 @@ class Internship extends AbstractTraining
      * @var bool
      * @Serializer\Groups({"training", "api"})
      */
-    protected $designatedPublic;
+    protected $designatedpublic;
 
 
     public function __construct()
     {
-        $this->publicTypes = new ArrayCollection();
-        $this->publicTypesRestrict = new ArrayCollection();
+        $this->publictypes = new ArrayCollection();
+        $this->publictypesrestrict = new ArrayCollection();
 
         parent::__construct();
     }
 
     public function __clone()
     {
-        $this->publicTypes = new ArrayCollection();
-        $this->publicTypesRestrict = new ArrayCollection();
+        $this->publictypes = new ArrayCollection();
+        $this->publictypesrestrict = new ArrayCollection();
 
         parent::__construct();
     }
 
     /**
-     * @param mixed $publicTypes
+     * @param mixed $Publictypes
      */
-    public function setPublicTypes($publicTypes)
+    public function setPublictypes($Publictypes)
     {
-        $this->publicTypes = $publicTypes;
+        $this->publictypes = $Publictypes;
     }
 
     /**
      * @return mixed
      */
-    public function getPublicTypes()
+    public function getPublictypes()
     {
-        return $this->publicTypes;
+        return $this->publictypes;
     }
 
     /**
-     * @param PublicType $publicType
+     * @param Publictype $Publictype
      */
-    public function addPublicType($publicType)
+    public function addPublictype($Publictype)
     {
-        if (!$this->publicTypes->contains($publicType)) {
-            $this->publicTypes->add($publicType);
+        if (!$this->publictypes->contains($Publictype)) {
+            $this->publictypes->add($Publictype);
         }
     }
 
     /**
-     * @param PublicType $publicType
+     * @param Publictype $Publictype
      */
-    public function removePublicType($publicType)
+    public function removePublictype($Publictype)
     {
-        if ($this->publicTypes->contains($publicType)) {
-            $this->publicTypes->removeElement($publicType);
+        if ($this->publictypes->contains($Publictype)) {
+            $this->publictypes->removeElement($Publictype);
         }
     }
 
@@ -109,11 +109,11 @@ class Internship extends AbstractTraining
      * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
      * @return String
      */
-    public function getPublicTypesListString()
+    public function getPublictypesListString()
     {
-        if (empty($this->publicTypes)) return "";
+        if (empty($this->publictypes)) return "";
         $ptNames = array();
-        foreach ($this->publicTypes as $pt) {
+        foreach ($this->publictypes as $pt) {
             $ptNames[] = $pt->getName();
         }
 
@@ -121,38 +121,38 @@ class Internship extends AbstractTraining
     }
 
     /**
-     * @param mixed $publicTypesRestrict
+     * @param mixed $Publictypesrestrict
      */
-    public function setPublicTypesRestrict($publicTypesRestrict)
+    public function setPublictypesrestrict($Publictypesrestrict)
     {
-        $this->publicTypesRestrict = $publicTypesRestrict;
+        $this->publictypesrestrict = $Publictypesrestrict;
     }
 
     /**
      * @return mixed
      */
-    public function getPublicTypesRestrict()
+    public function getPublictypesrestrict()
     {
-        return $this->publicTypesRestrict;
+        return $this->publictypesrestrict;
     }
 
     /**
-     * @param PublicTypeRestrict $publicTypesRestrict
+     * @param Publictype $Publictype
      */
-    public function addPublicTypeRestrict($publicTypesRestrict)
+    public function addPublictyperestrict($Publictype)
     {
-        if (!$this->publicTypesRestrict->contains($publicTypesRestrict)) {
-            $this->publicTypesRestrict->add($publicTypesRestrict);
+        if (!$this->publictypesrestrict->contains($Publictype)) {
+            $this->publictypesrestrict->add($Publictype);
         }
     }
 
     /**
-     * @param PublicTypeRestrict $publicTypesRestrict
+     * @param Publictype $Publictype
      */
-    public function removePublicTypeRestrict($publicTypesRestrict)
+    public function removePublictyperestrict($Publictype)
     {
-        if ($this->publicTypesRestrict->contains($publicTypesRestrict)) {
-            $this->publicTypesRestrict->removeElement($publicTypesRestrict);
+        if ($this->publictypesrestrict->contains($Publictype)) {
+            $this->publictypesrestrict->removeElement($Publictype);
         }
     }
 
@@ -160,11 +160,11 @@ class Internship extends AbstractTraining
      * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
      * @return String
      */
-    public function getPublicTypesRestrictListString()
+    public function getPublictypesRestrictListString()
     {
-        if (empty($this->publicTypesRestrict)) return "";
+        if (empty($this->Publictypesrestrict)) return "";
         $ptNames = array();
-        foreach ($this->publicTypesRestrict as $pt) {
+        foreach ($this->Publictypesrestrict as $pt) {
             $ptNames[] = $pt->getName();
         }
 
@@ -190,17 +190,17 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getDesignatedPublic()
+    public function getDesignatedpublic()
     {
-        return $this->designatedPublic;
+        return $this->designatedpublic;
     }
 
     /**
-     * @param mixed $designatedPublic
+     * @param mixed $designatedpublic
      */
-    public function setDesignatedPublic($designatedPublic)
+    public function setDesignatedpublic($designatedPublic)
     {
-        $this->designatedPublic = $designatedPublic;
+        $this->designatedpublic = $designatedPublic;
     }
 
     /**

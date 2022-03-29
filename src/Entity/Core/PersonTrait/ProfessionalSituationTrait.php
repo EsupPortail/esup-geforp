@@ -2,7 +2,7 @@
 
 namespace App\Entity\Core\PersonTrait;
 
-use App\Entity\Core\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\AbstractInstitution;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -24,12 +24,12 @@ trait ProfessionalSituationTrait
     protected $institution;
 
     /**
-     * @var PublicType
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\PublicType")
+     * @var Publictype
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Publictype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainee", "trainer", "inscription", "api.profile","session"})
      */
-    protected $publicType;
+    protected $publictype;
 
     /**
      * @var string service
@@ -60,7 +60,7 @@ trait ProfessionalSituationTrait
     public function copyProfessionalSituation($entity, $force = true)
     {
         $propertyAccessor = new PropertyAccessor();
-        foreach (array('institution', 'publicType', 'service', 'isPaying', 'status') as $property) {
+        foreach (array('institution', 'publictype', 'service', 'isPaying', 'status') as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
             if ($force || ! $thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
@@ -84,19 +84,19 @@ trait ProfessionalSituationTrait
     }
 
     /**
-     * @param mixed $publicType
+     * @param mixed $Publictype
      */
-    public function setPublicType($publicType)
+    public function setPublictype($Publictype)
     {
-        $this->publicType = $publicType;
+        $this->publictype = $Publictype;
     }
 
     /**
-     * @return PublicType
+     * @return Publictype
      */
-    public function getPublicType()
+    public function getPublictype()
     {
-        return $this->publicType;
+        return $this->publictype;
     }
 
     /**

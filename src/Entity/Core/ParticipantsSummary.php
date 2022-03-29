@@ -4,7 +4,7 @@ namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Term\PublicType;
+use App\Entity\Core\Term\Publictype;
 
 /**
  * Participants summary for a session.
@@ -26,12 +26,12 @@ class ParticipantsSummary
     protected $session;
 
     /**
-     * @var PublicType
+     * @var Publictype
      * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\PublicType")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Publictype")
      * @Serializer\Groups({"session"})
      */
-    protected $publicType;
+    protected $publictype;
 
     /**
      * @ORM\Column(name="count", type="integer", nullable=true)
@@ -78,18 +78,18 @@ class ParticipantsSummary
     }
 
     /**
-     * @return PublicType
+     * @return Publictype
      */
-    public function getPublicType()
+    public function getPublictype()
     {
-        return $this->publicType;
+        return $this->publictype;
     }
 
     /**
-     * @param PublicType $publicType
+     * @param Publictype $Publictype
      */
-    public function setPublicType($publicType)
+    public function setPublictype($Publictype)
     {
-        $this->publicType = $publicType;
+        $this->publictype = $Publictype;
     }
 }

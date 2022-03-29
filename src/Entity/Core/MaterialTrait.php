@@ -55,12 +55,12 @@ trait MaterialTrait
     public function getPublicMaterials()
     {
         $materials = array();
-        foreach ($this->materials as $material) {
+/*        foreach ($this->materials as $material) {
             if ($material->getIsPublic()) {
                 $materials[] = $material;
             }
         }
-
+*/
         return $materials;
     }
 
@@ -73,11 +73,11 @@ trait MaterialTrait
     public function getPrivateMaterials()
     {
         $materials = array();
-        foreach ($this->materials as $material) {
+/*        foreach ($this->materials as $material) {
             if (!$material->getIsPublic()) {
                 $materials[] = $material;
             }
-        }
+        }*/
 
         return $materials;
     }
