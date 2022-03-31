@@ -128,6 +128,9 @@ class AbstractTrainerType extends AbstractType
                 'label' => 'Observations',
             ));
 
+        // add listeners to handle conditionals fields
+        $this->addEventListeners($builder);
+
         // If the user does not have the rights, remove the organization field and force the value
 /*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_core.access_right.trainer.all.create');
         if (!$hasAccessRightForAll) {

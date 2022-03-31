@@ -30,6 +30,7 @@ class EmailController extends AbstractController
      */
     public function searchAction(Request $request)
     {
+        /*
         $search = $this->get('sygefor_email.search');
         $search->handleRequest($request);
         $requestFilters = $request->request->get('filters');
@@ -45,7 +46,14 @@ class EmailController extends AbstractController
             $search->addTermFilter('trainer.organization.id', $this->getUser()->getOrganization()->getId());
         }
 
-        return $search->search();
+        return $search->search();*/
+
+        $ret = array(
+            'total' => array(),
+            'pageSize' => 0,
+            'items' => 0,
+        );
+        return $ret;
     }
 
     /**
