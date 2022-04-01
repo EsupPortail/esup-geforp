@@ -35,37 +35,37 @@ class DateSession
      * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $dateBegin;
+    protected $datebegin;
 
     /**
      * @ORM\Column(name="dateEnd", type="datetime", nullable=true)
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $dateEnd;
+    protected $dateend;
 
     /**
      * @ORM\Column(name="scheduleMorn", type="string", length=512, nullable=true)
      * @var String
      */
-    protected $scheduleMorn;
+    protected $schedulemorn;
 
     /**
      * @ORM\Column(name="scheduleAfter", type="string", length=512, nullable=true)
      * @var String
      */
-    protected $scheduleAfter;
+    protected $scheduleafter;
 
     /**
      * @ORM\Column(name="hourNumberMorn", type="decimal", scale=2, nullable=true)
      * @var String
      */
-    protected $hourNumberMorn;
+    protected $hournumbermorn;
 
     /**
      * @ORM\Column(name="hourNumberAfter", type="decimal", scale=2, nullable=true)
      * @var String
      */
-    protected $hourNumberAfter;
+    protected $hournumberafter;
 
     /**
      * @ORM\Column(name="place", type="string", length=512, nullable=true)
@@ -110,97 +110,97 @@ class DateSession
     /**
      * @return mixed
      */
-    public function getDateBegin()
+    public function getDatebegin()
     {
-        return $this->dateBegin;
+        return $this->datebegin;
     }
 
     /**
      * @param mixed $dateBegin
      */
-    public function setDateBegin($dateBegin)
+    public function setDatebegin($dateBegin)
     {
-        $this->dateBegin = $dateBegin;
+        $this->datebegin = $dateBegin;
     }
 
     /**
      * @return mixed
      */
-    public function getDateEnd()
+    public function getDateend()
     {
-        return $this->dateEnd;
+        return $this->dateend;
     }
 
     /**
      * @param mixed $dateEnd
      */
-    public function setDateEnd($dateEnd)
+    public function setDateend($dateEnd)
     {
-        $this->dateEnd = $dateEnd;
+        $this->dateend = $dateEnd;
     }
 
     /**
      * @return mixed
      */
-    public function getHourNumberMorn()
+    public function getHournumbermorn()
     {
-        return $this->hourNumberMorn;
+        return $this->hournumbermorn;
     }
 
     /**
      * @param mixed $hournumbermorn
      */
-    public function setHourNumberMorn($hournumbermorn)
+    public function setHournumbermorn($hournumbermorn)
     {
-        $this->hourNumberMorn = $hournumbermorn;
+        $this->hournumbermorn = $hournumbermorn;
     }
 
     /**
      * @return mixed
      */
-    public function getScheduleMorn()
+    public function getSchedulemorn()
     {
-        return $this->scheduleMorn;
+        return $this->schedulemorn;
     }
 
     /**
      * @param mixed $scheduleMorn
      */
-    public function setScheduleMorn($scheduleMorn)
+    public function setSchedulemorn($scheduleMorn)
     {
-        $this->scheduleMorn = $scheduleMorn;
+        $this->schedulemorn = $scheduleMorn;
     }
 
     /**
      * @return mixed
      */
-    public function getScheduleAfter()
+    public function getScheduleafter()
     {
-        return $this->scheduleAfter;
+        return $this->scheduleafter;
     }
 
     /**
      * @param mixed $scheduleAfter
      */
-    public function setScheduleAfter($scheduleAfter)
+    public function setScheduleafter($scheduleAfter)
     {
-        $this->scheduleAfter = $scheduleAfter;
+        $this->scheduleafter = $scheduleAfter;
     }
 
     /**
      * @return mixed
      */
-    public function getHourNumberAfter()
+    public function getHournumberafter()
     {
-        return $this->hourNumberAfter;
+        return $this->hournumberafter;
     }
 
     /**
      * @param mixed $hournumberafter
      */
-    public function setHourNumberAfter($hournumberafter)
+    public function setHournumberafter($hournumberafter)
     {
-        $this->hourNumberAfter = $hournumberafter;
+        $this->hournumberafter = $hournumberafter;
     }
 
     /**

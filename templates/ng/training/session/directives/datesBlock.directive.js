@@ -14,7 +14,7 @@ sygeforApp.directive('datesBlock', ['$dialog', '$filter', function($dialog, $fil
             scope.$dialog = $dialog;
         },
         controller: 'DatesViewController',
-        templateUrl: 'mycompanybundle/training/session/directives/dates.block.html'
+        templateUrl: 'training/session/directives/dates.block.html'
     }
 }]);
 

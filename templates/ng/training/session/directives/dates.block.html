@@ -27,12 +27,12 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="date in session.dates | orderBy:'dateBegin':false" >
-                    <td>{{ date.dateBegin | date: 'dd/MM/yyyy' }}</td>
-                    <td>{{ date.dateEnd | date: 'dd/MM/yyyy' }}</td>
-                    <td>{{ date.scheduleMorn }}</td>
-                    <td>{{ date.scheduleAfter }}</td>
-                    <td>{{ date.hourNumber }}</td>
+                <tr ng-repeat="date in session.dates | orderBy:'datebegin':false" >
+                    <td>{{ date.datebegin | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.dateend | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.schedulemorn }}</td>
+                    <td>{{ date.scheduleafter }}</td>
+                    <td>{{ date.hournumber }}</td>
                     <td>{{ date.place }}</td>
                     <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>
                     <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span class="fa fa-trash-o"></span></a></td>
