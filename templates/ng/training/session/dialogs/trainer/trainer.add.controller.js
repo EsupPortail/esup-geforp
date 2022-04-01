@@ -60,7 +60,7 @@ sygeforApp.controller('TrainerAddController', ['$scope', '$modalInstance', '$dia
         return $http.post(url, query).then(function (res) {
             var adresses = [];
             angular.forEach(res.data.items, function (item) {
-                adresses.push({label: item.fullName, value: item.id, organization: (item.organization.name) ? item.organization.name : ''})
+                adresses.push({label: item.fullname, value: item.id, organization: (item.organization.name) ? item.organization.name : ''})
             });
 
             return adresses;

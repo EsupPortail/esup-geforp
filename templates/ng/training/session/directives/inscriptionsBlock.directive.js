@@ -14,7 +14,7 @@ sygeforApp.directive('inscriptionsBlock', ['$dialog', '$filter', function($dialo
             scope.$dialog = $dialog;
         },
         controller: 'SessionInscriptionsController',
-        templateUrl: 'mycompanybundle/training/session/directives/inscriptions.block.html'
+        templateUrl: 'training/session/directives/inscriptions.block.html'
     }
 }]);
 

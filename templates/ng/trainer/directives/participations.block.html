@@ -14,7 +14,7 @@
             <table class="table table-condensed table-nohead">
                 <tbody>
                 <tr ng-repeat="participation in search.result.items" class="row">
-                    <td class="col-xs-3"><span class="text-gray-light text-small">{{ participation.session.dateBegin | date:'dd/MM/yy' }}</span></td>
+                    <td class="col-xs-3"><span class="text-gray-light text-small">{{ participation.session.datebegin | date:'dd/MM/yy' }}</span></td>
                     <td class="col-xs-9"><a ui-sref="session.detail.view({id: participation.session.id})">{{ participation.session.training.name }}</a><br>
                         <span class="text-light text-gray-light">{{ participation.session.training.typeLabel }}</span>
                     </td>

@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Participation;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -17,6 +18,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use App\Utils\Search\SearchService;
 use App\Entity\Core\AbstractParticipation;
 use App\Entity\Core\AbstractSession;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Form\FormError;
@@ -35,10 +37,10 @@ abstract class AbstractParticipationController extends AbstractController
      * @Route("/participation/search", name="participation.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
-    public function participationSearchAction(Request $request)
+    public function participationSearchAction(Request $request, ManagerRegistry $doctrine)
     {
         /** @var SearchService $search */
-        $search = $this->get('sygefor_participation.search');
+/*        $search = $this->get('sygefor_participation.search');
         $search->handleRequest($request);
 
         // security check
@@ -46,16 +48,24 @@ abstract class AbstractParticipationController extends AbstractController
             $search->addTermFilter('organization.id', $this->getUser()->getOrganization()->getId());
         }
 
-        return $search->search();
+        return $search->search(); */
+        $participations = $doctrine->getRepository(Participation::class)->findAll();
+        $nbParticipations  = count($participations);
+
+        $ret = array(
+            'total' => $nbParticipations,
+            'pageSize' => 0,
+            'items' => $participations,
+        );
+        return $ret;
     }
 
     /**
      * @Route("/{session}/add", name="participation.add", options={"expose"=true}, defaults={"_format" = "json"})
-     * @SecureParam(name="session", permissions="EDIT")
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "session"})
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function addParticipationAction(Request $request, AbstractSession $session)
+    public function addParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
     {
         /** @var AbstractParticipation $participation */
         $participation = new $this->participationClass();
@@ -75,9 +85,11 @@ abstract class AbstractParticipationController extends AbstractController
 
                 if (!$existingParticipation || ($existingParticipation->getTrainer() !== $participation->getTrainer())) {
                     $session->addParticipation($participation);
-                    $session->updateTimestamps();
-                    $session->getTraining()->updateTimestamps();
-                    $em = $this->getDoctrine()->getManager();
+                    //$session->updateTimestamps();
+                    $session->setUpdatedAt(New \DateTime('now'));
+                    //$session->getTraining()->updateTimestamps();
+                    $session->getTraining()->setUpdatedAt(New \DateTime('now'));
+                    $em = $doctrine->getManager();
                     $em->persist($participation);
                     $em->flush();
                 }
@@ -89,22 +101,23 @@ abstract class AbstractParticipationController extends AbstractController
 
     /**
      * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="participation.edit", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("participation", class="SygeforCoreBundle:AbstractParticipation", options={"id" = "id"})
+     * @ParamConverter("participation", class="App\Entity\Core\AbstractParticipation", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "participation", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function editParticipationAction(Request $request, AbstractParticipation $participation)
+    public function editParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractParticipation $participation)
     {
         // participation can't be created if user has no rights for it
-        if (!$this->get('security.context')->isGranted('EDIT', $participation->getSession())) {
+/*        if (!$this->get('security.context')->isGranted('EDIT', $participation->getSession())) {
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         $form = $this->createForm($participation::getFormType(), $participation);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $participation->getSession()->updateTimestamps();
-                $this->getDoctrine()->getManager()->flush();
+                //$participation->getSession()->updateTimestamps();
+                $participation->getSession()->setUpdatedAt(New \DateTime('now'));
+                $doctrine->getManager()->flush();
             }
         }
 
@@ -114,19 +127,20 @@ abstract class AbstractParticipationController extends AbstractController
     /**
      * @Route("/{session}/remove/{participation}", name="participation.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @SecureParam(name="session", permissions="EDIT")
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "session"})
-     * @ParamConverter("participation", class="SygeforCoreBundle:AbstractParticipation", options={"id" = "participation"})
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
+     * @ParamConverter("participation", class="App\Entity\Core\AbstractParticipation", options={"id" = "participation"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeParticipationAction(AbstractSession $session, AbstractParticipation $participation)
+    public function removeParticipationAction(AbstractSession $session, ManagerRegistry $docrtine, AbstractParticipation $participation)
     {
         $session->removeParticipation($participation);
-        $session->updateTimestamps();
-        $session->getTraining()->updateTimestamps();
-        $this->getDoctrine()->getManager()->remove($participation);
-        $this->getDoctrine()->getManager()->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $session->updateTimestamps();
+//        $session->getTraining()->updateTimestamps();
+        $session->setUpdatedAt(New \DateTime('now'));
+        $session->getTraining()->setUpdatedAt(New \DateTime('now'));
+        $docrtine->getManager()->remove($participation);
+        $docrtine->getManager()->flush();
+//        $this->get('fos_elastica.index')->refresh();
 
         return;
     }

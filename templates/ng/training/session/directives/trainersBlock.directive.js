@@ -59,6 +59,6 @@ sygeforApp.directive('trainersBlock', [function() {
             };
 
         },
-        templateUrl: 'mycompanybundle/training/session/directives/trainers.block.html'
+        templateUrl: 'training/session/directives/trainers.block.html'
     }
 }]);

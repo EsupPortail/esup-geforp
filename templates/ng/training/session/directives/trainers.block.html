@@ -16,7 +16,7 @@
         <div ng-if="session.participations.length">
             <span ng-repeat="participation in session.participations">
                 <button type="button" class="close close-inline" ng-click="removeTrainer(participation)"><span aria-hidden="true">&times;</span></button>
-                <a href="" ui-sref="trainer.detail.view({session: participation.session.id, id: participation.trainer.id})"> <!-- ng-click="editParticipation(participation)" -->{{ participation.trainer.fullName }}</a>
+                <a href="" ui-sref="trainer.detail.view({session: participation.session.id, id: participation.trainer.id})"> <!-- ng-click="editParticipation(participation)" -->{{ participation.trainer.fullname }}</a>
                 {{$last ? '' : ', '}}
             </span>
             <br>

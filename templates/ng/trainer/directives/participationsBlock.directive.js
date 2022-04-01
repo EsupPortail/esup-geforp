@@ -16,7 +16,7 @@ sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', functi
             // get participations from elasticsearch
             var search = $searchFactory('participation.search');
             search.query.filters['trainer.id'] = scope.trainer.id;
-            search.query.sorts = {'session.dateBegin': 'desc'};
+            search.query.sorts = {'session.datebegin': 'desc'};
             search.query.size = 20;
             scope.search = search;
             search.search().then(function() {

@@ -13,6 +13,6 @@ sygeforApp.directive('participantsSummaryBlock', [function() {
 
         },
         controller: 'SessionParticipantsSummaryController',
-        templateUrl: 'mycompanybundle/training/session/directives/participants-summary.block.html'
+        templateUrl: 'training/session/directives/participants-summary.block.html'
     }
 }]);
