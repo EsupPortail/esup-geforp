@@ -19,7 +19,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             });
         },
         available: function () {
-            return ( training !== null ) && ($user.hasAccessRight('sygefor_training.rights.training.all.update') || $user.hasAccessRight('sygefor_training.rights.training.own.update'));
+            return ( training !== null ) ; // && ($user.hasAccessRight('sygefor_training.rights.training.all.update') || $user.hasAccessRight('sygefor_training.rights.training.own.update'));
         }
      }];
 
@@ -139,7 +139,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
         'training.name.source' : {
             label: 'Formation'
         },
-        'dateBegin' : {
+        'datebegin' : {
             label: 'Date',
             type: 'range'
         },

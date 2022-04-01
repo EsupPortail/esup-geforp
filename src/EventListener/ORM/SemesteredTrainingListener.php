@@ -106,7 +106,7 @@ class SemesteredTrainingListener extends Listener
                 $this->scheduledForDeletion[] = $training->getId().'_'.$object->getYear().'_'.$object->getSemester();
 
                 // we need to update the semesteredTraining its associated with
-                $date = $object->getDateBegin();
+                $date = $object->getDatebegin();
                 $training = $object->getTraining();
                 $year = $date->format('Y');
                 $semester = ($date->format('m') < 6) ? 1 : 2;
@@ -131,7 +131,7 @@ class SemesteredTrainingListener extends Listener
             $training = $object->getTraining();
             if ($training) {
                 /** @var \DateTime $date */
-                $date = $object->getDateBegin();
+                $date = $object->getDatebegin();
                 $year = $date->format('Y');
                 $semester = ($date->format('m') < 6) ? 1 : 2;
 

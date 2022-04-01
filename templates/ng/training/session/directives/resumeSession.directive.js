@@ -9,6 +9,6 @@ sygeforApp.directive('resumeSessionBlock', [function() {
         scope: {
             session: '=resumeSessionBlock'
         },
-        templateUrl: 'mycompanybundle/training/session/directives/resumeSession.block.html'
+        templateUrl: 'training/session/directives/resumeSession.block.html'
     }
 }]);

@@ -162,9 +162,9 @@ class Internship extends AbstractTraining
      */
     public function getPublictypesRestrictListString()
     {
-        if (empty($this->Publictypesrestrict)) return "";
+        if (empty($this->publictypesrestrict)) return "";
         $ptNames = array();
-        foreach ($this->Publictypesrestrict as $pt) {
+        foreach ($this->publictypesrestrict as $pt) {
             $ptNames[] = $pt->getName();
         }
 

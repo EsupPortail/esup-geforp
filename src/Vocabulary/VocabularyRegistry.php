@@ -10,7 +10,7 @@ use App\Entity\Core\Term\MenuItem;
 use App\Entity\Core\Term\PresenceStatus;
 use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\Term\PublipostTemplate;
-use App\Entity\Core\Term\SessionType;
+use App\Entity\Core\Term\Sessiontype;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Theme;
@@ -89,7 +89,7 @@ class VocabularyRegistry
         $voc = new Tag();
         $this->addVocabulary($voc, $i);
         $i++;
-        $voc = new SessionType();
+        $voc = new Sessiontype();
         $this->addVocabulary($voc, $i);
         $i++;
         $voc = new TrainerType();

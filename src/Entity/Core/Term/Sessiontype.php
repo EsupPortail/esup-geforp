@@ -18,7 +18,7 @@ use App\Entity\Core\Term\VocabularyInterface;
  * @ORM\Table(name="session_type")
  * @ORM\Entity
  */
-class SessionType extends AbstractTerm implements VocabularyInterface
+class Sessiontype extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @return mixed

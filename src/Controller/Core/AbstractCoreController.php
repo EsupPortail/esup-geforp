@@ -4,7 +4,7 @@ namespace App\Controller\Core;
 
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use JMS\Serializer\SerializationContext;
+use FOS\RestBundle\Context\Context;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractTraining;
 use App\Entity\Organization;
@@ -58,10 +58,10 @@ abstract class AbstractCoreController extends AbstractController
         }
 
         // security
-        $security = $this->get('security.context');
+/*        $security = $this->get('security.context');
         if (!$security->isGranted('VIEW', $entity)) {
             throw new AccessDeniedHttpException();
-        }
+        }*/
 
         // determine the serialization groups
         $groups = array('Default');
@@ -73,7 +73,11 @@ abstract class AbstractCoreController extends AbstractController
 
         // return the view
         $view = new View($entity);
-        $view->setSerializationContext(SerializationContext::create()->setGroups($groups));
+//        $view->setSerializationContext(SerializationContext::create()->setGroups($groups));
+        $context = new Context();
+        $context->setGroups($groups);
+        $view->setContext($context);
+
 
         return $view;
     }

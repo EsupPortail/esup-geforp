@@ -9,7 +9,7 @@ use App\Entity\Core\Term\InscriptionStatus;
 use App\Entity\Core\Term\MenuItem;
 use App\Entity\Core\Term\PresenceStatus;
 use App\Entity\Core\Term\Publictype;
-use App\Entity\Core\Term\SessionType;
+use App\Entity\Core\Term\Sessiontype;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Theme;

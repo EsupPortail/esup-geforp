@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\PreSerializeEvent;
 use App\Entity\Core\AbstractSession;
+use App\EventListener\Serializer\TrainingEventSubscriber;
 
 /**
  * Session serialization event subscriber.

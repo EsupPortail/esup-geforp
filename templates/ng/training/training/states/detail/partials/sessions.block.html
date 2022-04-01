@@ -15,8 +15,8 @@
             Il n'y a aucune session passée ou à venir.
         </div>
         <ul class="list-unstyled list-padded">
-            <li ng-repeat="session in training.sessions | orderBy:'dateBegin':true" ng-class="{past: $moment(session.dateBegin) < $moment()}">
-                <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.dateBegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
+            <li ng-repeat="session in training.sessions | orderBy:'datebegin':true" ng-class="{past: $moment(session.datebegin) < $moment()}">
+                <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.datebegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
 
                 <!-- stats -->
                 &nbsp;&nbsp;

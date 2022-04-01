@@ -11,9 +11,13 @@ namespace App\Form\Type;
 
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use App\Entity\Core\Term\Sessiontype as Type;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -34,63 +38,94 @@ class AbstractSessionType extends AbstractType
                 'class' => AbstractTraining::class,
                 'required' => true,
             ))
-            ->add('dateBegin', DateType::class, array(
+            ->add('datebegin', DateType::class, array(
                 'label' => 'Date de début',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
+                'html5' => false,
                 'required' => true,
             ))
-            ->add('dateEnd', DateType::class, array(
+            ->add('dateend', DateType::class, array(
                 'label' => 'Date de fin',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
+                'html5' => false,
                 'required' => false,
+            ))
+            ->add('schedule', null, array(
+                'label'    => "Horaires",
+                'required' => false
+            ))
+            ->add('hourNumber', TextType::class, array(
+                'label'    => "Nombre d'heures",
+                'required' => true,
+                'attr'     => array(
+                    'min' => 1,
+                    'max' => 999,
+                ),
+            ))
+            ->add('dayNumber', TextType::class, array(
+                'label'    => 'Nombre de jours',
+                'required' => true,
+                'attr'     => array(
+                    'min' => 1,
+                    'max' => 999,
+                ),
             ))
             ->add('registration', ChoiceType::class, array(
                 'label' => 'Inscriptions',
                 'choices' => array(
-                    AbstractSession::REGISTRATION_DEACTIVATED => 'Désactivées',
-                    AbstractSession::REGISTRATION_CLOSED => 'Fermées',
-                    AbstractSession::REGISTRATION_PRIVATE => 'Privées',
-                    AbstractSession::REGISTRATION_PUBLIC => 'Publiques',
+                    'Désactivées' => AbstractSession::REGISTRATION_DEACTIVATED,
+                    'Fermées' => AbstractSession::REGISTRATION_CLOSED,
+                    'Privées' => AbstractSession::REGISTRATION_PRIVATE,
+                    'Publiques' => AbstractSession::REGISTRATION_PUBLIC,
                 ),
-                'required' => true,
+                'required' => false,
             ))
-            ->add('displayOnline', ChoiceType::class, array(
+            ->add('promote', CheckboxType::class, array(
+                'label' => 'Promouvoir',
+            ))
+            ->add('displayonline', ChoiceType::class, array(
                 'label' => 'Afficher en ligne',
                 'choices' => array(
-                    0 => 'Non',
-                    1 => 'Oui',
+                    'Non' => 0,
+                    'Oui' => 1,
                 ),
                 'required' => false,
             ))
             ->add('status', ChoiceType::class, array(
                 'label' => 'Statut',
                 'choices' => array(
-                    AbstractSession::STATUS_OPEN => 'Ouverte',
-                    AbstractSession::STATUS_REPORTED => 'Reportée',
-                    AbstractSession::STATUS_CANCELED => 'Annulée',
+                    'Ouverte' => AbstractSession::STATUS_OPEN,
+                    'Reportée' => AbstractSession::STATUS_REPORTED,
+                    'Annulée' => AbstractSession::STATUS_CANCELED,
                 ),
                 'required' => false,
             ))
-            ->add('numberOfRegistrations', null, array(
+            ->add('sessiontype', EntityType::class, array(
+                'label'    => 'Type',
+                'class'    => Type::class,
+                'required' => false,
+            ))
+            ->add('numberofregistrations', null, array(
                 'label' => "Nombre d'inscrits",
                 'required' => false,
             ))
-            ->add('maximumNumberOfRegistrations', null, array(
+            ->add('maximumnumberofregistrations', null, array(
                 'label' => 'Participants max.',
                 'required' => true,
             ))
-            ->add('limitRegistrationDate', 'date', array(
+           ->add('limitregistrationdate', DateType::class, array(
                 'label' => "Date limite d'inscription",
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
+                'html5' => false,
                 'required' => true,
             ))
-            ->add('comments', 'textarea', array(
+            ->add('comments', null, array(
                 'required' => false,
                 'label' => 'Commentaires',
-            ));
+            )) ;
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -11,8 +11,8 @@
         </thead>
         <tbody>
             <tr ng-repeat="item in items">
-                <td><a href="" ui-sref="session.detail.view({ id: item.id, training: item.training.id })" ui-sref-widget-opts>{{ item.dateBegin|date: 'dd/MM/yyyy' }}</a></td>
-                <td>{{ item.training.typeLabel }}</td>
+                <td><a href="" ui-sref="session.detail.view({ id: item.id, training: item.training.id })" ui-sref-widget-opts>{{ item.datebegin|date: 'dd/MM/yyyy' }}</a></td>
+                <td>{{ item.training.TypeLabel }}</td>
                 <td><span class="fa fa-star fa-highlight" ng-if="item.promote" title="Session promue"></span> <a href="" ui-sref="training.detail.view({ id: item.training.id })">{{ item.training.name }}</a></td>
                 <td>
                     <span ng-repeat="stat in item.inscriptionStats |filter:{status:'!2'}| orderBy:'count':1">

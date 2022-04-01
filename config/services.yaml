@@ -37,6 +37,11 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    App\Listener\SessionListener:
+        tags:
+            - { name: doctrine.event_subscriber }
+
+
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder
 #        arguments:

@@ -2,8 +2,11 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Session;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,6 +14,7 @@ use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractParticipation;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use App\Form\Type\AbstractSessionType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Console\Exception\InvalidOptionException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -31,7 +35,7 @@ abstract class AbstractSessionController extends AbstractController
      * @Route("/search", name="session.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
 /*        $search = $this->get('sygefor_training.session.search');
         $search->handleRequest($request);
@@ -42,20 +46,24 @@ abstract class AbstractSessionController extends AbstractController
         }
 
         return $search->search(); */
+
+        $sessions = $doctrine->getRepository(Session::class)->findAll();
+        $nbSessions  = count($sessions);
+
         $ret = array(
-            'total' => 0,
+            'total' => $nbSessions,
             'pageSize' => 0,
-            'items' => array(),
+            'items' => $sessions,
         );
         return $ret;
     }
 
     /**
      * @Route("/create/{training}", requirements={"id" = "\d+"}, name="session.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("training", class="App/Entity/Core/AbstractTraining", options={"id" = "training"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "training"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function createAction(Request $request, AbstractTraining $training)
+    public function createAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training)
     {
         /** @var AbstractSession $session */
         $session = new $this->sessionClass();
@@ -64,13 +72,25 @@ abstract class AbstractSessionController extends AbstractController
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                dump($session->getDisplayonline());
+                $session->setCreatedAt(new \DateTime('now'));
+                $session->setUpdatedAt(new \DateTime('now'));
+                $em = $doctrine->getManager();
                 $em->persist($session);
-                $training->updateTimestamps();
+//                $training->updateTimestamps();
                 $em->flush();
             }
         }
+
+/*        if (!$this->get('security.context')->isGranted('EDIT', $session)) {
+            if ($this->get('security.context')->isGranted('VIEW', $session)) {
+                return array('session' => $session);
+            }
+
+            throw new AccessDeniedException('Action non autorisée');
+        }*/
 
         return array('form' => $form->createView(), 'training' => $session->getTraining(), 'session' => $session);
     }
@@ -79,25 +99,25 @@ abstract class AbstractSessionController extends AbstractController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="session.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "id"})
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function viewAction(Request $request, AbstractSession $session)
+    public function viewAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
     {
-        if (!$this->get('security.context')->isGranted('EDIT', $session)) {
+/*        if (!$this->get('security.context')->isGranted('EDIT', $session)) {
             if ($this->get('security.context')->isGranted('VIEW', $session)) {
                 return array('session' => $session);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         $sessionRegistration = $session->getRegistration();
         $form = $this->createForm($session::getFormType(), $session);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $doctrine->getManager();
                 $em->flush();
 
                 return $this->redirectToRoute('session.view', array('id' => $session->getId()));
@@ -113,7 +133,7 @@ abstract class AbstractSessionController extends AbstractController
      * @param mixed                $inscriptionIds
      *
      * @Route("/duplicate/{id}/{inscriptionIds}", requirements={"id" = "\d+"}, name="session.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", isOptional="true")
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", isOptional="true")
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      *
      * @return array
@@ -132,25 +152,25 @@ abstract class AbstractSessionController extends AbstractController
             // get session
             $session = $inscriptions[0]->getSession();
         }
-
+/*
         // new session can't be created if user has no rights for it
         if (!$this->get('security.context')->isGranted('EDIT', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
-
+*/
         $cloned = clone $session;
         $form = $this->createFormBuilder($cloned)
             ->add('name', null, array(
                 'required' => true,
                 'label' => 'Intitulé de la session',
             ))
-            ->add('dateBegin', DateType::class, array(
+            ->add('datebegin', DateType::class, array(
                 'required' => true,
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
                 'label' => 'Date de début',
             ))
-            ->add('dateEnd', DateType::class, array(
+            ->add('dateend', DateType::class, array(
                 'required' => false,
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
@@ -191,17 +211,17 @@ abstract class AbstractSessionController extends AbstractController
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="session.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "id"})
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeAction(AbstractSession $session)
+    public function removeAction(AbstractSession $session, ManagerRegistry $doctrine)
     {
         $training = $session->getTraining();
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->remove($session);
-        $training->updateTimestamps();
+//        $training->updateTimestamps();
         $em->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('training.view', array('id' => $training->getId())));
     }

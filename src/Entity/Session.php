@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractSession;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Form\SessionType;
+use App\Form\Type\SessionType;
 use App\Entity\DateSession;
 use App\Entity\Alert;
 
@@ -31,40 +31,40 @@ class Session extends AbstractSession
     protected $price;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="teaching_cost",type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $teachingCost;
+    protected $teachingcost;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="vacation_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $vacationCost;
+    protected $vacationcost;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="accommodation_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $accommodationCost;
+    protected $accommodationcost;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="meal_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $mealCost;
+    protected $mealcost;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="transport_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $transportCost;
+    protected $transportcost;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(name="material_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $materialCost;
+    protected $materialcost;
 
     /**
      * @ORM\Column(type="float", nullable=true)
@@ -75,7 +75,7 @@ class Session extends AbstractSession
     /**
      * @var ArrayCollection $dates
      * @ORM\OneToMany(targetEntity="App\Entity\DateSession", mappedBy="session", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"dateBegin" = "ASC"})
+     * @ORM\OrderBy({"datebegin" = "ASC"})
      * @Serializer\Groups({"session", "api.session"})
      */
     protected $dates;
@@ -122,25 +122,25 @@ class Session extends AbstractSession
     /**
      * @return mixed
      */
-    public function getTeachingCost()
+    public function getTeachingcost()
     {
-        return $this->teachingCost;
+        return $this->teachingcost;
     }
 
     /**
      * @param mixed $teachingCost
      */
-    public function setTeachingCost($teachingCost)
+    public function setTeachingcost($teachingCost)
     {
-        $this->teachingCost = $teachingCost;
+        $this->teachingcost = $teachingCost;
     }
 
     /**
      * @return mixed
      */
-    public function getVacationCost()
+    public function getVacationcost()
     {
-        return $this->vacationCost;
+        return $this->vacationcost;
     }
 
     /**
@@ -148,71 +148,71 @@ class Session extends AbstractSession
      */
     public function setVacationCost($vacationCost)
     {
-        $this->vacationCost = $vacationCost;
+        $this->vacationcost = $vacationCost;
     }
 
     /**
      * @return mixed
      */
-    public function getAccommodationCost()
+    public function getAccommodationcost()
     {
-        return $this->accommodationCost;
+        return $this->accommodationcost;
     }
 
     /**
      * @param mixed $accommodationCost
      */
-    public function setAccommodationCost($accommodationCost)
+    public function setAccommodationcost($accommodationCost)
     {
-        $this->accommodationCost = $accommodationCost;
+        $this->accommodationcost = $accommodationCost;
     }
 
     /**
      * @return mixed
      */
-    public function getMealCost()
+    public function getMealcost()
     {
-        return $this->mealCost;
+        return $this->mealcost;
     }
 
     /**
      * @param mixed $mealCost
      */
-    public function setMealCost($mealCost)
+    public function setMealcost($mealCost)
     {
-        $this->mealCost = $mealCost;
+        $this->mealcost = $mealCost;
     }
 
     /**
      * @return mixed
      */
-    public function getTransportCost()
+    public function getTransportcost()
     {
-        return $this->transportCost;
+        return $this->transportcost;
     }
 
     /**
      * @param mixed $transportCost
      */
-    public function setTransportCost($transportCost)
+    public function setTransportcost($transportCost)
     {
-        $this->transportCost = $transportCost;
+        $this->transportcost = $transportCost;
     }
 
     /**
      * @return mixed
      */
-    public function getMaterialCost()
+    public function getMaterialcost()
     {
-        return $this->materialCost;
+        return $this->materialcost;
     }
 
     /**
      * @param mixed $materialCost
      */
-    public function setMaterialCost($materialCost)
+    public function setMaterialcost($materialCost)
     {
-        $this->materialCost = $materialCost;
+        $this->materialcost = $materialCost;
     }
 
     /**

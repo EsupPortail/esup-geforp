@@ -7,20 +7,20 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th search-table-th field="dateBegin" class="visible">Date</th>
+                        <th search-table-th field="datebegin" class="visible">Date</th>
                         <th search-table-th field="training.name.source">Formation</th>
                         <th search-table-th field="registration" class="visible">Inscriptions</th>
                         <th search-table-th field="status">Statut</th>
-                        <th search-table-th field="numberOfRegistrations">Inscrits</th>
+                        <th search-table-th field="numberofregistrations">Inscrits</th>
                         <th>Statistiques</th>
-                        <th search-table-th field="numberOfParticipants">Présents</th>
-                        <th search-table-th field="displayOnline">En ligne</th>
+                        <th search-table-th field="numberofparticipants">Présents</th>
+                        <th search-table-th field="displayonline">En ligne</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
                         <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
-                        <td><a href="" ui-sref="session.detail.view({id: item.id})">{{ item.dateBegin|date: 'dd/MM/yyyy' }}</a></td>
+                        <td><a href="" ui-sref="session.detail.view({id: item.id})">{{ item.datebegin|date: 'dd/MM/yyyy' }}</a></td>
                         <td><a href="" ui-sref="training.detail.view({id: item.training.id + '_' + item.year + '_' + item.semester})">{{ item.training.name }}</a></td>
                         <td>
                             <span registration-label="item" large></span>
@@ -31,7 +31,7 @@
                             <a registration-stats-label="item" class="label-lg"></a>
                         </td>
                         <td>{{ item.numberOfParticipants }}</td>
-                        <td><span class="label label-lg" ng-class="item.displayOnline ? 'label-success' : 'label-default'">{{ item.displayOnline ? "Oui" : "Non" }}</span></td>
+                        <td><span class="label label-lg" ng-class="item.displayonline ? 'label-success' : 'label-default'">{{ item.displayonline ? "Oui" : "Non" }}</span></td>
                     </tr>
                 </tbody>
             </table>

@@ -135,7 +135,7 @@ class SemesteredTraining
         $result = null;
         $maxdif = 9999999999;
         foreach ($this->sessions as $session) {
-            $dif = $now->getTimestamp() - $session->getDateBegin()->getTimeStamp();
+            $dif = $now->getTimestamp() - $session->getDatebegin()->getTimeStamp();
             if (($dif > 0) && ($dif < $maxdif)) {
                 $result = $session;
                 $maxdif = $dif;
@@ -158,7 +158,7 @@ class SemesteredTraining
         $result = null;
         $maxdif = 9999999999;
         foreach ($this->sessions as $session) {
-            $dif = $session->getDateBegin()->getTimestamp() - $now->getTimeStamp();
+            $dif = $session->getDatebegin()->getTimestamp() - $now->getTimeStamp();
             if (($dif > 0) && ($dif < $maxdif)) {
                 $result = $session;
                 $maxdif = $dif;
@@ -193,7 +193,7 @@ class SemesteredTraining
         if (!empty($sessions)) {
             foreach ($sessions as $session) {
                 /** @var \DateTime $date */
-                $date = $session->getDateBegin();
+                $date = $session->getDatebegin();
 
                 $year = $date->format('Y');
                 $semester = ($date->format('m') <= 6) ? 1 : 2;
@@ -248,7 +248,7 @@ class SemesteredTraining
             foreach ($sessions as $session) {
                 //if (!$session ){die();}
                 /** @var \DateTime $date */
-                $date = $session->getDateBegin();
+                $date = $session->getDatebegin();
 
                 $year = $date->format('Y');
                 $semester = ($date->format('m') <= 6) ? 1 : 2;
@@ -358,7 +358,7 @@ class SemesteredTraining
         $sessions = array();
         foreach ($tmpArray as $re) {
             if (!empty($re)) {
-                $ys = self::getYearAndSemesterFromDate($re->getDateBegin());
+                $ys = self::getYearAndSemesterFromDate($re->getDatebegin());
                 $tId = $re->getTraining()->getId();
                 if (!isset($sessions[$tId])) {
                     $sessions[$tId] = array();
@@ -413,8 +413,8 @@ class SemesteredTraining
     private function orderSessions()
     {
         @usort($this->sessions, function ($a, $b) {
-            $ad = $a->getDateBegin();
-            $bd = $b->getDateBegin();
+            $ad = $a->getDatebegin();
+            $bd = $b->getDatebegin();
 
             if ($ad === $bd) {
                 return 0;

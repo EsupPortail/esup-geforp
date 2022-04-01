@@ -12,13 +12,13 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
         resolve: {
             training: function($stateParams, $entityManager) {
                 if($stateParams.training) {
-                    return $entityManager('SygeforTrainingBundle:Training\\AbstractTraining').find($stateParams.training);
+                    return $entityManager('App\\Entity\\Core\\AbstractTraining').find($stateParams.training);
                 }
                 return null;
             },
             search: function ($searchFactory, $stateParams, training, $user) {
                 var search = $searchFactory('session.search');
-                search.query.sorts = {'dateBegin': 'desc'};
+                search.query.sorts = {'datebegin': 'desc'};
                 search.query.filters = {
                     'training.organization.name.source': $user.organization.name,
                     'year': moment().format('YYYY'),
@@ -75,7 +75,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                             }
                         },
                         breadcrumb: function (data, $filter) {
-                            return {label: $filter('date')(data.session.dateBegin, "dd MMMM y")}
+                            return {label: $filter('date')(data.session.datebegin, "dd MMMM y")}
                         }
                     }
                 }
@@ -93,9 +93,9 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             $scope.form = form;
 
             // add new module option
-            if ($scope.form.children.module) {
+/*            if ($scope.form.children.module) {
                 $scope.form.children.module.choices.unshift({l: "Nouveau module"});
-            }
+            }*/
 
             $scope.$moment = moment;
             $scope.onSuccess = function(data) {
@@ -273,10 +273,10 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 state: 'session.table',
                 title: 'Prochaines sessions',
                 size: 10,
-                sorts: {'dateBegin': 'asc'},
+                sorts: {'datebegin': 'asc'},
                 filters: {
                     'training.organization.name.source': $user.organization.name,
-                    'dateBegin': moment().format('DD/MM/YYYY') + ' - ' + moment().add('years', 1).format('DD/MM/YYYY')
+                    'datebegin': moment().format('DD/MM/YYYY') + ' - ' + moment().add('years', 1).format('DD/MM/YYYY')
                 }
             }
         }

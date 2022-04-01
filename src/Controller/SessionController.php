@@ -8,6 +8,7 @@ use App\Entity\DateSession;
 use App\Entity\Inscription;
 use App\Form\Type\DateSessionType;
 use App\Controller\Core\AbstractSessionController;
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -29,17 +30,17 @@ class SessionController extends AbstractSessionController
 
     /**
      * @Route("/adddates/{session}", name="dates.add", requirements={"id" = "\d+"}, options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "session"})
+     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function adddatesAction(Session $session, Request $request)
+    public function adddatesAction(Session $session, Request $request, ManagerRegistry $doctrine)
     {
         $dateSession = new $this->dateClass;
         $dateSession->setSession($session);
         $daysSum =0;
         $hoursSum = 0;
 
-        $form        = $this->createForm(new DateSessionType(), $dateSession);
+        $form        = $this->createForm(DateSessionType::class, $dateSession);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -48,41 +49,41 @@ class SessionController extends AbstractSessionController
                 $datesEnd = array();
                 /** @var DateSession $existingDate */
                 foreach ($session->getDates() as $existingDate) {
-                    if ($existingDate->getDateBegin() == $dateSession->getDateBegin()) {
-                        $form->get('dateBegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
+                    if ($existingDate->getDatebegin() == $dateSession->getDatebegin()) {
+                        $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
                         return array('form' => $form->createView(), 'dates' => $dateSession);
                     }
-                    $datesBegin[] = $existingDate->getDateBegin();
-                    $datesEnd[] = $existingDate->getDateEnd();
+                    $datesBegin[] = $existingDate->getDatebegin();
+                    $datesEnd[] = $existingDate->getDateend();
 
-                    if (($existingDate->getDateBegin() == $existingDate->getDateEnd()) || ($existingDate->getDateEnd() == null)) {
+                    if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
                         $daysSum++;
-                        $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter());
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
                     }
                     else {
-                        $daysSum += $existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1;
-                        $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter()) * ($existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1);
+                        $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
                     }
                 }
 
-                if (!$existingDate || ($existingDate->getDateBegin() !== $dateSession->getDateBegin())) {
+                if (!$existingDate || ($existingDate->getDatebegin() !== $dateSession->getDatebegin())) {
                     $session->addDates($dateSession);
-                    $session->updateTimestamps();
-                    $session->getTraining()->updateTimestamps();
-                    $em = $this->getDoctrine()->getManager();
+                    $session->setUpdatedAt(new \DateTime('now'));
+                    $session->getTraining()->setUpdatedAt(new \DateTime('now'));
+                    $em = $doctrine->getManager();
                     $em->persist($dateSession);
                     $em->flush();
-                    $datesBegin[] = $dateSession->getDateBegin();
-                    $datesEnd[] = $dateSession->getDateEnd();
+                    $datesBegin[] = $dateSession->getDatebegin();
+                    $datesEnd[] = $dateSession->getDateend();
 
                     // Calcul nombre de jours
-                    if (($dateSession->getDateBegin() == $dateSession->getDateEnd()) || ($dateSession->getDateEnd() == null)) {
+                    if (($dateSession->getDatebegin() == $dateSession->getDateend()) || ($dateSession->getDateend() == null)) {
                         $daysSum++;
-                        $hoursSum += ($dateSession->getHourNumberMorn() + $dateSession->getHourNumberAfter());
+                        $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter());
                     }
                     else {
-                        $daysSum += $dateSession->getDateBegin()->diff($dateSession->getDateEnd())->format('%a') + 1;
-                        $hoursSum += ($dateSession->getHourNumberMorn() + $dateSession->getHourNumberAfter()) * ($dateSession->getDateBegin()->diff($dateSession->getDateEnd())->format('%a') + 1);
+                        $daysSum += $dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1;
+                        $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter()) * ($dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1);
                     }
                 }
 
@@ -98,15 +99,15 @@ class SessionController extends AbstractSessionController
                 $session->setPlace($session->getDates()[0]->getPlace());
 
                 // Renseigner le nombre d'heures
-                $session->setHourNumber($hoursSum);
+                $session->setHournumber($hoursSum);
 
                 // Renseigner le nombre de jours
-                $session->setDayNumber($daysSum);
+                $session->setDaynumber($daysSum);
 
                 // Récupérer les dates min et max début et fin pour les caler dans les dates de session
-                $session->setDateBegin($datesBegin[0]);
-                $session->setDateEnd($datesEnd[count($datesEnd)-1]);
-                $em = $this->getDoctrine()->getManager();
+                $session->setDatebegin($datesBegin[0]);
+                $session->setDateend($datesEnd[count($datesEnd)-1]);
+                $em = $doctrine->getManager();
                 $em->persist($session);
                 $em->flush();
 
@@ -119,17 +120,17 @@ class SessionController extends AbstractSessionController
         /**
      * @Route("/{session}/remove/{dates}", name="dates.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "session"})
-     * @ParamConverter("dates", class="SygeforMyCompanyBundle:DateSession", options={"id" = "dates"})
+     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "session"})
+     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removedatesAction(Session $session, DateSession $dates)
+    public function removedatesAction(Session $session, DateSession $dates, ManagerRegistry $doctrine)
     {
         $session->removeDate($dates);
-        $session->updateTimestamps();
-        $session->getTraining()->updateTimestamps();
-        $this->getDoctrine()->getManager()->remove($dates);
-        $this->getDoctrine()->getManager()->flush();
+        $session->setUpdatedAt(new \DateTime('now'));
+        $session->getTraining()->setUpdatedAt(new \DateTime('now'));
+        $doctrine->getManager()->remove($dates);
+        $doctrine->getManager()->flush();
 
         // Traitement des dates min et max
         $datesBegin = array();
@@ -139,16 +140,16 @@ class SessionController extends AbstractSessionController
 
         /** @var DateSession $existingDate */
         foreach ($session->getDates() as $existingDate) {
-            $datesBegin[] = $existingDate->getDateBegin();
-            $datesEnd[] = $existingDate->getDateEnd();
+            $datesBegin[] = $existingDate->getDatebegin();
+            $datesEnd[] = $existingDate->getDateend();
 
-            if (($existingDate->getDateBegin() == $existingDate->getDateEnd()) || ($existingDate->getDateEnd() == null)) {
+            if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
                 $daysSum++;
-                $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter());
+                $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
             }
             else {
-                $daysSum += $existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1;
-                $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter()) * ($existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1);
+                $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
             }
         }
         // Tri des tableaux de dates
@@ -161,11 +162,11 @@ class SessionController extends AbstractSessionController
 
         // Récupérer les dates min et max début et fin pour les caler dans les dates de session
         if (!empty($datesBegin) && isset($datesBegin)) {
-            $session->setDateBegin($datesBegin[0]);
-            $session->setDateEnd($datesEnd[count($datesEnd) - 1]);
-            $session->setHourNumber($hoursSum);
-            $session->setDayNumber($daysSum);
-            $em = $this->getDoctrine()->getManager();
+            $session->setDatebegin($datesBegin[0]);
+            $session->setDateend($datesEnd[count($datesEnd) - 1]);
+            $session->setHournumber($hoursSum);
+            $session->setDaynumber($daysSum);
+            $em = $doctrine->getManager();
             $em->persist($session);
             $em->flush();
         }
@@ -177,13 +178,13 @@ class SessionController extends AbstractSessionController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/editdates/{dates}", name="dates.edit", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="SygeforMyCompanyBundle:DateSession", options={"id" = "dates"})
+     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function editdatesAction(DateSession $dates, Request $request )
+    public function editdatesAction(DateSession $dates, Request $request, ManagerRegistry $doctrine)
     {
         $session = $dates->getSession();
-        $form = $this->createForm(new DateSessionType(), $dates);
+        $form = $this->createForm(DateSessionType::class, $dates);
         $daysSum =0;
         $hoursSum = 0;
 
@@ -191,7 +192,7 @@ class SessionController extends AbstractSessionController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 //Mise à jour date
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->flush();
 
                 $existingDate = null;
@@ -199,16 +200,16 @@ class SessionController extends AbstractSessionController
                 $datesEnd = array();
                 /** @var DateSession $existingDate */
                 foreach ($session->getDates() as $existingDate) {
-                    $datesBegin[] = $existingDate->getDateBegin();
-                    $datesEnd[] = $existingDate->getDateEnd();
+                    $datesBegin[] = $existingDate->getDatebegin();
+                    $datesEnd[] = $existingDate->getDateend();
 
-                    if (($existingDate->getDateBegin() == $existingDate->getDateEnd()) || ($existingDate->getDateEnd() == null)) {
+                    if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
                         $daysSum++;
-                        $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter());
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
                     }
                     else {
-                        $daysSum += $existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1;
-                        $hoursSum += ($existingDate->getHourNumberMorn() + $existingDate->getHourNumberAfter()) * ($existingDate->getDateBegin()->diff($existingDate->getDateEnd())->format('%a') + 1);
+                        $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
                     }
 
                 }
@@ -225,15 +226,15 @@ class SessionController extends AbstractSessionController
                 $session->setPlace($session->getDates()[0]->getPlace());
 
                 // Renseigner le nombre d'heures
-                $session->setHourNumber($hoursSum);
+                $session->setHournumber($hoursSum);
 
                 // Renseigner le nombre de jours
-                $session->setDayNumber($daysSum);
+                $session->setDaynumber($daysSum);
 
                 // Récupérer les dates min et max début et fin pour les caler dans les dates de session
-                $session->setDateBegin($datesBegin[0]);
-                $session->setDateEnd($datesEnd[count($datesEnd)-1]);
-                $em = $this->getDoctrine()->getManager();
+                $session->setDatebegin($datesBegin[0]);
+                $session->setDateend($datesEnd[count($datesEnd)-1]);
+                $em = $doctrine->getManager();
                 $em->persist($session);
                 $em->flush();
 
@@ -247,16 +248,16 @@ class SessionController extends AbstractSessionController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/viewdates/{dates}", name="dates.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="SygeforMyCompanyBundle:DateSession", options={"id" = "dates"})
+     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function viewdatesAction(DateSession $dates, Request $request )
+    public function viewdatesAction(DateSession $dates, Request $request, ManagerRegistry $doctrine)
     {
-        $form = $this->createForm(new DateSessionType(), $dates);
+        $form = $this->createForm(DateSessionType::class, $dates);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->flush();
             }
         }

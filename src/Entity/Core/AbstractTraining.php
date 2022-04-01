@@ -179,6 +179,14 @@ abstract class AbstractTraining implements SerializedAccessRights
     protected $comments;
 
     /**
+     * @var ArrayCollection
+     * @ORM\OneToMany(targetEntity="App\Entity\Core\AbstractMaterial", mappedBy="training", cascade={"remove", "persist"})
+     * @ORM\JoinColumn(nullable=true)
+     * @Serializer\Groups({"training", "session", "api.attendance"})
+     */
+    protected $materials;
+
+    /**
      * Constructor.
      */
     public function __construct()
@@ -559,6 +567,23 @@ abstract class AbstractTraining implements SerializedAccessRights
     public function setFirstsessionperiodyear($firstSessionPeriodYear)
     {
         $this->firstsessionperiodyear = $firstSessionPeriodYear;
+    }
+
+    /**
+     * @param ArrayCollection $materials
+     */
+    public function setMaterials($materials)
+    {
+        $this->materials = $materials;
+    }
+
+    /**
+     * @param Material $material
+     */
+    public function addMaterial($material)
+    {
+        $material->setTraining($this);
+        $this->materials->add($material);
     }
 
     /**

@@ -5,7 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\SessionType;
+use App\Entity\Core\Term\Sessiontype;
 use App\Form\Type\AbstractSessionType;
 use App\Security\AccessRight\SerializedAccessRights;
 use App\Entity\Core\Term\InscriptionStatus;
@@ -85,7 +85,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $dateBegin;
+    protected $datebegin;
 
     /**
      * @var \DateTime
@@ -93,7 +93,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @ORM\Column(name="dateEnd", type="datetime", nullable=true)
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $dateEnd;
+    protected $dateend;
 
     /**
      * @ORM\Column(name="registration", type="integer")
@@ -112,26 +112,26 @@ abstract class AbstractSession implements SerializedAccessRights
      * @var bool
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $displayOnline = false;
+    protected $displayonline = false;
 
     /**
      * @ORM\Column(name="numberOfRegistrations", type="integer", nullable=true)
      * @Serializer\Exclude
      */
-    protected $numberOfRegistrations;
+    protected $numberofregistrations;
 
     /**
      * @ORM\Column(name="maximumNumberOfRegistrations", type="integer")
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      * @Assert\NotBlank()
      */
-    protected $maximumNumberOfRegistrations = 20;
+    protected $maximumnumberofregistrations = 20;
 
     /**
      * @ORM\Column(name="limitRegistrationDate", type="datetime")
      * @Serializer\Groups({"session", "training", "api"})
      */
-    protected $limitRegistrationDate;
+    protected $limitregistrationdate;
 
     /**
      * @ORM\Column(name="comments", type="text", nullable=true)
@@ -142,12 +142,12 @@ abstract class AbstractSession implements SerializedAccessRights
     protected $comments;
 
     /**
-     * @var SessionType
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\SessionType")
+     * @var Sessiontype
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Sessiontype")
      * @ORM\JoinColumn(name="sessionType_id", referencedColumnName="id", onDelete="SET NULL")
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $sessionType;
+    protected $sessiontype;
 
     /**
      * @ORM\Column(name="hourNumber", type="float")
@@ -155,7 +155,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Assert\GreaterThan(value = 0, message = "Vous devez renseigner un nombre d'heures")
      * @Assert\NotNull(message="Vous devez renseigner un nombre d'heures")
      */
-    protected $hourNumber;
+    protected $hournumber;
 
     /**
      * @ORM\Column(name="dayNumber", type="float")
@@ -163,7 +163,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Assert\GreaterThan(value = 0, message = "Vous devez renseigner un nombre de jours")
      * @Assert\NotNull(message="Vous devez renseigner un nombre de jours")
      */
-    protected $dayNumber;
+    protected $daynumber;
 
     /**
      * @ORM\Column(name="schedule", type="string", length=512, nullable=true)
@@ -413,25 +413,33 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isDisplayOnline()
+    public function isDisplayonline()
     {
-        return $this->displayOnline;
-    }
-
-    /**
-     * @param bool $displayOnline
-     */
-    public function setDisplayOnline($displayOnline)
-    {
-        $this->displayOnline = $displayOnline;
+        return $this->displayonline;
     }
 
     /**
      * @return mixed
      */
-    public function getDateBegin()
+    public function getDisplayonline()
     {
-        return $this->dateBegin;
+        return $this->displayonline;
+    }
+
+    /**
+     * @param bool $displayOnline
+     */
+    public function setDisplayonline($displayOnline)
+    {
+        $this->displayonline = $displayOnline;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDatebegin()
+    {
+        return $this->datebegin;
     }
 
     /**
@@ -440,7 +448,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getYear()
     {
-        return $this->getDateBegin() ? $this->getDateBegin()->format('Y') : null;
+        return $this->getDatebegin() ? $this->getDatebegin()->format('Y') : null;
     }
 
     /**
@@ -449,7 +457,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getSemester()
     {
-        return $this->getDateBegin() ? ceil($this->getDateBegin()->format('m') / 6) : null;
+        return $this->getDatebegin() ? ceil($this->getDatebegin()->format('m') / 6) : null;
     }
 
     /**
@@ -465,57 +473,57 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param mixed $dateBegin
      */
-    public function setDateBegin($dateBegin)
+    public function setDatebegin($dateBegin)
     {
-        $this->dateBegin = $dateBegin;
+        $this->datebegin = $dateBegin;
     }
 
     /**
      * @return mixed
      */
-    public function getDateEnd()
+    public function getDateend()
     {
-        return $this->dateEnd;
+        return $this->dateend;
     }
 
     /**
      * @param mixed $dateEnd
      */
-    public function setDateEnd($dateEnd)
+    public function setDateend($dateEnd)
     {
-        $this->dateEnd = $dateEnd;
+        $this->dateend = $dateEnd;
     }
 
     /**
      * @return mixed
      */
-    public function getHourNumber()
+    public function getHournumber()
     {
-        return $this->hourNumber;
+        return $this->hournumber;
     }
 
     /**
      * @param mixed $hourNumber
      */
-    public function setHourNumber($hourNumber)
+    public function setHournumber($hourNumber)
     {
-        $this->hourNumber = $hourNumber;
+        $this->hournumber = $hourNumber;
     }
 
     /**
      * @return mixed
      */
-    public function getDayNumber()
+    public function getDaynumber()
     {
-        return $this->dayNumber;
+        return $this->daynumber;
     }
 
     /**
      * @param mixed $dayNumber
      */
-    public function setDayNumber($dayNumber)
+    public function setDaynumber($dayNumber)
     {
-        $this->dayNumber = $dayNumber;
+        $this->daynumber = $dayNumber;
     }
 
     /**
@@ -523,7 +531,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getDuration()
     {
-        return $this->getHourNumber() . ' heure(s) sur ' . $this->getDayNumber() . ' jour(s)';
+        return $this->getHournumber() . ' heure(s) sur ' . $this->getDaynumber() . ' jour(s)';
     }
 
     /**
@@ -593,33 +601,33 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return mixed
      */
-    public function getMaximumNumberOfRegistrations()
+    public function getMaximumnumberofregistrations()
     {
-        return $this->maximumNumberOfRegistrations;
+        return $this->maximumnumberofregistrations;
     }
 
     /**
      * @param mixed $maximumNumberOfRegistrations
      */
-    public function setMaximumNumberOfRegistrations($maximumNumberOfRegistrations)
+    public function setMaximumnumberofregistrations($maximumNumberOfRegistrations)
     {
-        $this->maximumNumberOfRegistrations = $maximumNumberOfRegistrations;
+        $this->maximumnumberofregistrations = $maximumNumberOfRegistrations;
     }
 
     /**
-     * @return SessionType
+     * @return Sessiontype
      */
-    public function getSessionType()
+    public function getSessiontype()
     {
-        return $this->sessionType;
+        return $this->sessiontype;
     }
 
     /**
-     * @param SessionType $sessionType
+     * @param Sessiontype $sessionType
      */
-    public function setSessionType($sessionType)
+    public function setSessiontype($sessionType)
     {
-        $this->sessionType = $sessionType;
+        $this->sessiontype = $sessionType;
     }
 
     /**
@@ -656,7 +664,7 @@ abstract class AbstractSession implements SerializedAccessRights
         $now = new \DateTime();
 
         // check date
-        if ($this->getDateBegin() <= $now) {
+        if ($this->getDatebegin() <= $now) {
             return false;
         }
 
@@ -666,8 +674,8 @@ abstract class AbstractSession implements SerializedAccessRights
         }
 
         // check limit registration date
-        if ($this->getLimitRegistrationDate()) {
-            $limitRegistrationDate = clone $this->getLimitRegistrationDate();
+        if ($this->getLimitregistrationdate()) {
+            $limitRegistrationDate = clone $this->getLimitregistrationdate();
             $limitRegistrationDate->modify('+1 days');
             if ($limitRegistrationDate < $now) {
                 return false;
@@ -697,7 +705,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getAvailablePlaces()
     {
-        return $this->getMaximumNumberOfRegistrations() - $this->getNumberOfAcceptedRegistrations();
+        return $this->getMaximumnumberofregistrations() - $this->getNumberOfAcceptedRegistrations();
     }
 
     /**
@@ -705,10 +713,10 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberOfRegistrations()
+    public function getNumberofregistrations()
     {
         if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
-            return $this->numberOfRegistrations;
+            return $this->numberofregistrations;
         }
 
         if (empty($this->inscriptions)) {
@@ -721,9 +729,9 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param mixed $numberOfRegistrations
      */
-    public function setNumberOfRegistrations($numberOfRegistrations)
+    public function setNumberofregistrations($numberOfRegistrations)
     {
-        $this->numberOfRegistrations = $numberOfRegistrations;
+        $this->numberofregistrations = $numberOfRegistrations;
     }
 
     /**
@@ -734,7 +742,7 @@ abstract class AbstractSession implements SerializedAccessRights
     public function getNumberOfAcceptedRegistrations()
     {
         if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
-            return $this->numberOfRegistrations;
+            return $this->numberofregistrations;
         }
 
         if (empty($this->inscriptions)) {
@@ -754,17 +762,17 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return mixed
      */
-    public function getLimitRegistrationDate()
+    public function getLimitregistrationdate()
     {
-        return $this->limitRegistrationDate;
+        return $this->limitregistrationdate;
     }
 
     /**
      * @param mixed $limitRegistrationDate
      */
-    public function setLimitRegistrationDate($limitRegistrationDate)
+    public function setLimitregistrationdate($limitRegistrationDate)
     {
-        $this->limitRegistrationDate = $limitRegistrationDate;
+        $this->limitregistrationdate = $limitRegistrationDate;
     }
 
     /**
@@ -772,14 +780,14 @@ abstract class AbstractSession implements SerializedAccessRights
      *
      * @ORM\PrePersist
      */
-    public function updateLimitRegistrationDate()
+    public function updateLimitregistrationdate()
     {
         // if the limit registration date is not set,
         // set it to the day before date begin
-        if (!$this->getLimitRegistrationDate()) {
-            $date = clone $this->getDateBegin();
+        if (!$this->getLimitregistrationdate()) {
+            $date = clone $this->getDatebegin();
             $date->modify('-1 month');
-            $this->setLimitRegistrationDate($date);
+            $this->setLimitregistrationdate($date);
         }
     }
 
