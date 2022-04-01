@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -28,10 +28,10 @@ class InscriptionStatusVocabularyType extends VocabularyType
             'multiple' => false,
             'required' => true,
             'choices' => array(
-                InscriptionStatus::STATUS_ACCEPTED => 'Accepté',
-                InscriptionStatus::STATUS_WAITING => 'En attente',
-                InscriptionStatus::STATUS_PENDING => 'En attente de traitement',
-                InscriptionStatus::STATUS_REJECTED => 'Rejeté',
+                Inscriptionstatus::STATUS_ACCEPTED => 'Accepté',
+                Inscriptionstatus::STATUS_WAITING => 'En attente',
+                Inscriptionstatus::STATUS_PENDING => 'En attente de traitement',
+                Inscriptionstatus::STATUS_REJECTED => 'Rejeté',
             ),
         ));
     }
@@ -50,7 +50,7 @@ class InscriptionStatusVocabularyType extends VocabularyType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => InscriptionStatus::class,
+            'data_class' => Inscriptionstatus::class,
         ));
     }
 }

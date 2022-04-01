@@ -103,7 +103,7 @@ class AbstractTrainerType extends AbstractType
             ))
             ->add('trainerType', EntityType::class, array(
                 'label'    => "Type d'intervenant",
-                'class'    => \App\Entity\Core\Term\TrainerType::class,
+                'class'    => \App\Entity\Core\Term\Trainertype::class,
                 'required' => false,
             ))
             ->add('service', null, array(

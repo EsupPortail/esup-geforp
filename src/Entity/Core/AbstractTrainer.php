@@ -10,7 +10,7 @@ use App\Form\Type\AbstractTrainerType;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
 use App\Entity\Core\PersonTrait\PersonTrait;
 use App\Entity\Core\PersonTrait\ProfessionalSituationTrait;
-use App\Entity\Core\Term\TrainerType;
+use App\Entity\Core\Term\Trainertype;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -60,7 +60,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     protected $participations;
 
     /**
-     * @var TrainerType
+     * @var Trainertype
      * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\TrainerType")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainer"})
@@ -171,7 +171,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     }
 
     /**
-     * @return TrainerType
+     * @return Trainertype
      */
     public function getTrainerType()
     {
@@ -179,7 +179,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     }
 
     /**
-     * @param TrainerType $trainerType
+     * @param Trainertype $trainerType
      */
     public function setTrainerType($trainerType)
     {

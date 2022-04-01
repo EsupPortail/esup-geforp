@@ -6,7 +6,7 @@ sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$mo
     $scope.service = 'sygefor_mycompany.batch.alert';
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
-    $scope.inscriptionStatus = $dialogParams.inscriptionStatus;
+    $scope.inscriptionstatus = $dialogParams.inscriptionstatus;
     $scope.presenceStatus = $dialogParams.presenceStatus;
     $scope.send = {Mail: !!config.templates.length};
     $scope.attachmentTemplates = config.attachmentTemplates;
@@ -70,8 +70,8 @@ sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$mo
             ids: $scope.items.join(",")
         };
 
-        if (typeof $scope.inscriptionStatus != 'undefined') {
-            data['options']['inscriptionStatus'] = $scope.inscriptionStatus.id
+        if (typeof $scope.inscriptionstatus != 'undefined') {
+            data['options']['inscriptionStatus'] = $scope.inscriptionstatus.id
         }
 
         if (typeof $scope.presenceStatus != 'undefined') {

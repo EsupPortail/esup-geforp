@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Context\ExecutionContext;
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
-class PublipostTemplate extends AbstractTerm implements VocabularyInterface
+class Publiposttemplate extends AbstractTerm implements VocabularyInterface
 {
     use UploadableTrait;
 

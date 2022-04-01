@@ -10,9 +10,6 @@ namespace App\Listener;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Events;
-use Elastica\Index;
-use Elastica\Query\Match;
-use Elastica\Type;
 use FOS\ElasticaBundle\Doctrine\Listener;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
 use FOS\ElasticaBundle\Provider\IndexableInterface;

@@ -3,10 +3,10 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Core\Term\EmailTemplate;
-use App\Entity\Core\Term\InscriptionStatus;
-use App\Entity\Core\Term\PresenceStatus;
-use App\Entity\Core\Term\PublipostTemplate;
+use App\Entity\Core\Term\Emailtemplate;
+use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Core\Term\Publiposttemplate;
 use App\Utils\Email\CCRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
@@ -73,9 +73,9 @@ class EmailTemplateVocabularyType extends VocabularyType
 		        'widget_suffix' => 'Envoi le courriel même si le stagiaire a désactivé les lettres d\'informations',
 		        'required' => false,
 	        ))*/
-            ->add('inscriptionStatus', EntityType::class, array(
+            ->add('inscriptionstatus', EntityType::class, array(
                 'label' => "Status d'inscription",
-                'class' => InscriptionStatus::class,
+                'class' => Inscriptionstatus::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('i')
                         ->where('i.organization = :orgId')
@@ -87,7 +87,7 @@ class EmailTemplateVocabularyType extends VocabularyType
             ))
             ->add('attachmentTemplates', EntityType::class, array(
                 'label' => 'Modèles de pièces jointes',
-                'class' => PublipostTemplate::class,
+                'class' => Publiposttemplate::class,
                 'multiple' => 'true',
                 'query_builder' => function (EntityRepository $er) use ($options) {
                     $data = $options['data'];
@@ -104,9 +104,9 @@ class EmailTemplateVocabularyType extends VocabularyType
                 },
                 'required' => false,
             ))
-            ->add('presenceStatus', EntityType::class, array(
+            ->add('presencestatus', EntityType::class, array(
                 'label' => 'Statut de présence',
-                'class' => PresenceStatus::class,
+                'class' => Presencestatus::class,
                 'query_builder' => function (EntityRepository $er) {
                     return $er->createQueryBuilder('p')
                         ->where('p.organization = :orgId')
@@ -124,7 +124,7 @@ class EmailTemplateVocabularyType extends VocabularyType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => EmailTemplate::class,
+            'data_class' => Emailtemplate::class,
         ));
     }
 }

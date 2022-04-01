@@ -8,7 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\Sessiontype;
 use App\Form\Type\AbstractSessionType;
 use App\Security\AccessRight\SerializedAccessRights;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Timestampable\Traits\TimestampableEntity;
 
@@ -751,7 +751,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
         $nAccepted = 0;
         foreach ($this->inscriptions as $inscription) {
-            if ($inscription->getInscriptionStatus()->getStatus() === InscriptionStatus::STATUS_ACCEPTED) {
+            if ($inscription->getInscriptionstatus()->getStatus() === Inscriptionstatus::STATUS_ACCEPTED) {
                 ++$nAccepted;
             }
         }

@@ -15,7 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Table(name="training_category")
  * @ORM\Entity
  */
-class TrainingCategory extends AbstractTerm implements VocabularyInterface
+class Trainingcategory extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @var string

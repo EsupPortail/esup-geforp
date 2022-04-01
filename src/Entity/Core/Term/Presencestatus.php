@@ -19,7 +19,7 @@ use App\Form\Type\PresenceStatusVocabularyType;
  * @ORM\Table(name="presence_status")
  * @ORM\Entity
  */
-class PresenceStatus extends AbstractTerm implements VocabularyInterface
+class Presencestatus extends AbstractTerm implements VocabularyInterface
 {
     const STATUS_ABSENT = 0;
     const STATUS_PRESENT = 1;

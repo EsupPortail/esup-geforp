@@ -7,12 +7,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Class EmailTemplates.
+ * Class Emailtemplate.
  *
  * @ORM\Table(name="trainee_email_template")
  * @ORM\Entity
  */
-class EmailTemplate extends AbstractTerm implements VocabularyInterface
+class Emailtemplate extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @ORM\Column(name="subject", type="string", length=255, nullable=false)
@@ -36,16 +36,18 @@ class EmailTemplate extends AbstractTerm implements VocabularyInterface
     private $body;
 
     /**
-     * @ORM\ManyToOne(targetEntity="InscriptionStatus")
+     * @ORM\ManyToOne(targetEntity="Inscriptionstatus")
+     * @ORM\JoinColumn(name="inscription_status_id", referencedColumnName="id")
      *
-     * @var InscriptionStatus
+     * @var Inscriptionstatus
      */
-    protected $inscriptionStatus;
+    protected $inscriptionstatus;
 
     /**
-     * @ORM\ManyToOne(targetEntity="PresenceStatus")
+     * @ORM\ManyToOne(targetEntity="Presencestatus")
+     * @ORM\JoinColumn(name="presence_status_id", referencedColumnName="id")
      */
-    protected $presenceStatus;
+    protected $presencestatus;
 
     /**
      * @var ArrayCollection
@@ -122,35 +124,35 @@ class EmailTemplate extends AbstractTerm implements VocabularyInterface
     }
 
     /**
-     * @param InscriptionStatus $inscriptionStatus
+     * @param Inscriptionstatus $inscriptionStatus
      */
-    public function setInscriptionStatus($inscriptionStatus)
+    public function setInscriptionstatus($inscriptionStatus)
     {
-        $this->inscriptionStatus = $inscriptionStatus;
+        $this->inscriptionstatus = $inscriptionStatus;
     }
 
     /**
-     * @return InscriptionStatus
+     * @return Inscriptionstatus
      */
-    public function getInscriptionStatus()
+    public function getInscriptionstatus()
     {
-        return $this->inscriptionStatus;
+        return $this->inscriptionstatus;
     }
 
     /**
-     * @param PresenceStatus $presenceStatus
+     * @param Presencestatus $presenceStatus
      */
-    public function setPresenceStatus($presenceStatus)
+    public function setPresencestatus($presenceStatus)
     {
-        $this->presenceStatus = $presenceStatus;
+        $this->presencestatus = $presenceStatus;
     }
 
     /**
-     * @return PresenceStatus
+     * @return Presencestatus
      */
-    public function getPresenceStatus()
+    public function getPresencestatus()
     {
-        return $this->presenceStatus;
+        return $this->presencestatus;
     }
 
     /**

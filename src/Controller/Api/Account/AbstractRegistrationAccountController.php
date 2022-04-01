@@ -7,11 +7,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\AbstractInscription;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use App\Entity\Core\AbstractTrainee;
-use App\Entity\Core\Term\EmailTemplate;
+use App\Entity\Core\Term\Emailtemplate;
 use App\Entity\Core\AbstractSession;
-use App\Entity\Core\Term\PublipostTemplate;
+use App\Entity\Core\Term\Publiposttemplate;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -162,12 +162,12 @@ abstract class AbstractRegistrationAccountController extends AbstractController
         }
 
         // check status
-        if ($inscription->getInscriptionStatus()->getStatus() > InscriptionStatus::STATUS_ACCEPTED) {
+        if ($inscription->getInscriptionStatus()->getStatus() > Inscriptionstatus::STATUS_ACCEPTED) {
             throw new BadRequestHttpException('Your registration has already been rejected.');
         }
 
         // ok, let's go
-        if ($inscription->getInscriptionStatus()->getStatus() === InscriptionStatus::STATUS_PENDING) {
+        if ($inscription->getInscriptionStatus()->getStatus() === Inscriptionstatus::STATUS_PENDING) {
             // if the inscription is pending, just delete it
             $em->remove($inscription);
         } else {
@@ -189,7 +189,7 @@ abstract class AbstractRegistrationAccountController extends AbstractController
      */
     public function authorizationAction($ids, Request $request)
     {
-        $authorizationTemplate = $this->getDoctrine()->getRepository(PublipostTemplate::class)->findOneBy(array(
+        $authorizationTemplate = $this->getDoctrine()->getRepository(Publiposttemplate::class)->findOneBy(array(
             'organization' => $this->getUser()->getOrganization(),
             'machineName' => 'authorization',
         ));
@@ -224,20 +224,20 @@ abstract class AbstractRegistrationAccountController extends AbstractController
             $org = $this->getDoctrine()->getRepository(AbstractOrganization::class)->find($organizationId);
 
             /** @var QueryBuilder $qb */
-            $qb = $this->getDoctrine()->getRepository(InscriptionStatus::class)->createQueryBuilder('s');
-            /** @var InscriptionStatus $inscriptionStatus */
+            $qb = $this->getDoctrine()->getRepository(Inscriptionstatus::class)->createQueryBuilder('s');
+            /** @var Inscriptionstatus $inscriptionStatus */
             $inscriptionStatus = $qb
                 ->andWhere('s.organization = :organization')
                 ->orWhere('s.organization IS NULL')
                 ->andWhere('s.status = :status')
-                ->setParameter('status', InscriptionStatus::STATUS_PENDING)
+                ->setParameter('status', Inscriptionstatus::STATUS_PENDING)
                 ->setParameter('organization', $org)
                 ->setMaxResults(1)
                 ->getQuery()->execute();
 
             if ($inscriptionStatus) {
-                /** @var EmailTemplate $checkoutEmailTemplate */
-                $checkoutEmailTemplate = $this->getDoctrine()->getRepository(EmailTemplate::class)->findOneBy(
+                /** @var Emailtemplate $checkoutEmailTemplate */
+                $checkoutEmailTemplate = $this->getDoctrine()->getRepository(Emailtemplate::class)->findOneBy(
                     array(
                         'organization' => $this->getDoctrine()->getRepository(AbstractOrganization::class)->find($organizationId),
                         'inscriptionStatus' => $inscriptionStatus,
@@ -264,14 +264,14 @@ abstract class AbstractRegistrationAccountController extends AbstractController
     /**
      * @param AbstractTrainee $trainee
      *
-     * @return InscriptionStatus|null
+     * @return Inscriptionstatus|null
      */
     protected function getDesistInscriptionStatus(AbstractTrainee $trainee)
     {
         $em = $this->getDoctrine()->getManager();
-        $status = $em->getRepository(InscriptionStatus::class)->findOneBy(array('machineName' => 'desist', 'organization' => null));
+        $status = $em->getRepository(Inscriptionstatus::class)->findOneBy(array('machineName' => 'desist', 'organization' => null));
         if (!$status) {
-            $status = $em->getRepository(InscriptionStatus::class)->findOneBy(array('machineName' => 'desist', 'organization' => $trainee->getOrganization()));
+            $status = $em->getRepository(Inscriptionstatus::class)->findOneBy(array('machineName' => 'desist', 'organization' => $trainee->getOrganization()));
         }
 
         return $status;

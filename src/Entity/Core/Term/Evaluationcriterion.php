@@ -14,7 +14,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\Table(name="evaluation_criterion")
  * @ORM\Entity
  */
-class EvaluationCriterion extends AbstractTerm implements VocabularyInterface
+class Evaluationcriterion extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @return string

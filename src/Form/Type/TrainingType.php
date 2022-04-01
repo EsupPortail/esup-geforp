@@ -8,7 +8,7 @@ use App\Entity\Core\AbstractInstitution;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Theme;
-use App\Entity\Core\Term\TrainingCategory;
+use App\Entity\Core\Term\Trainingcategory;
 use App\Entity\Core\AbstractTraining;
 use App\Security\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -93,7 +93,7 @@ class TrainingType extends AbstractType
             ))
             ->add('category', EntityType::class, array(
                 'label'         => 'Catégorie de formation',
-                'class'         => TrainingCategory::class,
+                'class'         => Trainingcategory::class,
                 'query_builder' => $training ? function (EntityRepository $er) use ($training) {
                     return $er->createQueryBuilder('c')
                         ->where('c.trainingType = :trainingType')

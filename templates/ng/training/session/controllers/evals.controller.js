@@ -14,7 +14,7 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
      * Get the total accepted inscriptions count
      */
     $scope.totalAcceptedInscriptions = function() {
-        return $filter('filter')($scope.session.inscriptions, {inscriptionStatus: {status: 2}}).length;
+        return $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 2}}).length;
     }
 
     /**

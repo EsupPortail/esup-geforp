@@ -11,7 +11,7 @@ use App\Entity\Core\AbstractInstitution;
 use App\Entity\Core\AbstractMaterial;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
-use App\Entity\Core\Term\TrainingCategory;
+use App\Entity\Core\Term\Trainingcategory;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Security\AccessRight\SerializedAccessRights;
 
@@ -118,7 +118,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     protected $supervisor;
 
     /**
-     * @var TrainingCategory
+     * @var Trainingcategory
      * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\TrainingCategory")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"training", "api"})
@@ -442,7 +442,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     }
 
     /**
-     * @return TrainingCategory
+     * @return Trainingcategory
      */
     public function getCategory()
     {
@@ -450,7 +450,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     }
 
     /**
-     * @param TrainingCategory $category
+     * @param Trainingcategory $category
      */
     public function setCategory($category)
     {

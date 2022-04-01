@@ -199,7 +199,7 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
         )));
 
         // PublicCategoryTrait
-        $metadata->addPropertyConstraint('publicType', new Assert\NotNull(array(
+        $metadata->addPropertyConstraint('Publictype', new Assert\NotNull(array(
             'message' => 'Vous devez renseigner un type de personnel.',
             'groups'  => 'api.profile',
         )));

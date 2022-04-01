@@ -173,7 +173,7 @@ class SemesteredTraining
      *
      * @return int
      */
-    public function getSessionsCount()
+    public function getSessionscount()
     {
         if (empty($this->sessions)) {
             return 0;

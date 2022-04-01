@@ -9,7 +9,7 @@ use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractInscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use App\Form\Type\AbstractInscriptionType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -129,7 +129,7 @@ abstract class AbstractInscriptionController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $inscription = new $this->inscriptionClass();
         $inscription->setSession($session);
-		$defaultInscriptionStatus = $em->getRepository(InscriptionStatus::class)->findOneBy(['machineName' => 'waiting']);
+		$defaultInscriptionStatus = $em->getRepository(Inscriptionstatus::class)->findOneBy(['machineName' => 'waiting']);
         $inscription->setInscriptionStatus($defaultInscriptionStatus);
 
         return $inscription;

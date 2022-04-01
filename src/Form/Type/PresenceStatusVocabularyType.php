@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Presencestatus;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
@@ -22,8 +22,8 @@ class PresenceStatusVocabularyType extends VocabularyType
             'multiple' => false,
             'required' => true,
             'choices' => array(
-                PresenceStatus::STATUS_PRESENT => 'Présent',
-                PresenceStatus::STATUS_ABSENT => 'Absent',
+                Presencestatus::STATUS_PRESENT => 'Présent',
+                Presencestatus::STATUS_ABSENT => 'Absent',
             ),
         ));
     }

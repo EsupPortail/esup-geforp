@@ -52,7 +52,7 @@
 		    </td>
                     <td class="text-right">
 		            <div class="btn-group dropdown">
-                		<button class="btn btn-xs dropdown-toggle" ng-class="$root.inscriptionStatusClass(inscription.inscriptionStatus.status, 'btn')" data-toggle="dropdown">{{ inscription.inscriptionStatus.name }} <span class="caret"></span></button>
+                		<button class="btn btn-xs dropdown-toggle" ng-class="$root.inscriptionStatusClass(inscription.inscriptionstatus.status, 'btn')" data-toggle="dropdown">{{ inscription.inscriptionStatus.name }} <span class="caret"></span></button>
                 		<ul class="dropdown-menu text-small">
                     			<li ng-repeat="status in inscriptionStatus track by status.id" ng-class="{disabled :inscription.inscriptionStatus.id == status.id}"><a href="" ng-click="updateInscriptionStatus(status)"><i class="fa fa-check" ng-if="inscription.inscriptionStatus.id == status.id"></i> {{ status.name }}</a></li>
                 		</ul>

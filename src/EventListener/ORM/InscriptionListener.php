@@ -7,7 +7,7 @@ use Html2Text\Html2Text;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\DependencyInjection\Container;
-use App\Entity\Core\Term\EmailTemplate;
+use App\Entity\Core\Term\Emailtemplate;
 use App\Entity\Core\AbstractInscription;
 
 /**
@@ -46,7 +46,7 @@ class InscriptionListener implements EventSubscriber
     {
         $inscription = $eventArgs->getEntity();
         if ($inscription instanceof AbstractInscription) {
-            if ($inscription->isSendInscriptionStatusMail()) {
+            if ($inscription->isSendinscriptionstatusmail()) {
                 $this->sendInscriptionStatusMail($eventArgs);
             }
 
@@ -82,12 +82,12 @@ class InscriptionListener implements EventSubscriber
         $inscription = $eventArgs->getEntity();
 
         // find the first template for the given inscription status
-        $repository = $eventArgs->getEntityManager()->getRepository('SygeforCoreBundle:Term\EmailTemplate');
+        $repository = $eventArgs->getEntityManager()->getRepository('App\Entity\Core\Term\Emailtemplate');
 
-        /** @var EmailTemplate $template */
+        /** @var Emailtemplate $template */
         $template = $repository->findOneBy(array(
             'organization' => $inscription->getSession()->getTraining()->getOrganization(),
-            'inscriptionStatus' => $inscription->getInscriptionStatus(),
+            'inscriptionStatus' => $inscription->getInscriptionstatus(),
         ), array('position' => 'ASC'));
 
 	    if ($template) {
@@ -118,7 +118,7 @@ class InscriptionListener implements EventSubscriber
 	    $chgSet = $uow->getEntityChangeSet($inscription);
 
 	    if (isset($chgSet['inscriptionStatus'])) {
-		    $status = $inscription->getInscriptionStatus();
+		    $status = $inscription->getInscriptionstatus();
 
 		    if ($status->getNotify()) {
 			    return $this->container->get('notification.mailer')->send('inscription.status_changed', $inscription->getSession()->getTraining()->getOrganization(), [

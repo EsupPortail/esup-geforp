@@ -39,7 +39,7 @@ class TraineeEventSubscriber implements EventSubscriberInterface
                 $inscriptions[] = array(
                     'id' => $inscription->getId(),
                     'session' => $inscription->getSession()->getId(),
-                    'inscriptionStatus' => $inscription->getInscriptionStatus()->getId(),
+                    'inscriptionStatus' => $inscription->getInscriptionstatus()->getId(),
                 );
             }
             $event->getVisitor()->addData('registrations', $inscriptions);

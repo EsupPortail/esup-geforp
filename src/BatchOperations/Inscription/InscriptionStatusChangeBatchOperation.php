@@ -13,8 +13,8 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use App\BatchOperations\AbstractBatchOperation;
 use Aoo\Entity\Core\AbstractInscription;
-use App\Entity\Core\Term\InscriptionStatus;
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Core\Term\Presencestatus;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -50,8 +50,8 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
     {
         $inscriptions = $this->getObjectList($idList);
         $em = $this->container->get('doctrine.orm.entity_manager');
-        $repoInscriptionStatus = $em->getRepository(InscriptionStatus::class);
-        $repoPresenceStatus = $em->getRepository(PresenceStatus::class);
+        $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
+        $repoPresenceStatus = $em->getRepository(Presencestatus::class);
 
         $inscriptionStatus = (empty($options['inscriptionStatus'])) ? null : $repoInscriptionStatus->find($options['inscriptionStatus']);
         $presenceStatus = (empty($options['presenceStatus'])) ? null : $repoPresenceStatus->find($options['presenceStatus']);
@@ -63,9 +63,9 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
             if ($this->container->get('security.context')->isGranted('EDIT', $inscription)) {
                 //setting new inscription status
                 if ($inscriptionStatus) {
-                    $inscription->setInscriptionStatus($inscriptionStatus);
+                    $inscription->setInscriptionstatus($inscriptionStatus);
                 } elseif ($presenceStatus) {
-                    $inscription->setPresenceStatus($presenceStatus);
+                    $inscription->setPresencestatus($presenceStatus);
                 }
                 $arrayInscriptionsGranted[] = $inscription;
             }
@@ -109,7 +109,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
         $attRepo = $em->getRepository(get_class($attachmentTerm));
 
         if (!empty($options['inscriptionStatus'])) {
-            $repoInscriptionStatus = $em->getRepository(InscriptionStatus::class);
+            $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
             $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionStatus']);
             $findCriteria = array('inscriptionStatus' => $inscriptionStatus);
             if ($userOrg) {
@@ -118,7 +118,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
             $templates = $repo->findBy($findCriteria);
         }
         else if (!empty($options['presenceStatus'])) {
-            $repoInscriptionStatus = $em->getRepository(PresenceStatus::class);
+            $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
             $presenceStatus = $repoInscriptionStatus->findById($options['presenceStatus']);
             $findCriteria = array('presenceStatus' => $presenceStatus);
             if ($userOrg) {

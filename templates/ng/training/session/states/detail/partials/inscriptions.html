@@ -69,21 +69,21 @@
 
                     <!-- editable -->
                     <div class="btn-group dropdown">
-                        <button class="btn btn-xs dropdown-toggle" ng-if="!inscription.presenceStatus || inscription.inscriptionStatus.status!=2" class="label" ng-class="$root.inscriptionStatusClass(inscription.inscriptionStatus.status, 'btn')" data-toggle="dropdown">
-                            {{ inscription.inscriptionStatus.name }}
+                        <button class="btn btn-xs dropdown-toggle" ng-if="!inscription.presencestatus || inscription.inscriptionstatus.status!=2" class="label" ng-class="$root.inscriptionStatusClass(inscription.inscriptionStatus.status, 'btn')" data-toggle="dropdown">
+                            {{ inscription.inscriptionstatus.name }}
                             <span class="caret"></span>
                         </button>
-                        <button class="btn btn-xs dropdown-toggle" ng-if="inscription.presenceStatus &&  inscription.inscriptionStatus.status==2" class="label" ng-class="$root.presenceStatusClass(inscription.presenceStatus.status, 'btn')" data-toggle="dropdown">
-                            {{ inscription.presenceStatus.name }}
+                        <button class="btn btn-xs dropdown-toggle" ng-if="inscription.presencestatus &&  inscription.inscriptionstatus.status==2" class="label" ng-class="$root.presenceStatusClass(inscription.presenceStatus.status, 'btn')" data-toggle="dropdown">
+                            {{ inscription.presencestatus.name }}
                             <span class="caret"></span>
                         </button>
                         <ul class="dropdown-menu text-small" role="menu">
                             <li class="dropdown-header">Statuts d'inscription</li>
-                            <li ng-repeat="status in status.inscription track by status.id" ng-class="{disabled :inscription.inscriptionStatus.id == status.id}"><a href="" ng-click="updateInscriptionStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.inscriptionStatus.id == status.id"></i> {{ status.name }}</a></li>
+                            <li ng-repeat="status in status.inscription track by status.id" ng-class="{disabled :inscription.inscriptionstatus.id == status.id}"><a href="" ng-click="updateInscriptionStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.inscriptionStatus.id == status.id"></i> {{ status.name }}</a></li>
 
-                            <li ng-if="inscription.inscriptionStatus.status == 2" class="divider"></li>
-                            <li ng-if="inscription.inscriptionStatus.status == 2" class="dropdown-header">Statuts de présence</li>
-                            <li ng-if="inscription.inscriptionStatus.status == 2" ng-repeat="status in status.presence track by status.id" ng-class="{disabled :inscription.presenceStatus.id == status.id}"><a href="" ng-click="updatePresenceStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.presenceStatus.id == status.id"></i> {{ status.name }}</a></li>
+                            <li ng-if="inscription.inscriptionstatus.status == 2" class="divider"></li>
+                            <li ng-if="inscription.inscriptionstatus.status == 2" class="dropdown-header">Statuts de présence</li>
+                            <li ng-if="inscription.inscriptionstatus.status == 2" ng-repeat="status in status.presence track by status.id" ng-class="{disabled :inscription.presenceStatus.id == status.id}"><a href="" ng-click="updatePresenceStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.presenceStatus.id == status.id"></i> {{ status.name }}</a></li>
 
                             <li class="divider"></li>
                             <li><a href="" ng-click="delete(inscription)">Supprimer cette inscription</a></li>

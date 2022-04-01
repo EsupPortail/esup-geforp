@@ -38,7 +38,7 @@ class Inscription extends AbstractInscription
     protected $message;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\ActionType")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Actiontype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */

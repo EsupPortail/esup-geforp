@@ -15,7 +15,7 @@
                 <td><a href="" ui-sref="trainee.detail.view({ id: item.trainee.id })">{{ item.trainee.fullName }}</a></td>
                 <td><a href="" ui-sref="session.detail.view({ id: item.session.id, training: item.session.training.id })">{{ item.session.dateBegin|date: 'dd/MM/yyyy' }} - {{ item.session.training.name }}</a></td>
                 <td>{{ item.trainee.publicCategory }}</td>
-                <td><span class="label" ng-class="$root.inscriptionStatusClass(item.inscriptionStatus.status)">{{ item.inscriptionStatus.name }}</span></td>
+                <td><span class="label" ng-class="$root.inscriptionStatusClass(item.inscriptionstatus.status)">{{ item.inscriptionstatus.name }}</span></td>
             </tr>
         </tbody>
     </table>

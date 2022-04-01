@@ -19,7 +19,7 @@ use App\Form\Type\InscriptionStatusVocabularyType;
  * @ORM\Table(name="inscription_status")
  * @ORM\Entity
  */
-class InscriptionStatus extends AbstractTerm implements VocabularyInterface
+class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
 {
     const STATUS_PENDING = 0;
     const STATUS_WAITING = 1;

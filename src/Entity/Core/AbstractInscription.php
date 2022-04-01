@@ -7,8 +7,8 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\Core\Term\PresenceStatus;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Form\Type\AbstractInscriptionType;
 use App\Security\AccessRight\SerializedAccessRights;
@@ -58,24 +58,26 @@ abstract class AbstractInscription implements SerializedAccessRights
     protected $session;
 
     /**
-     * @var InscriptionStatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\InscriptionStatus")
+     * @var Inscriptionstatus
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Inscriptionstatus")
+     * @ORM\JoinColumn(name="inscription_status_id", referencedColumnName="id")
      * @Assert\NotNull(message="Vous devez spécifier un status d'inscription.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $inscriptionStatus;
+    protected $inscriptionstatus;
 
     /**
-     * @var PresenceStatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\PresenceStatus")
+     * @var Presencestatus
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Presencestatus")
+     * @ORM\JoinColumn(name="presence_status_id", referencedColumnName="id")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $presenceStatus;
+    protected $presencestatus;
 
     /**
      * @var bool
      */
-    protected $sendInscriptionStatusMail = false;
+    protected $sendinscriptionstatusmail = false;
 
     /**
      * @param int $id
@@ -94,35 +96,35 @@ abstract class AbstractInscription implements SerializedAccessRights
     }
 
     /**
-     * @param InscriptionStatus
+     * @param Inscriptionstatus
      */
-    public function setInscriptionStatus($inscriptionStatus)
+    public function setInscriptionstatus($inscriptionStatus)
     {
-        $this->inscriptionStatus = $inscriptionStatus;
+        $this->inscriptionstatus = $inscriptionStatus;
     }
 
     /**
-     * @return InscriptionStatus
+     * @return Inscriptionstatus
      */
-    public function getInscriptionStatus()
+    public function getInscriptionstatus()
     {
-        return $this->inscriptionStatus;
+        return $this->inscriptionstatus;
     }
 
     /**
-     * @param PresenceStatus
+     * @param Presencestatus
      */
-    public function setPresenceStatus($presenceStatus)
+    public function setPresencestatus($presenceStatus)
     {
-        $this->presenceStatus = $presenceStatus;
+        $this->presencestatus = $presenceStatus;
     }
 
     /**
-     * @return PresenceStatus
+     * @return Presencestatus
      */
-    public function getPresenceStatus()
+    public function getPresencestatus()
     {
-        return $this->presenceStatus;
+        return $this->presencestatus;
     }
 
     /**
@@ -160,17 +162,17 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isSendInscriptionStatusMail()
+    public function isSendinscriptionstatusmail()
     {
-        return $this->sendInscriptionStatusMail;
+        return $this->sendinscriptionstatusmail;
     }
 
     /**
-     * @param bool $sendInscriptionStatusMail
+     * @param bool $sendinscriptionstatusmail
      */
-    public function setSendInscriptionStatusMail($sendInscriptionStatusMail)
+    public function setSendinscriptionstatusmail($sendinscriptionstatusmail)
     {
-        $this->sendInscriptionStatusMail = $sendInscriptionStatusMail;
+        $this->sendinscriptionstatusmail = $sendinscriptionstatusmail;
     }
 
     /**
@@ -179,12 +181,12 @@ abstract class AbstractInscription implements SerializedAccessRights
      * @ORM\PreUpdate
      * @ORM\PrePersist
      */
-    public function setDefaultInscriptionStatus(LifecycleEventArgs $eventArgs)
+    public function setDefaultInscriptionstatus(LifecycleEventArgs $eventArgs)
     {
-        if (!$this->getInscriptionStatus()) {
-            $repository = $eventArgs->getEntityManager()->getRepository(InscriptionStatus::class);
+        if (!$this->getInscriptionstatus()) {
+            $repository = $eventArgs->getEntityManager()->getRepository(Inscriptionstatus::class);
             $status = $repository->findOneBy(array('machineName' => 'waiting'));
-            $this->setInscriptionStatus($status);
+            $this->setInscriptionstatus($status);
         }
     }
 

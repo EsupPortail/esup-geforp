@@ -8,7 +8,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Core\AbstractInscription;
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Presencestatus;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -158,7 +158,7 @@ class AttendanceAccountController extends AbstractController
         // only with the PRESENT status
         $qb->join('i.presenceStatus', 'p');
         $qb->andWhere('p.status = :presenceStatus')
-            ->setParameter('presenceStatus', PresenceStatus::STATUS_PRESENT);
+            ->setParameter('presenceStatus', Presencestatus::STATUS_PRESENT);
         // only past sessions
         $qb->join('i.session', 's');
         $qb->andWhere('s.dateBegin <= CURRENT_DATE()');

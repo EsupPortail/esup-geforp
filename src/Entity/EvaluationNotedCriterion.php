@@ -30,7 +30,7 @@ class EvaluationNotedCriterion
     protected $inscription;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\EvaluationCriterion")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Evaluationcriterion")
      * @ORM\JoinColumn(name="criterion_id", referencedColumnName="id", onDelete="CASCADE")
      * @Serializer\Groups({"Default", "api.attendance"})
      */

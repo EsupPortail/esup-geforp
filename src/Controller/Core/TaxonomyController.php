@@ -2,20 +2,20 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Core\Term\ActionType;
-use App\Entity\Core\Term\EmailTemplate;
-use App\Entity\Core\Term\EvaluationCriterion;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Actiontype;
+use App\Entity\Core\Term\Emailtemplate;
+use App\Entity\Core\Term\Evaluationcriterion;
+use App\Entity\Core\Term\Inscriptionstatus;
 use App\Entity\Core\Term\MenuItem;
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Presencestatus;
 use App\Entity\Core\Term\Publictype;
 use App\Entity\Core\Term\Sessiontype;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Theme;
 use App\Entity\Core\Term\Title;
-use App\Entity\Core\Term\TrainerType;
-use App\Entity\Core\Term\TrainingCategory;
+use App\Entity\Core\Term\Trainertype;
+use App\Entity\Core\Term\Trainingcategory;
 use App\Entity\Organization;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityNotFoundException;
@@ -28,7 +28,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\Term\AbstractTerm;
-use App\Entity\Core\Term\PublipostTemplate;
+use App\Entity\Core\Term\Publiposttemplate;
 use App\Entity\Core\Term\TreeTrait;
 use App\Form\Type\VocabularyType;
 use App\Entity\Core\Term\VocabularyInterface;
@@ -419,11 +419,11 @@ class TaxonomyController extends AbstractController
 	 * @Method("GET")
 	 * @Security("is_granted('VIEW', 'Sygefor\\Bundle\\TaxonomyBundle\\Vocabulary\\VocabularyInterface')")
 	 *
-	 * @param PublipostTemplate $template
+	 * @param Publiposttemplate $template
 	 *
 	 * @return BinaryFileResponse
 	 */
-	public function downloadTemplateAction(PublipostTemplate $template)
+	public function downloadTemplateAction(Publiposttemplate $template)
 	{
 		$file = $template->getFile();
 		if (!$file) {

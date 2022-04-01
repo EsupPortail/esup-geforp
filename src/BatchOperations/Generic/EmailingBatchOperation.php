@@ -12,10 +12,10 @@ namespace App\BatchOperations\Generic;
 use Doctrine\ORM\EntityManager;
 use App\Entity\Core\User;
 use App\Entity\Core\AbstractTrainee;
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Presencestatus;
 use App\Entity\Core\AbstractOrganization;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use App\Entity\Core\Term\InscriptionStatus;
+use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use App\BatchOperations\AbstractBatchOperation;
 use App\BatchOperations\AttachEmailPublipostAttachment;
@@ -205,7 +205,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
 		$repo = $em->getRepository(get_class($templateTerm));
 
 		if (!empty($options['inscriptionStatus'])) {
-			$repoInscriptionStatus = $em->getRepository(InscriptionStatus::class);
+			$repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
 			$inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionStatus']);
 			$templates = $repo->findBy([
 				'inscriptionStatus' => $inscriptionStatus,
@@ -213,7 +213,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
 			]);
 		}
 		else if (!empty($options['presenceStatus'])) {
-			$repoPresenceStatus = $em->getRepository(PresenceStatus::class);
+			$repoPresenceStatus = $em->getRepository(Presencestatus::class);
 			$presenceStatus = $repoPresenceStatus->findById($options['presenceStatus']);
 			$templates = $repo->findBy([
 				'presenceStatus' => $presenceStatus,

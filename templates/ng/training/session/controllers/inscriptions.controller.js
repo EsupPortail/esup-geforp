@@ -28,7 +28,7 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      */
     var recalculateStats = function() {
         for(var key in $scope.status.inscription) {
-            $scope.status.inscription[key].count = $filter('filter')($scope.session.inscriptions, {inscriptionStatus: {id: $scope.status.inscription[key].id }}).length;
+            $scope.status.inscription[key].count = $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {id: $scope.status.inscription[key].id }}).length;
         }
         for(var key in $scope.status.presence) {
             $scope.status.presence[key].count = $filter('filter')($scope.session.inscriptions, {presenceStatus: {id: $scope.status.presence[key].id }}).length;
@@ -56,10 +56,10 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
     $scope.updateInscriptionStatus = function(inscription, status) {
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
-            inscriptionStatus: status,
+            inscriptionstatus: status,
             presenceStatus : undefined
         }).then(function() {
-            inscription.inscriptionStatus = status;
+            inscription.inscriptionstatus = status;
 
             recalculateStats();
         });
@@ -73,11 +73,11 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      * @returns {promise|*|promise|promise|promise|promise}
      */
     $scope.updatePresenceStatus = function(inscription, status) {
-        inscription.inscriptionStatus = undefined;
+        inscription.inscriptionstatus = undefined;
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
             presenceStatus: status,
-            inscriptionStatus: undefined
+            inscriptionstatus: undefined
         }).then(function() {
             inscription.presenceStatus = status;
 
@@ -100,7 +100,7 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      * Get the total accepted inscriptions count
      */
     $scope.totalAcceptedInscriptions = function() {
-        return $filter('filter')($scope.session.inscriptions, {inscriptionStatus: {status: 2}}).length;
+        return $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 2}}).length;
     }
 
     /**

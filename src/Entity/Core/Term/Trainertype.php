@@ -3,8 +3,8 @@
 /**
  * Created by PhpStorm.
  * User: erwan
- * Date: 5/25/16
- * Time: 10:14 AM.
+ * Date: 6/22/16
+ * Time: 5:46 PM.
  */
 namespace App\Entity\Core\Term;
 
@@ -15,10 +15,10 @@ use App\Entity\Core\Term\VocabularyInterface;
 /**
  * Type de personnel.
  *
- * @ORM\Table(name="action_type")
+ * @ORM\Table(name="trainer_type")
  * @ORM\Entity
  */
-class ActionType extends AbstractTerm implements VocabularyInterface
+class Trainertype extends AbstractTerm implements VocabularyInterface
 {
     public static function getVocabularyStatus()
     {
@@ -30,6 +30,6 @@ class ActionType extends AbstractTerm implements VocabularyInterface
      */
     public function getVocabularyName()
     {
-        return 'Type d\'action de formation';
+        return "Type d'intervenant";
     }
 }

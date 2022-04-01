@@ -10,7 +10,7 @@
         </thead>
         <tbody>
         <tr ng-repeat="item in items">
-            <td><a href="" ui-sref="inscription.detail.view({ id: item.id, session: item.session.id })" ui-sref-widget-opts>{{ item.inscriptionStatusUpdatedAt|date: 'dd/MM/yyyy' }}</a></td>
+            <td><a href="" ui-sref="inscription.detail.view({ id: item.id, session: item.session.id })" ui-sref-widget-opts>{{ item.inscriptionstatusUpdatedAt|date: 'dd/MM/yyyy' }}</a></td>
             <td><a href="" ui-sref="trainee.detail.view({ id: item.trainee.id })">{{ item.trainee.fullName }}</a></td>
             <td><a href="" ui-sref="session.detail.view({ id: item.session.id, training: item.session.training.id })">{{ item.session.dateBegin|date: 'dd/MM/yyyy' }} - {{ item.session.training.name }}</a></td>
             <td>{{ item.trainee.publicCategory }}</td>

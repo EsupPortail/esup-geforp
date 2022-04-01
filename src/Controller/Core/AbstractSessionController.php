@@ -291,7 +291,7 @@ abstract class AbstractSessionController extends AbstractController
                 foreach ($inscriptions as $inscription) {
                     $newInscription = clone $inscription;
                     $newInscription->setSession($cloned);
-                    $newInscription->setPresenceStatus(null);
+                    $newInscription->setPresencestatus(null);
                     $cloned->addInscription($newInscription);
                     $em->persist($newInscription);
                 }
