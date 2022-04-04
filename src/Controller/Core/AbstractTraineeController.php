@@ -2,6 +2,9 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Trainee;
+use App\Form\Type\AbstractTraineeType;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
@@ -40,7 +43,7 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @throws \Exception
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
 /*        $search = $this->get('sygefor_trainee.search');
         $search->handleRequest($request);
@@ -51,10 +54,13 @@ abstract class AbstractTraineeController extends AbstractController
         }
 
         return $search->search(); */
+        $trainees = $doctrine->getRepository(Trainee::class)->findAll();
+        $nbTrainees  = count($trainees);
+
         $ret = array(
-            'total' => 0,
+            'total' => $nbTrainees,
             'pageSize' => 0,
-            'items' => array(),
+            'items' => $trainees,
         );
         return $ret;
     }
@@ -67,22 +73,24 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function createAction(Request $request)
+    public function createAction(Request $request, ManagerRegistry $doctrine)
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
         $trainee->setOrganization($this->getUser()->getOrganization());
 
         //trainee can't be created if user has no rights for it
-        if (!$this->get('security.context')->isGranted('CREATE', $trainee)) {
+/*        if (!$this->get('security.context')->isGranted('CREATE', $trainee)) {
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
-        $form = $this->createForm($trainee::getFormType(), $trainee);
+        $form = $this->createForm(AbstractTraineeType::class, $trainee);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $trainee->setCreatedAt(new \DateTime('now'));
+                $trainee->setUpdatedAt(new \DateTime('now'));
+                $em = $doctrine->getManager();
                 $em->persist($trainee);
                 $em->flush();
             }
@@ -96,27 +104,28 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      * 
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="trainee.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
+     * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
      */
-    public function viewAction(Request $request, AbstractTrainee $trainee)
+    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee)
     {
         // access right is checked inside controller, so to be able to send specific error message
-        if (!$this->get('security.context')->isGranted('EDIT', $trainee)) {
+/*        if (!$this->get('security.context')->isGranted('EDIT', $trainee)) {
             if ($this->get('security.context')->isGranted('VIEW', $trainee)) {
                 return array('trainee' => $trainee);
             }
 
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
-        }
+        }*/
 
-        $form = $this->createForm($trainee::getFormType(), $trainee);
+        $form = $this->createForm(AbstractTraineeType::class, $trainee);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $trainee->setUpdatedAt(new \DateTime('now'));
+                $em = $doctrine->getManager();
                 $em->persist($trainee);
                 $em->flush();
             }

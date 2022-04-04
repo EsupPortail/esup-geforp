@@ -3,13 +3,15 @@
 namespace App\Entity;
 
 
+use App\Entity\Core\AbstractInscription;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Form\TraineeType;
+use App\Form\Type\TraineeType;
 use App\Entity\Core\AbstractTrainee;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Entity\Core\User;
 
 /**
  *
@@ -23,13 +25,13 @@ class Trainee extends AbstractTrainee implements UserInterface
      * @ORM\Column(name="birth_date", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $birthDate;
+    protected $birthdate;
 
     /**
      * @ORM\Column(name="amu_statut", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $amuStatut;
+    protected $amustatut;
 
     /**
      * @ORM\Column(name="bap", type="string", length=255)
@@ -59,55 +61,37 @@ class Trainee extends AbstractTrainee implements UserInterface
      * @ORM\Column(name="first_name_sup", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $firstNameSup;
+    protected $firstnamesup;
 
     /**
      * @ORM\Column(name="last_name_sup", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $lastNameSup;
+    protected $lastnamesup;
 
     /**
      * @ORM\Column(name="email_sup", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $emailSup;
+    protected $emailsup;
 
     /**
      * @ORM\Column(name="first_name_corr", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $firstNameCorr;
+    protected $firstnamecorr;
 
     /**
      * @ORM\Column(name="last_name_corr", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $lastNameCorr;
+    protected $lastnamecorr;
 
     /**
      * @ORM\Column(name="email_corr", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $emailCorr;
-
-    /**
-     * @ORM\Column(name="first_name_aut", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $firstNameAut;
-
-    /**
-     * @ORM\Column(name="last_name_aut", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $lastNameAut;
-
-    /**
-     * @ORM\Column(name="email_aut", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $emailAut;
+    protected $emailcorr;
 
     /**
      * @ORM\Column(name="fonction", type="string", length=255)
@@ -136,9 +120,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setBirthDate($birthDate)
+    public function setBirthdate($birthDate)
     {
-        $this->birthDate = $birthDate;
+        $this->birthdate = $birthDate;
 
         return $this;
     }
@@ -147,9 +131,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get birth date
      *
      */
-    public function getBirthDate()
+    public function getBirthdate()
     {
-        return $this->birthDate;
+        return $this->birthdate;
     }
 
     /**
@@ -159,9 +143,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setAmuStatut($amuStatut)
+    public function setAmustatut($amuStatut)
     {
-        $this->amuStatut = $amuStatut;
+        $this->amustatut = $amuStatut;
 
         return $this;
     }
@@ -170,9 +154,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get amuStatut
      *
      */
-    public function getAmuStatut()
+    public function getAmustatut()
     {
-        return $this->amuStatut;
+        return $this->amustatut;
     }
 
     /**
@@ -275,9 +259,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setFirstNameSup($firstNameSup)
+    public function setFirstnamesup($firstNameSup)
     {
-        $this->firstNameSup = $firstNameSup;
+        $this->firstnamesup = $firstNameSup;
 
         return $this;
     }
@@ -287,21 +271,21 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getFirstNameSup()
+    public function getFirstnamesup()
     {
-        return $this->firstNameSup;
+        return $this->firstnamesup;
     }
 
     /**
      * Set lastnameSup
      *
-     * @param string $lastNameSup
+     * @param string $lastnamesup
      *
      * @return Trainee
      */
-    public function setLastNameSup($lastNameSup)
+    public function setLastnamesup($lastNameSup)
     {
-        $this->lastNameSup = $lastNameSup;
+        $this->lastnamesup = $lastNameSup;
 
         return $this;
     }
@@ -311,9 +295,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getLastNameSup()
+    public function getLastnamesup()
     {
-        return $this->lastNameSup;
+        return $this->lastnamesup;
     }
 
     /**
@@ -323,9 +307,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setEmailSup($emailSup)
+    public function setEmailsup($emailSup)
     {
-        $this->emailSup = $emailSup;
+        $this->emailsup = $emailSup;
 
         return $this;
     }
@@ -335,21 +319,21 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getEmailSup()
+    public function getEmailsup()
     {
-        return $this->emailSup;
+        return $this->emailsup;
     }
 
     /**
      * Set firstnameCorr
      *
-     * @param string $firstNameCorr
+     * @param string $firstnamecorr
      *
      * @return Trainee
      */
-    public function setFirstNameCorr($firstNameCorr)
+    public function setFirstnamecorr($firstNameCorr)
     {
-        $this->firstNameCorr = $firstNameCorr;
+        $this->firstnamecorr = $firstNameCorr;
 
         return $this;
     }
@@ -359,9 +343,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getFirstNameCorr()
+    public function getFirstnamecorr()
     {
-        return $this->firstNameCorr;
+        return $this->firstnamecorr;
     }
 
     /**
@@ -371,9 +355,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setLastNameCorr($lastNameCorr)
+    public function setLastnamecorr($lastNameCorr)
     {
-        $this->lastNameCorr = $lastNameCorr;
+        $this->lastnamecorr = $lastNameCorr;
 
         return $this;
     }
@@ -383,9 +367,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getLastNameCorr()
+    public function getLastnamecorr()
     {
-        return $this->lastNameCorr;
+        return $this->lastnamecorr;
     }
 
     /**
@@ -395,9 +379,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setEmailCorr($emailCorr)
+    public function setEmailcorr($emailCorr)
     {
-        $this->emailCorr = $emailCorr;
+        $this->emailcorr = $emailCorr;
 
         return $this;
     }
@@ -407,81 +391,9 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getEmailCorr()
+    public function getEmailcorr()
     {
-        return $this->emailCorr;
-    }
-
-    /**
-     * Set firstNameAut
-     *
-     * @param string firstNameAut
-     *
-     * @return Trainee
-     */
-    public function setFirstNameAut($firstNameAut)
-    {
-        $this->firstNameAut = $firstNameAut;
-
-        return $this;
-    }
-
-    /**
-     * Get $firstNameAut
-     *
-     * @return string
-     */
-    public function getFirstNameAut()
-    {
-        return $this->firstNameAut;
-    }
-
-    /**
-     * Set lastnameAut
-     *
-     * @param string $lastNameAut
-     *
-     * @return Trainee
-     */
-    public function setLastNameAut($lastNameAut)
-    {
-        $this->lastNameAut = $lastNameAut;
-
-        return $this;
-    }
-
-    /**
-     * Get lastnameAut
-     *
-     * @return string
-     */
-    public function getLastNameAut()
-    {
-        return $this->lastNameAut;
-    }
-
-    /**
-     * Set emailAut
-     *
-     * @param string $emailAut
-     *
-     * @return Trainee
-     */
-    public function setEmailAut($emailAut)
-    {
-        $this->emailAut = $emailAut;
-
-        return $this;
-    }
-
-    /**
-     * Get emailAut
-     *
-     * @return string
-     */
-    public function getEmailAut()
-    {
-        return $this->emailAut;
+        return $this->emailcorr;
     }
 
     /**
@@ -515,7 +427,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function addInscription(\App\Entity\Core\AbstractInscription $inscription)
+    public function addInscription(AbstractInscription $inscription)
     {
         $this->inscriptions[] = $inscription;
 
@@ -527,7 +439,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @param \App\Entity\Core\AbstractInscription $inscription
      */
-    public function removeInscription(\App\Entity\Core\AbstractInscription $inscription)
+    public function removeInscription(AbstractInscription $inscription)
     {
         $this->inscriptions->removeElement($inscription);
     }

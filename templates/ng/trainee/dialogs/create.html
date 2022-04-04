@@ -7,7 +7,7 @@
 <form sf-href="trainee.create" sf-form="form" json-path="form" on-success="onSuccess(data)" class="form-horizontal" novalidate>
     <div class="modal-body">
 
-        <div ng-repeat="key in ['organization', 'title', 'lastName', 'firstName', 'email', 'birthDate', 'phoneNumber', 'address', 'zip', 'city', 'institution', 'service', 'amuStatut', 'bap', 'corps', 'category', 'campus', 'fonction']">
+        <div ng-repeat="key in ['organization', 'title', 'lastname', 'firstname', 'email', 'birthdate', 'phonenumber', 'address', 'zip', 'city', 'institution', 'service', 'amustatut', 'bap', 'corps', 'category', 'campus', 'fonction']">
             <div class="form-group" ng-if="form.children[key]" ng-class="{'has-error': form.children[key].errors.length }">
                 <label class="col-sm-3 control-label" for="{{ form.children[key].id }}">{{ form.children[key].label }}</label>
                 <div class="col-sm-9">
@@ -17,16 +17,16 @@
             </div>
         </div>
         <div>
-            <div class="form-group" ng-if="form.children['publicType']" ng-class="{'has-error': form.children['publicType'].errors.length }">
-                <label class="col-sm-3 control-label" for="{{ form.children['publicType'].id }}">{{ form.children['publicType'].label }}</label>
+            <div class="form-group" ng-if="form.children['publictype']" ng-class="{'has-error': form.children['publictype'].errors.length }">
+                <label class="col-sm-3 control-label" for="{{ form.children['publictype'].id }}">{{ form.children['publictype'].label }}</label>
                 <div class="col-sm-9">
-                    <span sf-form-widget="form.children['publicType']" ng-required="true" class="form-control" />
-                    <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children['publicType'].errors" class="help-block">{{ error }}</div>
+                    <span sf-form-widget="form.children['publictype']" ng-required="true" class="form-control" />
+                    <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children['publictype'].errors" class="help-block">{{ error }}</div>
                 </div>
             </div>
         </div>
         <h3 class="modal-header">Responsable hiérarchique</h3>
-        <div ng-repeat="key in ['lastNameSup', 'firstNameSup', 'emailSup']">
+        <div ng-repeat="key in ['lastnamesup', 'firstnamesup', 'emailsup']">
             <div class="form-group" ng-if="form.children[key]" ng-class="{'has-error': form.children[key].errors.length }" >
                 <label class="col-sm-3 control-label" for="{{ form.children[key].id }}">{{ form.children[key].label }}</label>
                 <div class="col-sm-9">
@@ -36,7 +36,7 @@
             </div>
         </div>
         <h3 class="modal-header">Correspondant formation</h3>
-        <div ng-repeat="key in ['lastNameCorr', 'firstNameCorr', 'emailCorr']">
+        <div ng-repeat="key in ['lastnamecorr', 'firstnamecorr', 'emailcorr']">
             <div class="form-group" ng-if="form.children[key]" ng-class="{'has-error': form.children[key].errors.length }" >
                 <label class="col-sm-3 control-label" for="{{ form.children[key].id }}">{{ form.children[key].label }}</label>
                 <div class="col-sm-9">

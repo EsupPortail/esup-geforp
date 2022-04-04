@@ -164,10 +164,10 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
         $metadata->addPropertyConstraint('title', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner une civilité.',
         )));
-        $metadata->addPropertyConstraint('lastName', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('lastname', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un nom de famille.',
         )));
-        $metadata->addPropertyConstraint('firstName', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('firstname', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un prénom.',
         )));
 
@@ -187,7 +187,7 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
         $metadata->addPropertyConstraint('email', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un email.',
         )));
-        $metadata->addPropertyConstraint('phoneNumber', new Assert\NotBlank(array(
+        $metadata->addPropertyConstraint('phonenumber', new Assert\NotBlank(array(
             'message' => 'Vous devez renseigner un numéro de téléphone.',
             'groups'  => 'api.profile',
         )));
@@ -199,7 +199,7 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
         )));
 
         // PublicCategoryTrait
-        $metadata->addPropertyConstraint('Publictype', new Assert\NotNull(array(
+        $metadata->addPropertyConstraint('publictype', new Assert\NotNull(array(
             'message' => 'Vous devez renseigner un type de personnel.',
             'groups'  => 'api.profile',
         )));

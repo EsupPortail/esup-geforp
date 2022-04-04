@@ -86,19 +86,16 @@ class MenuBuilder
                     'label' => 'Événements',
                     'icon'  => 'calendar',
                     'uri'   => $this->router->generate('core.index') . '#/training',
-//                    'uri' => $this->router->generate('core.index'),
                 ));
 
                 $item->addChild('internships', array(
                     'label' => 'Stages',
                     'uri'   => $this->router->generate('core.index') . '#/training?type=internship',
-//                    'uri' => $this->router->generate('core.index'),
                 ));
 
                 $item->addChild('sessions', array(
                     'label' => 'Toutes les sessions',
                     'uri'   => $this->router->generate('core.index') . '#/training/session',
-//                    'uri' => $this->router->generate('core.index'),
                 ))->setAttribute('divider_prepend', true);
 
 //            }
@@ -107,8 +104,8 @@ class MenuBuilder
                 $menu->addChild('trainees', array(
                     'label' => 'Publics',
                     'icon'  => 'group',
-//                    'uri'   => $this->router->generate('core.index') . '#/trainee',
-                    'uri' => $this->router->generate('core.index'),
+                    'uri'   => $this->router->generate('core.index') . '#/trainee',
+//                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
@@ -117,7 +114,6 @@ class MenuBuilder
                     'label' => 'Etablissements',
                     'icon'  => 'university',
                     'uri'   => $this->router->generate('core.index') . '#/institution',
-//                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
@@ -126,7 +122,6 @@ class MenuBuilder
                     'label' => 'Intervenants',
                     'icon'  => 'user',
                     'uri'   => $this->router->generate('core.index') . '#/trainer',
-//                    'uri' => $this->router->generate('core.index'),
                 ));
 //            }
 
