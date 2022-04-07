@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core;
 
+use App\Form\Type\BaseInscriptionType;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
@@ -203,7 +204,7 @@ abstract class AbstractInscription implements SerializedAccessRights
      */
     public static function getFormType()
     {
-        return AbstractInscriptionType::class;
+        return BaseInscriptionType::class;
     }
 
     /**

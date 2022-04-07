@@ -73027,7 +73027,7 @@ function L(a,c,b,d){var e,g=RegExp(/\[\]$/);if(b instanceof Array)n(b,function(b
 i.m=function(a,c,b){var d=this.i(a),e=c||{},g={},z;for(z in e)g[z]=e[z];var h="",s=!0,j="";n(d.tokens,function(b){if("text"===b[0])h=b[1]+h,s=f;else if("variable"===b[0]){var c=b[3]in d.defaults;if(f===s||!c||b[3]in e&&e[b[3]]!=d.defaults[b[3]]){if(b[3]in e){var c=e[b[3]],p=b[3];p in g&&delete g[p]}else if(c)c=d.defaults[b[3]];else{if(s)return;throw Error('The route "'+a+'" requires the parameter "'+b[3]+'".');}if(!(!0===c||f===c||""===c)||!s)p=encodeURIComponent(c).replace(/%2F/g,"/"),"null"===p&&
 null===c&&(p=""),h=b[1]+p+h;s=f}else c&&(b=b[3],b in g&&delete g[b])}else throw Error('The token type "'+b[0]+'" is not supported.');});""===h&&(h="/");n(d.hosttokens,function(a){var b;if("text"===a[0])j=a[1]+j;else if("variable"===a[0]){if(a[3]in e){b=e[a[3]];var c=a[3];c in g&&delete g[c]}else a[3]in d.defaults&&(b=d.defaults[a[3]]);j=a[1]+b+j}});h=this.b.e+h;"_scheme"in d.requirements&&this.b.scheme!=d.requirements._scheme?h=d.requirements._scheme+"://"+(j||this.b.host)+h:j&&this.b.host!==j?h=
 this.b.scheme+"://"+j+h:!0===b&&(h=this.b.scheme+"://"+this.b.host+h);var c=0,A;for(A in g)c++;if(0<c){var B,H=[];A=function(a,b){b="function"===typeof b?b():b;H.push(encodeURIComponent(a)+"="+encodeURIComponent(null===b?"":b))};for(B in g)L(this,B,g[B],A);h=h+"?"+H.join("&").replace(/%20/g,"+")}return h};l("fos.Router",K);l("fos.Router.setData",function(a){var c=K.g();c.k(a.base_url);c.h(a.routes);"prefix"in a&&c.l(a.prefix);c.b.host=a.host;c.b.scheme=a.scheme});K.getInstance=K.g;K.prototype.setRoutes=K.prototype.h;K.prototype.getRoutes=K.prototype.o;K.prototype.setBaseUrl=K.prototype.k;K.prototype.getBaseUrl=K.prototype.n;K.prototype.generate=K.prototype.m;K.prototype.setPrefix=K.prototype.l;K.prototype.getRoute=K.prototype.i;window.Routing=K.g();})();
-fos.Router.setData({"base_url":"","routes":{"core.search":{"tokens":[["text","\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"core.entity":{"tokens":[["text","\/entity"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"email.search":{"tokens":[["text","\/email\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"email.view":{"tokens":[["variable","\/","\\d+","id",true],["text","\/email\/view"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"organization.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/admin\/organizations"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"taxonomy.terms_order":{"tokens":[["text","\/terms\/order"],["variable","\/","[^\/]++","vocabulary",true],["text","\/admin\/taxonomy"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"taxonomy.get":{"tokens":[["variable","\/","[^\/]++","vocabularyId",true],["text","\/admin\/taxonomy\/get_terms"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"user.view":{"tokens":[["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"user.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"user.account":{"tokens":[["text","\/admin\/users\/account"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"user.access_rights":{"tokens":[["text","\/access-rights"],["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"presence.edit":{"tokens":[["variable","\/","[^\/]++","presence",true],["text","\/inscription\/editpresence"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.search":{"tokens":[["text","\/inscription\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.create":{"tokens":[["variable","\/","[^\/]++","session",true],["text","\/inscription\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/inscription"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"inscription.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/inscription"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.search":{"tokens":[["text","\/institution\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.create":{"tokens":[["text","\/institution\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/institution"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"institution.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/institution"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/institution"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"participation.search":{"tokens":[["text","\/participation\/participation\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"participation.add":{"tokens":[["text","\/add"],["variable","\/","[^\/]++","session",true],["text","\/participation"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"participation.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/participation"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"participation.remove":{"tokens":[["variable","\/","[^\/]++","participation",true],["text","\/remove"],["variable","\/","[^\/]++","session",true],["text","\/participation"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.add":{"tokens":[["variable","\/","[^\/]++","session",true],["text","\/training\/session\/adddates"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"dates.remove":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/remove"],["variable","\/","[^\/]++","session",true],["text","\/training\/session"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.edit":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/training\/session\/editdates"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.view":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/training\/session\/viewdates"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"session.search":{"tokens":[["text","\/training\/session\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"session.create":{"tokens":[["variable","\/","[^\/]++","training",true],["text","\/training\/session\/create"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/training\/session"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.duplicate":{"tokens":[["variable","\/","[^\/]++","inscriptionIds",true],["variable","\/","\\d+","id",true],["text","\/training\/session\/duplicate"]],"defaults":{"inscriptionIds":null},"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/training\/session"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.search":{"tokens":[["text","\/trainee\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.create":{"tokens":[["text","\/trainee\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/trainee"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.toggleActivation":{"tokens":[["text","\/toggleActivation"],["variable","\/","\\d+","id",true],["text","\/trainee"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.changepwd":{"tokens":[["text","\/changepwd"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.search":{"tokens":[["text","\/trainer\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.create":{"tokens":[["text","\/trainer\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/trainer"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainer.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/trainer"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/trainer"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.search":{"tokens":[["text","\/training\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.create":{"tokens":[["variable","\/","[^\/]++","type",true],["text","\/training\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/training"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"training.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/training"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"training.choosetypeduplicate":{"tokens":[["text","\/training\/choosetypeduplicate"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.duplicate":{"tokens":[["variable","\/","[^\/]++","type",true],["variable","\/","[^\/]++","id",true],["text","\/training\/duplicate"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.balancesheet":{"tokens":[["variable",".","csv|xls|xlsx","_format",true],["text","\/bilan"],["variable","\/","[^\/]++","id",true],["text","\/training"]],"defaults":{"_format":"xls"},"requirements":{"_format":"csv|xls|xlsx"},"hosttokens":[],"methods":[],"schemes":[]}},"prefix":"","host":"localhost","port":"","scheme":"http","locale":""});
+fos.Router.setData({"base_url":"","routes":{"sygefor_core.batch_operation.execute":{"tokens":[["text","\/execute"],["variable","\/","[^\/]++","id",true],["text","\/batchoperation"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"sygefor_core.batch_operation.modal_config":{"tokens":[["variable","\/","[^\/]++","service",true],["text","\/batchoperation\/modalconfig"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"sygefor_core.batch_operation.get_file":{"tokens":[["variable","\/","[^\/]++","filename",true],["text","\/as"],["variable","\/","[^\/]++","file",true],["text","\/get"],["variable","\/","[^\/]++","service",true],["text","\/batchoperation"]],"defaults":{"filename":null},"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"core.search":{"tokens":[["text","\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"core.entity":{"tokens":[["text","\/entity"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"email.search":{"tokens":[["text","\/email\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"email.view":{"tokens":[["variable","\/","\\d+","id",true],["text","\/email\/view"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"organization.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/admin\/organizations"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"taxonomy.terms_order":{"tokens":[["text","\/terms\/order"],["variable","\/","[^\/]++","vocabulary",true],["text","\/admin\/taxonomy"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"taxonomy.get":{"tokens":[["variable","\/","[^\/]++","vocabularyId",true],["text","\/admin\/taxonomy\/get_terms"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"user.view":{"tokens":[["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"user.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"user.account":{"tokens":[["text","\/admin\/users\/account"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"user.access_rights":{"tokens":[["text","\/access-rights"],["variable","\/","\\d+","id",true],["text","\/admin\/users"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"presence.edit":{"tokens":[["variable","\/","[^\/]++","presence",true],["text","\/inscription\/editpresence"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.search":{"tokens":[["text","\/inscription\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.create":{"tokens":[["variable","\/","[^\/]++","session",true],["text","\/inscription\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"inscription.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/inscription"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"inscription.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/inscription"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.search":{"tokens":[["text","\/institution\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.create":{"tokens":[["text","\/institution\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/institution"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"institution.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/institution"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"institution.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/institution"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"participation.search":{"tokens":[["text","\/participation\/participation\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"participation.add":{"tokens":[["text","\/add"],["variable","\/","[^\/]++","session",true],["text","\/participation"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"participation.edit":{"tokens":[["text","\/edit"],["variable","\/","\\d+","id",true],["text","\/participation"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"participation.remove":{"tokens":[["variable","\/","[^\/]++","participation",true],["text","\/remove"],["variable","\/","[^\/]++","session",true],["text","\/participation"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.add":{"tokens":[["variable","\/","[^\/]++","session",true],["text","\/training\/session\/adddates"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"dates.remove":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/remove"],["variable","\/","[^\/]++","session",true],["text","\/training\/session"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.edit":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/training\/session\/editdates"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"dates.view":{"tokens":[["variable","\/","[^\/]++","dates",true],["text","\/training\/session\/viewdates"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"session.search":{"tokens":[["text","\/training\/session\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"session.create":{"tokens":[["variable","\/","[^\/]++","training",true],["text","\/training\/session\/create"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/training\/session"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.duplicate":{"tokens":[["variable","\/","[^\/]++","inscriptionIds",true],["variable","\/","\\d+","id",true],["text","\/training\/session\/duplicate"]],"defaults":{"inscriptionIds":null},"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"session.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/training\/session"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.search":{"tokens":[["text","\/trainee\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.create":{"tokens":[["text","\/trainee\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/trainee"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.toggleActivation":{"tokens":[["text","\/toggleActivation"],["variable","\/","\\d+","id",true],["text","\/trainee"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainee.changepwd":{"tokens":[["text","\/changepwd"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainee.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/trainee"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.search":{"tokens":[["text","\/trainer\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.create":{"tokens":[["text","\/trainer\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/trainer"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"trainer.changeorg":{"tokens":[["text","\/changeorg"],["variable","\/","[^\/]++","id",true],["text","\/trainer"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"trainer.delete":{"tokens":[["text","\/remove"],["variable","\/","[^\/]++","id",true],["text","\/trainer"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.search":{"tokens":[["text","\/training\/search"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.create":{"tokens":[["variable","\/","[^\/]++","type",true],["text","\/training\/create"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.view":{"tokens":[["text","\/view"],["variable","\/","\\d+","id",true],["text","\/training"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"training.remove":{"tokens":[["text","\/remove"],["variable","\/","\\d+","id",true],["text","\/training"]],"defaults":[],"requirements":{"id":"\\d+"},"hosttokens":[],"methods":[],"schemes":[]},"training.choosetypeduplicate":{"tokens":[["text","\/training\/choosetypeduplicate"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.duplicate":{"tokens":[["variable","\/","[^\/]++","type",true],["variable","\/","[^\/]++","id",true],["text","\/training\/duplicate"]],"defaults":[],"requirements":[],"hosttokens":[],"methods":[],"schemes":[]},"training.balancesheet":{"tokens":[["variable",".","csv|xls|xlsx","_format",true],["text","\/bilan"],["variable","\/","[^\/]++","id",true],["text","\/training"]],"defaults":{"_format":"xls"},"requirements":{"_format":"csv|xls|xlsx"},"hosttokens":[],"methods":[],"schemes":[]}},"prefix":"","host":"localhost","port":"","scheme":"http","locale":""});
 /* Modernizr 2.8.3 (Custom Build) | MIT & BSD
  * Build: http://modernizr.com/download/#-flexbox-flexboxlegacy-shiv-cssclasses-testprop-testallprops-domprefixes
  */
@@ -75420,6 +75420,262 @@ sygeforApp.directive('xeditable', ['$timeout', function($timeout) {
 }]);
 
 /**
+ * Search Toolbar Directive
+ */
+sygeforApp.directive('listToolbar', ['$timeout', function($timeout) {
+    return {
+        restrict: 'A',
+        replace: true,
+        transclude: true,
+        link: function(scope, element, attrs)
+        {
+
+            /**
+             * tells wether an add operation is available
+             * @param a
+             * @returns {*|available}
+             */
+            scope.addOperationAvailable = function (a) {
+                if(typeof a.available == "function") {
+                    return a.available();
+                } else if(typeof a.available != "undefined") {
+                    return a.available;
+                } else {
+                    return true;
+                }
+            };
+
+            scope.batchOperationAvailable = function(a) {
+                if(typeof a.available == "function") {
+                    return a.available();
+                } else if(typeof a.available != "undefined") {
+                    return a.available;
+                } else {
+                    return true;
+                }
+            }
+        },
+        templateUrl: "toolbar/list-toolbar.html"
+    }
+}]);
+
+/**
+ * SearchBoxController
+ */
+sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function($scope, $timeout) {
+    $scope.sbfacets = [];
+
+    /**
+     * Callback to get filtered facet list from the server
+     */
+    var getFacetItems = function(input, name) {
+
+        // default options
+        var options = {
+            size: 999,
+            order: { "_term" : "asc" }
+        };
+
+        // allow customize in facet config
+        if($scope.facets[name]) {
+            for(var key in $scope.facets[name]) {
+                if(options[key]) {
+                    options[key] = $scope.facets[name][key];
+                }
+            }
+        }
+
+        // set the input
+        if(input) {
+            options.include = {
+                "pattern" : ".*" + input + ".*",
+                "flags" : "CANON_EQ|CASE_INSENSITIVE"
+            };
+        }
+
+        // cancel the previous promise
+        if(typeof getFacetItemsTimeout !== "undefined") {
+            $timeout.cancel(getFacetItemsTimeout);
+        }
+
+        // launch the promise, with delay
+        getFacetItemsTimeout = $timeout(function() {
+            return $scope.search.fetchAggregation(name, options).then(function(agg) {
+                var items = [];
+                for(var i=0; i<agg.buckets.length; i++) {
+                    var key = agg.buckets[i].key;
+                    items.push({
+                        name: key,
+                        label: ($scope.facets[name] && $scope.facets[name].values && $scope.facets[name].values[key]) || key,
+                        count: agg.buckets[i].doc_count
+                    });
+                }
+                return items;
+            });
+        }, 500);
+
+        return getFacetItemsTimeout;
+    };
+
+    /**
+     * Add the facets
+     */
+    var sbfacets = [];
+    for(key in $scope.facets) {
+        var facet = {
+            name: key,
+            label: $scope.facets[key].label,
+            type: $scope.facets[key].type || 'string',
+//            items: typeof $scope.facets[key].items != "undefined" ? $scope.facets[key].items : getFacetItems
+            esType: $scope.facets[key].esType || 'string',
+            items: typeof $scope.facets[key].items != "undefined" ? $scope.facets[key].items : getFacetItems,
+            values: typeof $scope.facets[key].values != "undefined" ? $scope.facets[key].values : null
+        }
+        sbfacets.push(facet);
+    }
+    $scope.sbfacets = sbfacets;
+
+
+    /**
+     * Update search box parameters
+     */
+    var updateParameters = function() {
+        var sbparameters = [];
+        var filters = angular.copy($scope.search.query.filters);
+        for(var key in filters) {
+            // if the filter is not an array, transform
+            if(!Array.isArray(filters[key])) {
+                filters[key] = [filters[key]];
+            }
+            for(var i=0; i < filters[key].length; i++) {
+                sbparameters.push({
+                    key: key,
+                    value: filters[key][i]
+                });
+            }
+        }
+        if($scope.search.query.keywords) {
+            sbparameters.push({key: 'text', value: $scope.search.query.keywords});
+        }
+        $scope.sbparameters = sbparameters;
+    }
+
+    /**
+     * Watch search.query.filters
+     * Wath search.keywords
+     */
+    $scope.$watchCollection("search.query.filters", updateParameters);
+    $scope.$watch("search.query.keywords", updateParameters);
+
+    /**
+     * Watch searchbox parameters to update the query
+     */
+    $scope.$watch("sbparameters", function(params, oldParams) {
+        if(params) {
+            // prepare an object to merge
+            var query = {
+                keywords: null,
+                filters: $scope.search.query.filters
+            };
+
+            // empty all the filters based on facets
+            // @todo : searchbox must return empty value for each facet
+            for(var i = 0; i < oldParams.length; i++) {
+                delete query.filters[oldParams[i].key];
+            }
+
+            // fill the query with params
+            for(var i = 0; i < params.length; i++) {
+                var param = params[i];
+                // keywords
+                if(param.key == 'text') {
+                    query.keywords = param.value;
+                } else if(param.value) {
+                    if(query.filters[param.key]) {
+                        // if the filter is already defined
+                        if(!Array.isArray(query.filters[param.key])) {
+                            // if the filter is not yet an array
+                            query.filters[param.key] = [query.filters[param.key]];
+                        }
+                        query.filters[param.key].push(param.value);
+                    } else {
+                        // initialize the filter
+                        query.filters[param.key] = param.value;
+                    }
+                }
+            }
+
+            // extends the search query with our query
+            $scope.search.query = angular.extend($scope.search.query, query);
+        }
+    }, true);
+
+}]);
+
+/**
+ * WidgetListController
+ */
+sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$timeout', '$listState', '$dialog', 'options', function($scope, $searchFactory, $timeout, $listState, $dialog, options) {
+
+    // create search service
+    $scope.search = new $searchFactory(options.route);
+    $scope.$dialog = $dialog;
+
+    // load query infos
+    $scope.search.query.size = options.size;
+    $scope.search.query.sorts = options.sorts;
+    $scope.search.query.filters = options.filters ? options.filters : {};
+
+    $scope.$watch("search.result.total", function(total) {
+        options.subtitle = (total > 0 ? ' (' + total + ')' : '');
+    });
+
+    /**
+     * Refresh the widget
+     * @private
+     */
+    $scope.refresh = function() {
+        $scope.loading = true;
+        $scope.search.search().then(function(result) {
+            $scope.items = result.items;
+            $scope.loading = false;
+        });
+    };
+
+    /**
+     * Open the list
+     * @private
+     */
+    if (typeof $scope.options.open == "undefined") {
+        $scope.open = function() {
+            // copy the query
+            var q = angular.copy($scope.search.query);
+            // remove the size param
+            delete q.size;
+            // go the the configured state
+            $listState.go(options.state, {q: angular.toJson(q)});
+        }
+    }
+    else if($scope.options.open) {
+        $scope.open = $scope.options.open;
+    }
+
+    /**
+     * query page/size watcher
+     */
+    $scope.$watch('[search.query.page, search.query.size]', function(newValue, oldValue){
+        if(!angular.equals(newValue, oldValue)) {
+            $scope.refresh();
+        }
+    }, true);
+
+    /**
+     * init search
+     */
+    $timeout($scope.refresh);
+}]);
+
+/**
  * Dialog provider
  */
 sygeforApp.provider('$dialog', [function() {
@@ -75875,262 +76131,6 @@ sygeforApp.provider('$user', [function() {
 
         return user;
     };
-}]);
-
-/**
- * Search Toolbar Directive
- */
-sygeforApp.directive('listToolbar', ['$timeout', function($timeout) {
-    return {
-        restrict: 'A',
-        replace: true,
-        transclude: true,
-        link: function(scope, element, attrs)
-        {
-
-            /**
-             * tells wether an add operation is available
-             * @param a
-             * @returns {*|available}
-             */
-            scope.addOperationAvailable = function (a) {
-                if(typeof a.available == "function") {
-                    return a.available();
-                } else if(typeof a.available != "undefined") {
-                    return a.available;
-                } else {
-                    return true;
-                }
-            };
-
-            scope.batchOperationAvailable = function(a) {
-                if(typeof a.available == "function") {
-                    return a.available();
-                } else if(typeof a.available != "undefined") {
-                    return a.available;
-                } else {
-                    return true;
-                }
-            }
-        },
-        templateUrl: "toolbar/list-toolbar.html"
-    }
-}]);
-
-/**
- * SearchBoxController
- */
-sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function($scope, $timeout) {
-    $scope.sbfacets = [];
-
-    /**
-     * Callback to get filtered facet list from the server
-     */
-    var getFacetItems = function(input, name) {
-
-        // default options
-        var options = {
-            size: 999,
-            order: { "_term" : "asc" }
-        };
-
-        // allow customize in facet config
-        if($scope.facets[name]) {
-            for(var key in $scope.facets[name]) {
-                if(options[key]) {
-                    options[key] = $scope.facets[name][key];
-                }
-            }
-        }
-
-        // set the input
-        if(input) {
-            options.include = {
-                "pattern" : ".*" + input + ".*",
-                "flags" : "CANON_EQ|CASE_INSENSITIVE"
-            };
-        }
-
-        // cancel the previous promise
-        if(typeof getFacetItemsTimeout !== "undefined") {
-            $timeout.cancel(getFacetItemsTimeout);
-        }
-
-        // launch the promise, with delay
-        getFacetItemsTimeout = $timeout(function() {
-            return $scope.search.fetchAggregation(name, options).then(function(agg) {
-                var items = [];
-                for(var i=0; i<agg.buckets.length; i++) {
-                    var key = agg.buckets[i].key;
-                    items.push({
-                        name: key,
-                        label: ($scope.facets[name] && $scope.facets[name].values && $scope.facets[name].values[key]) || key,
-                        count: agg.buckets[i].doc_count
-                    });
-                }
-                return items;
-            });
-        }, 500);
-
-        return getFacetItemsTimeout;
-    };
-
-    /**
-     * Add the facets
-     */
-    var sbfacets = [];
-    for(key in $scope.facets) {
-        var facet = {
-            name: key,
-            label: $scope.facets[key].label,
-            type: $scope.facets[key].type || 'string',
-//            items: typeof $scope.facets[key].items != "undefined" ? $scope.facets[key].items : getFacetItems
-            esType: $scope.facets[key].esType || 'string',
-            items: typeof $scope.facets[key].items != "undefined" ? $scope.facets[key].items : getFacetItems,
-            values: typeof $scope.facets[key].values != "undefined" ? $scope.facets[key].values : null
-        }
-        sbfacets.push(facet);
-    }
-    $scope.sbfacets = sbfacets;
-
-
-    /**
-     * Update search box parameters
-     */
-    var updateParameters = function() {
-        var sbparameters = [];
-        var filters = angular.copy($scope.search.query.filters);
-        for(var key in filters) {
-            // if the filter is not an array, transform
-            if(!Array.isArray(filters[key])) {
-                filters[key] = [filters[key]];
-            }
-            for(var i=0; i < filters[key].length; i++) {
-                sbparameters.push({
-                    key: key,
-                    value: filters[key][i]
-                });
-            }
-        }
-        if($scope.search.query.keywords) {
-            sbparameters.push({key: 'text', value: $scope.search.query.keywords});
-        }
-        $scope.sbparameters = sbparameters;
-    }
-
-    /**
-     * Watch search.query.filters
-     * Wath search.keywords
-     */
-    $scope.$watchCollection("search.query.filters", updateParameters);
-    $scope.$watch("search.query.keywords", updateParameters);
-
-    /**
-     * Watch searchbox parameters to update the query
-     */
-    $scope.$watch("sbparameters", function(params, oldParams) {
-        if(params) {
-            // prepare an object to merge
-            var query = {
-                keywords: null,
-                filters: $scope.search.query.filters
-            };
-
-            // empty all the filters based on facets
-            // @todo : searchbox must return empty value for each facet
-            for(var i = 0; i < oldParams.length; i++) {
-                delete query.filters[oldParams[i].key];
-            }
-
-            // fill the query with params
-            for(var i = 0; i < params.length; i++) {
-                var param = params[i];
-                // keywords
-                if(param.key == 'text') {
-                    query.keywords = param.value;
-                } else if(param.value) {
-                    if(query.filters[param.key]) {
-                        // if the filter is already defined
-                        if(!Array.isArray(query.filters[param.key])) {
-                            // if the filter is not yet an array
-                            query.filters[param.key] = [query.filters[param.key]];
-                        }
-                        query.filters[param.key].push(param.value);
-                    } else {
-                        // initialize the filter
-                        query.filters[param.key] = param.value;
-                    }
-                }
-            }
-
-            // extends the search query with our query
-            $scope.search.query = angular.extend($scope.search.query, query);
-        }
-    }, true);
-
-}]);
-
-/**
- * WidgetListController
- */
-sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$timeout', '$listState', '$dialog', 'options', function($scope, $searchFactory, $timeout, $listState, $dialog, options) {
-
-    // create search service
-    $scope.search = new $searchFactory(options.route);
-    $scope.$dialog = $dialog;
-
-    // load query infos
-    $scope.search.query.size = options.size;
-    $scope.search.query.sorts = options.sorts;
-    $scope.search.query.filters = options.filters ? options.filters : {};
-
-    $scope.$watch("search.result.total", function(total) {
-        options.subtitle = (total > 0 ? ' (' + total + ')' : '');
-    });
-
-    /**
-     * Refresh the widget
-     * @private
-     */
-    $scope.refresh = function() {
-        $scope.loading = true;
-        $scope.search.search().then(function(result) {
-            $scope.items = result.items;
-            $scope.loading = false;
-        });
-    };
-
-    /**
-     * Open the list
-     * @private
-     */
-    if (typeof $scope.options.open == "undefined") {
-        $scope.open = function() {
-            // copy the query
-            var q = angular.copy($scope.search.query);
-            // remove the size param
-            delete q.size;
-            // go the the configured state
-            $listState.go(options.state, {q: angular.toJson(q)});
-        }
-    }
-    else if($scope.options.open) {
-        $scope.open = $scope.options.open;
-    }
-
-    /**
-     * query page/size watcher
-     */
-    $scope.$watch('[search.query.page, search.query.size]', function(newValue, oldValue){
-        if(!angular.equals(newValue, oldValue)) {
-            $scope.refresh();
-        }
-    }, true);
-
-    /**
-     * init search
-     */
-    $timeout($scope.refresh);
 }]);
 
 /**
@@ -76724,61 +76724,6 @@ sygeforApp.controller('BatchExportPdfController', ['$scope', '$window', '$modalI
 }]);
 
 /**
- * ManageMaterialsController
- */
-sygeforApp.controller('ManageMaterialsController', ['$scope', '$http', '$window', '$dialog', '$modalInstance', '$dialogParams', 'growl', function($scope, $http, $window, $dialog, $modalInstance, $dialogParams, growl)
-{
-    $scope.dialog = $modalInstance;
-    $scope.dialog.params = angular.copy($dialogParams);
-    $scope.entityType = $dialogParams.entityType;
-    $scope.entity = $dialogParams.entity;
-
-    /**
-     * Get response from sf-file-upload
-     */
-    $scope.getUploadedFile = function(jsFile, data) {
-        if (data.error) {
-            growl.addErrorMessage(data.error);
-        }
-        else {
-            $scope.entity.materials.push(data.material);
-        }
-    };
-
-    /**
-     * Add a linked material
-     */
-    $scope.addLinkMaterial = function () {
-        $dialog.open('material.linkmaterial.add', {entity_id: $scope.entity.id, type_entity: $scope.entityType, material_type: "link"}).
-        then(function (data) {
-            $scope.entity.materials.push(data.material);
-        });
-    };
-
-    /**
-     * function called to download file
-     * @param file
-     */
-    $scope.getFile = function (file) {
-        $window.location = Routing.generate('material.get', {id: file.id});
-    };
-
-    /**
-     * calls remove material modal and updates material list
-     * @param material
-     */
-    $scope.removeMaterial = function(material) {
-        return $dialog.open('material.remove', {material: material}).then(function() {
-            for (var i = 0 ; $scope.entity.materials ; i++) {
-                if ($scope.entity.materials[i].id === material.id) {
-                    $scope.entity.materials.splice(i, 1);
-                    break;
-                }
-            }
-        });
-    };
-}]);
-/**
  * BatchMailingController
  */
 sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config)
@@ -77002,101 +76947,6 @@ sygeforApp.controller('SessionRegistrationChange', ['$scope', '$http', '$window'
 /**
  * Trainer Add Controller
  */
-sygeforApp.controller('DatesAddController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$user', '$http', '$window', 'form', 'growl', function ($scope, $modalInstance, $dialog, $dialogParams, $state, $user, $http, $window, form, growl) {
-
-    $scope.dialog = $modalInstance;
-    $scope.dialog.params = angular.copy($dialogParams);
-    $scope.session = $dialogParams.session;
-    $scope.form = form;
-
-    /**
-     * open an inscription creation window, then process the return by adding inscription
-     * @param session
-     */
-    $scope.addDates = function () {
-        $dialog.open('add.dates', {session: $scope.session}).then(function (data){
-            $scope.session.dates.push(data.date);
-        });
-    }
-
-    /**
-     *
-     * @param data
-     */
-    $scope.onSuccess = function (data) {
-        growl.addSuccessMessage("La date a bien été ajoutée à la session.");
-        $scope.dialog.close(data);
-        location.reload();
-    };
-}]);
-
-
-
-/**
- * Trainer Add Controller
- */
-sygeforApp.controller('DatesEditController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$user', '$http', '$window', 'growl', 'data', function ($scope, $modalInstance, $dialog, $dialogParams, $state, $user, $http, $window, growl, data, $moment) {
-
-    $scope.dialog = $modalInstance;
-    $scope.dialog.params = $dialogParams;
-    $scope.form = data.form;
-    $scope.dates = data.dates;
-    //$scope.$apply();
-
-    /**
-     * open an inscription creation window, then process the return by adding inscription
-     * @param dates
-     */
-    $scope.editDates = function (dates) {
-        $dialog.open('dates.edit', {dates: dates}).then(function (data){
-            dates = data.dates;
-        });
-    };
-
-    /**
-     *
-     * @param data
-     */
-    $scope.onSuccess = function (data) {
-        growl.addSuccessMessage("La date a bien été mise à jour");
-        $scope.dialog.close(data);
-        location.reload();
-    };
-
-}]);
-
-
-
-/**
- * Trainer Add Controller
- */
-sygeforApp.controller('DatesRemoveController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$http', 'growl', function($scope, $modalInstance, $dialog, $dialogParams, $state, $http, growl) {
-    $scope.dialog = $modalInstance;
-    $scope.dialog.params = $dialogParams;
-    $scope.session = $dialogParams.session;
-    $scope.onSuccess = function(data) {
-        growl.addSuccessMessage("La date a bien été retirée de la session.");
-        $scope.dialog.close(data);
-    };
-
-    /**
-     * ensures the form was correctly filed (sets an error message otherwise), then asks for server-sid
-     */
-    $scope.ok = function () {
-        var url = Routing.generate('dates.remove', {session: $scope.dialog.params.session.id, dates: $scope.dialog.params.dates.id});
-        $http({ method: 'POST', url: url}).success(function (data) {
-            growl.addSuccessMessage("La date a bien été retirée de la session.");
-            $scope.dialog.close(data);
-            $scope.session.dates = $filter('filter')($scope.session.dates, {dates: dates});
-        });
-        location.reload();
-    };
-}]);
-
-
-/**
- * Trainer Add Controller
- */
 sygeforApp.controller('TrainerAddController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$user', '$http', 'form', 'growl', function ($scope, $modalInstance, $dialog, $dialogParams, $state, $user, $http, form, growl) {
     $scope.dialog = $modalInstance;
     $scope.dialog.params = angular.copy($dialogParams);
@@ -77199,6 +77049,101 @@ sygeforApp.controller('TrainerRemoveController', ['$scope', '$modalInstance', '$
 
 
 /**
+ * Trainer Add Controller
+ */
+sygeforApp.controller('DatesAddController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$user', '$http', '$window', 'form', 'growl', function ($scope, $modalInstance, $dialog, $dialogParams, $state, $user, $http, $window, form, growl) {
+
+    $scope.dialog = $modalInstance;
+    $scope.dialog.params = angular.copy($dialogParams);
+    $scope.session = $dialogParams.session;
+    $scope.form = form;
+
+    /**
+     * open an inscription creation window, then process the return by adding inscription
+     * @param session
+     */
+    $scope.addDates = function () {
+        $dialog.open('add.dates', {session: $scope.session}).then(function (data){
+            $scope.session.dates.push(data.date);
+        });
+    }
+
+    /**
+     *
+     * @param data
+     */
+    $scope.onSuccess = function (data) {
+        growl.addSuccessMessage("La date a bien été ajoutée à la session.");
+        $scope.dialog.close(data);
+        location.reload();
+    };
+}]);
+
+
+
+/**
+ * Trainer Add Controller
+ */
+sygeforApp.controller('DatesEditController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$user', '$http', '$window', 'growl', 'data', function ($scope, $modalInstance, $dialog, $dialogParams, $state, $user, $http, $window, growl, data, $moment) {
+
+    $scope.dialog = $modalInstance;
+    $scope.dialog.params = $dialogParams;
+    $scope.form = data.form;
+    $scope.dates = data.dates;
+    //$scope.$apply();
+
+    /**
+     * open an inscription creation window, then process the return by adding inscription
+     * @param dates
+     */
+    $scope.editDates = function (dates) {
+        $dialog.open('dates.edit', {dates: dates}).then(function (data){
+            dates = data.dates;
+        });
+    };
+
+    /**
+     *
+     * @param data
+     */
+    $scope.onSuccess = function (data) {
+        growl.addSuccessMessage("La date a bien été mise à jour");
+        $scope.dialog.close(data);
+        location.reload();
+    };
+
+}]);
+
+
+
+/**
+ * Trainer Add Controller
+ */
+sygeforApp.controller('DatesRemoveController', ['$scope', '$modalInstance', '$dialog', '$dialogParams', '$state', '$http', 'growl', function($scope, $modalInstance, $dialog, $dialogParams, $state, $http, growl) {
+    $scope.dialog = $modalInstance;
+    $scope.dialog.params = $dialogParams;
+    $scope.session = $dialogParams.session;
+    $scope.onSuccess = function(data) {
+        growl.addSuccessMessage("La date a bien été retirée de la session.");
+        $scope.dialog.close(data);
+    };
+
+    /**
+     * ensures the form was correctly filed (sets an error message otherwise), then asks for server-sid
+     */
+    $scope.ok = function () {
+        var url = Routing.generate('dates.remove', {session: $scope.dialog.params.session.id, dates: $scope.dialog.params.dates.id});
+        $http({ method: 'POST', url: url}).success(function (data) {
+            growl.addSuccessMessage("La date a bien été retirée de la session.");
+            $scope.dialog.close(data);
+            $scope.session.dates = $filter('filter')($scope.session.dates, {dates: dates});
+        });
+        location.reload();
+    };
+}]);
+
+
+/**
  * SessionDetailViewController
  */
 sygeforApp.controller('DatesViewController', ['$scope', '$taxonomy', '$dialog', '$trainingBundle', '$user', '$state', '$window','search', 'data', function($scope, $taxonomy, $dialog, $trainingBundle, $user, $state, $window, search, data)
@@ -77295,6 +77240,61 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
 
 }]);
 
+/**
+ * ManageMaterialsController
+ */
+sygeforApp.controller('ManageMaterialsController', ['$scope', '$http', '$window', '$dialog', '$modalInstance', '$dialogParams', 'growl', function($scope, $http, $window, $dialog, $modalInstance, $dialogParams, growl)
+{
+    $scope.dialog = $modalInstance;
+    $scope.dialog.params = angular.copy($dialogParams);
+    $scope.entityType = $dialogParams.entityType;
+    $scope.entity = $dialogParams.entity;
+
+    /**
+     * Get response from sf-file-upload
+     */
+    $scope.getUploadedFile = function(jsFile, data) {
+        if (data.error) {
+            growl.addErrorMessage(data.error);
+        }
+        else {
+            $scope.entity.materials.push(data.material);
+        }
+    };
+
+    /**
+     * Add a linked material
+     */
+    $scope.addLinkMaterial = function () {
+        $dialog.open('material.linkmaterial.add', {entity_id: $scope.entity.id, type_entity: $scope.entityType, material_type: "link"}).
+        then(function (data) {
+            $scope.entity.materials.push(data.material);
+        });
+    };
+
+    /**
+     * function called to download file
+     * @param file
+     */
+    $scope.getFile = function (file) {
+        $window.location = Routing.generate('material.get', {id: file.id});
+    };
+
+    /**
+     * calls remove material modal and updates material list
+     * @param material
+     */
+    $scope.removeMaterial = function(material) {
+        return $dialog.open('material.remove', {material: material}).then(function() {
+            for (var i = 0 ; $scope.entity.materials ; i++) {
+                if ($scope.entity.materials[i].id === material.id) {
+                    $scope.entity.materials.splice(i, 1);
+                    break;
+                }
+            }
+        });
+    };
+}]);
 /**
  * Created by maxime on 15/07/14.
  */
@@ -77494,505 +77494,6 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
 }]);
 
 /**
- * Application config
- */
-sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", function($listStateProvider, $dialogProvider, $widgetProvider) {
-
-    // inscription states
-    $listStateProvider.state('inscription', {
-        url: "/inscription?q&session&trainee&status",
-        abstract: true,
-        templateUrl: "list.html",
-        controller:"InscriptionListController",
-        resolve: {
-            session: function($stateParams, $entityManager) {
-                if($stateParams.session) {
-                    return $entityManager('SygeforTrainingBundle:Session\\AbstractSession').find($stateParams.session);
-                }
-                return null;
-            },
-            trainee: function($stateParams, $entityManager) {
-                if($stateParams.trainee) {
-                    return $entityManager('SygeforTraineeBundle:AbstractTrainee').find($stateParams.trainee);
-                }
-                return null;
-            },
-            inscriptionStatusList: function ($taxonomy) {
-                return $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status');
-            },
-            presenceStatusList: function ($taxonomy) {
-                return $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status');
-            },
-            search: function ($searchFactory, $stateParams, session, trainee, $user, inscriptionStatusList) {
-                var search = $searchFactory('inscription.search');
-                search.query.sorts = {'createdAt': 'desc'};
-                if(session) {
-                    search.filters["session.id"] = session.id;
-                } else if(trainee) {
-                    search.filters["trainee.id"] = trainee.id;
-                } else {
-                    search.query.filters['session.training.organization.name.source'] = $user.organization.name;
-                }
-                if($stateParams.status && inscriptionStatusList[$stateParams.status]) {
-                    search.query.filters["inscriptionStatus.name.source"] = inscriptionStatusList[$stateParams.status].name;
-                }
-                search.extendQueryFromJson($stateParams.q);
-                return search.search().then(function() { return search; });
-            }
-        },
-        breadcrumb:function(session, trainee, $filter, $trainingBundle) {
-            var breadcrumb = { label: "Inscriptions", sref: "inscription.table" };
-            if(trainee) {
-                // stagiaire
-                return [
-                    { label: "Public", sref: "trainee.table" },
-                    { label: trainee.fullName, sref: "trainee.detail.view({id: " + trainee.id + " })" },
-                    { label: "Inscriptions", sref: "inscription.table({trainee: " + trainee.id + "})" }
-                ];
-            }
-            if(session) {
-                // session
-                return [
-                    { label: "Évènements", sref: "training.table" },
-                    { label: $trainingBundle.getType(session.training.type).label, sref: "training.table({type: " + session.training.type + "})" },
-                    { label: session.training.name, sref: "training.detail.view({id: " + session.training.id + " })" },
-                    { label: 'Sessions', sref: "session.table({training: " + session.training.id + "})" },
-                    { label: $filter('date')(session.dateBegin, 'dd MMMM y'), sref: "session.detail.view({id: " + session.id + ", training: " + session.training.id + "})"},
-                    { label: "Inscriptions", sref: "inscription.table({session: " + session.id + "})" }
-                ];
-            }
-            return breadcrumb;
-        },
-        states: {
-            table: {
-                url: "",
-                icon: "fa-bars",
-                label: "Tableau",
-                weight: 0,
-                controller: 'ListTableController',
-                templateUrl: "inscription/states/table/table.html"
-            },
-            detail: {
-                url: "/detail",
-                icon: "fa-eye",
-                label: "aListe détaillée",
-                weight: 1,
-                templateUrl: "states/detail/detail.html",
-                controller: 'ListDetailController',
-                data:{
-                    resultTemplateUrl: "inscription/states/detail/result.html"
-                },
-                states: {
-                    view: {
-                        url: "/:id",
-                        templateUrl: "inscription/states/detail/inscription.html",
-                        controller: 'InscriptionDetailViewController',
-                        resolve: {
-                            data: function($http, $stateParams) {
-                                var url = Routing.generate('inscription.view', {id: $stateParams.id});
-                                return $http({method: 'GET', url: url}).then (function (data) { return data.data; });
-                            }
-                        },
-                        breadcrumb: {
-                            label: "{{ data.inscription.trainee.lastName }} {{ data.inscription.trainee.firstName }}"
-                        }
-                    }
-                }
-            }
-        }
-    });
-
-    /**
-     * DIALOGS
-     */
-    $dialogProvider.dialog('inscription.create', /* @ngInject */ {
-        controller: 'InscriptionCreate',
-        templateUrl: "inscription/dialogs/create.html",
-        resolve:{
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('inscription.create', {session: $dialogParams.session.id })).then(function (response) {
-                    return response.data.form;
-                });
-            }
-        }
-    });
-
-    // update status dialog
-                $dialogProvider.dialog("inscription.changeStatus", /* @ngInject */ {
-                    controller: 'InscriptionStatusChange',
-                    templateUrl: 'inscription/batch/inscriptionStatusChange/programmationChange.html',
-                    size: 'lg',
-                    resolve: {
-                        config: function ($http, $dialogParams) {
-                            var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_inscription.batch.inscription_status_change'});
-                            var optionsArray = {targetClass: 'SygeforInscriptionBundle:AbstractInscription'};
-                            if (typeof $dialogParams.inscriptionStatus != 'undefined') {
-                    optionsArray['inscriptionStatus'] = $dialogParams.inscriptionStatus.id;
-                }
-                if (typeof $dialogParams.presenceStatus != 'undefined') {
-                    optionsArray['presenceStatus'] = $dialogParams.presenceStatus.id;
-                }
-                return $http.get(url, {params: {options: optionsArray}}).then(function (response) {
-                    return response.data;
-                });
-            }
-        }
-    });
-
-    // delete dialog
-    $dialogProvider.dialog('inscription.delete', /* @ngInject */ {
-        templateUrl: 'inscription/dialogs/delete.html',
-        resolve:{
-            data: function ($http, $dialogParams) {
-                var url = Routing.generate('inscription.view', {id: $dialogParams.id});
-                return $http.get(url).then(function (response) {
-                    return response.data;
-                });
-            }
-        },
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl, data) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.inscription = data.inscription;
-            $scope.ok = function() {
-                var url = Routing.generate('inscription.delete', {id: $scope.inscription.id});
-                $http.post(url).then(function (response){
-                    growl.addSuccessMessage("L'inscription a bien été supprimée.");
-                    $scope.dialog.close(response.data);
-                });
-            };
-        }
-    });
-
-    // duplicate dialog
-    $dialogProvider.dialog('inscription.duplicate', /* @ngInject */ {
-        templateUrl: 'trainingbundle/session/dialogs/crud/duplicate.html',
-        resolve:{
-            data: function ($http, $dialogParams) {
-                var url = Routing.generate('session.duplicate', {id: 0, inscriptionIds: angular.toJson($dialogParams.items)});
-                return $http.get(url).then(function (response) {
-                    return response.data;
-                });
-            }
-        },
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl, data) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.form = data.form;
-            $scope.session = data.session;
-            $scope.inscriptions = angular.toJson(data.inscriptions);
-
-
-            $scope.onSuccess = function (response) {
-                $state.go('session.detail.view', {id: response.session.id}, {reload: true});
-                growl.addSuccessMessage("La session a bien été dupliquée. Vous êtes à présent sur la fiche de la nouvelle session.");
-                $scope.dialog.close(response.session);
-            };
-        }
-    });
-
-    /**
-     * presence.edit
-     */
-    $dialogProvider.dialog('presence.edit', /* @ngInject */ {
-        templateUrl: 'inscription/dialogs/presences/edit.html',
-        controller: 'PresenceEditController',
-        resolve:{
-            data: function ($http, $dialogParams){
-                return $http.get(Routing.generate('presence.edit', {'presence': $dialogParams.presence.id})).then(function (response) {
-                    return response.data;
-                });
-            }
-        }
-    });
-
-    /**
-     * WIDGETS
-     */
-    $widgetProvider.widget("inscription", /* @ngInject */ {
-        controller: 'WidgetListController',
-        templateUrl: 'inscription/widget/inscription.html',
-        options: function($user) {
-            return {
-                route: 'inscription.search',
-                rights: ['sygefor_inscription.rights.inscription.own.view'],
-                state: 'inscription.table',
-                title: 'Dernières inscriptions',
-                size: 10,
-                filters:{
-                    'session.training.organization.name.source': $user.organization.name,
-                    'inscriptionStatus.name.source': 'En attente'
-                },
-                sorts: {'createdAt': 'desc'}
-            }
-        }
-    });
-
-    var date = new Date();
-    date.setMonth(date.getMonth() - 1);
-    $widgetProvider.widget("disclaimer", /* @ngInject */ {
-        controller: 'WidgetListController',
-        templateUrl: 'inscription/widget/disclaimer.html',
-        options: function($user, $filter) {
-            return {
-                route: 'inscription.search',
-                rights: ['sygefor_inscription.rights.inscription.own.view'],
-                state: 'inscription.table',
-                title: 'Derniers désistements',
-                size: 5,
-                filters:{
-                    'inscriptionStatus.machine_name': 'desist',
-                    "inscriptionStatusUpdatedAt": {
-                        "type": "range",
-                        "gte": $filter('date')(date, 'yyyy-MM-dd')
-                    },
-                    'inscription.session.training.organization.name.source': $user.organization.name
-                },
-                sorts: {'inscriptionStatusUpdatedAt': 'desc'}
-            }
-        }
-    });
-}]);
-
-/**
- * Application run
- */
-sygeforApp.run(['$rootScope', function($rootScope) {
-
-    /**
-     * This helper could be used in ng-class to colorize inscription status label
-     *
-     * @param statusId
-     */
-    $rootScope.inscriptionStatusClass = function(statusId, prefix) {
-        if(!prefix) {
-            prefix = 'label';
-        }
-        var prefix = prefix ? prefix + '-' : '';
-        switch(statusId) {
-            case 0:
-                return prefix + 'default';
-            case 1:
-                return prefix + 'warning';
-            case 2:
-                return prefix + 'success';
-            case 3:
-                return prefix + 'danger';
-        }
-    }
-
-    /**
-     * This helper could be used in ng-class to colorize presence status label
-     *
-     * @param statusId
-     */
-    $rootScope.presenceStatusClass = function(statusId, prefix) {
-        if(!prefix) {
-            prefix = 'label';
-        }
-        var prefix = prefix ? prefix + '-' : '';
-        switch(statusId) {
-            case 0:
-                return prefix + 'danger';
-            case 1:
-                return prefix + 'success';
-        }
-    }
-
-}]);
-
-/**
- * Core List Controller
- */
-sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injector', 'BaseListController', 'search', '$state', '$timeout', '$dialog', 'session', 'inscriptionStatusList', 'presenceStatusList', function($scope, $user, $injector, BaseListController, search, $state, $timeout, $dialog, session, inscriptionStatusList, presenceStatusList) {
-    $injector.invoke(BaseListController, this, {key: 'inscription', $scope: $scope, $search: search});
-
-    /**
-     * Batch operations
-     */
-    $scope.batchOperations = [
-        {
-            icon: 'fa-external-link',
-            label: "Modifier le statut d'inscription",
-            available: function () {
-                return $user.hasAccessRight('sygefor_inscription.rights.inscription.own.update') || $user.hasAccessRight('sygefor_inscription.rights.inscription.all.update');
-            },
-            subitems: function () {
-                var items = [];
-                angular.forEach(inscriptionStatusList, function (item) {
-                    items.push({
-                        label: item.name,
-                        execute: function (items, $dialog) {
-                            return $dialog
-                                .open('inscription.changeStatus', {
-                                    items: items,
-                                    inscriptionStatus: item,
-                                    presenceStatus: undefined,
-                                    session: ( session ) ? session.id : 0
-                                })
-                                .then(function () {
-                                    // on success, reload the search page
-                                    //search.search();
-
-                                    for (var keySearch in $scope.search.result.items) {
-                                        for (var keyItem in items) {
-                                            if (items[keyItem] === $scope.search.result.items[keySearch].id) {
-                                                $scope.search.result.items[keySearch].inscriptionStatus = item;
-                                            }
-                                        }
-                                    }
-                                });
-                        }
-                    });
-                });
-                return items;
-            }()
-        },
-        {
-            icon: 'fa-external-link',
-            label: "Modifier le statut de présence",
-            available: function () {
-                return $user.hasAccessRight('sygefor_inscription.rights.inscription.own.update') || $user.hasAccessRight('sygefor_inscription.rights.inscription.all.update');
-            },
-            subitems: function () {
-                var items = [];
-                angular.forEach(presenceStatusList, function (item) {
-                    items.push({
-                        label: item.name,
-                        execute: function (items, $dialog) {
-                            return $dialog
-                                .open('inscription.changeStatus', {
-                                    items: items,
-                                    presenceStatus: item,
-                                    inscriptionStatus: undefined,
-                                    session: ( session ) ? session.id : 0
-                                })
-                                .then(function () {
-                                    // on success, reload the search page
-                                    //search.search();
-
-                                    for (var keySearch in $scope.search.result.items) {
-                                        for (var keyItem in items) {
-                                            if (items[keyItem] === $scope.search.result.items[keySearch].id) {
-                                                $scope.search.result.items[keySearch].presenceStatus = item;
-                                            }
-                                        }
-                                    }
-                                });
-                        }
-                    });
-                });
-                return items;
-            }()
-        },
-        {
-            icon: 'fa-envelope-o',
-            label: 'Envoyer un Email',
-            execute: function (items, $dialog) {
-                return $dialog.open('batch.email', {items: items, targetClass: 'SygeforInscriptionBundle:AbstractInscription'})
-            }
-        },
-        {
-            icon: 'fa-file-pdf-o',
-            label: 'Attestation de présence',
-            execute: function (items, $dialog) {
-                return $dialog.open('batch.export.pdf', {items: items, service: 'inscription.attestation'});
-            }
-        },
-        {
-            icon: 'fa-download',
-            label: 'Exporter',
-            subitems: [
-                {
-                    icon: 'fa-file-excel-o',
-                    label: 'CSV',
-                    execute: function (items, $dialog) {
-                        return $dialog.open('batch.export.csv', {items: items, service: 'inscription'})
-                    }
-                }, {
-                    icon: 'fa-external-link',
-                    label: 'Publipostage',
-                    execute: function (items, $dialog) {
-                        return $dialog.open('batch.publipost', {items: items, service: 'inscription'})
-                    }
-                }
-            ]
-        }
-    ];
-
-    // permit batch operation only if we come from session page
-    if ($scope.$stateParams.session) {
-        $scope.batchOperations.push({
-            icon: 'fa-copy',
-            label: 'Copier vers une nouvelle session',
-            execute: function (items, $dialog) {
-                return $dialog.open('inscription.duplicate', {items: items, service: 'inscription'})
-            }
-        });
-    }
-
-    /**
-     * Add operations
-     */
-    $scope.addOperations = [{
-        label: 'Ajouter une inscription',
-        execute: function () {
-            $dialog.open('inscription.create',{session: session}).then(function(data) {
-                $scope.search.search();
-            });
-        },
-        available: function () {
-            return (!!session && session._accessRights.edit);
-        }
-    }];
-
-    /**
-     * Facets
-     */
-    $scope.facets = {
-        'session.training.organization.name.source' : {
-            label: 'Centre'
-        },
-        'inscriptionStatus.name.source' : {
-            label: 'Statut inscription'
-        },
-        'presenceStatus.name.source' : {
-            label: 'Statut présence'
-        },
-        'institution.name.source' : {
-            label: 'Etablissement',
-            size: 10
-        },
-        'trainee.institution.name.source' : {
-            label: 'Etablissement actuel',
-            size: 10
-        },
-        'publicType.source' : {
-            label: 'Catégorie de personnel'
-        },
-        'trainee.fullName.source' : {
-            label: 'Stagiaire'
-        },
-        'session.dateBegin' : {
-            label: 'Date de session',
-            type: 'range'
-        },
-        'session.year' : {
-            label: 'Année de session'
-        },
-        'session.semester' : {
-            label: 'Semestre de session'
-        },
-        'session.training.typeLabel.source' : {
-            label: 'Type'
-        },
-        'session.training.name.source' : {
-            label: 'Formation'
-        }
-    };
-}]);
-
-/**
  * InstitutionBundle
  */
 sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateProvider, $dialogProvider) {
@@ -78164,6 +77665,505 @@ sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injecto
         },
         'city.source' : {
             label: 'Ville'
+        }
+    };
+}]);
+
+/**
+ * Application config
+ */
+sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", function($listStateProvider, $dialogProvider, $widgetProvider) {
+
+    // inscription states
+    $listStateProvider.state('inscription', {
+        url: "/inscription?q&session&trainee&status",
+        abstract: true,
+        templateUrl: "list.html",
+        controller:"InscriptionListController",
+        resolve: {
+            session: function($stateParams, $entityManager) {
+                if($stateParams.session) {
+                    return $entityManager('App\\Entity\\Core\\AbstractSession').find($stateParams.session);
+                }
+                return null;
+            },
+            trainee: function($stateParams, $entityManager) {
+                if($stateParams.trainee) {
+                    return $entityManager('App\\Entity\\Core\\AbstractTrainee').find($stateParams.trainee);
+                }
+                return null;
+            },
+            inscriptionStatusList: function ($taxonomy) {
+                return $taxonomy.getIndexedTerms(9);
+            },
+            presenceStatusList: function ($taxonomy) {
+                return $taxonomy.getIndexedTerms(10);
+            },
+            search: function ($searchFactory, $stateParams, session, trainee, $user, inscriptionStatusList) {
+                var search = $searchFactory('inscription.search');
+                search.query.sorts = {'createdAt': 'desc'};
+                if(session) {
+                    search.filters["session.id"] = session.id;
+                } else if(trainee) {
+                    search.filters["trainee.id"] = trainee.id;
+                } else {
+                    search.query.filters['session.training.organization.name.source'] = $user.organization.name;
+                }
+                if($stateParams.status && inscriptionStatusList[$stateParams.status]) {
+                    search.query.filters["inscriptionStatus.name.source"] = inscriptionStatusList[$stateParams.status].name;
+                }
+                search.extendQueryFromJson($stateParams.q);
+                return search.search().then(function() { return search; });
+            }
+        },
+        breadcrumb:function(session, trainee, $filter, $trainingBundle) {
+            var breadcrumb = { label: "Inscriptions", sref: "inscription.table" };
+            if(trainee) {
+                // stagiaire
+                return [
+                    { label: "Public", sref: "trainee.table" },
+                    { label: trainee.fullname, sref: "trainee.detail.view({id: " + trainee.id + " })" },
+                    { label: "Inscriptions", sref: "inscription.table({trainee: " + trainee.id + "})" }
+                ];
+            }
+            if(session) {
+                // session
+                return [
+                    { label: "Évènements", sref: "training.table" },
+                    { label: $trainingBundle.getType(session.training.type).label, sref: "training.table({type: " + session.training.type + "})" },
+                    { label: session.training.name, sref: "training.detail.view({id: " + session.training.id + " })" },
+                    { label: 'Sessions', sref: "session.table({training: " + session.training.id + "})" },
+                    { label: $filter('date')(session.datebegin, 'dd MMMM y'), sref: "session.detail.view({id: " + session.id + ", training: " + session.training.id + "})"},
+                    { label: "Inscriptions", sref: "inscription.table({session: " + session.id + "})" }
+                ];
+            }
+            return breadcrumb;
+        },
+        states: {
+            table: {
+                url: "",
+                icon: "fa-bars",
+                label: "Tableau",
+                weight: 0,
+                controller: 'ListTableController',
+                templateUrl: "inscription/states/table/table.html"
+            },
+            detail: {
+                url: "/detail",
+                icon: "fa-eye",
+                label: "aListe détaillée",
+                weight: 1,
+                templateUrl: "states/detail/detail.html",
+                controller: 'ListDetailController',
+                data:{
+                    resultTemplateUrl: "inscription/states/detail/result.html"
+                },
+                states: {
+                    view: {
+                        url: "/:id",
+                        templateUrl: "inscription/states/detail/inscription.html",
+                        controller: 'InscriptionDetailViewController',
+                        resolve: {
+                            data: function($http, $stateParams) {
+                                var url = Routing.generate('inscription.view', {id: $stateParams.id});
+                                return $http({method: 'GET', url: url}).then (function (data) { return data.data; });
+                            }
+                        },
+                        breadcrumb: {
+                            label: "{{ data.inscription.trainee.lastname }} {{ data.inscription.trainee.firstname }}"
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    /**
+     * DIALOGS
+     */
+    $dialogProvider.dialog('inscription.create', /* @ngInject */ {
+        controller: 'InscriptionCreate',
+        templateUrl: "inscription/dialogs/create.html",
+        resolve:{
+            form: function ($http, $dialogParams){
+                return $http.get(Routing.generate('inscription.create', {session: $dialogParams.session.id })).then(function (response) {
+                    return response.data.form;
+                });
+            }
+        }
+    });
+
+    // update status dialog
+                $dialogProvider.dialog("inscription.changeStatus", /* @ngInject */ {
+                    controller: 'InscriptionStatusChange',
+                    templateUrl: 'inscription/batch/inscriptionStatusChange/inscriptionStatusChange.html',
+                    size: 'lg',
+                    resolve: {
+                        config: function ($http, $dialogParams) {
+                            var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_inscription.batch.inscription_status_change'});
+                            var optionsArray = {targetClass: 'App\\Entity\\Core\\AbstractInscription'};
+                            if (typeof $dialogParams.inscriptionstatus != 'undefined') {
+                    optionsArray['inscriptionstatus'] = $dialogParams.inscriptionstatus.id;
+                }
+                if (typeof $dialogParams.presencestatus != 'undefined') {
+                    optionsArray['presencestatus'] = $dialogParams.presencestatus.id;
+                }
+                return $http.get(url, {params: {options: optionsArray}}).then(function (response) {
+                    return response.data;
+                });
+            }
+        }
+    });
+
+    // delete dialog
+    $dialogProvider.dialog('inscription.delete', /* @ngInject */ {
+        templateUrl: 'inscription/dialogs/delete.html',
+        resolve:{
+            data: function ($http, $dialogParams) {
+                var url = Routing.generate('inscription.view', {id: $dialogParams.id});
+                return $http.get(url).then(function (response) {
+                    return response.data;
+                });
+            }
+        },
+        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl, data) {
+            $scope.dialog = $modalInstance;
+            $scope.dialog.params = $dialogParams;
+            $scope.inscription = data.inscription;
+            $scope.ok = function() {
+                var url = Routing.generate('inscription.delete', {id: $scope.inscription.id});
+                $http.post(url).then(function (response){
+                    growl.addSuccessMessage("L'inscription a bien été supprimée.");
+                    $scope.dialog.close(response.data);
+                });
+            };
+        }
+    });
+
+    // duplicate dialog
+    $dialogProvider.dialog('inscription.duplicate', /* @ngInject */ {
+        templateUrl: 'training/session/dialogs/crud/duplicate.html',
+        resolve:{
+            data: function ($http, $dialogParams) {
+                var url = Routing.generate('session.duplicate', {id: 0, inscriptionIds: angular.toJson($dialogParams.items)});
+                return $http.get(url).then(function (response) {
+                    return response.data;
+                });
+            }
+        },
+        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl, data) {
+            $scope.dialog = $modalInstance;
+            $scope.dialog.params = $dialogParams;
+            $scope.form = data.form;
+            $scope.session = data.session;
+            $scope.inscriptions = angular.toJson(data.inscriptions);
+
+
+            $scope.onSuccess = function (response) {
+                $state.go('session.detail.view', {id: response.session.id}, {reload: true});
+                growl.addSuccessMessage("La session a bien été dupliquée. Vous êtes à présent sur la fiche de la nouvelle session.");
+                $scope.dialog.close(response.session);
+            };
+        }
+    });
+
+    /**
+     * presence.edit
+     */
+    $dialogProvider.dialog('presence.edit', /* @ngInject */ {
+        templateUrl: 'inscription/dialogs/presences/edit.html',
+        controller: 'PresenceEditController',
+        resolve:{
+            data: function ($http, $dialogParams){
+                return $http.get(Routing.generate('presence.edit', {'presence': $dialogParams.presence.id})).then(function (response) {
+                    return response.data;
+                });
+            }
+        }
+    });
+
+    /**
+     * WIDGETS
+     */
+    $widgetProvider.widget("inscription", /* @ngInject */ {
+        controller: 'WidgetListController',
+        templateUrl: 'inscription/widget/inscription.html',
+        options: function($user) {
+            return {
+                route: 'inscription.search',
+                rights: ['sygefor_inscription.rights.inscription.own.view'],
+                state: 'inscription.table',
+                title: 'Dernières inscriptions',
+                size: 10,
+                filters:{
+                    'session.training.organization.name.source': $user.organization.name,
+                    'inscriptionStatus.name.source': 'En attente'
+                },
+                sorts: {'createdAt': 'desc'}
+            }
+        }
+    });
+
+    var date = new Date();
+    date.setMonth(date.getMonth() - 1);
+    $widgetProvider.widget("disclaimer", /* @ngInject */ {
+        controller: 'WidgetListController',
+        templateUrl: 'inscription/widget/disclaimer.html',
+        options: function($user, $filter) {
+            return {
+                route: 'inscription.search',
+                rights: ['sygefor_inscription.rights.inscription.own.view'],
+                state: 'inscription.table',
+                title: 'Derniers désistements',
+                size: 5,
+                filters:{
+                    'inscriptionStatus.machine_name': 'desist',
+                    "inscriptionStatusUpdatedAt": {
+                        "type": "range",
+                        "gte": $filter('date')(date, 'yyyy-MM-dd')
+                    },
+                    'inscription.session.training.organization.name.source': $user.organization.name
+                },
+                sorts: {'inscriptionStatusUpdatedAt': 'desc'}
+            }
+        }
+    });
+}]);
+
+/**
+ * Application run
+ */
+sygeforApp.run(['$rootScope', function($rootScope) {
+
+    /**
+     * This helper could be used in ng-class to colorize inscription status label
+     *
+     * @param statusId
+     */
+    $rootScope.inscriptionStatusClass = function(statusId, prefix) {
+        if(!prefix) {
+            prefix = 'label';
+        }
+        var prefix = prefix ? prefix + '-' : '';
+        switch(statusId) {
+            case 0:
+                return prefix + 'default';
+            case 1:
+                return prefix + 'warning';
+            case 2:
+                return prefix + 'success';
+            case 3:
+                return prefix + 'danger';
+        }
+    }
+
+    /**
+     * This helper could be used in ng-class to colorize presence status label
+     *
+     * @param statusId
+     */
+    $rootScope.presenceStatusClass = function(statusId, prefix) {
+        if(!prefix) {
+            prefix = 'label';
+        }
+        var prefix = prefix ? prefix + '-' : '';
+        switch(statusId) {
+            case 0:
+                return prefix + 'danger';
+            case 1:
+                return prefix + 'success';
+        }
+    }
+
+}]);
+
+/**
+ * Core List Controller
+ */
+sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injector', 'BaseListController', 'search', '$state', '$timeout', '$dialog', 'session', 'inscriptionStatusList', 'presenceStatusList', function($scope, $user, $injector, BaseListController, search, $state, $timeout, $dialog, session, inscriptionStatusList, presenceStatusList) {
+    $injector.invoke(BaseListController, this, {key: 'inscription', $scope: $scope, $search: search});
+
+    /**
+     * Batch operations
+     */
+    $scope.batchOperations = [
+        {
+            icon: 'fa-external-link',
+            label: "Modifier le statut d'inscription",
+            available: function () {
+                return $user.hasAccessRight('sygefor_inscription.rights.inscription.own.update') || $user.hasAccessRight('sygefor_inscription.rights.inscription.all.update');
+            },
+            subitems: function () {
+                var items = [];
+                angular.forEach(inscriptionStatusList, function (item) {
+                    items.push({
+                        label: item.name,
+                        execute: function (items, $dialog) {
+                            return $dialog
+                                .open('inscription.changeStatus', {
+                                    items: items,
+                                    inscriptionstatus: item,
+                                    presencestatus: undefined,
+                                    session: ( session ) ? session.id : 0
+                                })
+                                .then(function () {
+                                    // on success, reload the search page
+                                    //search.search();
+
+                                    for (var keySearch in $scope.search.result.items) {
+                                        for (var keyItem in items) {
+                                            if (items[keyItem] === $scope.search.result.items[keySearch].id) {
+                                                $scope.search.result.items[keySearch].inscriptionstatus = item;
+                                            }
+                                        }
+                                    }
+                                });
+                        }
+                    });
+                });
+                return items;
+            }()
+        },
+        {
+            icon: 'fa-external-link',
+            label: "Modifier le statut de présence",
+            available: function () {
+                return $user.hasAccessRight('sygefor_inscription.rights.inscription.own.update') || $user.hasAccessRight('sygefor_inscription.rights.inscription.all.update');
+            },
+            subitems: function () {
+                var items = [];
+                angular.forEach(presenceStatusList, function (item) {
+                    items.push({
+                        label: item.name,
+                        execute: function (items, $dialog) {
+                            return $dialog
+                                .open('inscription.changeStatus', {
+                                    items: items,
+                                    presencestatus: item,
+                                    inscriptionstatus: undefined,
+                                    session: ( session ) ? session.id : 0
+                                })
+                                .then(function () {
+                                    // on success, reload the search page
+                                    //search.search();
+
+                                    for (var keySearch in $scope.search.result.items) {
+                                        for (var keyItem in items) {
+                                            if (items[keyItem] === $scope.search.result.items[keySearch].id) {
+                                                $scope.search.result.items[keySearch].presencestatus = item;
+                                            }
+                                        }
+                                    }
+                                });
+                        }
+                    });
+                });
+                return items;
+            }()
+        },
+        {
+            icon: 'fa-envelope-o',
+            label: 'Envoyer un Email',
+            execute: function (items, $dialog) {
+                return $dialog.open('batch.email', {items: items, targetClass: 'SygeforInscriptionBundle:AbstractInscription'})
+            }
+        },
+        {
+            icon: 'fa-file-pdf-o',
+            label: 'Attestation de présence',
+            execute: function (items, $dialog) {
+                return $dialog.open('batch.export.pdf', {items: items, service: 'inscription.attestation'});
+            }
+        },
+        {
+            icon: 'fa-download',
+            label: 'Exporter',
+            subitems: [
+                {
+                    icon: 'fa-file-excel-o',
+                    label: 'CSV',
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.export.csv', {items: items, service: 'inscription'})
+                    }
+                }, {
+                    icon: 'fa-external-link',
+                    label: 'Publipostage',
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.publipost', {items: items, service: 'inscription'})
+                    }
+                }
+            ]
+        }
+    ];
+
+    // permit batch operation only if we come from session page
+    if ($scope.$stateParams.session) {
+        $scope.batchOperations.push({
+            icon: 'fa-copy',
+            label: 'Copier vers une nouvelle session',
+            execute: function (items, $dialog) {
+                return $dialog.open('inscription.duplicate', {items: items, service: 'inscription'})
+            }
+        });
+    }
+
+    /**
+     * Add operations
+     */
+    $scope.addOperations = [{
+        label: 'Ajouter une inscription',
+        execute: function () {
+            $dialog.open('inscription.create',{session: session}).then(function(data) {
+                $scope.search.search();
+            });
+        },
+        available: function () {
+            return (!!session && session._accessRights.edit);
+        }
+    }];
+
+    /**
+     * Facets
+     */
+    $scope.facets = {
+        'session.training.organization.name.source' : {
+            label: 'Centre'
+        },
+        'inscriptionStatus.name.source' : {
+            label: 'Statut inscription'
+        },
+        'presenceStatus.name.source' : {
+            label: 'Statut présence'
+        },
+        'institution.name.source' : {
+            label: 'Etablissement',
+            size: 10
+        },
+        'trainee.institution.name.source' : {
+            label: 'Etablissement actuel',
+            size: 10
+        },
+        'publicType.source' : {
+            label: 'Catégorie de personnel'
+        },
+        'trainee.fullName.source' : {
+            label: 'Stagiaire'
+        },
+        'session.dateBegin' : {
+            label: 'Date de session',
+            type: 'range'
+        },
+        'session.year' : {
+            label: 'Année de session'
+        },
+        'session.semester' : {
+            label: 'Semestre de session'
+        },
+        'session.training.typeLabel.source' : {
+            label: 'Type'
+        },
+        'session.training.name.source' : {
+            label: 'Formation'
         }
     };
 }]);
@@ -78829,7 +78829,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         return $http.post(url, {
             "query": {
                 "match": {
-                    "fullName.autocomplete": {
+                    "fullname.autocomplete": {
                         "query":    angular.lowercase(pref)
                     }
                 }
@@ -78838,7 +78838,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         ).then(function (res) {
             var adresses = [];
             angular.forEach (res.data.items, function (item) {
-                adresses.push ({label: item.fullName, value:item.id, organization: (item.organization.name) ? item.organization.name : '', institution: (item.institution.name) ? item.institution.name : '', contracted: (item.institution.contracted ? item.institution.contracted : false)})
+                adresses.push ({label: item.fullname, value:item.id, organization: (item.organization.name) ? item.organization.name : '', institution: (item.institution.name) ? item.institution.name : '', contracted: (item.institution.contracted ? item.institution.contracted : false)})
             });
 
             return adresses;
@@ -78873,115 +78873,6 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
             $scope.setTrainee(trainee);
         });
     }
-}]);
-
-/**
- * Include a participation table block for a given trainer
- * Usage : <div participations-block="trainer"></div>
- */
-sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', function($dialog, $searchFactory) {
-    return {
-        restrict: 'EA',
-        scope: {
-            trainer: '=participationsBlock'
-        },
-        link: function(scope, element, attrs) {
-            // custum empty message
-            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucune session pour ce formateur.";
-            scope.$dialog = $dialog;
-
-            // get participations from elasticsearch
-            var search = $searchFactory('participation.search');
-            search.query.filters['trainer.id'] = scope.trainer.id;
-            search.query.sorts = {'session.datebegin': 'desc'};
-            search.query.size = 20;
-            scope.search = search;
-            search.search().then(function() {
-                // watch page
-                scope.$watch('search.query.page', function(newValue, oldValue) {
-                    if (newValue != oldValue) {
-                        search.search();
-                    }
-                });
-            });
-        },
-        templateUrl: 'trainer/directives/participations.block.html'
-    }
-}]);
-
-/**
- * Include a trainers list block for a given session
- *
- * Usage : <div resume-trainer-block="session"></div>
- */
-sygeforApp.directive('resumeTrainerBlock', [function() {
-    return {
-        restrict: 'EA',
-        scope: {
-            trainer: '=resumeTrainerBlock',
-            year: '=year',
-            status: '=status'
-        },
-        templateUrl: 'trainer/directives/resumeTrainer.block.html'
-    }
-}]);
-
-/**
- * Common elements of training and session elements
- */
-sygeforApp.config(["$dialogProvider", function($dialogProvider) {
-    /**
-     * Manage material (general dialog)
-     */
-    $dialogProvider.dialog('material.manage', /* @ngInject */ {
-        controller: 'ManageMaterialsController',
-        templateUrl: 'training/material/dialogs/material/manage-materials.html'
-    });
-
-    /**
-     * Add link material dialog
-     */
-    $dialogProvider.dialog('material.linkmaterial.add', /* @ngInject */ {
-        controller:function ($scope, $modalInstance, $dialogParams, form) {
-            $scope.dialog = $modalInstance;
-            $scope.form = form;
-            $scope.dialog.params = angular.copy($dialogParams);
-
-            $scope.onSuccess = function(data) {
-                $scope.dialog.close(data);
-            };
-        },
-        resolve:{
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('material.add', {
-                    entity_id: $dialogParams.entity_id,
-                    type_entity: $dialogParams.entityType,
-                    material_type: $dialogParams.material_type
-                })).then(function(response) {
-                    return response.data.form;
-                });
-            }
-        },
-        templateUrl: 'training/material/dialogs/material/add-link-material.html'
-    });
-
-    /**
-     * Remove material dialog
-     */
-    $dialogProvider.dialog('material.remove', /* @ngInject */ {
-        controller:function ($scope, $modalInstance, $dialogParams, $http) {
-            $scope.dialog = angular.copy($modalInstance);
-            $scope.dialog.params = $dialogParams;
-
-            $scope.ok = function() {
-                var url = Routing.generate('material.remove', {id: $dialogParams.material.id});
-                $http.post(url).then(function (data) {
-                    $scope.dialog.close(data);
-                });
-            }
-        },
-        templateUrl: 'training/material/dialogs/material/remove-material.html'
-    });
 }]);
 
 /**
@@ -79472,6 +79363,64 @@ sygeforApp.run(['$rootScope', function($rootScope) {
 }]);
 
 /**
+ * Common elements of training and session elements
+ */
+sygeforApp.config(["$dialogProvider", function($dialogProvider) {
+    /**
+     * Manage material (general dialog)
+     */
+    $dialogProvider.dialog('material.manage', /* @ngInject */ {
+        controller: 'ManageMaterialsController',
+        templateUrl: 'training/material/dialogs/material/manage-materials.html'
+    });
+
+    /**
+     * Add link material dialog
+     */
+    $dialogProvider.dialog('material.linkmaterial.add', /* @ngInject */ {
+        controller:function ($scope, $modalInstance, $dialogParams, form) {
+            $scope.dialog = $modalInstance;
+            $scope.form = form;
+            $scope.dialog.params = angular.copy($dialogParams);
+
+            $scope.onSuccess = function(data) {
+                $scope.dialog.close(data);
+            };
+        },
+        resolve:{
+            form: function ($http, $dialogParams){
+                return $http.get(Routing.generate('material.add', {
+                    entity_id: $dialogParams.entity_id,
+                    type_entity: $dialogParams.entityType,
+                    material_type: $dialogParams.material_type
+                })).then(function(response) {
+                    return response.data.form;
+                });
+            }
+        },
+        templateUrl: 'training/material/dialogs/material/add-link-material.html'
+    });
+
+    /**
+     * Remove material dialog
+     */
+    $dialogProvider.dialog('material.remove', /* @ngInject */ {
+        controller:function ($scope, $modalInstance, $dialogParams, $http) {
+            $scope.dialog = angular.copy($modalInstance);
+            $scope.dialog.params = $dialogParams;
+
+            $scope.ok = function() {
+                var url = Routing.generate('material.remove', {id: $dialogParams.material.id});
+                $http.post(url).then(function (data) {
+                    $scope.dialog.close(data);
+                });
+            }
+        },
+        templateUrl: 'training/material/dialogs/material/remove-material.html'
+    });
+}]);
+
+/**
  * Core List Controller
  */
 sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector', 'BaseListController', '$trainingBundle', '$state', '$timeout', '$dialog', 'search', function($scope, $user, $injector, BaseListController, $trainingBundle, $state, $timeout, $dialog, search) {
@@ -79918,6 +79867,57 @@ sygeforApp.directive('trainingTemplate', ['$trainingBundle', '$http', '$template
 }]);
 
 /**
+ * Include a participation table block for a given trainer
+ * Usage : <div participations-block="trainer"></div>
+ */
+sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', function($dialog, $searchFactory) {
+    return {
+        restrict: 'EA',
+        scope: {
+            trainer: '=participationsBlock'
+        },
+        link: function(scope, element, attrs) {
+            // custum empty message
+            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucune session pour ce formateur.";
+            scope.$dialog = $dialog;
+
+            // get participations from elasticsearch
+            var search = $searchFactory('participation.search');
+            search.query.filters['trainer.id'] = scope.trainer.id;
+            search.query.sorts = {'session.datebegin': 'desc'};
+            search.query.size = 20;
+            scope.search = search;
+            search.search().then(function() {
+                // watch page
+                scope.$watch('search.query.page', function(newValue, oldValue) {
+                    if (newValue != oldValue) {
+                        search.search();
+                    }
+                });
+            });
+        },
+        templateUrl: 'trainer/directives/participations.block.html'
+    }
+}]);
+
+/**
+ * Include a trainers list block for a given session
+ *
+ * Usage : <div resume-trainer-block="session"></div>
+ */
+sygeforApp.directive('resumeTrainerBlock', [function() {
+    return {
+        restrict: 'EA',
+        scope: {
+            trainer: '=resumeTrainerBlock',
+            year: '=year',
+            status: '=status'
+        },
+        templateUrl: 'trainer/directives/resumeTrainer.block.html'
+    }
+}]);
+
+/**
  * BatchMailingController
  */
 sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config)
@@ -79925,8 +79925,8 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     $scope.service = 'sygefor_inscription.batch.inscription_status_change';
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
-    $scope.inscriptionStatus = $dialogParams.inscriptionStatus;
-    $scope.presenceStatus = $dialogParams.presenceStatus;
+    $scope.inscriptionstatus = $dialogParams.inscriptionstatus;
+    $scope.presencestatus = $dialogParams.presencestatus;
     $scope.send = {Mail: !!config.templates.length};
     $scope.attachmentTemplates = config.attachmentTemplates;
     $scope.attachments = [];
@@ -79979,22 +79979,22 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         var data = {
             options: {
                 //inscriptionStatus: $scope.inscriptionStatus.id,
-                targetClass: 'SygeforInscriptionBundle:AbstractInscription',
+                targetClass: 'App\\Entity\\Core\\AbstractInscription',
                 sendMail: $scope.send.Mail,
                 subject: $scope.message.subject,
                 message: $scope.message.body,
                 attachmentTemplates: attTemplates,
-                objects: {'SygeforTrainingBundle:Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
+                objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
             ids: $scope.items.join(",")
         };
 
-        if (typeof $scope.inscriptionStatus != 'undefined') {
-            data['options']['inscriptionStatus'] = $scope.inscriptionStatus.id
+        if (typeof $scope.inscriptionstatus != 'undefined') {
+            data['options']['inscriptionstatus'] = $scope.inscriptionstatus.id
         }
 
-        if (typeof $scope.presenceStatus != 'undefined') {
-            data['options']['presenceStatus'] = $scope.presenceStatus.id
+        if (typeof $scope.presencestatus != 'undefined') {
+            data['options']['presencestatus'] = $scope.presencestatus.id
         }
 
         $http.post(url, data).success(function() {
@@ -80006,7 +80006,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $dialog.open('batch.emailPreview', {
             ids: $scope.items[0],
             options: {
-                targetClass: 'SygeforInscriptionBundle:AbstractInscription',
+                targetClass: 'App\\Entity\\Core\\AbstractInscription',
                 subject: $scope.message.subject,
                 message: $scope.message.body
             }
@@ -80089,6 +80089,38 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     });
 }]);
 
+sygeforApp.controller('InstitutionDetailViewController', ['$scope', '$taxonomy', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function($scope, $taxonomy, $dialog, $http, $window, $user, $state, search, data) {
+
+    $scope.institution = data.institution;
+    $scope.form = data.form ? data.form : false;
+    $scope.$moment = moment;
+    $scope.$user = $user;
+
+    $scope.onSuccess = function(data) {
+        $scope.displayNewTrainingCorrespondentForm = false;
+	    $scope.institution = data.institution;
+	    $scope.updateActiveItem($scope.institution);
+    };
+
+    /**
+     * Change Organization
+     */
+    $scope.changeOrganization = function () {
+        $dialog.open('institution.changeOrg', {institution: $scope.institution}).then(function(data) {
+            $scope.institution = data.institution;
+        });
+    };
+
+    /**
+     * Delete the institution
+     */
+    $scope.delete = function () {
+        $dialog.open('institution.delete', {institution: $scope.institution}).then(function (){
+            $state.go('institution.table', null, { reload:true });
+        });
+    };
+}]);
+
 /**
  * Core List Controller
  */
@@ -80132,18 +80164,18 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.$trainingBundle = $trainingBundle;
     $scope.$moment = moment;
 
-    $scope.inscriptionStatus = inscriptionStatusList;
-    $scope.presenceStatus = angular.copy(presenceStatusList);
+    $scope.inscriptionstatus = inscriptionStatusList;
+    $scope.presencestatus = angular.copy(presenceStatusList);
 
-    $scope.$watch('inscription.presenceStatus', function() {
-        if ($scope.inscription.presenceStatus && $scope.inscription.presenceStatus.id !== 0) {
-            $scope.presenceStatus[0] = {
+    $scope.$watch('inscription.presencestatus', function() {
+        if ($scope.inscription.presencestatus && $scope.inscription.presencestatus.id !== 0) {
+            $scope.presencestatus[0] = {
                 id: 0,
                 name: 'Aucun'
             };
         }
-        else if ($scope.presenceStatus[0] !== undefined) {
-            $scope.presenceStatus = angular.copy(presenceStatusList);
+        else if ($scope.presencestatus[0] !== undefined) {
+            $scope.presencestatus = angular.copy(presenceStatusList);
         }
     });
 
@@ -80157,10 +80189,10 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.updateInscriptionStatus = function(status) {
         return $dialog.open('inscription.changeStatus', {
             items: [$scope.inscription.id],
-            inscriptionStatus: status,
-            presenceStatus: undefined
+            inscriptionstatus: status,
+            presencestatus: undefined
         }).then(function() {
-            $scope.inscription.inscriptionStatus = status;
+            $scope.inscription.inscriptionstatus = status;
 	        $scope.updateActiveItem($scope.inscription);
         });
     }
@@ -80175,10 +80207,10 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.updatePresenceStatus = function(status) {
         return $dialog.open('inscription.changeStatus', {
             items: [$scope.inscription.id],
-            presenceStatus: status,
-            inscriptionStatus: undefined
+            presencestatus: status,
+            inscriptionstatus: undefined
         }).then(function() {
-            $scope.inscription.presenceStatus = status;
+            $scope.inscription.presencestatus = status;
 	        $scope.updateActiveItem($scope.inscription);
         });
     }
@@ -80200,38 +80232,6 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
 }]);
 
 
-
-sygeforApp.controller('InstitutionDetailViewController', ['$scope', '$taxonomy', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function($scope, $taxonomy, $dialog, $http, $window, $user, $state, search, data) {
-
-    $scope.institution = data.institution;
-    $scope.form = data.form ? data.form : false;
-    $scope.$moment = moment;
-    $scope.$user = $user;
-
-    $scope.onSuccess = function(data) {
-        $scope.displayNewTrainingCorrespondentForm = false;
-	    $scope.institution = data.institution;
-	    $scope.updateActiveItem($scope.institution);
-    };
-
-    /**
-     * Change Organization
-     */
-    $scope.changeOrganization = function () {
-        $dialog.open('institution.changeOrg', {institution: $scope.institution}).then(function(data) {
-            $scope.institution = data.institution;
-        });
-    };
-
-    /**
-     * Delete the institution
-     */
-    $scope.delete = function () {
-        $dialog.open('institution.delete', {institution: $scope.institution}).then(function (){
-            $state.go('institution.table', null, { reload:true });
-        });
-    };
-}]);
 
 sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function($scope, $taxonomy, $dialog, $http, $window, $user, $state, search, data) {
     $scope.trainee = data.trainee;
@@ -80301,74 +80301,6 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
     };
 }]);
 
-sygeforApp.controller(
-    'TrainerDetailViewController', ['$scope', '$user', '$state', '$dialog', 'search', 'data',
-    function($scope, $user, $state, $dialog, search, data)
-    {
-        $scope.trainer = data.trainer;
-        $scope.form = data.form ? data.form : false;
-
-        $scope.onSuccess = function(data) {
-            $scope.trainer = data.trainer;
-            $scope.updateActiveItem($scope.trainer);
-        };
-
-        /**
-         * Change Organization
-         */
-        $scope.changeOrganization = function () {
-            $dialog.open('trainer.changeOrg', {trainer: $scope.trainer}).then(function(data) {
-                $scope.trainer = data.trainer;
-            });
-        };
-
-        /**
-         * Delete trainer
-         */
-        $scope.delete = function(){
-            $dialog.open('trainer.delete', {trainer: $scope.trainer}).then(function () {
-                $state.go('trainer.table', null, {reload: true});
-            });
-        };
-    }
-]);
-
-/**
- * Include a inscription table block for a given session
- * Usage : <div materials-block="session" entity-type="'session'"></div>
- */
-sygeforApp.directive('materialsBlock', ['$dialog', '$window', function($dialog, $window) {
-    return {
-        restrict: 'EA',
-        scope: {
-            entity: '=materialsBlock',
-            entityType: '='
-        },
-        link: function(scope, attrs) {
-            // custum empty message
-            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucun support disponible.";
-        },
-        controller: function($scope, $dialog, $timeout)
-        {
-            /**
-             * Manage material modal
-             */
-            $scope.manageMaterials = function () {
-                $dialog.open('material.manage', {entity: $scope.entity, entityType: $scope.entityType});
-            };
-
-            /**
-             * Download file
-             * @param file
-             */
-            $scope.getMaterial = function (file) {
-                $window.location = Routing.generate('material.get', {id: file.id});
-            };
-        },
-        templateUrl: 'training/material/directives/materials.block.html'
-    }
-}]);
-
 /**
  * Core List Controller
  */
@@ -80415,7 +80347,8 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
 
     // fetch all status and count
     $q.all([
-        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
+//        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
+        $taxonomy.getIndexedTerms(2)
     ]).then(function(crit )  {
         $scope.crit = crit[0];
     });
@@ -80489,8 +80422,10 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
 
     // fetch all status and count
     $q.all([
-        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status'),
-        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status')
+/*        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status'),
+        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status')*/
+        $taxonomy.getIndexedTerms(9),
+        $taxonomy.getIndexedTerms(10)
     ]).then(function(status )  {
         $scope.status.inscription = status[0];
         $scope.status.presence = status[1];
@@ -80531,7 +80466,7 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
             inscriptionstatus: status,
-            presenceStatus : undefined
+            presencestatus : undefined
         }).then(function() {
             inscription.inscriptionstatus = status;
 
@@ -80550,10 +80485,10 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
         inscription.inscriptionstatus = undefined;
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
-            presenceStatus: status,
+            presencestatus: status,
             inscriptionstatus: undefined
         }).then(function() {
-            inscription.presenceStatus = status;
+            inscription.presencestatus = status;
 
             recalculateStats();
         });
@@ -80911,24 +80846,102 @@ sygeforApp.directive('trainersBlock', [function() {
     }
 }]);
 
+/**
+ * Include a inscription table block for a given session
+ * Usage : <div materials-block="session" entity-type="'session'"></div>
+ */
+sygeforApp.directive('materialsBlock', ['$dialog', '$window', function($dialog, $window) {
+    return {
+        restrict: 'EA',
+        scope: {
+            entity: '=materialsBlock',
+            entityType: '='
+        },
+        link: function(scope, attrs) {
+            // custum empty message
+            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucun support disponible.";
+        },
+        controller: function($scope, $dialog, $timeout)
+        {
+            /**
+             * Manage material modal
+             */
+            $scope.manageMaterials = function () {
+                $dialog.open('material.manage', {entity: $scope.entity, entityType: $scope.entityType});
+            };
+
+            /**
+             * Download file
+             * @param file
+             */
+            $scope.getMaterial = function (file) {
+                $window.location = Routing.generate('material.get', {id: file.id});
+            };
+        },
+        templateUrl: 'training/material/directives/materials.block.html'
+    }
+}]);
+
+sygeforApp.controller(
+    'TrainerDetailViewController', ['$scope', '$user', '$state', '$dialog', 'search', 'data',
+    function($scope, $user, $state, $dialog, search, data)
+    {
+        $scope.trainer = data.trainer;
+        $scope.form = data.form ? data.form : false;
+
+        $scope.onSuccess = function(data) {
+            $scope.trainer = data.trainer;
+            $scope.updateActiveItem($scope.trainer);
+        };
+
+        /**
+         * Change Organization
+         */
+        $scope.changeOrganization = function () {
+            $dialog.open('trainer.changeOrg', {trainer: $scope.trainer}).then(function(data) {
+                $scope.trainer = data.trainer;
+            });
+        };
+
+        /**
+         * Delete trainer
+         */
+        $scope.delete = function(){
+            $dialog.open('trainer.delete', {trainer: $scope.trainer}).then(function () {
+                $state.go('trainer.table', null, {reload: true});
+            });
+        };
+    }
+]);
+
 angular.module("conjecto.sygefor.app").run(["$templateCache", function($templateCache) {$templateCache.put("list.html","<div class=\"search-list full-height-container is-full-width is-absolute\">\n	<div class=\"full-height-item\">\n    	<div list-toolbar></div>\n    </div>\n    <div class=\"list-view full-height-item is-grow\">\n        <div ui-view></div>\n    </div>\n</div>\n");
 $templateCache.put("dashboard/dashboard.html","<div class=\"row\">\n    <div class=\"col-md-6\">\n        <div widget=\"session\"></div>\n        <div widget=\"inscription\" widget-options=\"options\"></div>\n    </div>\n    <div class=\"col-md-6\">\n        <div widget=\"disclaimer\"></div>\n        <div widget=\"trainee\"></div>\n        <!--<div widget=\"trainee.duplicate\"></div>-->\n    </div>\n</div>\n");
 $templateCache.put("dashboard/widget.html","<div class=\"widget\" ng-class=\"{\'loading\': loading}\">\n    <div class=\"widget-header\">\n        <ul class=\"widget-actions\">\n            <li ng-if=\"refresh\"><a href=\"\" ng-click=\"refresh()\"><i class=\"fa fa-refresh\"></i></a></li>\n            <li ng-if=\"configure\"><a href=\"\" ng-click=\"configure()\"><i class=\"fa fa-cog\"></i></a></li>\n            <li ng-if=\"open\"><a href=\"\" ng-click=\"open()\"><i class=\"fa fa-external-link\"></i></a></li>\n        </ul>\n        <div class=\"widget-title\">{{ options.title }} <small>{{ options.subtitle }}</small></div>\n    </div>\n    <div class=\"widget-body-container\">\n        <div class=\"widget-loading\" ng-show=\"loading\"><i class=\"fa fa-refresh fa-spin\"></i></div>\n        <div class=\"widget-body\" widget-body>Chargement...</div>\n    </div>\n</div>\n");
 $templateCache.put("toolbar/list-toolbar.html","<div class=\"list-toolbar\">\n    <div class=\"left-group\">\n        <div class=\"left-group-container\">\n            <!-- Select button -->\n            <div class=\"btn-group\">\n                <button ng-if=\"!selected.length\" ng-click=\"selectAll()\" title=\"Tous sélectionner\" type=\"button\" class=\"btn btn-default btn-min-width\" ng-class=\"{disabled: !search.result.total}\">\n                    <i class=\"fa fa-square-o\"></i>\n                </button>\n                <button ng-if=\"selected.length\" ng-click=\"deselectAll()\" title=\"Tous désélectionner\" type=\"button\" class=\"btn btn-{{ selected.length > search.result.total ? \'danger\' : \'default\' }}\">\n                    <i class=\"fa fa-check-square-o\" ng-if=\"selected.length == search.result.total\"></i>\n                    <i class=\"fa fa-minus-square-o\" ng-if=\"selected.length < search.result.total\"></i>\n                    <i class=\"fa fa-warning\" ng-if=\"selected.length > search.result.total\" title=\"{{ selected.length }} eléments sont sélectionnés alors que la dernière recherche a retourné {{ search.result.total }} résultat{{ search.result.total > 1 ? \'s\' : \'\' }}\"></i>\n                </button>\n\n                <button type=\"button\" class=\"btn btn-{{ selected.length > search.result.total ? \'danger\' : \'default\' }} dropdown-toggle\" data-toggle=\"dropdown\" ng-class=\"{disabled: !search.result.total}\">\n                    <span class=\"caret\"></span>\n                </button>\n                <ul class=\"dropdown-menu\">\n                    <li><a href=\"\" ng-click=\"selectAll()\">Tous sélectionner</a></li>\n                    <li ng-show=\"selected.length\" class=\"divider\"></li>\n                    <li ng-show=\"selected.length\"><a href=\"\" ng-click=\"deselectAll()\" >Tout desélectionner</a></li>\n                </ul>\n            </div>\n\n            <!-- Mass operations -->\n            <div class=\"btn-group btn-mass-operation\">\n                <button type=\"button\" class=\"btn btn-default dropdown-toggle\" data-toggle=\"dropdown\" ng-class=\"{disabled: !selected.length}\">\n                    Action groupée <span class=\"caret\"></span>\n                </button>\n                <ul class=\"dropdown-menu\">\n                    <li ng-repeat=\"operation in batchOperations| filter: batchOperationAvailable\" ng-class=\"{\'dropdown-submenu\': operation.subitems}\">\n                        <!-- with subitems -->\n                        <a href=\"\" ng-if=\"operation.subitems\"><i class=\"fa {{ operation.icon }}\"></i> {{ operation.label }}</a>\n                        <ul class=\"dropdown-menu\" ng-if=\"operation.subitems\">\n                            <li ng-repeat=\"sub in operation.subitems\"><a href=\"\" ng-click=\"batch(sub)\"><i class=\"fa {{ sub.icon }}\"></i> {{ sub.label }}</a></li>\n                        </ul>\n                        <!-- without subitems -->\n                        <a href=\"\" ng-click=\"batch(operation)\" ng-if=\"!operation.subitems\"><i class=\"fa {{ operation.icon }}\"></i> {{ operation.label }}</a>\n                    </li>\n                </ul>\n            </div>\n        </div>\n    </div>\n\n    <!-- Search bar -->\n    <div class=\"center-group form-group\">\n        <div class=\"center-group-container\">\n            <!--input type=\"search\" class=\"form-control\"  placeholder=\"Rechercher...\" ng-model=\"search.query.keywords\"-->\n            <div search-box ng-controller=\"SearchBoxController\" placeholder=\"Cliquez pour filtrer la liste...\" facet-list=\"sbfacets\" result-list=\"sbparameters\"></div>\n        </div>\n    </div>\n\n    <!-- View switch -->\n    <div class=\"right-group\">\n        <div class=\"right-group-container btn-group\">\n            <span ng-show=\"!!search.result.total\" class=\"btn btn-default btn-deactivated\"><strong>{{ (search.query.page-1)*search.query.size + 1  }} - {{ search.query.page*search.query.size < search.result.total ? search.query.page*search.query.size : search.result.total  }}</strong> sur <strong>{{ search.result.total }}</strong></span><!--\n            --><button ng-repeat=\"state in $state.$current.self.root.states|orderObjectBy : \'weight\'\" type=\"button\" ng-attr-title=\"Visualiser en mode : {{ state.label }}\" class=\"btn btn-default\" ng-class=\"{active: $state.includes(state.name)}\" ng-click=\"$state.go(state.name)\"><i class=\"fa {{ state.icon }}\"></i></button>\n        </div>\n    </div>\n\n    <!-- add button -->\n    <div class=\"btn-add-operation\">\n        <div class=\"btn-add-operation-container\">\n            <div class=\"btn-group\">\n                <!-- <button type=\"button\" class=\"btn btn-default\" ng-click=\"addOperation(addOperations[0])\"><i class=\"fa {{ addOperations[0].label }}\"></i></button>\n                <div ng-switch-default> -->\n                <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" data-toggle=\"dropdown\" ng-class=\"{disabled: (addOperations | filter: addOperationAvailable).length == 0 }\">\n                    Ajouter <span class=\"caret\"></span>\n                </button>\n                <ul class=\"dropdown-menu\">\n                    <li ng-repeat=\"operation in addOperations | filter: addOperationAvailable\"><a href=\"\" ng-click=\"operation.execute(operation.key)\"><i class=\"fa {{ operation.icon }}\"></i> {{ operation.label }}</a></li>\n                </ul>\n            </div>\n        </div>\n    </div>\n\n</div>\n");
 $templateCache.put("batch/convert-type/convert-type.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\">Etes-vous sûr de vouloir convertir ces {{ items.length }} formations vers le type {{ getTypeLabel() }} ?</h4>\n</div>\n\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\"  ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Convertir les formations</a>\n</div>\n");
+$templateCache.put("batch/mailing/mailing.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"cancel()\">×</button>\n    <h4 class=\"modal-title\">Mailing</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-2 control-label\">Nombre de destinataires </label>\n            <div class=\"col-sm-10\">\n                <span class=\"form-control\">{{ selected.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"subject\" class=\"col-sm-2 control-label\">Sujet </label>\n            <div class=\"col-sm-10\">\n                <input type=\"text\" class=\"form-control\" id=\"subject\" ng-model=\"options.subject\" placeholder=\"Sujet du mail\">\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"message\" class=\"col-sm-2 control-label\">Message </label>\n            <div class=\"col-sm-10\">\n                <textarea class=\"form-control\" rows=\"10\" id=\"message\" ng-model=\"options.message\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"cancel()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Envoyer</a>\n</div>\n\n");
 $templateCache.put("batch/email/email-preview.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"modalInstance.dismiss()\">×</button>\n    <h4 class=\"modal-title\">Prévisualisation du message :</h4>\n</div>\n<div class=\"modal-body\">\n    <div class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Sujet</label>\n            <div class=\"col-md-9\">\n                <div class=\"form-control\" style=\"height: auto\">\n                    {{ email.subject }}\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Message</label>\n            <div class=\"col-md-9\">\n                <div ng-bind-html=\"email.message | nl2br\" class=\"form-control\" style=\"height: auto\"></div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-if=\"email.templateAttachments.length > 0\">\n            <label class=\"col-sm-3 control-label\">Pièce{{ email.templateAttachments.length > 0 ? \'s\' : \'\' }} jointe{{ email.templateAttachments.length > 0 ? \'s\' : \'\' }} du modèle</label>\n            <div class=\"col-md-9\">\n                <div ng-repeat=\"templateAttachment in email.templateAttachments\" class=\"form-control\" style=\"height: auto\">\n                    <span>{{ templateAttachment }}</span>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"form-group\" ng-if=\"email.attachments.length > 0\">\n            <label class=\"col-sm-3 control-label\">Pièce{{ email.attachments.length > 1 ? \'s\' : \'\' }} jointe{{ email.attachments.length > 1 ? \'s\' : \'\' }} supplémentaire{{ email.attachments.length > 1 ? \'s\' : \'\' }}</label>\n            <div class=\"col-md-9\">\n                <div ng-repeat=\"attachment in email.attachments\" class=\"form-control\" style=\"height: auto\">\n                    <span>{{ attachment.name }}</span>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-primary\" ng-click=\"modalInstance.dismiss()\">Fermer</a>\n</div>\n");
 $templateCache.put("batch/email/email.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-envelope-o\"></i> Envoyer un email</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-2 control-label\">Destinataires </label>\n            <div class=\"col-sm-10\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-if=\"templates.length\">\n            <label for=\"subject\" class=\"col-sm-2 control-label\">Modèle </label>\n            <div class=\"col-sm-10\">\n                <select type=\"text\" class=\"form-control\" id=\"template\" ng-options=\"template.label for template in templates\" ng-model=\"message.template\" placeholder=\"Modèle du mail\">\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"subject\" class=\"col-sm-2 control-label\">Sujet </label>\n            <div class=\"col-sm-10\">\n                <input type=\"text\" class=\"form-control\" id=\"subject\" ng-model=\"message.subject\" placeholder=\"Sujet du mail\" autofocus>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"message\" class=\"col-sm-2 control-label\">Message </label>\n            <div class=\"col-sm-10\">\n                <textarea class=\"form-control\" rows=\"10\" id=\"message\" ng-model=\"message.body\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-if=\"message.templateAttachments.length > 0\">\n            <label for=\"attachmentTemplate\" class=\"col-sm-2 control-label\">Pièces jointes du modèle</label>\n            <div class=\"col-sm-10\">\n                <div ng-if=\"attachmentTemplate && isAObject(attachmentTemplate)\" ng-repeat=\"attachmentTemplate in message.templateAttachments track by $index\">\n                    <input type=\"checkbox\" ng-model=\"message.templateAttachmentChecklist[attachmentTemplate.id]\" ng-checked=\"true\" id=\"attachmentTemplate_{{ attachmentTemplate.id }}\">\n                    <label class=\"control-label\" for=\"attachmentTemplate_{{ attachmentTemplate.id }}\">{{attachmentTemplate.name}}</label>&nbsp;\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-if=\"message.attachments.length > 0\">\n            <label for=\"attachments\" class=\"col-sm-2 control-label\">Pièce{{ message.attachments.length > 1 ? \'s\' : \'\' }} jointe{{ message.attachments.length > 1 ? \'s\' : \'\' }} supplémentaire{{ message.attachments.length > 1 ? \'s\' : \'\' }}</label>\n            <div class=\"col-sm-10\">\n                <div ng-repeat=\"(id, attachment) in message.attachments track by $index\">\n                    <label class=\"control-label\" for=\"attachment_{{ id }}\">{{attachment.name}}</label>&nbsp;\n                    <a href=\"\" ng-click=\"removeAttachment(id)\">&nbsp;x&nbsp;</a>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"inputTplFile\" class=\"col-sm-2 control-label\">Ajouter des pièces jointes</label>\n            <div class=\"col-sm-10\">\n                <input multiple type=\"file\" class=\"form-control\" onChange=\"angular.element(this).scope().fileChanged(this,angular.element(this).scope())\" id=\"inputAttachment\"/>\n            </div>\n        </div>\n        <div class=\"form-group\" >\n            <div class=\"col-sm-2\">\n            </div>\n            <div class=\"col-sm-10\">\n                <button type=\"button\" class=\"btn\" ng-click=\"preview()\">Prévisualiser</button>\n            </div>\n        </div>\n        <div class=\"alert alert-danger\" ng-show=\"formError != \'\'\">{{ formError }}</div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Envoyer</a>\n</div>");
-$templateCache.put("batch/mailing/mailing.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"cancel()\">×</button>\n    <h4 class=\"modal-title\">Mailing</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-2 control-label\">Nombre de destinataires </label>\n            <div class=\"col-sm-10\">\n                <span class=\"form-control\">{{ selected.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"subject\" class=\"col-sm-2 control-label\">Sujet </label>\n            <div class=\"col-sm-10\">\n                <input type=\"text\" class=\"form-control\" id=\"subject\" ng-model=\"options.subject\" placeholder=\"Sujet du mail\">\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"message\" class=\"col-sm-2 control-label\">Message </label>\n            <div class=\"col-sm-10\">\n                <textarea class=\"form-control\" rows=\"10\" id=\"message\" ng-model=\"options.message\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"cancel()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Envoyer</a>\n</div>\n\n");
 $templateCache.put("batch/publipost/publipost.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\">Publipostage</h4>\n</div>\n\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\" enctype=\"multipart/form-data\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-4 control-label\">Nombre d\'éléments </label>\n            <div class=\"col-sm-8\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n            </div>\n            <div class=\"form-group\">\n                <label for=\"inputTplName\" class=\"col-sm-4 control-label\">Modèles disponibles </label>\n                <div class=\"col-sm-8\">\n                    <select type=\"text\" class=\"form-control\" id=\"inputTplName\" ng-model=\"options.template\" ng-options=\"value as value.name for value in templateList\"></select>\n                </div>\n            </div>\n            <div class=\"form-group\">\n                <label for=\"inputTplFile\" class=\"col-sm-4 control-label\">Choisir un modèle </label>\n                <div class=\"col-sm-6\">\n                    <input type=\"file\" class=\"form-control\" onChange=\"angular.element(this).scope().fileChanged(this,angular.element(this).scope())\" id=\"inputTplFile\" ng-model=\"options.templateFile\" />\n                </div>\n                <div class=\"col-sm-2 \">\n                    <button class=\"btn btn-primary\" ng-click=\"resetUpload(angular.element($(\'#inputTplFile\')))\"><i class=\"fa fa-undo fa-2g\"></i></button>\n                </div>\n            </div>\n            <div class=\"form-group\">\n                <div class=\"col-sm-4\"></div>\n                <div class=\"col-sm-4\">\n                    <input type=\"checkbox\" id=\"sendPdf\" ng-model=\"options.sendPdf\" />\n                    <label for=\"sendPdf\" class=\"control-label\">Générer en pdf</label>\n                </div>\n            </div>\n            <div class=\"alert alert-danger\" ng-show=\"chooseError != \'\'\">{{ chooseError }}</div>\n        </form>\n    </div>\n</div>\n\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\"  ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Créer le document</a>\n</div>\n");
 $templateCache.put("states/detail/detail.html","<div class=\"full-height-container is-absolute is-full-width is-direction-row\">\n\n    <div class=\"full-height-item grid-list-detail-results\">\n\n        <div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n            <div class=\"full-height-item is-full-width is-grow is-overflow-y\">\n                <div class=\"list-group\" ng-if=\"search.result.items.length\">\n                    <div class=\"list-group-item \" ng-repeat=\"result in search.result.items\"\n                         ng-class=\"[result.class, {active: $stateParams.id == result.id, \'list-group-item-warning\': selected.indexOf(result.id) > -1}]\">\n                        <i class=\"fa\" ng-click=\"switchSelect(result.id)\"\n                           ng-class=\"{\'fa-square-o\': !isSelected(result.id), \'fa-check-square-o\': isSelected(result.id)}\"></i>\n\n                        <div ng-include=\"resultTemplateUrl\"></div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"full-height-item is-full-width pager-wrapper\">\n                <!-- <pager total-items=\"search.result.total\" ng-model=\"search.query.page\"></pager> -->\n                <pagination ng-if=\"search.result.total > 0\" ng-model=\"search.query.page\"\n                            total-items=\"search.result.total\" items-per-page=\"search.query.size\" direction-links=\"false\"\n                            boundary-links=\"false\" rotate=\"false\" max-size=\"4\" next-text=\">\" previous-text=\"<\"\n                            first-text=\"Début\" last-text=\"Fin\"></pagination>\n            </div>\n        </div>\n\n    </div>\n\n\n    <div class=\"full-height-item grid-list-detail-view\"\n         ng-class=\"{\'\': search.result.items.length, \'col-lg-12\': !search.result.items.length}\">\n        <div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n            <div class=\"full-height-item is-overflow-y is-grow view\">\n                <!-- <div class=\"absolute-fixed-wrapper\"> -->\n                <div class=\"ui-view-container\">\n                    <div class=\"col-xs-12\">\n                        <div ui-view></div>\n                    </div>\n                </div>\n                <!-- </div> -->\n            </div>\n            <div ng-if=\"$state.current.views.bottom\" class=\"fixed-bloc-wrapper full-height-item\">\n                <div ui-view=\"bottom\">\n\n                </div>\n            </div>\n\n        </div>\n    </div>\n\n\n</div>\n");
 $templateCache.put("batch/export/csv/csv.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\">Exporter en CSV</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-4 control-label\">Nombre de lignes </label>\n            <div class=\"col-sm-8\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label for=\"inputEmail3\" class=\"col-sm-4 control-label\">Delimiter </label>\n            <div class=\"col-sm-8\">\n                <input type=\"text\" class=\"form-control\" id=\"inputEmail3\" ng-model=\"options.delimiter\" placeholder=\";\">\n            </div>\n        </div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\"  ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"export()\">Exporter</a>\n</div>\n");
 $templateCache.put("batch/export/pdf/pdf.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-file-pdf-o\"></i> Exporter en PDF</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-4 control-label\">Nombre d\'éléments</label>\n            <div class=\"col-sm-8\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"download()\">Télécharger</a>\n</div>\n");
 $templateCache.put("inscription/states/detail/partials/presences.html","<div>\n    <div class=\"mb-1\">\n\n        <div ng-if=\"!inscription.presences.length\" class=\"well well-empty well-sm\">\n            Il n\'y a aucune présence pour cette session.\n        </div>\n\n        <table ng-if=\"inscription.presences.length\" class=\"table table-hover table-search table-condensed\">\n            <thead>\n            <tr>\n                <th>Date</th>\n                <th>Matin</th>\n                <th>Après-midi</th>\n                <th>Modifier</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr ng-repeat=\"presence in inscription.presences | orderBy:\'dateBegin\':false\" >\n                <!--form sf-xeditable-form=\"form\" sf-href=\'dates.edit({dates: date })\' on-success=\"onSuccess(data)\"-->\n                    <td>{{ presence.dateBegin|date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ presence.morning }}</td>\n                    <td>{{ presence.afternoon }}</td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"editPresence(presence)\" tooltip=\"Modifier\"><span class=\"fa fa-pencil\"></span></a></td>\n                <!--/form-->\n            </tr>\n            </tbody>\n        </table>\n\n    </div>\n\n</div>\n");
 $templateCache.put("trainer/states/detail/partials/emails.html","<div>\n    <h3><span class=\"fa fa-send\"></span> Messages envoyés <span class=\"badge\">{{ search.result.total ? search.result.total : 0 }}</span></h3><hr/>\n\n    <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n        Aucun message n\'a été envoyé à ce formateur.\n    </div>\n\n    <table ng-if=\"search.result.total\" class=\"table table-hover table-responsive table-search.result table-condensed table-nohead\">\n        <!--thead>\n            <tr>\n                <th>Sujet</th>\n                <th>Envoyé par</th>\n                <th>Date</th>\n            </tr>\n        </thead-->\n        <tbody>\n        <tr ng-repeat=\"email in search.result.items\">\n            <td><a title=\"Voir le message\" ng-click=\"dislayEmail(email.id)\" href=\"\">{{ email.subject }}</a></td>\n            <td title=\"Envoyé par {{ email.userFrom.username }}\">{{ email.userFrom.username }}</td>\n            <td title=\"Date d\'envoi\">{{ email.sendAt | date: \'dd/MM/yyyy\' }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n</div>\n");
-$templateCache.put("trainee/states/detail/partials/emails.html","<div>\n    <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n        Aucun message n\'a été envoyé à ce stagiaire.\n    </div>\n\n    <table ng-if=\"search.result.total\" class=\"table table-hover table-responsive table-search.result table-condensed table-nohead\">\n        <!--<thead>-->\n            <!--<tr>-->\n                <!--<th>Sujet</th>-->\n                <!--<th>Session</th>-->\n                <!--<th>Envoyé par</th>-->\n                <!--<th>Date</th>-->\n            <!--</tr>-->\n        <!--</thead>-->\n        <tbody>\n        <tr ng-repeat=\"email in search.result.items\">\n            <td><a title=\"Voir le message\" ng-click=\"dislayEmail(email.id)\" href=\"\">{{ email.subject }}</a></td>\n            <td><a title=\"Voir la session\" href=\"\" ui-sref=\"session.detail.view({ id: email.session.id })\">{{ email.session.training.name }}</a></td>\n            <td title=\"Envoyé par {{ email.userFrom.username }}\">{{ email.userFrom.username }}</td>\n            <td title=\"Date d\'envoi\">{{ email.sendAt | date: \'dd/MM/yyyy\' }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n</div>\n");
 $templateCache.put("training/material/dialogs/material/add-link-material.html","<form sf-href=\"material.add({entity_id: dialog.params.entity_id, type_entity: dialog.params.entityType, material_type: dialog.params.material_type})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\">\n<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Ajouter un lien</h4>\n</div>\n<div class=\"modal-body\">\n    <div ng-repeat=\"key in [\'name\', \'url\']\">\n        <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n            <div class=\"col-sm-9\">\n                <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                <div ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Fermer</a>\n    <input class=\"btn btn-primary\" type=\"submit\" value=\"Ajouter\" />\n</div>\n</form>");
 $templateCache.put("training/material/dialogs/material/manage-materials.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Gérer les supports</h4>\n</div>\n\n<div class=\"modal-body\">\n    <!--add buttons-->\n    <div class=\"row mb-1 fileupload-buttonbar\">\n        <div class=\"col-xs-12\">\n            <div class=\"pull-right\">\n\n                <!--file add button-->\n                <span class=\"btn btn-primary fileinput-button\">\n                    <i class=\"glyphicon glyphicon-plus\"></i>\n                    <span>Ajouter un fichier</span>\n                    <div sf-file-upload data-thref=\"{route: \'material.add\', params: {entity_id: dialog.params.entity.id, type_entity: dialog.params.entityType}}\"\n                         data-add-callback=\"getUploadedFile\"\n                         data-queue=\'entity.materials\'>\n                    </div>\n                </span>\n\n                <!--link material add button-->\n                <span class=\"btn btn-primary\" ng-click=\"addLinkMaterial()\">\n                    <i class=\"glyphicon glyphicon-plus\"></i>\n                    <span>Ajouter un lien</span>\n                </span>\n            </div>\n        </div>\n    </div>\n\n    <!-- The list of files availables for upload/download -->\n    <div ng-if=\'!entity.materials.length\' class=\"row\">\n        <div class=\"col-xs-12\">\n            <div class=\"well well-empty well-sm\">\n                Aucun support n\'est disponible\n            </div>\n        </div>\n    </div>\n\n    <div ng-if=\'entity.materials.length\' ng-repeat=\"file in entity.materials track by $index\" class=\"row mb-1\">\n        <div class=\"col-md-6\">\n            <button type=\"button\" class=\"btn btn-default\">\n                {{file.name}}\n            </button>\n        </div>\n\n        <div class=\"col-md-3\">\n            <!--link material-->\n            <a ng-if=\"file.url\" target=\"_blank\" href=\"{{file.url}}\"><i class=\"fa fa-external-link\"></i></a>\n\n            <!--file material uploading -->\n            <div ng-if=\"file.uploading\" class=\"progress progress-striped active fade\" ng-class=\"{pending: \'in\'}[file.$state()]\" data-file-upload-progress=\"file.$progress()\" style=\"width:96px; height:33px;\">\n                <div class=\"progress-bar progress-bar-success\" ng-style=\"{width: num + \'%\'}\"></div>\n            </div>\n\n            <!--file material on server -->\n            <button ng-if=\"file.filePath\" type=\"button\" class=\"btn btn-success\" ng-click=\"getFile(file)\">\n                <i class=\"fa fa-download\"></i>\n                <span>Voir</span>\n            </button>\n        </div>\n\n        <div class=\"col-md-3\">\n            <!--link material or server file-->\n            <div ng-if=\"file.url || file.filePath\" class=\"col-md-3\">\n                <button type=\"button\" class=\"btn btn-warning cancel\" ng-click=\"removeMaterial(file)\">\n                    <i class=\"glyphicon glyphicon-ban-circle\"></i>\n                    <span>Retirer</span>\n                </button>\n            </div>\n\n            <!--file material uploading -->\n            <div ng-if=\"file.uploading\" class=\"col-md-3\">\n                <button type=\"button\" class=\"btn btn-warning cancel\" ng-click=\"file.$cancel()\"\n                        ng-hide=\"!file.$cancel\">\n                    <i class=\"glyphicon glyphicon-ban-circle\"></i>\n                    <span>Arreter</span>\n                </button>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Fermer</a>\n</div>\n");
 $templateCache.put("training/material/dialogs/material/remove-material.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer un support</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer définitivement le support <strong>{{ dialog.params.material.name }}</strong> ?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
+$templateCache.put("training/training/dialogs/create/internship.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Créer : {{ trainingType.label }}</h4>\n</div>\n<form sf-href=\"training.create({type: dialog.params.type})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <ng-include src=\"\'training/training/dialogs/common/internship.html\'\"></ng-include>\n\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
+$templateCache.put("training/training/dialogs/common/internship.html","<div ng-repeat=\"key in [\'organization\', \'name\', \'theme\', \'category\']\">\n    <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n        <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n        <div class=\"col-sm-9\">\n            <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n            <div ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n        </div>\n    </div>\n</div>\n\n<!-- Year - Semestre -->\n<div class=\"form-group\" ng-if=\"form.children.firstSessionPeriodSemester\" ng-class=\"{\'has-error\': form.children.firstSessionPeriodSemester.errors.length || form.children.firstSessionPeriodYear.errors.length }\">\n    <label class=\"col-sm-3 control-label\" for=\"{{ form.children.firstSessionPeriodSemester.id }}\">{{ form.children.firstSessionPeriodSemester.label }}</label>\n    <div class=\"col-sm-9\">\n        <div class=\"row\">\n            <div class=\"col-sm-7\"><span sf-form-widget=\"form.children.firstSessionPeriodSemester\" class=\"form-control\"/></div>\n            <div class=\"col-sm-5\"><span sf-form-widget=\"form.children.firstSessionPeriodYear\" class=\"form-control\"/></div>\n        </div>\n        <div ng-if=\"error.length\"  ng-repeat=\"error in form.children.firstSessionPeriodSemester.errors\" class=\"help-block\">{{ error }}</div>\n        <div ng-if=\"error.length\"  ng-repeat=\"error in form.children.firstSessionPeriodYear.errors\" class=\"help-block\">{{ error }}</div>\n    </div>\n</div>");
+$templateCache.put("training/training/dialogs/remove/training.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer une formation</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer la formation <strong>{{ dialog.params.training.name }}</strong> ? <br/>\n        Attention cette action supprimera les sessions et inscriptions de cette formation !\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
+$templateCache.put("training/training/states/detail/internship.html","<div ng-if=\"training\" class=\"row\">\n    <div class=\"col-md-8\">\n        <form sf-xeditable-form=\"form\" sf-href=\'training.view({id: training.id})\' on-success=\"onSuccess(data)\">\n\n            <!-- training form -->\n            <ng-include src=\"\'training/training/states/detail/partials/training.form.html\'\"></ng-include>\n\n            <h3>Méthodes pédagogiques</h3><hr>\n            <p><span sf-xeditable=\"form.children.teachingmethods\" data-type=\"textarea\">{{ training.teachingmethods }}</span></p>\n\n            <!-- training : intership -->\n            <h3><span>Stage</span></h3><hr>\n           <div class=\"row\">\n               <div class=\"col-lg-6\">\n                   <ul class=\"summary\">\n                       <li><label>Type de formation</label> <span sf-xeditable=\"form.children.category\">{{ training.category.name }}</span></li>\n                       <li><label>Publics prioritaires</label> <span sf-xeditable=\"form.children.publictypes\" data-type=\"select2\">{{ training.publictypes | joinObjects:\'name\' }}</span></li>\n                       <li><label>Publics cibles</label> <span sf-xeditable=\"form.children.publictypesrestrict\" data-type=\"select2\">{{ training.publictypesrestrict | joinObjects:\'name\' }}</span></li>\n                       <li><label>Etablissement</label> <span sf-xeditable=\"form.children.institution\">{{ training.institution.name }}</span></li>\n                       <li><label>Prérequis</label> <span sf-xeditable=\"form.children.prerequisites\" data-type=\"textarea\">{{ training.prerequisites }}</span></li>\n                   </ul>\n               </div>\n               <div class=\"col-lg-6\">\n                   <ul class=\"summary\">\n                       <li><label>Type d\'intervention</label> <span sf-xeditable=\"form.children.interventiontype\">{{ training.interventiontype }}</span></li>\n                       <li><label>Initiative extérieure</label> <span sf-xeditable=\"form.children.externalinitiative\">{{ training.externalinitiative ? \'Oui\' : \'Non\' }}</span></li>\n                       <li><label>Public désigné</label> <span sf-xeditable=\"form.children.designatedpublic\">{{ training.designatedpublic ? \'Oui\' : \'Non\' }}</span></li>\n                       <li><label>Responsable pédag.</label> <span sf-xeditable=\"form.children.supervisor\" >{{ training.supervisor.name }}</span></li>\n                       <li><label>1<sup>ère</sup> session</label>\n                           <span>\n                               <span sf-xeditable=\"form.children.firstsessionperiodsemester\">{{ training.firstsessionperiodsemester == 1 ? \'1er semestre\' : \'2nd semestre\' }}</span>\n                               <span sf-xeditable=\"form.children.firstsessionperiodyear\" class=\"inline-block\">{{ training.firstsessionperiodyear }}</span>\n                           </span>\n                       </li>\n                   </ul>\n               </div>\n           </div>\n        </form>\n    </div>\n\n    <!--\n    -- SIDEBAR\n    -->\n    <div class=\"col-md-4 sidebar\">\n        <ng-include src=\"\'training/training/states/detail/partials/sessions.block.html\'\"></ng-include>\n        <!--        <div materials-block=\"training\" entity-type=\"training.type\"></div> -->\n        <ng-include src=\"\'training/training/states/detail/partials/comments.block.html\'\"></ng-include>\n    </div>\n</div>\n");
+$templateCache.put("training/training/states/detail/result-old.html","<a ui-sref=\"training.detail.view({id: result.id})\" title=\"{{ result.training.name }}\">\n    <div class=\"list-group-item-title\">{{ result.training.name }}</div>\n    <div class=\"list-group-item-text\">{{ result.training.typeLabel }} n° {{ result.training.number }}{{ result.training.theme ? \' - \' + (result.training.theme.name ? result.training.theme.name : result.training.theme) : \'\' }}</div>\n\n    <!--<p class=\"list-group-item-text\">-->\n        <!--<span><i class=\"fa fa-folder-open\"></i> {{ result.training.theme }}</span><br>-->\n        <!--<span ng-if=\"result.nextSession\"><i class=\"fa fa-calendar\"></i> {{ result.nextSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n        <!--<span ng-if=\"result.lastSession\"><i class=\"fa fa-calendar\"></i> {{ result.lastSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n    <!--</p>-->\n</a>\n");
+$templateCache.put("training/training/states/detail/result.html","<a ui-sref=\"training.detail.view({id: result.id})\" title=\"{{ result.name }}\">\n    <div class=\"list-group-item-title\">{{ result.name }}</div>\n    <div class=\"list-group-item-text\">{{ result.typeLabel }} n° {{ result.number }}{{ result.theme ? \' - \' + (result.theme.name ? result.theme.name : result.theme) : \'\' }}</div>\n\n    <!--<p class=\"list-group-item-text\">-->\n        <!--<span><i class=\"fa fa-folder-open\"></i> {{ result.training.theme }}</span><br>-->\n        <!--<span ng-if=\"result.nextSession\"><i class=\"fa fa-calendar\"></i> {{ result.nextSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n        <!--<span ng-if=\"result.lastSession\"><i class=\"fa fa-calendar\"></i> {{ result.lastSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n    <!--</p>-->\n</a>\n");
+$templateCache.put("training/training/states/detail/training.html","<div ng-if=\"training\" class=\"row\" xmlns=\"http://www.w3.org/1999/html\">\n    <div class=\"col-md-8\">\n        <form sf-xeditable-form=\"form\" sf-href=\'training.view({id: training.id})\' on-success=\"onSuccess(data)\">\n            <span ng-include=\"\'training/training/states/detail/partials/training.form.html\'\"></span>\n        </form>\n    </div>\n    <div class=\"col-md-4 sidebar\">\n        <ng-include src=\"\'training/training/states/detail/partials/sessions.block.html\'\"></ng-include>\n        <div materials-block=\"training\" entity-type=\"training.type\"></div>\n        <ng-include src=\"\'training/training/states/detail/partials/comments.block.html\'\"></ng-include>\n    </div>\n</div>\n");
+$templateCache.put("training/training/dialogs/duplicate/choose-type.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-copy\"></i> Dupliquer une formation</h4>\n</div>\n<form sf-href=\"training.choosetypeduplicate()\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body center-block\">\n        <div ng-repeat=\"key in [\'duplicatedType\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Valider\" />\n    </div>\n</form>\n");
+$templateCache.put("training/training/dialogs/duplicate/internship.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Dupliquer : {{ form.value.typeLabel }}</h4>\n</div>\n<form sf-href=\"training.duplicate({id: training.id, type: type})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <ng-include src=\"\'mycompanybundle/training/training/dialogs/common/internship.html\'\"></ng-include>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
+$templateCache.put("training/training/states/table/table-old.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                <tr>\n                    <th></th>\n                    <!--<th search-table-th field=\"training.organization.name.source\">Centre</th>-->\n                    <th search-table-th field=\"year\">Année</th>\n                    <th search-table-th field=\"semester\">Semestre</th>\n                    <th search-table-th field=\"training.number\">Code</th>\n                    <th search-table-th field=\"training.typeLabel.source\">Type</th>\n                    <th search-table-th field=\"training.name.source\">Intitulé</th>\n                    <th search-table-th field=\"training.category.source\">Catégorie</th>\n                    <th search-table-th field=\"trainers.fullName\">Formateur(s)</th>\n                    <th search-table-th field=\"sessionsCount\">Sessions</th>\n                    <th search-table-th field=\"lastSession.dateBegin\">Dernière</th>\n                    <th search-table-th field=\"nextSession.dateBegin\">Prochaine</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                    <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                    <!--td>{{ item.training.organization.name.replace(\'Centre de\', \'\') }}</td-->\n                    <td>{{ item.year }}</td>\n                    <td>{{ item.semester }}</td>\n                    <td>{{ item.training.number }}</td>\n                    <td>{{ item.training.typeLabel }}</td>\n                    <td><a ui-sref=\"training.detail.view({id: item.id})\">{{ item.training.name ? item.training.name : \'(Sans titre)\' }}</a></td>\n                    <td>{{ item.category.name ? item.category.name : item.category }}</td>\n                    <td>{{ item.trainers | joinObjects:\'fullName\' }}</td>\n                    <td>{{ item.sessionsCount }}</td>\n                    <td><a ui-sref=\"session.detail.view({id: item.lastSession.id, training: item.training.id})\">{{ item.lastSession.dateBegin|date: \'dd/MM/yyyy\' }}</a></td>\n                    <td><a ui-sref=\"session.detail.view({id: item.nextSession.id, training: item.training.id})\">{{ item.nextSession.dateBegin|date: \'dd/MM/yyyy\' }}</a></td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune formation correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
+$templateCache.put("training/training/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                <tr>\n                    <th></th>\n                    <!--<th search-table-th field=\"training.organization.name.source\">Centre</th>-->\n                    <th search-table-th field=\"year\">Année</th>\n                    <th search-table-th field=\"semester\">Semestre</th>\n                    <th search-table-th field=\"training.number\">Code</th>\n                    <th search-table-th field=\"training.typeLabel.source\">Type</th>\n                    <th search-table-th field=\"training.name.source\">Intitulé</th>\n                    <th search-table-th field=\"training.category.source\">Catégorie</th>\n                    <th search-table-th field=\"trainers.fullName\">Formateur(s)</th>\n                    <th search-table-th field=\"sessionsCount\">Sessions</th>\n                    <th search-table-th field=\"lastSession.datebegin\">Dernière</th>\n                    <th search-table-th field=\"nextSession.datebegin\">Prochaine</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                    <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                    <!--td>{{ item.training.organization.name.replace(\'Centre de\', \'\') }}</td-->\n                    <td>{{ item.year }}</td>\n                    <td>{{ item.semester }}</td>\n                    <td>{{ item.number }}</td>\n                    <td>{{ item.typeLabel }}</td>\n                    <td><a ui-sref=\"training.detail.view({id: item.id})\">{{ item.name ? item.name : \'(Sans titre)\' }}</a></td>\n                    <td>{{ item.category.name ? item.category.name : item.category }}</td>\n<!--                    <td>{{ item.trainers | joinObjects:\'fullname\' }}</td> -->\n                    <td></td>\n                    <td>{{ item.sessionscount }}</td>\n                    <td><a ui-sref=\"session.detail.view({id: item.lastSession.id, training: item.training.id})\">{{ item.lastSession.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                    <td><a ui-sref=\"session.detail.view({id: item.nextSession.id, training: item.training.id})\">{{ item.nextSession.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune formation correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
 $templateCache.put("training/session/batch/ProgrammationChange/programmationChange.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"cancel()\">×</button>\n    <h4 class=\"modal-title\" ng-if=\"inscriptionStatus\">Modification du statut d\'inscription</h4>\n    <h4 class=\"modal-title\" ng-if=\"presenceStatus\">Modification du statut de présence</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Nombre de stagiaires </label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"inscriptionStatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ inscriptionstatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"presenceStatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ presenceStatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n                <input type=\"checkbox\" ng-model=\"send.Mail\" id=\"send_mail\"/>\n                <label class=\"control-label\" for=\"send_mail\">Envoyer un email</label>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Modèle </label>\n            <div class=\"col-sm-9\">\n                <select type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"template\" ng-options=\"template.label for template in templates\" ng-model=\"message.template\" placeholder=\"Modèle du mail\">\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group animate-show\" ng-show=\'send.Mail\'>\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Sujet </label>\n            <div class=\"col-sm-9\">\n                <input type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"subject\" ng-model=\"message.subject\" placeholder=\"Sujet du mail\">\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"message\" class=\"col-sm-3 control-label\">Message </label>\n            <div class=\"col-sm-9\">\n                <textarea class=\"form-control\" ng-disabled=\'!send.Mail\' rows=\"10\" id=\"message\" ng-model=\"message.body\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\'>\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n            <button type=\"button\" ng-disabled=\'!send.Mail\' class=\"btn\" ng-click=\"preview()\">Prévisualiser</button>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail && attCheckList.length\'>\n            <div class=\"col-sm-3 control-label\"><b>Pièces jointes</b> </div>\n            <div class=\"col-sm-5\">\n                <div ng-repeat=\"attachmentTemplate in attCheckList\">\n                <input type=\"checkbox\" ng-model=\"attachmentTemplate.selected\" id=\"attachment_{{ attachmentTemplate.id }}\"/>\n                <label class=\"control-label\" for=\"attachment_{{ attachmentTemplate.id }}\">{{ attachmentTemplate.name }}</label><a href=\"\" class=\"pull-right\" ng-click=\"previewAttachment(attachmentTemplate)\"><i class=\"fa fa-download\"></i> Prévisualiser</a>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"alert alert-danger\" ng-show=\"formError != \'\'\">{{ formError }}</div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"cancel()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
 $templateCache.put("training/session/dialogs/crud/create-old.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Créer une session</h4>\n</div>\n\n<form sf-href=\"session.create({training: dialog.params.training.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n\n        <div ng-repeat=\"key in [\'name\', \'module\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n\n        <div ng-show=\"form.children[\'module\'] && !form.children[\'module\'].value\" class=\"form-group\">\n            <label class=\"col-sm-3 control-label\" for=\"form.children[\'newModule\'].children.name.id\">Nouveau module</label>\n            <div class=\"col-sm-9\">\n                <div class=\"row\">\n                    <span ng-class=\"{\'has-error\': form.children[\'newModule\'].children.name.errors.length }\" class=\"col-sm-10\">\n                        <input type=\"text\" class=\"form-control\" ng-model=\"form.children[\'newModule\'].children.name.value\" />\n                    </span>\n                    <span class=\"col-sm-2\">\n                        <span title=\"{{ form.children[\'newModule\'].children.mandatory.label }}\" sf-form-widget=\"form.children[\'newModule\'].children.mandatory\" class=\"form-control\"/>\n                    </span>\n                </div>\n                <span ng-class=\"{\'has-error\': form.children[\'newModule\'].children.name.errors.length + form.children[\'newModule\'].children.mandatory.errors }\">\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children[\'newModule\'].children.name.errors\" class=\"help-block\">{{ error }}</div>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children[\'newModule\'].children.mandatory.errors\" class=\"help-block\">{{ error }}</div>\n                </span>\n            </div>\n        </div>\n\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\" for=\"form.children.dateBegin.id\">Date(s)</label>\n            <div class=\"col-sm-9\">\n                <div class=\"controls form-inline input-daterange\" bs-datepicker bs-datepicker-view-date=\"{{ $moment().format(\'YYYY-MM-DD\') }}\">\n                    <span ng-class=\"{\'has-error\': form.children.dateBegin.errors.length }\">\n                        <input type=\"text\" class=\"form-control input-datepicker\" ng-model=\"form.children.dateBegin.value\" />\n                    </span>\n                    <label>au</label>\n                    <span ng-class=\"{\'has-error\': form.children.dateEnd.errors.length }\">\n                        <input type=\"text\" class=\"form-control input-datepicker\" ng-model=\"form.children.dateEnd.value\" />\n                    </span>\n                </div>\n                <span ng-class=\"{\'has-error\': form.children.dateBegin.errors.length+form.children.dateEnd.errors }\">\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children.dateBegin.errors\" class=\"help-block\">{{ error }}</div>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children.dateEnd.errors\" class=\"help-block\">{{ error }}</div>\n                </span>\n            </div>\n        </div>\n\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.maximumNumberOfRegistrations.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.maximumNumberOfRegistrations.id }}\">{{ form.children.maximumNumberOfRegistrations.label }}</label>\n            <div class=\"col-sm-3\">\n                <span sf-form-widget=\"form.children.maximumNumberOfRegistrations\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.maximumNumberOfRegistrations.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n\n        <!-- inscription status -->\n        <!--div class=\"form-group\" ng-init=\"childReg = form.children.registration\" ng-class=\"{\'has-error\': childReg.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childReg.id }}\">{{childReg.label }}</label>\n            <div class=\"col-sm-3\">\n                <span sf-form-widget=\"childReg\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in childReg.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div-->\n\n        <div class=\"form-group\" ng-init=\"childDislayOnline = form.children.displayOnline\" ng-class=\"{\'has-error\': childDislayOnline.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childDislayOnline.id }}\">{{ childDislayOnline.label }}</label>\n            <div class=\"col-sm-9\">\n                <label ng-repeat=\"(key,choice) in childDislayOnline.choices\">\n                    <input type=\"radio\" name=\"{{ childDislayOnline.name }}\" value=\"{{ choice.v }}\" ng-model=\"form.children.displayOnline.value\"> {{ choice.l }}&nbsp;&nbsp;&nbsp;\n                </label>\n                <div ng-if=\"error.length\" ng-repeat=\"error in dateBegin.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n\n\n        <div class=\"form-group\" ng-init=\"childReg = form.children.registration\" ng-class=\"{\'has-error\': childReg.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childReg.id }}\">{{ childReg.label }}</label>\n            <div class=\"col-sm-9\">\n                <div ng-repeat=\"(key,choice) in childReg.choices\">\n                    <label>\n                        <input type=\"radio\" name=\"{{ childReg.name }}\" value=\"{{ choice.v }}\" ng-model=\"form.children.registration.value\"> {{ choice.l }}\n                        <div class=\"help-block\" ng-if=\"choice.v == \'0\'\">Les inscriptions ne sont pas gérées.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'1\'\">Les inscriptions sont gérées mais fermées au public.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'2\'\">Les inscriptions sont gérées et accessibles à un public restreint.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'3\'\">Les inscriptions sont gérées et accessibles publiquement.</div>\n                    </label>\n                </div>\n                <div ng-if=\"error.length\" ng-repeat=\"error in childReg.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n\n        <div ng-repeat=\"key in [\'dayNumber\', \'hourNumber\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n\n\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
 $templateCache.put("training/session/dialogs/crud/create.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Créer une session</h4>\n</div>\n<form sf-href=\"session.create({training: dialog.params.training.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div ng-repeat=\"key in [\'name\', \'module\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n\n\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\" for=\"form.children.datebegin.id\">Date(s)</label>\n            <div class=\"col-sm-9\">\n                <div class=\"controls form-inline input-daterange\" bs-datepicker bs-datepicker-view-date=\"{{ $moment().format(\'YYYY-MM-DD\') }}\">\n                    <span ng-class=\"{\'has-error\': form.children.datebegin.errors.length }\">\n                        <input type=\"text\" class=\"form-control input-datepicker\" ng-model=\"form.children.datebegin.value\" />\n                    </span>\n                    <label>au</label>\n                    <span ng-class=\"{\'has-error\': form.children.dateend.errors.length }\">\n                        <input type=\"text\" class=\"form-control input-datepicker\" ng-model=\"form.children.dateend.value\" />\n                    </span>\n                </div>\n                <span ng-class=\"{\'has-error\': form.children.datebegin.errors.length+form.children.dateend.errors }\">\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children.datebegin.errors\" class=\"help-block\">{{ error }}</div>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children.dateend.errors\" class=\"help-block\">{{ error }}</div>\n                </span>\n            </div>\n        </div>\n\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.maximumnumberofregistrations.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.maximumnumberofregistrations.id }}\">{{ form.children.maximumnumberofregistrations.label }}</label>\n            <div class=\"col-sm-3\">\n                <span sf-form-widget=\"form.children.maximumnumberofregistrations\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.maximumnumberofregistrations.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n\n        <!-- inscription status -->\n        <!--div class=\"form-group\" ng-init=\"childReg = form.children.registration\" ng-class=\"{\'has-error\': childReg.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childReg.id }}\">{{childReg.label }}</label>\n            <div class=\"col-sm-3\">\n                <span sf-form-widget=\"childReg\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in childReg.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div-->\n\n<!--        <div class=\"form-group\" ng-init=\"childDislayOnline = form.children.displayonline\" ng-class=\"{\'has-error\': childDislayOnline.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childDislayOnline.id }}\">{{ childDislayOnline.label }}</label>\n            <div class=\"col-sm-9\">\n                <label ng-repeat=\"(key,choice) in childDislayOnline.choices\">\n                    <input type=\"radio\" name=\"{{ childDislayOnline.name }}\" value=\"{{ choice.l }}\" ng-model=\"form.children.displayOnline.value\"> {{ choice.v }}\n                </label>\n                <div ng-if=\"error.length\" ng-repeat=\"error in dateBegin.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n-->\n<!--\n        <div class=\"form-group\" ng-init=\"childReg = form.children.registration\" ng-class=\"{\'has-error\': childReg.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ childReg.id }}\">{{ childReg.label }}</label>\n            <div class=\"col-sm-9\">\n                <div ng-repeat=\"(key,choice) in childReg.choices\">\n                    <label>\n                        <input type=\"radio\" name=\"{{ childReg.name }}\" value=\"{{ choice.v }}\" ng-model=\"form.children.registration.value\"> {{ choice.l }}\n                        <div class=\"help-block\" ng-if=\"choice.v == \'0\'\">Les inscriptions ne sont pas gérées.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'1\'\">Les inscriptions sont gérées mais fermées au public.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'2\'\">Les inscriptions sont gérées et accessibles à un public restreint.</div>\n                        <div class=\"help-block\" ng-if=\"choice.v == \'3\'\">Les inscriptions sont gérées et accessibles publiquement.</div>\n                    </label>\n                </div>\n                <div ng-if=\"error.length\" ng-repeat=\"error in childReg.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n-->\n        <div ng-repeat=\"key in [\'daynumber\', \'hournumber\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>");
@@ -80942,40 +80955,30 @@ $templateCache.put("training/session/dialogs/dates/remove.html","<div class=\"mo
 $templateCache.put("training/session/dialogs/trainer/participation-edit.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\">\n        <i class=\"fa fa-user\"></i> {{ participation.trainer.fullName }}\n        <a ui-sref=\"trainer.detail.view({session: participation.session.id, id: participation.trainer.id})\" ng-click=\"dialog.dismiss()\">\n            <i class=\"fa fa-external-link\"></i>\n        </a>\n    </h4>\n</div>\n\n<form sf-href=\"participation.edit({id: dialog.params.participation.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div ng-repeat=\"key in [\'fields\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n        <div ng-if=\"error.length\" ng-repeat=\"error in form.children.session.errors\" class=\"help-block\">{{ error }}</div>\n        <div ng-if=\"error.length\" ng-repeat=\"error in form.children.trainer.errors\" class=\"help-block\">{{ error }}</div>\n        <div ng-if=\"error.length\" ng-repeat=\"error in form.trainer.errors\" class=\"help-block\">{{ error }}</div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
 $templateCache.put("training/session/dialogs/trainer/trainer-add.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-user\"></i> Associer un formateur à une session</h4>\n</div>\n\n<form sf-href=\"participation.add({session: dialog.params.session.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.trainer.errors.length || form.trainer.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.trainer.id }}\">{{ form.children.trainer.label }}</label>\n            <div class=\"col-sm-9\">\n                <input placeholder=\"Cliquez pour rechercher un formateur...\" type=\"text\" typeahead-template-url=\"trainer/dialogs/typeahead-trainer.html\" typeahead-wait-ms=\"200\" typeahead=\"choice as choice.label for choice in getTrainerList($viewValue)\" typeahead-editable=\"false\" typeahead-on-select=\"setTrainer($item)\" class=\"form-control\" ng-model=\"$parent.selectedTrainer\" />\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.session.errors\" class=\"help-block\">{{ error }}</div>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.trainer.errors\" class=\"help-block\">{{ error }}</div>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.trainer.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n        <div ng-repeat=\"key in [\'fields\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Ajouter\" />\n    </div>\n</form>\n");
 $templateCache.put("training/session/dialogs/trainer/trainer-remove.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\"><i class=\"fa fa-warning\"></i> Retirer un formateur d\'une session</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir retirer le formateur <strong>{{ dialog.params.trainer.fullname }}</strong> de la session du <strong>{{ dialog.params.session.datebegin | date: \'dd/MM/yyyy\' }}</strong> de l\'événement <strong>{{ dialog.params.session.training.name }}</strong> ?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
-$templateCache.put("training/session/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"datebegin\" class=\"visible\">Date</th>\n                        <th search-table-th field=\"training.name.source\">Formation</th>\n                        <th search-table-th field=\"registration\" class=\"visible\">Inscriptions</th>\n                        <th search-table-th field=\"status\">Statut</th>\n                        <th search-table-th field=\"numberofregistrations\">Inscrits</th>\n                        <th>Statistiques</th>\n                        <th search-table-th field=\"numberofparticipants\">Présents</th>\n                        <th search-table-th field=\"displayonline\">En ligne</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td><a href=\"\" ui-sref=\"session.detail.view({id: item.id})\">{{ item.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                        <td><a href=\"\" ui-sref=\"training.detail.view({id: item.training.id + \'_\' + item.year + \'_\' + item.semester})\">{{ item.training.name }}</a></td>\n                        <td>\n                            <span registration-label=\"item\" large></span>\n                        </td>\n                        <td>{{ $trainingBundle.statusStates[item.status] }}</td>\n                        <td>{{ item.numberOfRegistrations }}</td>\n                        <td>\n                            <a registration-stats-label=\"item\" class=\"label-lg\"></a>\n                        </td>\n                        <td>{{ item.numberOfParticipants }}</td>\n                        <td><span class=\"label label-lg\" ng-class=\"item.displayonline ? \'label-success\' : \'label-default\'\">{{ item.displayonline ? \"Oui\" : \"Non\" }}</span></td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune session correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
 $templateCache.put("training/session/states/detail/result.html","<a ui-sref=\"session.detail.view({id: result.id})\" title=\"{{ result.training.name }}\">\n    <div class=\"list-group-item-title\">{{ result.training.name }}</div>\n    <div class=\"list-group-item-text\">\n        {{ result.datebegin | date: \'dd/MM/yyyy\' }}\n    </div>\n</a>\n");
 $templateCache.put("training/session/states/detail/session.html","<form sf-xeditable-form=\"form\" sf-href=\'session.view({id: session.id})\' on-success=\"onSuccess(data)\">\n    <div class=\"row session\">\n\n        <!--\n         Infos\n        -->\n        <div class=\"col-md-8\">\n            <div class=\"btn-group pull-right\">\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [session.id], service: \'session\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Voir l\'événement\" ng-if=\"session.training._accessRights.view\" ui-sref=\"training.detail.view({id: session.training.id})\"><span class=\"fa fa-calendar\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" ng-if=\"!session.promote\" tooltip=\"Promouvoir la session\" ng-if=\"session._accessRights.edit\" ng-click=\"promote(1)\"><span class=\"fa fa-star-o\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" ng-if=\"session.promote\" tooltip=\"Dépromouvoir la session\" ng-if=\"session._accessRights.edit\" ng-click=\"promote(0)\"><span class=\"fa fa-star fa-highlight\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Dupliquer\" ng-click=\"duplicate()\"><span class=\"fa fa-copy\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n            </div>\n\n            <div class=\"pre-title\">{{ session.training.typeLabel }} n°{{ session.training.id }} -  {{ session.training.name }}</div>\n            <h2>Session <span sf-xeditable=\"form.children.name\" data-type=\"text\">{{ session.name }}</span> du {{ session.datebegin|date: \'dd MMMM y\' }} <span ng-if=\"session.dateend\"> au {{ session.dateend|date: \'dd MMMM y\' }}</span></h2>\n\n            <div class=\"infos\" ng-if=\"form.children.module\">\n                <div><label>Module :</label> <span sf-xeditable=\"form.children.module\" data-type=\"select\">{{ session.module.name }}</span></div>\n                <div><label>Type :</label> <span sf-xeditable=\"form.children.type\" data-type=\"select\">{{ session.type.name }}</span></div>\n            </div>\n\n            <h3>Informations</h3>\n            <hr>\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-6\">\n                    <ul class=\"summary\">\n                        <li><label>Inscriptions</label> <span sf-xeditable=\"form.children.registration\">{{ $trainingBundle.registrationStates[session.registration] }}</span></li>\n                        <li><label>Afficher en ligne</label> <span sf-xeditable=\"form.children.displayonline\">{{ session.displayonline ? \'Oui\' : \'Non\' }}</span></li>\n                        <li><label>Statut</label> <span sf-xeditable=\"form.children.status\">{{ $trainingBundle.statusStates[session.status] }}</span></li>\n                        <li><label>Date</label> <span>{{ session.datebegin|date: \'dd/MM/yyyy\' }}</span></li>\n                        <li><label>Date de fin</label> <span>{{ session.dateend|date: \'dd/MM/yyyy\' }}</span></li>\n                        <li><label>Programmation</label> <span sf-xeditable=\"form.children.sessiontype\">{{ session.sessiontype.name }}</span></li>\n                        <li ng-if=\"session.sessiontype.name == \'A venir\'\"><a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"sendAlerts()\"><span class=\"fa fa-envelope\"></span> Envoyer les alertes d\'ouverture de session</a></li>\n                    </ul>\n                </div>\n                <div class=\"col-lg-6\">\n                    <ul class=\"summary\">\n                        <li ng-if=\"!session.registration\"><label>Nombre d\'inscriptions</label> <span sf-xeditable=\"form.children.numberofregistrations\">{{ session.numberofregistrations }}</span></li>\n                        <li><label>Participants max</label> <span sf-xeditable=\"form.children.maximumnumberofregistrations\">{{ session.maximumnumberofregistrations }}</span></li>\n                        <li><label>Date limite</label> <span sf-xeditable=\"form.children.limitregistrationdate\">{{ session.limitregistrationdate|date: \'dd/MM/yyyy\' }}</span></li>\n                        <li><label>Tarif</label> <span sf-xeditable=\"form.children.price\">{{ session.price ? session.price : \'0\' }} €</span></li>\n                        <li><label>Nombre d\'heures</label> <span>{{ session.hournumber }}</span></li>\n                        <li><label>Nombre de jours</label> <span>{{ session.daynumber }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <h3>Dates</h3>\n            <hr>\n            <!--\n             Dates\n            -->\n            <!--div dates-block=\"session\"></div-->\n            <div ng-include src=\"\'training/session/states/detail/partials/dates.html\'\" ng-controller=\"DatesViewController\"></div>\n\n            <ul class=\"nav nav-tabs\">\n                <li ng-click=\"tab = \'inscriptions\'\" class=\"active\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-graduation-cap\"></span> {{ session.registration > 0 ? \'Inscriptions (\' + session.inscriptions.length + \')\' : \'Participants (\' + getTotal() + \')\' }}</a></li>\n                <li ng-click=\"tab = \'alerts\'\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-bell\"></span> Inscrits aux alertes ({{ session.alerts.length ? session.alerts.length : 0 }})</a></li>\n                <li ng-click=\"tab = \'messages\'\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-send\"></span> Messages ({{ session.messages.length ? session.messages.length : 0 }})</a></li>\n                <li ng-click=\"tab = \'evals\'\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-smile-o\"></span> Evaluations </a></li>\n            </ul>\n\n            <!--\n             Inscriptions\n            -->\n            <div ng-show=\"!tab || tab === \'inscriptions\'\">\n                <div class=\"row\">\n                    <div class=\"col-lg-12\">\n                        <!-- opened inscriptions -->\n                        <div ng-if=\"session.registration > 0\" ng-include src=\"\'training/session/states/detail/partials/inscriptions.html\'\" ng-controller=\"SessionInscriptionsController\"></div>\n                        <!-- closed inscriptions -->\n                        <div ng-if=\"session.registration == 0\" ng-include src=\"\'training/session/states/detail/partials/participants-summary.html\'\" ng-controller=\"SessionParticipantsSummaryController\"></div>\n                    </div>\n                </div>\n            </div>\n\n            <!--\n             Emails\n            -->\n            <div ng-show=\"tab === \'messages\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div entity-emails session=\"session.id\"></div>\n                    </div>\n                </div>\n            </div>\n\n            <!--\n             Evaluations\n            -->\n            <div ng-show=\"tab === \'evals\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div ng-include src=\"\'training/session/states/detail/partials/evals.html\'\" ng-controller=\"EvalComputeController\"></div>\n                    </div>\n                </div>\n            </div>\n\n            <!--\n             Alertes\n            -->\n            <div ng-show=\"tab === \'alerts\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div>\n                            <div ng-if=\"!session.alerts.length\" class=\"well well-empty well-sm\">\n                                Il n\'y a aucune inscription à l\'alerte d\'ouverture de cette session.\n                            </div>\n\n                            <table ng-if=\"session.alerts.length\" class=\"table table-hover table-search table-condensed\">\n                                <tbody>\n                                <tr ng-repeat=\"alert in session.alerts | filter:filter | orderBy:\'createdAt\':true\">\n                                    <td> {{ alert.createdAt | date: \'dd/MM/yyyy\' }} </td>\n                                    <td> <a title=\"Voir le profil du stagiaire\" href=\"\" ui-sref=\"trainee.detail.view({ id: alert.trainee.id })\">{{ alert.trainee.fullName }}</a> </td>\n                                </tr>\n                                </tbody>\n                            </table>\n\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n        </div>\n\n\n        <!--\n         Sidebar\n        -->\n        <div class=\"col-md-4 sidebar\">\n\n            <!--\n             Url\n            -->\n            <div class=\"block\">\n                <div class=\"block-body\">\n                    <div input-copy-clipboard=\"session.frontUrl\"></div>\n                </div>\n            </div>\n\n            <!--\n             Trainers\n            -->\n            <div trainers-block=\"session\"></div>\n\n            <!--\n             MATERIALS\n            -->\n            <div materials-block=\"session\" entity-type=\"\'session\'\"></div>\n\n            <!--\n             Coûts\n             -->\n            <div class=\"block block-costs\">\n                <div class=\"block-title\">\n                    <span class=\"pull-right\">{{ session.totalCost | currency }}</span>\n                    <span class=\"fa fa-euro\"></span> Coûts\n                </div>\n                <div class=\"block-body\">\n                    <ul class=\"list-unstyled text-small text-gray-light\">\n                        <li><label>Coûts pédagogiques</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.teachingcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.teachingcost | currency }}</span></li>\n                        <li><label>Coûts en vacation</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.vacationcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.vacationcost | currency }}</span></li>\n                        <li><label>Frais de mission : hébergement</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.accommodationcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.accommodationcost | currency }}</span></li>\n                        <li><label>Frais de mission : repas</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.mealcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.mealcost | currency }}</span></li>\n                        <li><label>Frais de mission : transports</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.transportcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.transportcost | currency }}</span></li>\n                        <li><label>Frais de supports</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.materialcost\" data-mode=\"popup\" data-placement=\"left\">{{ session.materialcost | currency }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <!--\n             Recettes\n             -->\n            <div class=\"block block-costs\">\n                <div class=\"block-title\">\n                    <span class=\"pull-right\">{{ session.totalTaking | currency }}</span>\n                    <span class=\"fa fa-euro\"></span> Recettes\n                </div>\n                <div class=\"block-body\">\n                    <ul class=\"list-unstyled text-small text-gray-light\">\n                        <li><label>Recettes</label> <span class=\"pull-right inline-block\" sf-xeditable=\"form.children.taking\" data-mode=\"popup\" data-placement=\"left\">{{ session.taking | currency }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <!--\n             Comments\n            -->\n            <div class=\"block block-comments\">\n                <div class=\"block-title\">\n                    <span class=\"fa fa-comment-o\"></span> Commentaires\n                </div>\n                <div class=\"block-body\">\n                    <span sf-xeditable=\"form.children.comments\" data-type=\"textarea\">{{ session.comments }}</span>\n                </div>\n            </div>\n        </div>\n    </div>\n\n</form>\n");
-$templateCache.put("training/training/dialogs/common/internship.html","<div ng-repeat=\"key in [\'organization\', \'name\', \'theme\', \'category\']\">\n    <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n        <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n        <div class=\"col-sm-9\">\n            <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n            <div ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n        </div>\n    </div>\n</div>\n\n<!-- Year - Semestre -->\n<div class=\"form-group\" ng-if=\"form.children.firstSessionPeriodSemester\" ng-class=\"{\'has-error\': form.children.firstSessionPeriodSemester.errors.length || form.children.firstSessionPeriodYear.errors.length }\">\n    <label class=\"col-sm-3 control-label\" for=\"{{ form.children.firstSessionPeriodSemester.id }}\">{{ form.children.firstSessionPeriodSemester.label }}</label>\n    <div class=\"col-sm-9\">\n        <div class=\"row\">\n            <div class=\"col-sm-7\"><span sf-form-widget=\"form.children.firstSessionPeriodSemester\" class=\"form-control\"/></div>\n            <div class=\"col-sm-5\"><span sf-form-widget=\"form.children.firstSessionPeriodYear\" class=\"form-control\"/></div>\n        </div>\n        <div ng-if=\"error.length\"  ng-repeat=\"error in form.children.firstSessionPeriodSemester.errors\" class=\"help-block\">{{ error }}</div>\n        <div ng-if=\"error.length\"  ng-repeat=\"error in form.children.firstSessionPeriodYear.errors\" class=\"help-block\">{{ error }}</div>\n    </div>\n</div>");
-$templateCache.put("training/training/dialogs/create/internship.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Créer : {{ trainingType.label }}</h4>\n</div>\n<form sf-href=\"training.create({type: dialog.params.type})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <ng-include src=\"\'training/training/dialogs/common/internship.html\'\"></ng-include>\n\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
-$templateCache.put("training/training/dialogs/duplicate/choose-type.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-copy\"></i> Dupliquer une formation</h4>\n</div>\n<form sf-href=\"training.choosetypeduplicate()\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body center-block\">\n        <div ng-repeat=\"key in [\'duplicatedType\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Valider\" />\n    </div>\n</form>\n");
-$templateCache.put("training/training/dialogs/duplicate/internship.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\" id=\"myModalLabel\">Dupliquer : {{ form.value.typeLabel }}</h4>\n</div>\n<form sf-href=\"training.duplicate({id: training.id, type: type})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <ng-include src=\"\'mycompanybundle/training/training/dialogs/common/internship.html\'\"></ng-include>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
-$templateCache.put("training/training/states/detail/internship.html","<div ng-if=\"training\" class=\"row\">\n    <div class=\"col-md-8\">\n        <form sf-xeditable-form=\"form\" sf-href=\'training.view({id: training.id})\' on-success=\"onSuccess(data)\">\n\n            <!-- training form -->\n            <ng-include src=\"\'training/training/states/detail/partials/training.form.html\'\"></ng-include>\n\n            <h3>Méthodes pédagogiques</h3><hr>\n            <p><span sf-xeditable=\"form.children.teachingmethods\" data-type=\"textarea\">{{ training.teachingmethods }}</span></p>\n\n            <!-- training : intership -->\n            <h3><span>Stage</span></h3><hr>\n           <div class=\"row\">\n               <div class=\"col-lg-6\">\n                   <ul class=\"summary\">\n                       <li><label>Type de formation</label> <span sf-xeditable=\"form.children.category\">{{ training.category.name }}</span></li>\n                       <li><label>Publics prioritaires</label> <span sf-xeditable=\"form.children.publictypes\" data-type=\"select2\">{{ training.publictypes | joinObjects:\'name\' }}</span></li>\n                       <li><label>Publics cibles</label> <span sf-xeditable=\"form.children.publictypesrestrict\" data-type=\"select2\">{{ training.publictypesrestrict | joinObjects:\'name\' }}</span></li>\n                       <li><label>Etablissement</label> <span sf-xeditable=\"form.children.institution\">{{ training.institution.name }}</span></li>\n                       <li><label>Prérequis</label> <span sf-xeditable=\"form.children.prerequisites\" data-type=\"textarea\">{{ training.prerequisites }}</span></li>\n                   </ul>\n               </div>\n               <div class=\"col-lg-6\">\n                   <ul class=\"summary\">\n                       <li><label>Type d\'intervention</label> <span sf-xeditable=\"form.children.interventiontype\">{{ training.interventiontype }}</span></li>\n                       <li><label>Initiative extérieure</label> <span sf-xeditable=\"form.children.externalinitiative\">{{ training.externalinitiative ? \'Oui\' : \'Non\' }}</span></li>\n                       <li><label>Public désigné</label> <span sf-xeditable=\"form.children.designatedpublic\">{{ training.designatedpublic ? \'Oui\' : \'Non\' }}</span></li>\n                       <li><label>Responsable pédag.</label> <span sf-xeditable=\"form.children.supervisor\" >{{ training.supervisor.name }}</span></li>\n                       <li><label>1<sup>ère</sup> session</label>\n                           <span>\n                               <span sf-xeditable=\"form.children.firstsessionperiodsemester\">{{ training.firstsessionperiodsemester == 1 ? \'1er semestre\' : \'2nd semestre\' }}</span>\n                               <span sf-xeditable=\"form.children.firstsessionperiodyear\" class=\"inline-block\">{{ training.firstsessionperiodyear }}</span>\n                           </span>\n                       </li>\n                   </ul>\n               </div>\n           </div>\n        </form>\n    </div>\n\n    <!--\n    -- SIDEBAR\n    -->\n    <div class=\"col-md-4 sidebar\">\n        <ng-include src=\"\'training/training/states/detail/partials/sessions.block.html\'\"></ng-include>\n        <!--        <div materials-block=\"training\" entity-type=\"training.type\"></div> -->\n        <ng-include src=\"\'training/training/states/detail/partials/comments.block.html\'\"></ng-include>\n    </div>\n</div>\n");
-$templateCache.put("training/training/states/detail/result-old.html","<a ui-sref=\"training.detail.view({id: result.id})\" title=\"{{ result.training.name }}\">\n    <div class=\"list-group-item-title\">{{ result.training.name }}</div>\n    <div class=\"list-group-item-text\">{{ result.training.typeLabel }} n° {{ result.training.number }}{{ result.training.theme ? \' - \' + (result.training.theme.name ? result.training.theme.name : result.training.theme) : \'\' }}</div>\n\n    <!--<p class=\"list-group-item-text\">-->\n        <!--<span><i class=\"fa fa-folder-open\"></i> {{ result.training.theme }}</span><br>-->\n        <!--<span ng-if=\"result.nextSession\"><i class=\"fa fa-calendar\"></i> {{ result.nextSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n        <!--<span ng-if=\"result.lastSession\"><i class=\"fa fa-calendar\"></i> {{ result.lastSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n    <!--</p>-->\n</a>\n");
-$templateCache.put("training/training/states/detail/result.html","<a ui-sref=\"training.detail.view({id: result.id})\" title=\"{{ result.name }}\">\n    <div class=\"list-group-item-title\">{{ result.name }}</div>\n    <div class=\"list-group-item-text\">{{ result.typeLabel }} n° {{ result.number }}{{ result.theme ? \' - \' + (result.theme.name ? result.theme.name : result.theme) : \'\' }}</div>\n\n    <!--<p class=\"list-group-item-text\">-->\n        <!--<span><i class=\"fa fa-folder-open\"></i> {{ result.training.theme }}</span><br>-->\n        <!--<span ng-if=\"result.nextSession\"><i class=\"fa fa-calendar\"></i> {{ result.nextSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n        <!--<span ng-if=\"result.lastSession\"><i class=\"fa fa-calendar\"></i> {{ result.lastSession.dateBegin | date: \'dd/MM/yyyy\' }}</span>-->\n    <!--</p>-->\n</a>\n");
-$templateCache.put("training/training/states/detail/training.html","<div ng-if=\"training\" class=\"row\" xmlns=\"http://www.w3.org/1999/html\">\n    <div class=\"col-md-8\">\n        <form sf-xeditable-form=\"form\" sf-href=\'training.view({id: training.id})\' on-success=\"onSuccess(data)\">\n            <span ng-include=\"\'training/training/states/detail/partials/training.form.html\'\"></span>\n        </form>\n    </div>\n    <div class=\"col-md-4 sidebar\">\n        <ng-include src=\"\'training/training/states/detail/partials/sessions.block.html\'\"></ng-include>\n        <div materials-block=\"training\" entity-type=\"training.type\"></div>\n        <ng-include src=\"\'training/training/states/detail/partials/comments.block.html\'\"></ng-include>\n    </div>\n</div>\n");
-$templateCache.put("training/training/dialogs/remove/training.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer une formation</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer la formation <strong>{{ dialog.params.training.name }}</strong> ? <br/>\n        Attention cette action supprimera les sessions et inscriptions de cette formation !\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
-$templateCache.put("training/training/states/table/table-old.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                <tr>\n                    <th></th>\n                    <!--<th search-table-th field=\"training.organization.name.source\">Centre</th>-->\n                    <th search-table-th field=\"year\">Année</th>\n                    <th search-table-th field=\"semester\">Semestre</th>\n                    <th search-table-th field=\"training.number\">Code</th>\n                    <th search-table-th field=\"training.typeLabel.source\">Type</th>\n                    <th search-table-th field=\"training.name.source\">Intitulé</th>\n                    <th search-table-th field=\"training.category.source\">Catégorie</th>\n                    <th search-table-th field=\"trainers.fullName\">Formateur(s)</th>\n                    <th search-table-th field=\"sessionsCount\">Sessions</th>\n                    <th search-table-th field=\"lastSession.dateBegin\">Dernière</th>\n                    <th search-table-th field=\"nextSession.dateBegin\">Prochaine</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                    <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                    <!--td>{{ item.training.organization.name.replace(\'Centre de\', \'\') }}</td-->\n                    <td>{{ item.year }}</td>\n                    <td>{{ item.semester }}</td>\n                    <td>{{ item.training.number }}</td>\n                    <td>{{ item.training.typeLabel }}</td>\n                    <td><a ui-sref=\"training.detail.view({id: item.id})\">{{ item.training.name ? item.training.name : \'(Sans titre)\' }}</a></td>\n                    <td>{{ item.category.name ? item.category.name : item.category }}</td>\n                    <td>{{ item.trainers | joinObjects:\'fullName\' }}</td>\n                    <td>{{ item.sessionsCount }}</td>\n                    <td><a ui-sref=\"session.detail.view({id: item.lastSession.id, training: item.training.id})\">{{ item.lastSession.dateBegin|date: \'dd/MM/yyyy\' }}</a></td>\n                    <td><a ui-sref=\"session.detail.view({id: item.nextSession.id, training: item.training.id})\">{{ item.nextSession.dateBegin|date: \'dd/MM/yyyy\' }}</a></td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune formation correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
-$templateCache.put("training/training/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                <tr>\n                    <th></th>\n                    <!--<th search-table-th field=\"training.organization.name.source\">Centre</th>-->\n                    <th search-table-th field=\"year\">Année</th>\n                    <th search-table-th field=\"semester\">Semestre</th>\n                    <th search-table-th field=\"training.number\">Code</th>\n                    <th search-table-th field=\"training.typeLabel.source\">Type</th>\n                    <th search-table-th field=\"training.name.source\">Intitulé</th>\n                    <th search-table-th field=\"training.category.source\">Catégorie</th>\n                    <th search-table-th field=\"trainers.fullName\">Formateur(s)</th>\n                    <th search-table-th field=\"sessionsCount\">Sessions</th>\n                    <th search-table-th field=\"lastSession.datebegin\">Dernière</th>\n                    <th search-table-th field=\"nextSession.datebegin\">Prochaine</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                    <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                    <!--td>{{ item.training.organization.name.replace(\'Centre de\', \'\') }}</td-->\n                    <td>{{ item.year }}</td>\n                    <td>{{ item.semester }}</td>\n                    <td>{{ item.number }}</td>\n                    <td>{{ item.typeLabel }}</td>\n                    <td><a ui-sref=\"training.detail.view({id: item.id})\">{{ item.name ? item.name : \'(Sans titre)\' }}</a></td>\n                    <td>{{ item.category.name ? item.category.name : item.category }}</td>\n<!--                    <td>{{ item.trainers | joinObjects:\'fullname\' }}</td> -->\n                    <td></td>\n                    <td>{{ item.sessionscount }}</td>\n                    <td><a ui-sref=\"session.detail.view({id: item.lastSession.id, training: item.training.id})\">{{ item.lastSession.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                    <td><a ui-sref=\"session.detail.view({id: item.nextSession.id, training: item.training.id})\">{{ item.nextSession.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune formation correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
-$templateCache.put("training/session/states/detail/partials/dates.html","<div>\n    <div class=\"mb-1\">\n        <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addDates()\"><span class=\"fa fa-plus\"></span> Ajouter une date</a>\n        <br><br>\n\n        <div ng-if=\"!session.dates.length\" class=\"well well-empty well-sm\">\n            Il n\'y a aucune date pour cette session.\n        </div>\n\n        <table ng-if=\"session.dates.length\" class=\"table table-hover table-search table-condensed\">\n            <thead>\n            <tr>\n                <th>Date début</th>\n                <th>Date fin</th>\n                <th>Horaires matin</th>\n                <th>Nombres d\'heures matin</th>\n                <th>Horaires après-midi</th>\n                <th>Nombres d\'heures après-midi</th>\n                <th>Lieu</th>\n                <th>Modifier</th>\n                <th>Supprimer</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr ng-repeat=\"date in session.dates | orderBy:\'datebegin\':false\" >\n                <!--form sf-xeditable-form=\"form\" sf-href=\'dates.edit({dates: date })\' on-success=\"onSuccess(data)\"-->\n                    <td>{{ date.datebegin|date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.dateend|date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.schedulemorn }}</td>\n                    <td>{{ date.hournumbermorn }}</td>\n                    <td>{{ date.scheduleafter }}</td>\n                    <td>{{ date.hournumberafter }}</td>\n                    <td>{{ date.place }}</td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"editDates(date)\" tooltip=\"Modifier\"><span class=\"fa fa-pencil\"></span></a></td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"removeDates(date)\" tooltip=\"Supprimer\"><span class=\"fa fa-trash-o\"></span></a></td>\n                <!--/form-->\n            </tr>\n            </tbody>\n        </table>\n\n    </div>\n\n</div>\n");
-$templateCache.put("training/session/states/detail/partials/emails.html","<div>\n    <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n        Aucun message concernant cette session n\'a été envoyé.\n    </div>\n\n    <table ng-if=\"search.result.total\" class=\"table table-hover table-responsive table-search.result table-condensed table-nohead\">\n        <!--thead>\n            <tr>\n                <th>Stagiaire</th>\n                <th>Sujet</th>\n                <th>Envoyé par</th>\n                <th>Date</th>\n            </tr>\n        </thead-->\n        <tbody>\n        <tr ng-repeat=\"email in search.result.items\">\n            <td>{{ email.trainee.fullName }}</td>\n            <td title=\"Sujet du message\"><a ng-click=\"dislayEmail(email.id)\" title=\"Voir le message\" href=\"\">{{ email.subject }}</a></td>\n            <td title=\"Envoyé par {{ email.userFrom.username }}\" >{{ email.userFrom.username }}</td>\n            <td title=\"Date d\'envoi\">{{ email.sendAt | date: \'dd/MM/yyyy\' }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n</div>\n");
-$templateCache.put("training/session/states/detail/partials/evals.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Nombre d\'évaluations remplies :</small>\n            <!-- stats -->\n            <span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalEvaluatedInscriptions(), totalAcceptedInscriptions)\" tooltip-placement=\"bottom\">{{ totalEvaluatedInscriptions() }} / {{ totalAcceptedInscriptions() }}</span>\n        </span>\n\n    </div>\n\n    <div ng-if=\"totalEvaluatedInscriptions() == 0\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune evaluation pour cette session.\n    </div>\n\n    <table ng-if=\"totalEvaluatedInscriptions()\" class=\"table table-hover table-search table-condensed\">\n        <tbody>\n        <tr ng-repeat=\"criter in crit\">\n            <td> {{ criter.name }} </td>\n            <td> {{ EvalAverage(criter) }} </td>\n        </tr>\n        </tbody>\n    </table>\n\n    <table ng-if=\"totalEvaluatedInscriptions()\" class=\"table table-hover table-search table-condensed\">\n        <thead>\n            <th>Remarques</th>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions\" ng-if=\"inscription.message.length\">\n                <td> {{ inscription.message }} </td>\n            </tr>\n        </tbody>\n    </table>\n\n</div>\n\n");
-$templateCache.put("training/session/states/detail/partials/inscriptions.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Filtrer par statut :</small>\n            <span class=\"btn-group dropdown\">\n                <a href=\"\" class=\"btn btn-xs btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n                    <span class=\"text-small\">{{ filterLabel || \'Tous (\' + session.inscriptions.length + \')\' }}</span>\n                    <span class=\"caret\"></span>\n                </a>\n                <ul class=\"dropdown-menu\" role=\"menu\">\n                    <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                </ul>\n            </span>\n        </span>\n\n        <!-- stats -->\n        &nbsp;&nbsp;-&nbsp;&nbsp;<span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalAcceptedInscriptions(), session.maximumNumberOfRegistrations)\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places\" tooltip-placement=\"bottom\">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>\n\n        <!-- operation -->\n        <div class=\"pull-right\">\n            <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span> Ajouter une inscription</a>\n            <a class=\"btn btn-fa ng-scope\" href=\"\" tooltip=\"Agrandir la liste\" ui-sref=\"inscription.table({session: session.id})\"><span class=\"fa fa-external-link\"></span></a>\n        </div>\n    </div>\n    <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune inscription pour cette session.\n    </div>\n\n    <table ng-if=\"session.inscriptions.length\" class=\"table table-hover table-search table-condensed\">\n        <!--thead>\n            <tr>\n                <th>Date</th>\n                <th>Stagiaire</th>\n                <th>Public</th>\n                <th>Établissement</th>\n                <th>Statut</th>\n            </tr>\n        </thead-->\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n                <td><a title=\"Voir l\'inscription\" href=\"\" ui-sref=\"inscription.detail.view({ id: inscription.id, session: inscription.session.id })\">{{ inscription.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                <td>\n                    <a title=\"Voir le profil du stagiaire\" href=\"\" ui-sref=\"trainee.detail.view({ id: inscription.trainee.id })\">{{ inscription.trainee.fullName }}</a>\n                </td>\n                <td>{{ inscription.publicType.machineName }}</td>\n                <td>{{ inscription.institution.machineName == \'other\' ? inscription.otherInstitution : inscription.institution.name }}</td>\n                <td>\n                    <!--div class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                        <ul class=\"dropdown-menu text-small\" role=\"menu\">\n                            <li ng-repeat=\"sta in status.inscription track by sta.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == sta.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription, sta)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == sta.id\"></i> {{ sta.name }}</a></li>\n                        </ul>\n                    </div>\n\n                    <div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            <span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                            <span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                            <span class=\"caret\"></span>\n                        </button>\n                        <ul class=\"dropdown-menu text-small\">\n                            <li ng-repeat=\"stat in status.presence track by stat.id\" ng-class=\"{disabled :inscription.presenceStatus.id == stat.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription, stat)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == stat.id\"></i> {{ stat.name }}</a></li>\n                        </ul>\n                    </div-->\n\n                    <!-- editable -->\n                    <div class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-if=\"!inscription.presencestatus || inscription.inscriptionstatus.status!=2\" class=\"label\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            {{ inscription.inscriptionstatus.name }}\n                            <span class=\"caret\"></span>\n                        </button>\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-if=\"inscription.presencestatus &&  inscription.inscriptionstatus.status==2\" class=\"label\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            {{ inscription.presencestatus.name }}\n                            <span class=\"caret\"></span>\n                        </button>\n                        <ul class=\"dropdown-menu text-small\" role=\"menu\">\n                            <li class=\"dropdown-header\">Statuts d\'inscription</li>\n                            <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :inscription.inscriptionstatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription, status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == status.id\"></i> {{ status.name }}</a></li>\n\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" class=\"divider\"></li>\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" class=\"dropdown-header\">Statuts de présence</li>\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :inscription.presenceStatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription, status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == status.id\"></i> {{ status.name }}</a></li>\n\n                            <li class=\"divider\"></li>\n                            <li><a href=\"\" ng-click=\"delete(inscription)\">Supprimer cette inscription</a></li>\n                        </ul>\n                    </div>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n\n</div>\n");
-$templateCache.put("training/session/states/detail/partials/inscriptions.ok.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Filtrer par statut :</small>\n            <span class=\"btn-group dropdown\">\n                <a href=\"\" class=\"btn btn-xs btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n                    <span class=\"text-small\">{{ filterLabel || \'Tous (\' + session.inscriptions.length + \')\' }}</span>\n                    <span class=\"caret\"></span>\n                </a>\n                <ul class=\"dropdown-menu\" role=\"menu\">\n                    <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                </ul>\n            </span>\n        </span>\n\n        <!-- stats -->\n        &nbsp;&nbsp;-&nbsp;&nbsp;<span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalAcceptedInscriptions(), session.maximumNumberOfRegistrations)\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places\" tooltip-placement=\"bottom\">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>\n\n        <!-- operation -->\n        <div class=\"pull-right\">\n            <a ng-if=\"session._accessRights.edit\" class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span> Ajouter une inscription</a>\n            <a class=\"btn btn-fa ng-scope\" href=\"\" tooltip=\"Agrandir la liste\" ui-sref=\"inscription.table({session: session.id})\"><span class=\"fa fa-external-link\"></span></a>\n        </div>\n    </div>\n    <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune inscription pour cette session.\n    </div>\n\n    <table ng-if=\"session.inscriptions.length\" class=\"table table-hover table-search table-condensed\">\n        <!--thead>\n            <tr>\n                <th>Date</th>\n                <th>Stagiaire</th>\n                <th>Public</th>\n                <th>Établissement</th>\n                <th>Statut</th>\n            </tr>\n        </thead-->\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n                <td><a title=\"Voir l\'inscription\" href=\"\" ui-sref=\"inscription.detail.view({ id: inscription.id, session: inscription.session.id })\">{{ inscription.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                <td>\n                    <a ng-if=\"inscription.trainee._accessRights.view\" title=\"Voir le profil du stagiaire\" href=\"\" ui-sref=\"trainee.detail.view({ id: inscription.trainee.id })\">{{ inscription.trainee.fullName }}</a>\n                    <span ng-if=\"!inscription.trainee._accessRights.view\">{{ inscription.trainee.fullName }}</span>\n                </td>\n                <td>{{ inscription.publicCategory.name }}</td>\n                <td>{{ inscription.institution.machineName == \'other\' ? inscription.otherInstitution : inscription.institution.name }}</td>\n                <td>\n		<div class=\"ng-binding\">\n			<div class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription,status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		</div>\n\n            		<div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    			<span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                    			<span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                    			<span class=\"caret\"></span>\n                		</button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :inscription.presenceStatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription,status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		</div>\n		</div>\n		</td>\n            </tr>\n        </tbody>\n    </table>\n</div>\n");
-$templateCache.put("training/session/states/detail/partials/participants-summary.html","<ul class=\"summary\">\n    <li ng-repeat=\"public in publics\">\n        {{ public.name }}\n        <span class=\"pull-right inline-block\" sf-xeditable=\"getFormElement(public)\" data-mode=\"popup\" data-placement=\"left\">{{ getCount(public) }}</span>\n    </li>\n</ul>\n");
+$templateCache.put("training/session/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"datebegin\" class=\"visible\">Date</th>\n                        <th search-table-th field=\"training.name.source\">Formation</th>\n                        <th search-table-th field=\"registration\" class=\"visible\">Inscriptions</th>\n                        <th search-table-th field=\"status\">Statut</th>\n                        <th search-table-th field=\"numberofregistrations\">Inscrits</th>\n                        <th>Statistiques</th>\n                        <th search-table-th field=\"numberofparticipants\">Présents</th>\n                        <th search-table-th field=\"displayonline\">En ligne</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td><a href=\"\" ui-sref=\"session.detail.view({id: item.id})\">{{ item.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                        <td><a href=\"\" ui-sref=\"training.detail.view({id: item.training.id + \'_\' + item.year + \'_\' + item.semester})\">{{ item.training.name }}</a></td>\n                        <td>\n                            <span registration-label=\"item\" large></span>\n                        </td>\n                        <td>{{ $trainingBundle.statusStates[item.status] }}</td>\n                        <td>{{ item.numberOfRegistrations }}</td>\n                        <td>\n                            <a registration-stats-label=\"item\" class=\"label-lg\"></a>\n                        </td>\n                        <td>{{ item.numberOfParticipants }}</td>\n                        <td><span class=\"label label-lg\" ng-class=\"item.displayonline ? \'label-success\' : \'label-default\'\">{{ item.displayonline ? \"Oui\" : \"Non\" }}</span></td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune session correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
+$templateCache.put("trainee/states/detail/partials/emails.html","<div>\n    <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n        Aucun message n\'a été envoyé à ce stagiaire.\n    </div>\n\n    <table ng-if=\"search.result.total\" class=\"table table-hover table-responsive table-search.result table-condensed table-nohead\">\n        <!--<thead>-->\n            <!--<tr>-->\n                <!--<th>Sujet</th>-->\n                <!--<th>Session</th>-->\n                <!--<th>Envoyé par</th>-->\n                <!--<th>Date</th>-->\n            <!--</tr>-->\n        <!--</thead>-->\n        <tbody>\n        <tr ng-repeat=\"email in search.result.items\">\n            <td><a title=\"Voir le message\" ng-click=\"dislayEmail(email.id)\" href=\"\">{{ email.subject }}</a></td>\n            <td><a title=\"Voir la session\" href=\"\" ui-sref=\"session.detail.view({ id: email.session.id })\">{{ email.session.training.name }}</a></td>\n            <td title=\"Envoyé par {{ email.userFrom.username }}\">{{ email.userFrom.username }}</td>\n            <td title=\"Date d\'envoi\">{{ email.sendAt | date: \'dd/MM/yyyy\' }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n</div>\n");
 $templateCache.put("training/training/states/detail/partials/comments.block.html","<div class=\"block block-comments\">\n    <div class=\"block-title\">\n        <span class=\"h4\"><span class=\"fa fa-comment-o\"></span> Commentaires</span>\n    </div>\n    <div class=\"block-body\">\n        <form sf-xeditable-form=\"form\" sf-href=\'training.view({id: training.id})\' on-success=\"onSuccess(data)\">\n            <p><span sf-xeditable=\"form.children.comments\" data-type=\"textarea\">{{ training.comments }}</span></p>\n        </form>\n    </div>\n</div>\n");
 $templateCache.put("training/training/states/detail/partials/module_sessions.block.html","<div class=\"block block-module-sessions\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <a ui-sref=\"session.table({training: training.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-calendar-o\"></span>Sessions / module</a>\n            <div class=\"pull-right\">\n                <a ng-if=\"training._accessRights.edit\" class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter une session\" ng-click=\"addSession()\"><span class=\"fa fa-plus\"></span></a>\n                <span class=\"badge\" tooltip=\"{{ training.sessions.length}} session(s)\">{{ training.sessions.length}}</span>\n            </div>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <!-- display sessions without module -->\n        <div ng-if=\"sessionsWithoutModule.length > 0\">\n            <div class=\"text-muted\">Session(s) sans module</div>\n            <ul class=\"list-circle\">\n                <li ng-repeat=\"session in sessionsWithoutModule | orderBy:\'dateBegin\':true\" ng-class=\"{past: $moment(session.dateBegin) < $moment()}\">\n                    <a ui-sref=\"session.detail.view({training: training.id, id: session.id})\">{{ session.dateBegin | date:\'EEEE d MMMM y\' }} - {{ session.name }}</a>\n\n                    <!-- stats -->\n                    &nbsp;&nbsp;\n                    <span registration-label=\"session\"></span>\n\n                    <div class=\"pull-right\">\n                        <a registration-stats-label=\"session\" class=\"label-lg\" tooltip-placement=\"left\"></a>\n                    </div>\n                </li>\n            </ul>\n        </div>\n\n        <!--display module sessions-->\n        <div ng-repeat=\"module in training.modules | orderBy: \'name\' : false\">\n            <a tooltip=\"{{ module.name + (module.mandatory ? \' obligatoire\' : \' non obligatoire\') }}\" ng-if=\"training._accessRights.edit\" href=\"\" class=\"text-muted\" ng-click=\"editModule(module)\">\n                {{ module.name }}\n                <span class=\"fa\" ng-class=\"{\'fa-check-square-o\': module.mandatory, \'fa-square-o\': !module.mandatory}\"></span>\n            </a>\n            <div tooltip=\"{{ module.name + (module.mandatory ? \' obligatoire\' : \' non obligatoire\') }}\" ng-if=\"!training._accessRights.edit\" class=\"text-muted\">\n                {{ module.name }}\n                <span class=\"fa\" ng-class=\"{\'fa-check-square-o\': module.mandatory, \'fa-square-o\': !module.mandatory}\"></span>\n            </div>\n            <ul class=\"list-circle\">\n                <li ng-repeat=\"session in module.sessions | orderBy:\'dateBegin\':true\" ng-class=\"{past: $moment(session.dateBegin) < $moment()}\">\n                    <a ui-sref=\"session.detail.view({training: training.id, id: session.id})\">{{ session.dateBegin | date:\'EEEE d MMMM y\' }} - {{ session.name }}</a>\n\n                    <!-- stats -->\n                    &nbsp;&nbsp;\n                    <span registration-label=\"session\"></span>\n\n                    <div class=\"pull-right\">\n                        <a registration-stats-label=\"session\" class=\"label-lg\" tooltip-placement=\"left\"></a>\n                    </div>\n                </li>\n            </ul>\n        </div>\n    </div>\n</div>\n");
 $templateCache.put("training/training/states/detail/partials/sessions.block.html","<div class=\"block block-sessions\">\n\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <a ui-sref=\"session.table({training: training.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-calendar-o\"></span>Sessions</a>\n            <div class=\"pull-right\">\n                <a class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter une session\" ng-click=\"addSession()\"><span class=\"fa fa-plus\"></span></a><!--\n                <a ng-if=\"training._accessRights.edit\" class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter une session\" ng-click=\"addSession()\"><span class=\"fa fa-plus\"></span></a>\n                --><span class=\"badge\">{{ training.sessions.length}}</span>\n            </div>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <div class=\"well well-empty well-sm\" ng-if=\"!training.sessions.length\">\n            Il n\'y a aucune session passée ou à venir.\n        </div>\n        <ul class=\"list-unstyled list-padded\">\n            <li ng-repeat=\"session in training.sessions | orderBy:\'datebegin\':true\" ng-class=\"{past: $moment(session.datebegin) < $moment()}\">\n                <a ui-sref=\"session.detail.view({training: training.id, id: session.id})\">{{ session.datebegin | date:\'EEEE d MMMM y\' }} - {{ session.name }}</a>\n\n                <!-- stats -->\n                &nbsp;&nbsp;\n                <span registration-label=\"session\"></span>\n\n                <div class=\"pull-right\">\n                    <a registration-stats-label=\"session\" class=\"label-lg\" tooltip-placement=\"left\"></a>\n                </div>\n            </li>\n        </ul>\n    </div>\n</div>\n");
 $templateCache.put("training/training/states/detail/partials/training.form.html","<div class=\"btn-group pull-right\">\n    <a class=\"btn btn-fa\" href=\"\" tooltip=\"Bilan\" ng-if=\"training.sessions.length && training._accessRights.view\" ng-click=\"getBalanceSheet()\"><span class=\"fa fa-file-excel-o\"></span></a>\n    <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [training.id], service: \'training\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n    <a class=\"btn btn-fa\" href=\"\" tooltip=\"Dupliquer\" ng-if=\"training._accessRights.edit\" ng-click=\"duplicate()\"><span class=\"fa fa-copy\"></span></a>\n<!--    <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"training._accessRights.delete\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>-->\n    <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n</div>\n\n<div class=\"pre-title\">{{ training.typeLabel }} n°{{ training.number }} -  {{ training.organization.name }}</div>\n\n<h2><span sf-xeditable=\"form.children.name\" data-type=\"text\">{{ training.name }}<!-- action button --></span></h2>\n\n<div class=\"infos\">\n    <label>Thème :</label> <span sf-xeditable=\"form.children.theme\" data-type=\"select\">{{ training.theme.name }}</span><br/>\n<!--    <div><label>Tags :</label> <span sf-xeditable=\"form.children.tags\" data-type=\"select2\">{{ training.tags|joinObjects:\'name\' }}</span></div> -->\n</div>\n\n<h3>Objectifs</h3><hr>\n<p><span sf-xeditable=\"form.children.description\" data-type=\"textarea\">{{ training.description }}</span></p>\n\n<h3>Programme</h3><hr>\n<p><span sf-xeditable=\"form.children.program\" data-type=\"textarea\">{{ training.program }}</span></p>\n");
+$templateCache.put("training/session/states/detail/partials/dates.html","<div>\n    <div class=\"mb-1\">\n        <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addDates()\"><span class=\"fa fa-plus\"></span> Ajouter une date</a>\n        <br><br>\n\n        <div ng-if=\"!session.dates.length\" class=\"well well-empty well-sm\">\n            Il n\'y a aucune date pour cette session.\n        </div>\n\n        <table ng-if=\"session.dates.length\" class=\"table table-hover table-search table-condensed\">\n            <thead>\n            <tr>\n                <th>Date début</th>\n                <th>Date fin</th>\n                <th>Horaires matin</th>\n                <th>Nombres d\'heures matin</th>\n                <th>Horaires après-midi</th>\n                <th>Nombres d\'heures après-midi</th>\n                <th>Lieu</th>\n                <th>Modifier</th>\n                <th>Supprimer</th>\n            </tr>\n            </thead>\n            <tbody>\n            <tr ng-repeat=\"date in session.dates | orderBy:\'datebegin\':false\" >\n                <!--form sf-xeditable-form=\"form\" sf-href=\'dates.edit({dates: date })\' on-success=\"onSuccess(data)\"-->\n                    <td>{{ date.datebegin|date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.dateend|date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.schedulemorn }}</td>\n                    <td>{{ date.hournumbermorn }}</td>\n                    <td>{{ date.scheduleafter }}</td>\n                    <td>{{ date.hournumberafter }}</td>\n                    <td>{{ date.place }}</td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"editDates(date)\" tooltip=\"Modifier\"><span class=\"fa fa-pencil\"></span></a></td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"removeDates(date)\" tooltip=\"Supprimer\"><span class=\"fa fa-trash-o\"></span></a></td>\n                <!--/form-->\n            </tr>\n            </tbody>\n        </table>\n\n    </div>\n\n</div>\n");
+$templateCache.put("training/session/states/detail/partials/emails.html","<div>\n    <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n        Aucun message concernant cette session n\'a été envoyé.\n    </div>\n\n    <table ng-if=\"search.result.total\" class=\"table table-hover table-responsive table-search.result table-condensed table-nohead\">\n        <!--thead>\n            <tr>\n                <th>Stagiaire</th>\n                <th>Sujet</th>\n                <th>Envoyé par</th>\n                <th>Date</th>\n            </tr>\n        </thead-->\n        <tbody>\n        <tr ng-repeat=\"email in search.result.items\">\n            <td>{{ email.trainee.fullName }}</td>\n            <td title=\"Sujet du message\"><a ng-click=\"dislayEmail(email.id)\" title=\"Voir le message\" href=\"\">{{ email.subject }}</a></td>\n            <td title=\"Envoyé par {{ email.userFrom.username }}\" >{{ email.userFrom.username }}</td>\n            <td title=\"Date d\'envoi\">{{ email.sendAt | date: \'dd/MM/yyyy\' }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n</div>\n");
+$templateCache.put("training/session/states/detail/partials/evals.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Nombre d\'évaluations remplies :</small>\n            <!-- stats -->\n            <span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalEvaluatedInscriptions(), totalAcceptedInscriptions)\" tooltip-placement=\"bottom\">{{ totalEvaluatedInscriptions() }} / {{ totalAcceptedInscriptions() }}</span>\n        </span>\n\n    </div>\n\n    <div ng-if=\"totalEvaluatedInscriptions() == 0\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune evaluation pour cette session.\n    </div>\n\n    <table ng-if=\"totalEvaluatedInscriptions()\" class=\"table table-hover table-search table-condensed\">\n        <tbody>\n        <tr ng-repeat=\"criter in crit\">\n            <td> {{ criter.name }} </td>\n            <td> {{ EvalAverage(criter) }} </td>\n        </tr>\n        </tbody>\n    </table>\n\n    <table ng-if=\"totalEvaluatedInscriptions()\" class=\"table table-hover table-search table-condensed\">\n        <thead>\n            <th>Remarques</th>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions\" ng-if=\"inscription.message.length\">\n                <td> {{ inscription.message }} </td>\n            </tr>\n        </tbody>\n    </table>\n\n</div>\n\n");
+$templateCache.put("training/session/states/detail/partials/inscriptions.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Filtrer par statut :</small>\n            <span class=\"btn-group dropdown\">\n                <a href=\"\" class=\"btn btn-xs btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n                    <span class=\"text-small\">{{ filterLabel || \'Tous (\' + session.inscriptions.length + \')\' }}</span>\n                    <span class=\"caret\"></span>\n                </a>\n                <ul class=\"dropdown-menu\" role=\"menu\">\n                    <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                </ul>\n            </span>\n        </span>\n\n        <!-- stats -->\n        &nbsp;&nbsp;-&nbsp;&nbsp;<span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalAcceptedInscriptions(), session.maximumnumberofregistrations)\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumnumberofregistrations }} places\" tooltip-placement=\"bottom\">{{ totalAcceptedInscriptions() }} / {{ session.maximumnumberofregistrations }}</span>\n\n        <!-- operation -->\n        <div class=\"pull-right\">\n            <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span> Ajouter une inscription</a>\n            <a class=\"btn btn-fa ng-scope\" href=\"\" tooltip=\"Agrandir la liste\" ui-sref=\"inscription.table({session: session.id})\"><span class=\"fa fa-external-link\"></span></a>\n        </div>\n    </div>\n    <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune inscription pour cette session.\n    </div>\n\n    <table ng-if=\"session.inscriptions.length\" class=\"table table-hover table-search table-condensed\">\n        <!--thead>\n            <tr>\n                <th>Date</th>\n                <th>Stagiaire</th>\n                <th>Public</th>\n                <th>Établissement</th>\n                <th>Statut</th>\n            </tr>\n        </thead-->\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n<!--                <td><a title=\"Voir l\'inscription\" href=\"\" ui-sref=\"inscription.detail.view({ id: inscription.id, session: inscription.session.id })\">{{ inscription.createdAt|date: \'dd/MM/yyyy\' }}</a></td> -->\n                <td><a title=\"Voir l\'inscription\" href=\"\" ui-sref=\"inscription.detail.view({ id: inscription.id, session: inscription.session.id })\">05/04/2022</a></td>\n                <td>\n                    <a title=\"Voir le profil du stagiaire\" href=\"\" ui-sref=\"trainee.detail.view({ id: inscription.trainee.id })\">{{ inscription.trainee.fullname }}</a>\n                </td>\n                <td>{{ inscription.trainee.publictype.name }}</td>\n                <td>{{ inscription.trainee.institution.name }}</td>\n                <td>\n                    <!--div class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                        <ul class=\"dropdown-menu text-small\" role=\"menu\">\n                            <li ng-repeat=\"sta in status.inscription track by sta.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == sta.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription, sta)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == sta.id\"></i> {{ sta.name }}</a></li>\n                        </ul>\n                    </div>\n\n                    <div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            <span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                            <span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                            <span class=\"caret\"></span>\n                        </button>\n                        <ul class=\"dropdown-menu text-small\">\n                            <li ng-repeat=\"stat in status.presence track by stat.id\" ng-class=\"{disabled :inscription.presenceStatus.id == stat.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription, stat)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == stat.id\"></i> {{ stat.name }}</a></li>\n                        </ul>\n                    </div-->\n\n                    <!-- editable -->\n                    <div class=\"btn-group dropdown\">\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-if=\"!inscription.presencestatus || inscription.inscriptionstatus.status!=2\" class=\"label\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionstatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            {{ inscription.inscriptionstatus.name }}\n                            <span class=\"caret\"></span>\n                        </button>\n                        <button class=\"btn btn-xs dropdown-toggle\" ng-if=\"inscription.presencestatus &&  inscription.inscriptionstatus.status==2\" class=\"label\" ng-class=\"$root.presenceStatusClass(inscription.presencestatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                            {{ inscription.presencestatus.name }}\n                            <span class=\"caret\"></span>\n                        </button>\n                        <ul class=\"dropdown-menu text-small\" role=\"menu\">\n                            <li class=\"dropdown-header\">Statuts d\'inscription</li>\n                            <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :inscription.inscriptionstatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription, status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionstatus.id == status.id\"></i> {{ status.name }}</a></li>\n\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" class=\"divider\"></li>\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" class=\"dropdown-header\">Statuts de présence</li>\n                            <li ng-if=\"inscription.inscriptionstatus.status == 2\" ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :inscription.presencestatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription, status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presencestatus.id == status.id\"></i> {{ status.name }}</a></li>\n\n                            <li class=\"divider\"></li>\n                            <li><a href=\"\" ng-click=\"delete(inscription)\">Supprimer cette inscription</a></li>\n                        </ul>\n                    </div>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n\n</div>\n");
+$templateCache.put("training/session/states/detail/partials/inscriptions.ok.html","<div>\n    <div class=\"mb-1\">\n        <!-- filter -->\n        <span><small>Filtrer par statut :</small>\n            <span class=\"btn-group dropdown\">\n                <a href=\"\" class=\"btn btn-xs btn-default dropdown-toggle\" data-toggle=\"dropdown\">\n                    <span class=\"text-small\">{{ filterLabel || \'Tous (\' + session.inscriptions.length + \')\' }}</span>\n                    <span class=\"caret\"></span>\n                </a>\n                <ul class=\"dropdown-menu\" role=\"menu\">\n                    <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    <li class=\"divider\"></li>\n                    <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                </ul>\n            </span>\n        </span>\n\n        <!-- stats -->\n        &nbsp;&nbsp;-&nbsp;&nbsp;<span class=\"label\" ng-class=\"$root.sessionInscriptionStatsClass(totalAcceptedInscriptions(), session.maximumNumberOfRegistrations)\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places\" tooltip-placement=\"bottom\">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>\n\n        <!-- operation -->\n        <div class=\"pull-right\">\n            <a ng-if=\"session._accessRights.edit\" class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span> Ajouter une inscription</a>\n            <a class=\"btn btn-fa ng-scope\" href=\"\" tooltip=\"Agrandir la liste\" ui-sref=\"inscription.table({session: session.id})\"><span class=\"fa fa-external-link\"></span></a>\n        </div>\n    </div>\n    <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n        Il n\'y a aucune inscription pour cette session.\n    </div>\n\n    <table ng-if=\"session.inscriptions.length\" class=\"table table-hover table-search table-condensed\">\n        <!--thead>\n            <tr>\n                <th>Date</th>\n                <th>Stagiaire</th>\n                <th>Public</th>\n                <th>Établissement</th>\n                <th>Statut</th>\n            </tr>\n        </thead-->\n        <tbody>\n            <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n                <td><a title=\"Voir l\'inscription\" href=\"\" ui-sref=\"inscription.detail.view({ id: inscription.id, session: inscription.session.id })\">{{ inscription.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                <td>\n                    <a ng-if=\"inscription.trainee._accessRights.view\" title=\"Voir le profil du stagiaire\" href=\"\" ui-sref=\"trainee.detail.view({ id: inscription.trainee.id })\">{{ inscription.trainee.fullName }}</a>\n                    <span ng-if=\"!inscription.trainee._accessRights.view\">{{ inscription.trainee.fullName }}</span>\n                </td>\n                <td>{{ inscription.publicCategory.name }}</td>\n                <td>{{ inscription.institution.machineName == \'other\' ? inscription.otherInstitution : inscription.institution.name }}</td>\n                <td>\n		<div class=\"ng-binding\">\n			<div class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(inscription,status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		</div>\n\n            		<div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    			<span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                    			<span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                    			<span class=\"caret\"></span>\n                		</button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :inscription.presenceStatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(inscription,status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		</div>\n		</div>\n		</td>\n            </tr>\n        </tbody>\n    </table>\n</div>\n");
+$templateCache.put("training/session/states/detail/partials/participants-summary.html","<ul class=\"summary\">\n    <li ng-repeat=\"public in publics\">\n        {{ public.name }}\n        <span class=\"pull-right inline-block\" sf-xeditable=\"getFormElement(public)\" data-mode=\"popup\" data-placement=\"left\">{{ getCount(public) }}</span>\n    </li>\n</ul>\n");
 $templateCache.put("directives/entity-emails/email.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\">×</button>\n    <h4 class=\"modal-title\">\n        Visualisation du message\n        <span ng-if=\"email.session\">\n            concernant la session <strong>{{ email.session.training.name }}</strong> du <strong>{{ email.session.datebegin | date: \'dd/MM/yyyy\' }}</strong>\n        </span>\n    </h4>\n</div>\n<div class=\"modal-body\">\n    <div class=\"form-horizontal\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Sujet</label>\n            <div class=\"col-md-9\">\n                <div class=\"form-control\" style=\"height: auto\">\n                    {{ email.subject }}\n                </div>\n            </div>\n        </div>\n\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Message</label>\n            <div class=\"col-md-9\">\n                <div ng-bind-html=\"email.body | nl2br\" class=\"form-control\" style=\"height: auto\">\n                </div>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"row\">\n        <div class=\"col-md-12\">\n            <span class=\"pull-right\">\n                <em>Envoyé par {{ email.userFrom.username }}<{{ email.emailFrom }}> à {{ email.trainee ? email.trainee.fullName : (email.trainer ? email.trainer.fullName : \'\') }} le {{ email.sendAt | date: \'dd/MM/yyyy\' }}</em>\n            </span>\n        </div>\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-primary\" ng-click=\"dialog.dismiss()\">Fermer</a>\n</div>\n");
 $templateCache.put("institution/dialogs/change-organization.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-university\"></i> Changer le centre de rattachement</h4>\n</div>\n<form sf-href=\"institution.changeorg({id: dialog.params.institution.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body center-block\">\n        <div ng-repeat=\"key in [\'organization\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length || form.errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Valider\" />\n    </div>\n</form>\n");
 $templateCache.put("institution/dialogs/create.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-user\"></i> Ajouter un établissement</h4>\n</div>\n\n<form sf-href=\"institution.create\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n\n        <div ng-repeat=\"key in [\'organization\', \'name\', \'zip\', \'city\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
 $templateCache.put("institution/dialogs/delete.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer un établissement</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer l\'établissement <strong>{{ dialog.params.institution.name }}</strong> ?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
 $templateCache.put("institution/dialogs/validation.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Change la validation</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir {{ dialog.params.institution.validated ? \'invalider\' : \'valider\' }} l\'établissement <strong>{{ dialog.params.institution.name }}</strong> ?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
-$templateCache.put("inscription/dialogs/create.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-graduation-cap\"></i> Ajouter une inscription</h4>\n</div>\n\n<form sf-href=\"inscription.create({session: dialog.params.session.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.trainee.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.trainee.id }}\">{{ form.children.trainee.label }}</label>\n            <div class=\"col-sm-9\">\n               <div class=\"input-group\" ng-if=\"userCanAddTrainee()\">\n                   <input placeholder=\"Cliquez pour rechercher un stagiaire...\" type=\"text\" typeahead-template-url=\"mycompanybundle/inscription/dialogs/typeahead-trainee.html\" required=\"required\" typeahead-wait-ms=\"200\" typeahead=\"choice as choice.label for choice in getTraineeList($viewValue)\" typeahead-editable=\"false\" class=\"form-control\" typeahead-on-select=\"setTrainee($item)\" ng-model=\"$parent.selectedTrainee\" />\n                    <span class=\"input-group-btn\">\n                        <button tooltip=\"Créer un nouveau stagiaire\" tooltip-placement=\"bottom\" class=\"btn btn-default\" ng-click=\"createUser()\" type=\"button\"><i class=\"fa fa-plus\"></i></button>\n                    </span>\n               </div>\n               <input placeholder=\"Cliquez pour rechercher un stagiaire...\" ng-if=\"!userCanAddTrainee()\" type=\"text\" typeahead-template-url=\"mycompanybundle/inscription/dialogs/typeahead-trainee.html\" required=\"required\" typeahead-wait-ms=\"200\" typeahead=\"choice as choice.label for choice in getTraineeList($viewValue)\" typeahead-editable=\"false\" class=\"form-control\" typeahead-on-select=\"setTrainee($item)\" ng-model=\"$parent.selectedTrainee\" />\n                   <div ng-if=\"error.length\" ng-repeat=\"error in form.children.trainee.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.inscriptionStatus.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.inscriptionStatus.id }}\">{{ form.children.inscriptionStatus.label }}</label>\n            <div class=\"col-sm-9\">\n                <span sf-form-widget=\"form.children.inscriptionStatus\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.inscriptionStatus.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Ajouter\" />\n    </div>\n</form>\n");
+$templateCache.put("inscription/dialogs/create.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-graduation-cap\"></i> Ajouter une inscription</h4>\n</div>\n\n<form sf-href=\"inscription.create({session: dialog.params.session.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.trainee.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.trainee.id }}\">{{ form.children.trainee.label }}</label>\n            <div class=\"col-sm-9\">\n               <div class=\"input-group\" ng-if=\"userCanAddTrainee()\">\n                   <input placeholder=\"Cliquez pour rechercher un stagiaire...\" type=\"text\" typeahead-template-url=\"inscription/dialogs/typeahead-trainee.html\" required=\"required\" typeahead-wait-ms=\"200\" typeahead=\"choice as choice.label for choice in getTraineeList($viewValue)\" typeahead-editable=\"false\" class=\"form-control\" typeahead-on-select=\"setTrainee($item)\" ng-model=\"$parent.selectedTrainee\" />\n                    <span class=\"input-group-btn\">\n                        <button tooltip=\"Créer un nouveau stagiaire\" tooltip-placement=\"bottom\" class=\"btn btn-default\" ng-click=\"createUser()\" type=\"button\"><i class=\"fa fa-plus\"></i></button>\n                    </span>\n               </div>\n               <input placeholder=\"Cliquez pour rechercher un stagiaire...\" ng-if=\"!userCanAddTrainee()\" type=\"text\" typeahead-template-url=\"inscription/dialogs/typeahead-trainee.html\" required=\"required\" typeahead-wait-ms=\"200\" typeahead=\"choice as choice.label for choice in getTraineeList($viewValue)\" typeahead-editable=\"false\" class=\"form-control\" typeahead-on-select=\"setTrainee($item)\" ng-model=\"$parent.selectedTrainee\" />\n                   <div ng-if=\"error.length\" ng-repeat=\"error in form.children.trainee.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.inscriptionstatus.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.inscriptionstatus.id }}\">{{ form.children.inscriptionstatus.label }}</label>\n            <div class=\"col-sm-9\">\n                <span sf-form-widget=\"form.children.inscriptionstatus\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.inscriptionstatus.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Ajouter\" />\n    </div>\n</form>\n");
 $templateCache.put("inscription/dialogs/delete.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer une inscription</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer l\'inscription du stagiaire <strong>{{ inscription.trainee.fullName }}</strong> à la session du <strong>{{ inscription.session.dateBegin|date:\'dd/MM/yy\' }}</strong> de la formation <strong>{{ inscription.session.training.name }}</strong>?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
 $templateCache.put("inscription/dialogs/typeahead-trainee.html","<a class=\"typeahead-inscription-item\">\n <h4 class=\"item-name\">{{match.label}}</h4>\n    <div ng-if=\"match.model.institution != \'\'\" class=\"item-complement row\"><span class=\"col-xs-6\">{{match.model.institution }}</span><span class=\"small col-xs-6 pull-right inline-block\">({{match.model.organization }})</span></div>\n    <p ng-if=\"match.model.institution == \'\'\" class=\"item-complement\">{{match.model.organization }}</p>\n\n</a>");
-$templateCache.put("inscription/widget/disclaimer.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Stagiaire</th>\n            <th>Session</th>\n            <th>Type de personnel</th>\n        </tr>\n        </thead>\n        <tbody>\n        <tr ng-repeat=\"item in items\">\n            <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id, session: item.session.id })\" ui-sref-widget-opts>{{ item.inscriptionstatusUpdatedAt|date: \'dd/MM/yyyy\' }}</a></td>\n            <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullName }}</a></td>\n            <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id, training: item.session.training.id })\">{{ item.session.dateBegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n            <td>{{ item.trainee.publicCategory }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune inscription dans cette liste\' }}</div>\n");
-$templateCache.put("inscription/widget/inscription.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Stagiaire</th>\n            <th>Session</th>\n            <th>Type de personnel</th>\n            <th>Inscription</th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id, session: item.session.id })\" ui-sref-widget-opts>{{ item.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullName }}</a></td>\n                <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id, training: item.session.training.id })\">{{ item.session.dateBegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n                <td>{{ item.trainee.publicCategory }}</td>\n                <td><span class=\"label\" ng-class=\"$root.inscriptionStatusClass(item.inscriptionstatus.status)\">{{ item.inscriptionstatus.name }}</span></td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune inscription dans cette liste\' }}</div>\n");
+$templateCache.put("inscription/widget/disclaimer.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Stagiaire</th>\n            <th>Session</th>\n            <th>Type de personnel</th>\n        </tr>\n        </thead>\n        <tbody>\n        <tr ng-repeat=\"item in items\">\n            <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id, session: item.session.id })\" ui-sref-widget-opts>{{ item.inscriptionstatusUpdatedAt|date: \'dd/MM/yyyy\' }}</a></td>\n            <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullname }}</a></td>\n            <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id, training: item.session.training.id })\">{{ item.session.datebegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n            <td>{{ item.trainee.publictype.name }}</td>\n        </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune inscription dans cette liste\' }}</div>\n");
+$templateCache.put("inscription/widget/inscription.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Stagiaire</th>\n            <th>Session</th>\n            <th>Type de personnel</th>\n            <th>Inscription</th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id, session: item.session.id })\" ui-sref-widget-opts>{{ item.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullname }}</a></td>\n                <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id, training: item.session.training.id })\">{{ item.session.datebegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n                <td>{{ item.trainee.publictype.name }}</td>\n                <td><span class=\"label\" ng-class=\"$root.inscriptionStatusClass(item.inscriptionstatus.status)\">{{ item.inscriptionstatus.name }}</span></td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune inscription dans cette liste\' }}</div>\n");
 $templateCache.put("trainer/directives/participations.block.html","<div class=\"block block-participations\">\n    <div class=\"block-title\">\n        <a class=\"btn btn-link h4\" ui-sref=\"session.table({trainer: trainer.id})\"><span class=\"fa fa-calendar-o\"></span>Sessions</a>\n        <div class=\"pull-right\">\n            <span class=\"badge ng-binding\">{{ search.result.total ? search.result.total : 0 }}</span>\n        </div>\n    </div>\n\n    <div class=\"block-body\">\n        <div ng-if=\"!search.result.total\" class=\"well well-empty well-sm\">\n            {{ emptyMsg }}\n        </div>\n        <div ng-if=\"search.result.total\">\n            <table class=\"table table-condensed table-nohead\">\n                <tbody>\n                <tr ng-repeat=\"participation in search.result.items\" class=\"row\">\n                    <td class=\"col-xs-3\"><span class=\"text-gray-light text-small\">{{ participation.session.datebegin | date:\'dd/MM/yy\' }}</span></td>\n                    <td class=\"col-xs-9\"><a ui-sref=\"session.detail.view({id: participation.session.id})\">{{ participation.session.training.name }}</a><br>\n                        <span class=\"text-light text-gray-light\">{{ participation.session.training.typeLabel }}</span>\n                    </td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n        <div ng-if=\"search.result.total > search.query.size\" class=\"full-height-item is-full-width\">\n            <div search-table-controls></div>\n        </div>\n    </div>\n</div>\n");
 $templateCache.put("trainer/directives/resumeTrainer.block.html","<div class=\"block block-trainer\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <span class=\"h4\"><span class=\"fa fa-user\"></span> {{ trainer.fullName }} </span>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <ul class=\"summary\">\n            <li><label>Email</label> {{ trainer.email }}</li>\n            <li><label>Téléphone</label> {{ trainer.phoneNumber }}</li>\n            <li><label>Formateur interne</label> {{ trainer.isOrganization ? \'Oui\' : \'Non\' }}</li>\n            <li><label>Type</label> {{ trainer.trainerType.name }}</li>\n            <li><label>Etablissement</label> {{ trainer.institution.name }}</li>\n            <li><label>Nombre d\'heures/an</label> {{ trainer.yearHours }}</li>\n        </ul>\n    </div>\n</div>");
 $templateCache.put("trainer/dialogs/change-organization.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-university\"></i> Changer le centre de rattachement</h4>\n</div>\n<form sf-href=\"trainer.changeorg({id: dialog.params.trainer.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body center-block\">\n        <div ng-repeat=\"key in [\'organization\', \'institution\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n        <div class=\"form-group col-sm-9 col-sm-offset-3\" ng-if=\"form.errors.length\" ng-class=\"{\'has-error\': form.errors.length }\">\n            <div ng-repeat=\"error in form.errors\" class=\"help-block\">{{ error }}</div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Valider\" />\n    </div>\n</form>\n");
@@ -80987,27 +80990,27 @@ $templateCache.put("trainee/dialogs/change-organization.html","<div class=\"moda
 $templateCache.put("trainee/dialogs/change-password.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-unlock-alt\"></i> Changer le mot de passe</h4>\n</div>\n<form sf-href=\"trainee.changepwd({id: dialog.params.trainee.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body center-block\">\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.plainPassword.children.first.errors.length }\">\n            <label class=\"col-sm-4 control-label\" for=\"{{ form.children.plainPassword.children.first.id }}\">Nouveau mot de passe</label>\n            <div class=\"col-sm-8\">\n                <span sf-form-widget=\"form.children.plainPassword.children.first\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children.plainPassword.children.first.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.plainPassword.children.second.errors.length }\">\n            <label class=\"col-sm-4 control-label\" for=\"{{ form.children.plainPassword.children.second.id }}\">Confirmation</label>\n            <div class=\"col-sm-8\">\n                <span sf-form-widget=\"form.children.plainPassword.children.second\" class=\"form-control\"/>\n                <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children.plainPassword.children.second.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Valider\" />\n    </div>\n</form>\n");
 $templateCache.put("trainee/dialogs/create.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-user\"></i> Ajouter un stagiaire</h4><br>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Attention : lorsque vous ajoutez manuellement un stagiaire, les informations saisies sont potentiellement incomplètes ou erronées. Cela entraîne des erreurs dans les statistiques !</h4>\n</div>\n\n<form sf-href=\"trainee.create\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n\n        <div ng-repeat=\"key in [\'organization\', \'title\', \'lastname\', \'firstname\', \'email\', \'birthdate\', \'phonenumber\', \'address\', \'zip\', \'city\', \'institution\', \'service\', \'amustatut\', \'bap\', \'corps\', \'category\', \'campus\', \'fonction\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\" />\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n        <div>\n            <div class=\"form-group\" ng-if=\"form.children[\'publictype\']\" ng-class=\"{\'has-error\': form.children[\'publictype\'].errors.length }\">\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[\'publictype\'].id }}\">{{ form.children[\'publictype\'].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[\'publictype\']\" ng-required=\"true\" class=\"form-control\" />\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[\'publictype\'].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n        <h3 class=\"modal-header\">Responsable hiérarchique</h3>\n        <div ng-repeat=\"key in [\'lastnamesup\', \'firstnamesup\', \'emailsup\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\" >\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n        <h3 class=\"modal-header\">Correspondant formation</h3>\n        <div ng-repeat=\"key in [\'lastnamecorr\', \'firstnamecorr\', \'emailcorr\']\">\n            <div class=\"form-group\" ng-if=\"form.children[key]\" ng-class=\"{\'has-error\': form.children[key].errors.length }\" >\n                <label class=\"col-sm-3 control-label\" for=\"{{ form.children[key].id }}\">{{ form.children[key].label }}</label>\n                <div class=\"col-sm-9\">\n                    <span sf-form-widget=\"form.children[key]\" class=\"form-control\"/>\n                    <div ng-if=\"error.length\" ng-if=\"error.length\" ng-repeat=\"error in form.children[key].errors\" class=\"help-block\">{{ error }}</div>\n                </div>\n            </div>\n        </div>\n\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n");
 $templateCache.put("trainee/dialogs/delete.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-warning\"></i> Supprimer un stagiaire</h4>\n</div>\n<div class=\"modal-body center-block\">\n    <div class=\"alert alert-danger\" role=\"alert\">\n        Êtes-vous certain de vouloir supprimer le stagiaire <strong>{{ dialog.params.trainee.fullName }}</strong> ?\n    </div>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
-$templateCache.put("trainee/widget/trainee.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Nom</th>\n            <th>Type de personnel</th>\n            <th>Établissement</th>\n            <th>Activé</th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td>{{ item.createdAt|date: \'dd/MM/yyyy\' }}</td>\n                <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.id })\" ui-sref-widget-opts>{{ item.fullName }}</a></td>\n                <td>{{ item.publicCategory }}</td>\n                <td>{{ item.institution.name }}</td>\n                <td>\n                    <span class=\"label\" ng-class=\"{\'label-danger\' : item.isActive == false, \'label-default\' : item.isActive == true}\">\n                        {{ item.isActive ? \'Oui\' : \'Non\' }}\n                    </span>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucun stagiaire dans cette liste\' }}</div>\n");
+$templateCache.put("trainee/widget/trainee.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Nom</th>\n            <th>Type de personnel</th>\n            <th>Établissement</th>\n            <th>Activé</th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td>{{ item.createdAt|date: \'dd/MM/yyyy\' }}</td>\n                <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.id })\" ui-sref-widget-opts>{{ item.fullname }}</a></td>\n                <td>{{ item.publictype.name }}</td>\n                <td>{{ item.institution.name }}</td>\n                <td>\n                    <span class=\"label\" ng-class=\"{\'label-danger\' : item.isActive == false, \'label-default\' : item.isActive == true}\">\n                        {{ item.isActive ? \'Oui\' : \'Non\' }}\n                    </span>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucun stagiaire dans cette liste\' }}</div>\n");
 $templateCache.put("institution/states/detail/institution.html","<form sf-xeditable-form=\"form\" sf-href=\'institution.view({id: institution.id})\' on-success=\"onSuccess(data)\">\n    <div class=\"row\">\n        <div class=\"col-md-8\">\n\n            <div class=\"btn-group pull-right\">\n<!--                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le centre de rattachement\" ng-if=\"$user.hasAccessRight(\'sygefor_institution.rights.institution.all.update\')\" ng-click=\"changeOrganization()\"><span class=\"fa fa-university\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"institution._accessRights.delete\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a> -->\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le centre de rattachement\" ng-click=\"changeOrganization()\"><span class=\"fa fa-university\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\"  ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n            </div>\n\n            <div class=\"pre-title\">Créé le {{ institution.createdAt|date: \'dd/MM/yyyy\' }} - {{ institution.organization.name }}</div>\n            <h2><span sf-xeditable=\"form.children.name\">{{ institution.name }}</span></h2>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6\">\n                    <h3>Informations</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Adresse</label> <span sf-xeditable=\"form.children.address\" data-type=\"textarea\">{{ institution.address }}</span></li>\n                        <li><label>Code postal</label> <span sf-xeditable=\"form.children.zip\">{{ institution.zip }}</span></li>\n                        <li><label>Ville</label> <span sf-xeditable=\"form.children.city\">{{ institution.city }}</span></li>\n                    </ul>\n                </div>\n                <div class=\"col-lg-6\">\n<!--                    <h3>Directeur de l\'établissement</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Nom</label> <span sf-xeditable=\"form.children.manager.children.lastName\">{{ institution.manager.lastName }}</span></li>\n                        <li><label>Prénom</label> <span sf-xeditable=\"form.children.manager.children.firstName\">{{ institution.manager.firstName }}</span></li>\n                        <li><label>Téléphone</label> <span sf-xeditable=\"form.children.manager.children.phoneNumber\">{{ institution.manager.phoneNumber }}</span></li>\n                        <li><label>Email</label> <span sf-xeditable=\"form.children.manager.children.email\">{{ institution.manager.email }}</span></li>\n                    </ul> -->\n                </div>\n            </div>\n        </div>\n    </div>\n</form>\n");
 $templateCache.put("institution/states/detail/result.html","<a ui-sref=\"institution.detail.view({id: result.id})\">\n    <label>{{ result.name }}</label>\n    <p class=\"list-group-item-text\">\n        {{ result.institutionType.name ? result.institutionType.name : result.institutionType  }}\n    </p>\n</a>");
 $templateCache.put("institution/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"name.source\">Intitulé</th>\n                        <th search-table-th field=\"zip\">Code postal</th>\n                        <th search-table-th field=\"city.source\">Ville</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td><a href=\"\" ui-sref=\"institution.detail.view({ id: item.id })\">{{ item.name }}</a></td>\n                        <td>{{ item.zip }}</td>\n                        <td>{{ item.city }}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div ng-if=\"search.executed && !search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune unité correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
 $templateCache.put("inscription/dialogs/presences/edit.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"dialog.dismiss()\" aria-hidden=\"true\">×</button>\n    <h4 class=\"modal-title\"><i class=\"fa fa-graduation-cap\"></i> Editer les présences pour la journée du {{ presence.dateBegin|date: \'dd/MM/yyyy\' }}</h4>\n</div>\n\n<form sf-href=\"presence.edit({presence: dialog.params.presence.id})\" sf-form=\"form\" json-path=\"form\" on-success=\"onSuccess(data)\" class=\"form-horizontal\" novalidate>\n    <div class=\"modal-body\">\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.morning.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.scheduleMorn.id }}\">{{ form.children.morning.label }}</label>\n            <div class=\"col-sm-3\" ng-if=\"!presence.morning\">\n                <span disabled=\"true\" sf-form-widget=\"form.children.morning\" class=\"form-control\" />\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.morning.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n            <div class=\"col-sm-3\" ng-if=\"presence.morning\">\n                <span sf-form-widget=\"form.children.morning\" class=\"form-control\" />\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.morning.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-class=\"{\'has-error\': form.children.afternoon.errors.length }\">\n            <label class=\"col-sm-3 control-label\" for=\"{{ form.children.afternoon.id }}\">{{ form.children.afternoon.label }}</label>\n            <div class=\"col-sm-3\" ng-if=\"!presence.afternoon\">\n                <span disabled=\"true\" sf-form-widget=\"form.children.afternoon\" class=\"form-control\" />\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.afternoon.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n            <div class=\"col-sm-3\" ng-if=\"presence.afternoon\">\n                <span sf-form-widget=\"form.children.afternoon\" class=\"form-control\" />\n                <div ng-if=\"error.length\" ng-repeat=\"error in form.children.afternoon.errors\" class=\"help-block\">{{ error }}</div>\n            </div>\n        </div>\n    </div>\n    <div class=\"modal-footer\">\n        <a class=\"btn btn-default\" ng-click=\"dialog.dismiss()\">Annuler</a>\n        <input class=\"btn btn-primary\" type=\"submit\" value=\"Enregistrer\" />\n    </div>\n</form>\n\n\n");
-$templateCache.put("inscription/batch/inscriptionStatusChange/inscriptionStatusChange.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"cancel()\">×</button>\n    <h4 class=\"modal-title\" ng-if=\"inscriptionStatus\">Modification du statut d\'inscription</h4>\n    <h4 class=\"modal-title\" ng-if=\"presenceStatus\">Modification du statut de présence</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Nombre de stagiaires </label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"inscriptionStatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ inscriptionStatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"presenceStatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ presenceStatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n                <input type=\"checkbox\" ng-model=\"send.Mail\" id=\"send_mail\"/>\n                <label class=\"control-label\" for=\"send_mail\">Envoyer un email</label>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Modèle </label>\n            <div class=\"col-sm-9\">\n                <select type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"template\" ng-options=\"template.label for template in templates\" ng-model=\"message.template\" placeholder=\"Modèle du mail\">\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group animate-show\" ng-show=\'send.Mail\'>\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Sujet </label>\n            <div class=\"col-sm-9\">\n                <input type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"subject\" ng-model=\"message.subject\" placeholder=\"Sujet du mail\">\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"message\" class=\"col-sm-3 control-label\">Message </label>\n            <div class=\"col-sm-9\">\n                <textarea class=\"form-control\" ng-disabled=\'!send.Mail\' rows=\"10\" id=\"message\" ng-model=\"message.body\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\'>\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n            <button type=\"button\" ng-disabled=\'!send.Mail\' class=\"btn\" ng-click=\"preview()\">Prévisualiser</button>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail && attCheckList.length\'>\n            <div class=\"col-sm-3 control-label\"><b>Pièces jointes</b> </div>\n            <div class=\"col-sm-5\">\n                <div ng-repeat=\"attachmentTemplate in attCheckList\">\n                <input type=\"checkbox\" ng-model=\"attachmentTemplate.selected\" id=\"attachment_{{ attachmentTemplate.id }}\"/>\n                <label class=\"control-label\" for=\"attachment_{{ attachmentTemplate.id }}\">{{ attachmentTemplate.name }}</label><a href=\"\" class=\"pull-right\" ng-click=\"previewAttachment(attachmentTemplate)\"><i class=\"fa fa-download\"></i> Prévisualiser</a>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"alert alert-danger\" ng-show=\"formError != \'\'\">{{ formError }}</div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"cancel()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
-$templateCache.put("inscription/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"createdAt\">Date</th>\n                        <th ng-hide=\"$stateParams.trainee\" search-table-th field=\"trainee.fullName.source\">Stagiaire</th>\n                        <th ng-hide=\"$stateParams.session\" search-table-th field=\"session.dateBegin\">Session</th>\n                        <th search-table-th field=\"publicCategory.source\">Type de personnel</th>\n                        <th search-table-th field=\"institution.name.source\">Établissement</th>\n                        <th search-table-th field=\"sessionPrice.price\">Tarif</th>\n                        <th search-table-th field=\"inscriptionStatus.name.source\">Inscription</th>\n                        <th search-table-th field=\"presenceStatus.name.source\">Présence</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id })\">{{ item.createdAt|date: \'dd/MM/yyyy\' }}</a></td>\n                        <td ng-hide=\"$stateParams.trainee\"><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullName }}</a></td>\n                        <td ng-hide=\"$stateParams.session\"><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id })\">{{ item.session.dateBegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n                        <td>{{ item.publicType.name ? item.publicType.name : item.publicType }}</td>\n                        <td>{{ item.institution.name }}</td>\n                        <td>{{ item.price | number: 2 }} &euro;</td>\n                        <td><span class=\"label label-lg\" ng-class=\"$root.inscriptionStatusClass(item.inscriptionStatus.status)\">{{ item.inscriptionStatus.name }}</span></td>\n                        <td><span class=\"label label-lg\" ng-class=\"$root.presenceStatusClass(item.presenceStatus.status)\" ng-if=\"item.presenceStatus\">{{ item.presenceStatus.name }}</span></td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune inscription correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
-$templateCache.put("inscription/states/detail/inscription.html","<div class=\"row\">\n    <div class=\"col-md-8\">\n        <div class=\"btn-group pull-right\">\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [inscription.id], service: \'inscription\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Attestation de stage\" ng-if=\"inscription.presenceStatus.status == 1\" ng-click=\"$dialog.open(\'batch.export.pdf\', { items: [inscription.id], service: \'inscription.attestation\' })\"><span class=\"fa fa-file-pdf-o\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Voir le profil\" ng-if=\"inscription.trainee._accessRights.view\" ui-sref=\"trainee.detail.view({id: inscription.trainee.id})\"><span class=\"fa fa-user\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Voir la session\" ng-if=\"inscription.session.training._accessRights.view\" ui-sref=\"session.detail.view({training: inscription.session.training.id, id: inscription.session.id})\"><span class=\"fa fa-calendar-o\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"inscription._accessRights.delete\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n        </div>\n\n        <div class=\"pre-title\">{{ inscription.session.dateBegin|date: \'dd/MM/yyyy\' }} - {{ inscription.session.training.name }}</div>\n\n        <h2>Inscription de {{ inscription.trainee.fullName }}</h2>\n\n        <div>\n            <strong>Date :</strong> {{ inscription.createdAt | date: \'dd/MM/yyyy HH:mm\' }}<br>\n\n            <div class=\"btn-group dropdown\">\n                <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionStatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                <ul class=\"dropdown-menu text-small\">\n                    <li ng-repeat=\"status in inscriptionStatus track by status.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                </ul>\n            </div>\n\n            <div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    <span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                    <span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                    <span class=\"caret\"></span>\n                </button>\n                <ul class=\"dropdown-menu text-small\">\n                    <li ng-repeat=\"status in presenceStatus track by status.id\" ng-class=\"{disabled :inscription.presenceStatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                </ul>\n            </div>\n        </div>\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-6\">\n                <h3><i class=\"fa fa-user\"></i> {{ inscription.trainee.title.name }} {{ inscription.trainee.fullName }}</h3><hr>\n                <ul class=\"summary\">\n                    <li><label>Email</label> {{ inscription.trainee.email }}</li>\n                    <li><label>Téléphone</label> {{ inscription.trainee.phoneNumber }}</li>\n                    <li><label>Unité</label> {{ inscription.institution.machineName == \'other\' ? inscription.otherInstitution : inscription.institution.name }}</li>\n                    <li><label>Code postal</label> {{ inscription.trainee.zip }}</li>\n                    <li><label>Ville</label> {{ inscription.trainee.city }}</li>\n                </ul>\n            </div>\n\n            <div class=\"col-lg-6\">\n                <h3>Profil professionnel</h3><hr>\n                <ul class=\"summary\">\n                    <li><label>Catégorie de public</label> {{ inscription.publicType.machineName }}</li>\n                    <li><label>Service</label> {{ inscription.trainee.service}}</li>\n                    <li><label>Statut</label> {{ inscription.trainee.amuStatut }}</li>\n                    <li><label>BAP</label> {{ inscription.trainee.bap }}</li>\n                    <li><label>Corps</label> {{ inscription.trainee.corps }}</li>\n                    <li><label>Catégorie</label> {{ inscription.trainee.category }}</li>\n                    <li><label>Fonction</label> {{ inscription.trainee.fonction }}</li>\n                </ul>\n            </div>\n        </div>\n\n        <form sf-xeditable-form=\"form\" sf-href=\'inscription.view({id: inscription.id})\' on-success=\"onSuccess(data)\">\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n\n                        <h3>Informations relatives à l\'inscription</h3>\n                        <hr>\n                        <ul class=\"summary\">\n                            <li><label>Tarif</label> {{ inscription.price ? inscription.price : 0 }} &euro;</li>\n                            <li><label>Typologie</label> <span sf-xeditable=\"form.children.typology\">{{ inscription.typology.name }}</span></li>\n                            <li><label>Motivation</label> <span sf-xeditable=\"form.children.motivation\" data-type=\"textarea\">{{ inscription.motivation }}</span></li>\n                            <li><label>Type d\'action de formation</label> <span sf-xeditable=\"form.children.actiontype\" data-type=\"select\">{{ inscription.actiontype.name }}</span></li>\n                            <li><label>Compte personnel de formation</label> <span sf-xeditable=\"form.children.dif\">{{inscription.dif ? \'Oui\' : \'Non\' }}</span> </li>\n                            <li><label>Motif de refus (si statut refusé par N+1)</label> {{inscription.refuse }} </li>\n                        </ul>\n\n\n                </div>\n            </div>\n        </form>\n\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-12\">\n                <h3>Tableau de présence</h3><hr>\n                <!-- Présences -->\n                <div ng-include src=\"\'mycompanybundle/inscription/states/detail/partials/presences.html\'\" ng-controller=\"PresencesViewController\"></div>\n            </div>\n        </div>\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-12\">\n                <h3>Evaluation de la session</h3><hr>\n\n                <div ng-if=\"!inscription.criteria.length\" class=\"well well-empty well-sm\">\n                    Il n\'y a pas d\'évaluation remplie pour cette session.\n                </div>\n\n                <table ng-if=\"inscription.criteria.length\" class=\"table table-hover table-search table-condensed\">\n                    <thead>\n                        <tr>\n                            <th>Critère</th>\n                            <th>Evaluation (note de 1 à 5)</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr ng-repeat=\"crit in inscription.criteria\">\n                            <td> {{ crit.criterion.name }}</td>\n                            <td ng-if=\"crit.note==0\"> Non concerné </td>\n                            <td ng-if=\"crit.note!=0\"> {{crit.note}} </td>\n                        </tr>\n                    </tbody>\n                </table>\n                <hr>\n                <ul class=\"summary\">\n                    <li><label>Remarques</label> {{ inscription.message }} </li>\n                </ul>\n\n            </div>\n        </div>\n\n        <div class=\"alert alert-warning well-sm\"><strong>Important :</strong> les informations présentées ci-dessus <strong>sont datées de la date de la session</strong> ({{ inscription.session.dateBegin|date: \'dd/MM/yyyy\' }}).\n            <span ng-if=\"inscription.trainee._accessRights.view\">Pour obtenir des informations à jour, vous pouvez <a ui-sref=\"trainee.detail.view({id: inscription.trainee.id})\" class=\"alert-link\">consulter le profil du participant <i class=\"fa fa-external-link\"></i></a>.</span>\n            <span ng-if=\"!inscription.trainee._accessRights.view\">Pour obtenir des informations à jour, contactez un administrateur de l\'{{ inscription.trainee.organization.name }}.</span>\n        </div>\n\n    </div>\n\n    <div class=\"col-sm-4\">\n        <div resume-session-block=\"inscription.session\"></div>\n    </div>\n</div>");
-$templateCache.put("inscription/states/detail/result.html","<a ui-sref=\"inscription.detail.view({id: result.id})\" title=\"{{ result.session.training.name }} - {{ result.session.dateBegin | date: \'dd/MM/yyyy\' }}\">\n    <div class=\"list-group-item-title\">{{ result.trainee.fullName }}</div>\n    <div class=\"list-group-item-text\">\n        {{ result.createdAt | date: \'dd/MM/yyyy HH:mm\' }}\n    </div>\n    <div class=\"list-group-item-text\">\n        {{ result.session.training.name | characters:80 }} - {{ result.session.dateBegin | date: \'dd/MM/yyyy\' }}\n    </div>\n    <span ng-if=\"!result.presenceStatus.id\" class=\"label\" ng-class=\"$root.inscriptionStatusClass(result.inscriptionStatus.status)\">\n        {{ result.inscriptionStatus.name }}\n    </span>\n    <span ng-if=\"result.presenceStatus.id\" class=\"label\" ng-class=\"$root.presenceStatusClass(result.presenceStatus.status)\">\n        {{ result.presenceStatus.name }}\n    </span>\n</a>\n");
+$templateCache.put("inscription/batch/inscriptionStatusChange/inscriptionStatusChange.html","<div class=\"modal-header\">\n    <button type=\"button\" class=\"close\" ng-click=\"cancel()\">×</button>\n    <h4 class=\"modal-title\" ng-if=\"inscriptionstatus\">Modification du statut d\'inscription</h4>\n    <h4 class=\"modal-title\" ng-if=\"presencestatus\">Modification du statut de présence</h4>\n</div>\n<div class=\"modal-body\">\n    <form novalidate class=\"form-horizontal\" role=\"form\">\n        <div class=\"form-group\">\n            <label class=\"col-sm-3 control-label\">Nombre de stagiaires </label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ items.length }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"inscriptionstatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ inscriptionstatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\"presencestatus\">\n            <label class=\"col-sm-3 control-label\">Nouveau statut</label>\n            <div class=\"col-sm-9\">\n                <span class=\"form-control\">{{ presencestatus.name }}</span>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n                <input type=\"checkbox\" ng-model=\"send.Mail\" id=\"send_mail\"/>\n                <label class=\"control-label\" for=\"send_mail\">Envoyer un email</label>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Modèle </label>\n            <div class=\"col-sm-9\">\n                <select type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"template\" ng-options=\"template.label for template in templates\" ng-model=\"message.template\" placeholder=\"Modèle du mail\">\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group animate-show\" ng-show=\'send.Mail\'>\n            <label for=\"subject\" class=\"col-sm-3 control-label\">Sujet </label>\n            <div class=\"col-sm-9\">\n                <input type=\"text\" ng-disabled=\'!send.Mail\' class=\"form-control\" id=\"subject\" ng-model=\"message.subject\" placeholder=\"Sujet du mail\">\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\' >\n            <label for=\"message\" class=\"col-sm-3 control-label\">Message </label>\n            <div class=\"col-sm-9\">\n                <textarea class=\"form-control\" ng-disabled=\'!send.Mail\' rows=\"10\" id=\"message\" ng-model=\"message.body\"  placeholder=\"Message du mail\"></textarea>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail\'>\n            <div class=\"col-sm-3\">\n            </div>\n            <div class=\"col-sm-9\">\n            <button type=\"button\" ng-disabled=\'!send.Mail\' class=\"btn\" ng-click=\"preview()\">Prévisualiser</button>\n            </div>\n        </div>\n        <div class=\"form-group\" ng-show=\'send.Mail && attCheckList.length\'>\n            <div class=\"col-sm-3 control-label\"><b>Pièces jointes</b> </div>\n            <div class=\"col-sm-5\">\n                <div ng-repeat=\"attachmentTemplate in attCheckList\">\n                <input type=\"checkbox\" ng-model=\"attachmentTemplate.selected\" id=\"attachment_{{ attachmentTemplate.id }}\"/>\n                <label class=\"control-label\" for=\"attachment_{{ attachmentTemplate.id }}\">{{ attachmentTemplate.name }}</label><a href=\"\" class=\"pull-right\" ng-click=\"previewAttachment(attachmentTemplate)\"><i class=\"fa fa-download\"></i> Prévisualiser</a>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"alert alert-danger\" ng-show=\"formError != \'\'\">{{ formError }}</div>\n    </form>\n</div>\n<div class=\"modal-footer\">\n    <a class=\"btn btn-default\" ng-click=\"cancel()\">Annuler</a>\n    <a class=\"btn btn-primary\" ng-click=\"ok()\">Valider</a>\n</div>\n");
+$templateCache.put("inscription/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"createdAt\">Date</th>\n                        <th ng-hide=\"$stateParams.trainee\" search-table-th field=\"trainee.fullname\">Stagiaire</th>\n                        <th ng-hide=\"$stateParams.session\" search-table-th field=\"session.datebegin\">Session</th>\n                        <th search-table-th field=\"trainee.publictype.name\">Type de personnel</th>\n                        <th search-table-th field=\"trainee.institution.name\">Établissement</th>\n                        <th search-table-th field=\"sessionPrice.price\">Tarif</th>\n                        <th search-table-th field=\"inscriptionstatus.name.source\">Inscription</th>\n                        <th search-table-th field=\"presencestatus.name.source\">Présence</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n<!--                        <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id })\">{{ item.createdAt|date: \'dd/MM/yyyy\' }}</a></td> -->\n                        <td><a href=\"\" ui-sref=\"inscription.detail.view({ id: item.id })\">05/04/2022</a></td>\n                        <td ng-hide=\"$stateParams.trainee\"><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.trainee.id })\">{{ item.trainee.fullname }}</a></td>\n                        <td ng-hide=\"$stateParams.session\"><a href=\"\" ui-sref=\"session.detail.view({ id: item.session.id })\">{{ item.session.datebegin|date: \'dd/MM/yyyy\' }} - {{ item.session.training.name }}</a></td>\n                        <td>{{ item.trainee.publictype.name }}</td>\n                        <td>{{ item.trainee.institution.name }}</td>\n                        <td>{{ item.price | number: 2 }} &euro;</td>\n                        <td><span class=\"label label-lg\" ng-class=\"$root.inscriptionStatusClass(item.inscriptionstatus.status)\">{{ item.inscriptionstatus.name }}</span></td>\n                        <td><span class=\"label label-lg\" ng-class=\"$root.presenceStatusClass(item.presencestatus.status)\" ng-if=\"item.presencestatus\">{{ item.presencestatus.name }}</span></td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune inscription correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
+$templateCache.put("inscription/states/detail/inscription.html","<div class=\"row\">\n    <div class=\"col-md-8\">\n        <div class=\"btn-group pull-right\">\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [inscription.id], service: \'inscription\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Attestation de stage\" ng-if=\"inscription.presenceStatus.status == 1\" ng-click=\"$dialog.open(\'batch.export.pdf\', { items: [inscription.id], service: \'inscription.attestation\' })\"><span class=\"fa fa-file-pdf-o\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Voir le profil\" ng-if=\"inscription.trainee._accessRights.view\" ui-sref=\"trainee.detail.view({id: inscription.trainee.id})\"><span class=\"fa fa-user\"></span></a>\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Voir la session\" ng-if=\"inscription.session.training._accessRights.view\" ui-sref=\"session.detail.view({training: inscription.session.training.id, id: inscription.session.id})\"><span class=\"fa fa-calendar-o\"></span></a>\n<!--            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"inscription._accessRights.delete\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a> -->\n            <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n        </div>\n\n        <div class=\"pre-title\">{{ inscription.session.datebegin|date: \'dd/MM/yyyy\' }} - {{ inscription.session.training.name }}</div>\n\n        <h2>Inscription de {{ inscription.trainee.fullname }}</h2>\n\n        <div>\n            <strong>Date :</strong> {{ inscription.createdAt | date: \'dd/MM/yyyy HH:mm\' }}<br>\n\n            <div class=\"btn-group dropdown\">\n                <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionstatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionstatus.name }} <span class=\"caret\"></span></button>\n                <ul class=\"dropdown-menu text-small\">\n                    <li ng-repeat=\"status in inscriptionstatus track by status.id\" ng-class=\"{disabled :inscription.inscriptionstatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionstatus.id == status.id\"></i> {{ status.name }}</a></li>\n                </ul>\n            </div>\n            <div ng-if=\"inscription.presencestatus || inscription.inscriptionstatus.status == 2\" class=\"btn-group dropdown\">\n                <button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presencestatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    <span ng-if=\"inscription.presencestatus\">{{ inscription.presencestatus.name }}</span>\n                    <span ng-if=\"!inscription.presencestatus\"><em>Statut de présence</em></span>\n                    <span class=\"caret\"></span>\n                </button>\n                <ul class=\"dropdown-menu text-small\">\n                    <li ng-repeat=\"status in presencestatus track by status.id\" ng-class=\"{disabled :inscription.presencestatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presencestatus.id == status.id\"></i> {{ status.name }}</a></li>\n                </ul>\n            </div>\n        </div>\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-6\">\n                <h3><i class=\"fa fa-user\"></i> {{ inscription.trainee.title.name }} {{ inscription.trainee.fullname }}</h3><hr>\n                <ul class=\"summary\">\n                    <li><label>Email</label> {{ inscription.trainee.email }}</li>\n                    <li><label>Téléphone</label> {{ inscription.trainee.phonenumber }}</li>\n                    <li><label>Unité</label> {{ inscription.trainee.institution.name }}</li>\n                    <li><label>Code postal</label> {{ inscription.trainee.zip }}</li>\n                    <li><label>Ville</label> {{ inscription.trainee.city }}</li>\n                </ul>\n            </div>\n\n            <div class=\"col-lg-6\">\n                <h3>Profil professionnel</h3><hr>\n                <ul class=\"summary\">\n                    <li><label>Catégorie de public</label> {{ inscription.trainee.publictype.name }}</li>\n                    <li><label>Service</label> {{ inscription.trainee.service}}</li>\n                    <li><label>Statut</label> {{ inscription.trainee.amustatut }}</li>\n                    <li><label>BAP</label> {{ inscription.trainee.bap }}</li>\n                    <li><label>Corps</label> {{ inscription.trainee.corps }}</li>\n                    <li><label>Catégorie</label> {{ inscription.trainee.category }}</li>\n                    <li><label>Fonction</label> {{ inscription.trainee.fonction }}</li>\n                </ul>\n            </div>\n        </div>\n\n        <form sf-xeditable-form=\"form\" sf-href=\'inscription.view({id: inscription.id})\' on-success=\"onSuccess(data)\">\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n\n                        <h3>Informations relatives à l\'inscription</h3>\n                        <hr>\n                        <ul class=\"summary\">\n                            <li><label>Tarif</label> {{ inscription.price ? inscription.price : 0 }} &euro;</li>\n                            <li><label>Typologie</label> <span sf-xeditable=\"form.children.typology\">{{ inscription.typology.name }}</span></li>\n                            <li><label>Motivation</label> <span sf-xeditable=\"form.children.motivation\" data-type=\"textarea\">{{ inscription.motivation }}</span></li>\n                            <li><label>Type d\'action de formation</label> <span sf-xeditable=\"form.children.actiontype\" data-type=\"select\">{{ inscription.actiontype.name }}</span></li>\n                            <li><label>Compte personnel de formation</label> <span sf-xeditable=\"form.children.dif\">{{inscription.dif ? \'Oui\' : \'Non\' }}</span> </li>\n                            <li><label>Motif de refus (si statut refusé par N+1)</label> {{inscription.refuse }} </li>\n                        </ul>\n\n\n                </div>\n            </div>\n        </form>\n\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-12\">\n                <h3>Tableau de présence</h3><hr>\n                <!-- Présences -->\n                <div ng-include src=\"\'inscription/states/detail/partials/presences.html\'\" ng-controller=\"PresencesViewController\"></div>\n            </div>\n        </div>\n\n        <div class=\"row mb-1\">\n            <div class=\"col-lg-12\">\n                <h3>Evaluation de la session</h3><hr>\n\n                <div ng-if=\"!inscription.criteria.length\" class=\"well well-empty well-sm\">\n                    Il n\'y a pas d\'évaluation remplie pour cette session.\n                </div>\n\n                <table ng-if=\"inscription.criteria.length\" class=\"table table-hover table-search table-condensed\">\n                    <thead>\n                        <tr>\n                            <th>Critère</th>\n                            <th>Evaluation (note de 1 à 5)</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr ng-repeat=\"crit in inscription.criteria\">\n                            <td> {{ crit.criterion.name }}</td>\n                            <td ng-if=\"crit.note==0\"> Non concerné </td>\n                            <td ng-if=\"crit.note!=0\"> {{crit.note}} </td>\n                        </tr>\n                    </tbody>\n                </table>\n                <hr>\n                <ul class=\"summary\">\n                    <li><label>Remarques</label> {{ inscription.message }} </li>\n                </ul>\n\n            </div>\n        </div>\n\n        <div class=\"alert alert-warning well-sm\"><strong>Important :</strong> les informations présentées ci-dessus <strong>sont datées de la date de la session</strong> ({{ inscription.session.dateBegin|date: \'dd/MM/yyyy\' }}).\n            <span ng-if=\"inscription.trainee._accessRights.view\">Pour obtenir des informations à jour, vous pouvez <a ui-sref=\"trainee.detail.view({id: inscription.trainee.id})\" class=\"alert-link\">consulter le profil du participant <i class=\"fa fa-external-link\"></i></a>.</span>\n            <span ng-if=\"!inscription.trainee._accessRights.view\">Pour obtenir des informations à jour, contactez un administrateur de l\'{{ inscription.trainee.organization.name }}.</span>\n        </div>\n\n    </div>\n\n    <div class=\"col-sm-4\">\n        <div resume-session-block=\"inscription.session\"></div>\n    </div>\n</div>");
+$templateCache.put("inscription/states/detail/result.html","<a ui-sref=\"inscription.detail.view({id: result.id})\" title=\"{{ result.session.training.name }} - {{ result.session.datebegin | date: \'dd/MM/yyyy\' }}\">\n    <div class=\"list-group-item-title\">{{ result.trainee.fullname }}</div>\n    <div class=\"list-group-item-text\">\n        {{ result.createdAt | date: \'dd/MM/yyyy HH:mm\' }}\n    </div>\n    <div class=\"list-group-item-text\">\n        {{ result.session.training.name | characters:80 }} - {{ result.session.datebegin | date: \'dd/MM/yyyy\' }}\n    </div>\n    <span ng-if=\"!result.presencestatus.id\" class=\"label\" ng-class=\"$root.inscriptionStatusClass(result.inscriptionstatus.status)\">\n        {{ result.inscriptionstatus.name }}\n    </span>\n    <span ng-if=\"result.presencestatus.id\" class=\"label\" ng-class=\"$root.presenceStatusClass(result.presencestatus.status)\">\n        {{ result.presencestatus.name }}\n    </span>\n</a>\n");
 $templateCache.put("trainer/states/detail/result.html","<a ui-sref=\"trainer.detail.view({id: result.id})\">\n    <label>{{ result.fullname }}</label>\n    <p class=\"list-group-item-text\">\n        <span><i class=\"fa fa-building\"></i> {{ result.institution.name }}</span>\n    </p>\n</a>\n\n");
 $templateCache.put("trainer/states/detail/trainer.html","<form sf-xeditable-form=\"form\" sf-href=\'trainer.view({id: trainer.id})\' on-success=\"onSuccess(data)\">\n    <div class=\"row\">\n        <div class=\"col-md-8\">\n            <div class=\"btn-group pull-right\">\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le centre de rattachement\" ng-click=\"changeOrganization()\"><span class=\"fa fa-university\"></span></a>\n                   <!--ng-if=\"$user.hasAccessRight(\'sygefor_trainer.rights.trainer.all.update\')\" -->\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [trainer.id], service: \'trainer\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n<!--                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"trainer._accessRights.delete\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a> -->\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n            </div>\n\n            <div class=\"pre-title\">Enregistré le {{ trainer.createdAt|date: \'dd/MM/yyyy\' }} - {{ trainer.organization.name }}</div>\n\n            <h2>{{ trainer.fullname }}</h2>\n            <h3><span>Informations personnelles</span></h3>\n            <hr>\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-6\">\n                    <ul class=\"summary\">\n                        <li><label>Nom</label> <span sf-xeditable=\"form.children.lastname\">{{ trainer.lastname }}</span></li>\n                        <li><label>Prénom</label> <span sf-xeditable=\"form.children.firstname\">{{ trainer.firstname }}</span></li>\n                        <li><label>Email</label> <span sf-xeditable=\"form.children.email\">{{ trainer.email }}</span></li>\n                        <li><label>Téléphone</label> <span sf-xeditable=\"form.children.phonenumber\">{{ trainer.phonenumber }}</span></li>\n                        <li><label>Site web</label> <span sf-xeditable=\"form.children.website\">{{ trainer.website }}</span></li>\n                        <li><label>Publié sur le web</label>  <span sf-xeditable=\"form.children.isPublic\">{{ trainer.isPublic ? \'Oui\' : \'Non\' }}</span></li>\n                        <li title=\"Autoriser l\'envoie de courriels pour les stagiaires\"><label>Autoriser les courriels</label> <span sf-xeditable=\"form.children.isAllowSendMail\">{{ trainer.isAllowSendMail === true || trainer.isAllowSendMail === undefined ? \'Oui\' : \'Non\' }}</span></li>\n                    </ul>\n                </div>\n                <div class=\"col-lg-6\">\n                    <ul class=\"summary\">\n                        <li><label>Etablissement</label> <span sf-xeditable=\"form.children.institution\">{{ trainer.institution.name }}</span></li>\n                        <li><label>Formateur interne</label> <span sf-xeditable=\"form.children.isOrganization\">{{ trainer.isOrganization ? \'Oui\' : \'Non\' }}</span></li>\n                        <li><label>Service</label> <span sf-xeditable=\"form.children.service\">{{ trainer.service }}</span></li>\n                        <li><label>Fonction, statut</label>  <span sf-xeditable=\"form.children.status\">{{ trainer.status }}</span></li>\n                        <li><label>Archivé</label> <span sf-xeditable=\"form.children.isArchived\">{{ trainer.isArchived ? \'Oui\' : \'Non\' }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <h3>Coordonnées</h3>\n            <hr>\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-6\">\n                    <ul class=\"summary\">\n                        <li><label>Adresse</label> <span sf-xeditable=\"form.children.address\" data-type=\"textarea\">{{ trainer.address }}</span></li>\n                        <li><label>Code postal</label> <span sf-xeditable=\"form.children.zip\">{{ trainer.zip }}</span></li>\n                        <li><label>Ville</label> <span sf-xeditable=\"form.children.city\">{{ trainer.city }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <div class=\"row\">\n                <div class=\"col-lg-12\">\n                    <h3><span>Observations</span></h3><hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-10\">\n                            <p><span sf-xeditable=\"form.children.comments\" data-type=\"textarea\">{{ trainer.comments }}</span></p>\n\n                        </div>\n                    </div>\n\n                    <!-- Emails -->\n                    <div entity-emails trainer=\"trainer.id\"></div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"col-md-4 sidebar\">\n            <!--\n            PARTICIPATIONS\n            -->\n            <div participations-block=\"trainer\"></div>\n        </div>\n    </div>\n</form>\n");
 $templateCache.put("trainer/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"organization.name\">Centre</th>\n                        <th search-table-th field=\"lastname\">Nom</th>\n                        <th search-table-th field=\"institution.name\">Etablissement</th>\n                        <th search-table-th field=\"service\">Service</th>\n                        <th search-table-th field=\"isOrganization\">Statut</th>\n                        <th search-table-th field=\"isArchived\">Archivé</th>\n                        <th search-table-th field=\"isPublic\">Publié</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td>{{ item.organization.name }}</td>\n                        <td><a href=\"\" ui-sref=\"trainer.detail.view({ id: item.id })\">{{ item.fullname }}</a></td>\n                        <td>{{ item.institution.name }}</td>\n                        <td>{{ item.service }}</td>\n                        <td>{{ item.isOrganization ? \'Formateur interne\' : \'Formateur externe\' }}</td>\n                        <td><span ng-class=\"{\'label label-lg label-danger\': item.isArchived}\">{{ item.isArchived === true ? \'Oui\' : \'Non\' }}</span></td>\n                        <td><span class=\"label label-lg\" ng-class=\"{\'label-success\': item.isPublic, \'label-danger\': !item.isPublic}\">{{ item.isPublic ? \'Publié\' : \'Non publié\' }}</span></td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div class=\"full-height-item is-full-width is-grow\" ng-if=\"search.executed && !search.result.total\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucun formateur correspondant à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
-$templateCache.put("trainee/states/detail/result.html","<a ui-sref=\"trainee.detail.view({id: result.id})\">\n    <label>{{ result.fullname }}</label>\n    <p class=\"list-group-item-text\">\n        <span ng-if=\"result.institution\"><i class=\"fa fa-building\"></i> {{ result.institution.name }}</span>\n    </p>\n</a>\n\n");
-$templateCache.put("trainee/states/detail/trainee.html","<form sf-xeditable-form=\"form\" sf-href=\'trainee.view({id: trainee.id})\' on-success=\"onSuccess(data)\">\n    <div class=\"row\">\n        <div class=\"col-md-8\">\n\n            <div class=\"btn-group pull-right\">\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"{{ trainee.isActive ? \'Désactiver le compte\' : \'Activer le compte\' }}\" ng-if=\"trainee._accessRights.edit\" ng-click=\"toggleActivation()\">\n                    <span class=\"fa\" ng-class=\"{\'fa-thumbs-o-up\': !trainee.isActive, \'fa-thumbs-o-down\': trainee.isActive }\"></span>\n                </a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [trainee.id], service: \'trainee\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le mot de passe\" ng-if=\"trainee._accessRights.edit\" ng-click=\"changePassword()\"><span class=\"fa fa-key\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le centre de rattachement\" ng-if=\"$user.hasAccessRight(\'sygefor_trainee.rights.trainee.all.update\')\" ng-click=\"changeOrganization()\"><span class=\"fa fa-university\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"$user.hasAccessRight(\'sygefor_trainee.rights.trainee.all.update\')\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n            </div>\n\n            <div class=\"pre-title\">Inscrit le {{ trainee.createdAt|date: \'dd/MM/yyyy\' }} - {{ trainee.organization.name }}</div>\n\n            <!--<h2><span ng-class=\"{\'invalidated\': !trainee.isActive }\">{{ trainee.fullname }}</span></h2> -->\n            <h2><span>{{ trainee.fullname }}</span></h2>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6\">\n                    <h3>Informations personnelles</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Civilité</label> {{ trainee.title.name }}</li>\n                        <li><label>Nom</label> {{ trainee.lastname }}</li>\n                        <li><label>Prénom</label> {{ trainee.firstname }}</li>\n                        <li><label>Date de naissance</label> {{ trainee.birthdate }}</li>\n                        <li><label>Email</label> {{ trainee.email }}</li>\n                        <li><label>Téléphone</label> <span sf-xeditable=\"form.children.phonenumber\">{{ trainee.phonenumber }}</span></li>\n                    </ul>\n                </div>\n\n                <div class=\"col-lg-6\">\n                    <h3>Adresse</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Adresse</label> <span sf-xeditable=\"form.children.address\" data-type=\"textarea\">{{ trainee.address }}</span></li>\n                        <li><label>Code postal</label> <span sf-xeditable=\"form.children.zip\">{{ trainee.zip }}</span></li>\n                        <li><label>Ville</label> <span sf-xeditable=\"form.children.city\">{{ trainee.city }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Informations professionnelles</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Etablissement</label> {{ trainee.institution.name }}</li>\n                                <li><label>Campus</label> {{ trainee.campus }}</li>\n                                <li><label>Catégorie de public</label> {{ trainee.publictype.machinename }}</li>\n                                <li><label>Service</label> {{ trainee.service }}</li>\n                                <li><label>Statut</label> {{ trainee.amustatut }}</li>\n                                <li><label>BAP</label> {{ trainee.bap }}</li>\n                                <li><label>Corps</label> {{ trainee.corps }}</li>\n                                <li><label>Catégorie</label> {{ trainee.category }}</li>\n                                <li><label>Fonction exercée</label> <span sf-xeditable=\"form.children.fonction\">{{ trainee.fonction }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Domaine disciplinaire</label> <span sf-xeditable=\"form.children.disciplinaryDomain\" on-change=\"unset(\'disciplinary\')\">{{ trainee.disciplinaryDomain.name }}</span></li>\n                                <li ng-show=\"trainee.disciplinaryDomain\"><label>Discipline</label> <span sf-xeditable=\"form.children.disciplinary\">{{ trainee.disciplinary.name }}</span></li>\n                                <li><label>Payant</label> <span sf-xeditable=\"form.children.isPaying\">{{ trainee.isPaying ? \'Oui\' : \'Non\' }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Responsable hiérarchique</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Nom</label> <span sf-xeditable=\"form.children.lastnamesup\">{{ trainee.lastnamesup }}</span></li>\n                                <li><label>Prénom</label> <span sf-xeditable=\"form.children.firstnamesup\">{{ trainee.firstnamesup }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Mail</label> <span sf-xeditable=\"form.children.emailsup\">{{ trainee.emailsup }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Correspondant formation</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Nom</label> <span sf-xeditable=\"form.children.lastnamecorr\">{{ trainee.lastnamecorr }}</span></li>\n                                <li><label>Prénom</label> <span sf-xeditable=\"form.children.firstnamecorr\">{{ trainee.firstnamecorr }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Mail</label> <span sf-xeditable=\"form.children.emailcorr\">{{ trainee.emailcorr }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <ul class=\"nav nav-tabs\">\n                <li ng-click=\"tab = \'inscriptions\'\" class=\"active\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-graduation-cap\"></span> Inscriptions ({{ trainee.inscriptions.length }})</a></li>\n                <li ng-click=\"tab = \'alerts\'\" ><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-bell\"></span> Alertes ({{ trainee.alerts.length }})</a></li>\n                <li ng-click=\"tab = \'messages\'\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-send\"></span> Messages ({{ trainee.messages.length ? trainee.messages.length : 0 }})</a></li>\n            </ul>\n\n            <!--\n            INSCRIPTIONS\n            -->\n            <div ng-show=\"!tab || tab === \'inscriptions\'\">\n                <div ng-if=\"!trainee.inscriptions.length\" class=\"well well-empty well-sm\">\n                    Il n\'y a aucune inscription pour ce stagiaire.\n                </div>\n\n                <table ng-if=\"trainee.inscriptions.length\" class=\"table table-hover table-condensed table-responsive table-nohead\">\n                    <!--<thead>-->\n                        <!--<th>Date d\'inscription</th>-->\n                        <!--<th>Centre</th>-->\n                        <!--<th>Fiche de l\'inscription</th>-->\n                        <!--<th>Fiche de la session</th>-->\n                        <!--<th>Statut d\'inscription</th>-->\n                        <!--<th>Statut de présence</th>-->\n                    <!--</thead>-->\n                    <tbody>\n                    <tr ng-repeat=\"inscription in trainee.inscriptions | filter:isViewable | orderBy:\'createdAt\':true\">\n                        <td>{{ inscription.createdAt | date:\'dd/MM/yy\' }}</td>\n                        <td>{{ inscription.session.training.organization.name }}</td>\n                        <td><a ui-sref-access=\"inscription._accessRights.view\" ui-sref=\"inscription.detail.view({id: inscription.id, session: session.id})\">{{ inscription.session.training.name }}</a></td>\n                        <td>{{ inscription.session.training.typeLabel }} - Session du <a ui-sref-access=\"inscription.session._accessRights.view\" ui-sref=\"session.detail.view({id: inscription.session.id})\">{{ inscription.session.datebegin | date:\'dd/MM/yyyy\' }}</a></td>\n                        <td><span class=\"label\" ng-class=\"$root.presenceStatusClass(inscription.presencestatus.status)\">{{ inscription.presencestatus.name }}</span></td>\n                        <td><span class=\"label\" ng-hide=\"inscription.presencestatus\" ng-class=\"$root.inscriptionstatusClass(inscription.inscriptionstatus.status)\">{{ inscription.inscriptionstatus.name }}</span></td>\n                    </tr>\n                    </tbody>\n                </table>\n            </div>\n\n            <!--\n             Alertes\n            -->\n            <div ng-show=\"tab === \'alerts\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div>\n                            <div ng-if=\"!trainee.alerts.length\" class=\"well well-empty well-sm\">\n                                Il n\'y a aucune inscription aux alertes pour ce stagiaire.\n                            </div>\n\n                            <table ng-if=\"trainee.alerts.length\" class=\"table table-hover table-search table-condensed\">\n                                <tbody>\n                                <tr ng-repeat=\"alert in trainee.alerts | filter:filter | orderBy:\'createdAt\':true\">\n                                    <td> {{ alert.createdAt | date: \'dd/MM/yyyy\' }} </td>\n                                    <td> {{ alert.session.training.name }} </td>\n                                </tr>\n                                </tbody>\n                            </table>\n\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!--\n             Emails\n            -->\n            <div ng-show=\"tab === \'messages\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div entity-emails trainee=\"trainee.id\"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"col-md-4 sidebar\">\n            <div class=\"block block-institution\" ng-show=\"trainee.institution\">\n                <div class=\"block-title\">\n                    <div class=\"btn-group full-width\">\n                        <a ui-sref=\"institution.detail.view({id: trainee.institution.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-institution\"></span>Unité : {{ trainee.institution.name }}</a>\n                    </div>\n                </div>\n\n                <div class=\"block-body text-gray-light text-light\">\n                    <div class=\"row mb-1\">\n                        <div class=\"col-xs-12\">\n                            <span>{{ trainee.institution.address }} {{ trainee.institution.zip }} {{ trainee.institution.city }}</span>\n                        </div>\n                    </div>\n\n                    <div class=\"row mb-1\">\n                        <div class=\"col-xs-12\">\n                            <div><strong><span class=\"fa fa-user\"></span> Directeur</strong></div>\n                            <span>{{ trainee.institution.manager.fullname }}</span><br>\n                            <span ng-if=\"trainee.institution.manager.email\"><a href=\"mailto:{{ trainee.institution.manager.email }}\" target=\"_blank\">{{ trainee.institution.manager.email }}</a><br></span>\n                            <span ng-if=\"trainee.institution.manager.phonenumber\">{{ trainee.institution.manager.phonenumber }}</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</form>");
-$templateCache.put("trainee/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"organization.name\">Centre</th>\n                        <th search-table-th field=\"title\">Civilite</th>\n                        <th search-table-th field=\"lastname\">Nom</th>\n                        <th search-table-th field=\"createdAt\">Inscription</th>\n                        <th search-table-th field=\"institution.name\">Etablissement</th>\n                        <th search-table-th field=\"publictype\">Catégorie de personnel</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{danger: !item.isActive, warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td>{{ item.organization.name }}</td>\n                        <td>{{ item.title.name ? item.title.name : item.title }}</td>\n                        <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.id })\">{{ item.fullname }}</a></td>\n                        <td>{{ item.createdAt | date: \'dd/MM/yyyy\' }}</td>\n                        <td>{{ item.institution.name }}</td>\n                        <td>{{ item.publictype.name ? item.publictype.name : item.publictype }}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div ng-if=\"search.executed && !search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune personne correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
 $templateCache.put("training/material/directives/materials.block.html","<div class=\"block block-materials\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <span class=\"h4\"><span class=\"fa fa-paperclip\"></span> Supports</span>\n            <div class=\"pull-right\">\n                <a tooltip=\"Gérer les supports\" ng-click=\"manageMaterials()\" href=\"\" class=\"btn btn-fa btn-sm\"><span class=\"fa fa-folder-open-o\"></span></a>\n                <span class=\"badge\">{{ entity.materials.length }}</span>\n            </div>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <div class=\"well well-empty well-sm\" ng-if=\"!entity.materials.length\">\n            {{ emptyMsg }}\n        </div>\n        <ul class=\"list-unstyled\">\n            <li ng-repeat=\"material in entity.materials\">\n                <a href=\"\" ng-click=\"getMaterial(material)\" ng-if=\"!material.url\">{{ material.fileName }}</a>\n                <a href=\"{{material.url}}\" target=\"_blank\" ng-if=\"material.url\">{{ material.name }}</a>\n            </li>\n        </ul>\n    </div>\n</div>\n");
 $templateCache.put("training/session/dialogs/typeahead-session.html","<a class=\"typeahead-inscription-item\">\n    <h4 class=\"item-name\">{{match.label}}</h4>\n    <p class=\"item-complement\">{{match.model.organization }}</p>\n</a>");
+$templateCache.put("training/session/widget/session.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Type</th>\n            <th>Titre</th>\n            <th>Inscriptions</th>\n            <th></th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.id, training: item.training.id })\" ui-sref-widget-opts>{{ item.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                <td>{{ item.training.TypeLabel }}</td>\n                <td><span class=\"fa fa-star fa-highlight\" ng-if=\"item.promote\" title=\"Session promue\"></span> <a href=\"\" ui-sref=\"training.detail.view({ id: item.training.id })\">{{ item.training.name }}</a></td>\n                <td>\n                    <span ng-repeat=\"stat in item.inscriptionStats |filter:{status:\'!2\'}| orderBy:\'count\':1\">\n                        <a href=\"\" ui-sref=\"inscription.table({session: item.id, status: stat.id})\" class=\"label label-default\" tooltip=\"{{ stat.name }} : {{ stat.count }}\" tooltip-placement=\"bottom\" ng-class=\"$root.inscriptionStatusClass(stat.status)\">{{ stat.count }}</a>\n                    </span>\n                </td>\n                <td>\n                    <a registration-stats-label=\"item\"></a>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune session dans cette liste.\' }}</div>\n");
 $templateCache.put("training/session/directives/dates.block.html","<div class=\"block block-dates\">\n    <div class=\"block-body\">\n        <div class=\"mb-1\">\n            <div class=\"pull-left\">\n                <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"addDates()\"><span class=\"fa fa-plus\"></span> Ajouter une date</a>\n            </div>\n        </div>\n\n        <br><br>\n\n        <div ng-if=\"!session.dates.length\" class=\"well well-empty well-sm\">\n            {{ emptyMsg }}\n        </div>\n\n        <div ng-if=\"session.dates.length\">\n            <table class=\"table table-hover table-search table-condensed\">\n                <thead>\n                <tr>\n                    <th>Date début</th>\n                    <th>Date fin</th>\n                    <th>Horaires matin</th>\n                    <th>Horaires après-midi</th>\n                    <th>Nombres d\'heures</th>\n                    <th>Lieu</th>\n                    <th>Modifier</th>\n                    <th>Supprimer</th>\n                </tr>\n                </thead>\n                <tbody>\n                <tr ng-repeat=\"date in session.dates | orderBy:\'datebegin\':false\" >\n                    <td>{{ date.datebegin | date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.dateend | date: \'dd/MM/yyyy\' }}</td>\n                    <td>{{ date.schedulemorn }}</td>\n                    <td>{{ date.scheduleafter }}</td>\n                    <td>{{ date.hournumber }}</td>\n                    <td>{{ date.place }}</td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"editDates(date)\" tooltip=\"Modifier\"><span class=\"fa fa-pencil\"></span></a></td>\n                    <td><a class=\"btn btn-fa\" href=\"\" ng-click=\"removeDates(date)\" tooltip=\"Supprimer\"><span class=\"fa fa-trash-o\"></span></a></td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n</div>\n");
-$templateCache.put("training/session/directives/inscriptions.block.html","<div class=\"block block-inscriptions\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n\n            <!-- title -->\n            <a ui-sref=\"inscription.table({session: session.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-graduation-cap\"></span>Inscriptions</a>\n\n            <!-- stat -->\n            <span ng-if=\"session.registration == 3 && session.registrable\" class=\"label label-success\">ouvertes</span>\n            <span ng-if=\"session.registration == 2 && session.registrable\" class=\"label label-warning\">privées</span>\n            <span ng-if=\"!session.registrable\" class=\"label label-danger\">closes</span>\n\n            <!-- filter -->\n            <span>&nbsp;\n                <span class=\"btn-group\">\n                    <a href=\"\" class=\"btn btn-link dropdown-toggle\" data-toggle=\"dropdown\">\n                        <span class=\"caret\"></span>\n                        <span class=\"text-small text-gray-light\">{{ filterLabel || \'Tous les statuts (\' + session.inscriptions.length + \')\' }}</span>\n                    </a>\n                    <ul class=\"dropdown-menu\" role=\"menu\">\n                        <!--li class=\"dropdown-header\">Filtrer par statut</li-->\n                        <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                        <li class=\"divider\"></li>\n                        <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                        <li class=\"divider\"></li>\n                        <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    </ul>\n                </span>\n            </span>\n\n\n            <!-- operation -->\n            <div class=\"pull-right\">\n                <a ng-if=\"session._accessRights.edit\" class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter une inscription\" tooltip-placement=\"left\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span></a><!--\n                --><span class=\"badge\" ng-class=\"inscriptionBadgeClassName()\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places\" tooltip-placement=\"left\">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>\n            </div>\n        </div>\n    </div>\n\n\n    <div class=\"block-body\">\n        <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n            {{ emptyMsg }}\n        </div>\n        <div ng-if=\"session.inscriptions.length\">\n            <table class=\"table table-condensed table-nohead\">\n                <tbody>\n                <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n                    <td><span class=\"text-gray-light text-small\">{{ inscription.createdAt | date:\'dd/MM/yy\' }}</span></td>\n                    <td>\n                        <a dialog-href-deprecated=\"inscription.detail({id: inscription.id})\" ui-sref=\"inscription.detail.view({id: inscription.id, session: session.id})\">{{ inscription.trainee.fullName }}</a>\n		    </td>\n                    <td class=\"text-right\">\n		            <div class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionstatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionStatus.name }} <span class=\"caret\"></span></button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in inscriptionStatus track by status.id\" ng-class=\"{disabled :inscription.inscriptionStatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		   </div>\n\n		            <div ng-if=\"inscription.presenceStatus || inscription.inscriptionStatus.status == 2\" class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presenceStatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    			<span ng-if=\"inscription.presenceStatus\">{{ inscription.presenceStatus.name }}</span>\n                    			<span ng-if=\"!inscription.presenceStatus\"><em>Statut de présence</em></span>\n                    			<span class=\"caret\"></span>\n                		</button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in presenceStatus track by status.id\" ng-class=\"{disabled :inscription.presenceStatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presenceStatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		   </div>\n\n                    </td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n\n        <div class=\"block\" ng-if=\"session.displayOnline === true && session.registration !== 2\">\n            <div class=\"block-body\">\n                <div input-copy-clipboard=\"session.publicUrl\"></div>\n            </div>\n        </div>\n\n        <div class=\"block\" ng-if=\"session.registration === 2\">\n            <div class=\"block-body\">\n                <div input-copy-clipboard=\"session.privateUrl\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n");
+$templateCache.put("training/session/directives/inscriptions.block.html","<div class=\"block block-inscriptions\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n\n            <!-- title -->\n            <a ui-sref=\"inscription.table({session: session.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-graduation-cap\"></span>Inscriptions</a>\n\n            <!-- stat -->\n            <span ng-if=\"session.registration == 3 && session.registrable\" class=\"label label-success\">ouvertes</span>\n            <span ng-if=\"session.registration == 2 && session.registrable\" class=\"label label-warning\">privées</span>\n            <span ng-if=\"!session.registrable\" class=\"label label-danger\">closes</span>\n\n            <!-- filter -->\n            <span>&nbsp;\n                <span class=\"btn-group\">\n                    <a href=\"\" class=\"btn btn-link dropdown-toggle\" data-toggle=\"dropdown\">\n                        <span class=\"caret\"></span>\n                        <span class=\"text-small text-gray-light\">{{ filterLabel || \'Tous les statuts (\' + session.inscriptions.length + \')\' }}</span>\n                    </a>\n                    <ul class=\"dropdown-menu\" role=\"menu\">\n                        <!--li class=\"dropdown-header\">Filtrer par statut</li-->\n                        <li><a href=\"\" ng-click=\"resetFilter()\"><i class=\"fa fa-check\" ng-if=\"!filter.inscriptionStatus && !filter.presenceStatus\"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>\n                        <li class=\"divider\"></li>\n                        <li ng-repeat=\"status in status.inscription track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'inscription\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.inscriptionStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                        <li class=\"divider\"></li>\n                        <li ng-repeat=\"status in status.presence track by status.id\" ng-class=\"{disabled :status.count == 0}\"><a href=\"\" ng-click=\"filterByStatus(\'presence\', status)\"><i class=\"fa fa-check\" ng-if=\"filter.presenceStatus.id == status.id\"></i> {{ status.name }} ({{ status.count }})</a></li>\n                    </ul>\n                </span>\n            </span>\n\n\n            <!-- operation -->\n            <div class=\"pull-right\">\n                <a ng-if=\"session._accessRights.edit\" class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter une inscription\" tooltip-placement=\"left\" ng-click=\"addInscription()\"><span class=\"fa fa-plus\"></span></a><!--\n                --><span class=\"badge\" ng-class=\"inscriptionBadgeClassName()\" tooltip=\"{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places\" tooltip-placement=\"left\">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>\n            </div>\n        </div>\n    </div>\n\n\n    <div class=\"block-body\">\n        <div ng-if=\"!session.inscriptions.length\" class=\"well well-empty well-sm\">\n            {{ emptyMsg }}\n        </div>\n        <div ng-if=\"session.inscriptions.length\">\n            <table class=\"table table-condensed table-nohead\">\n                <tbody>\n                <tr ng-repeat=\"inscription in session.inscriptions | filter:filter | orderBy:\'createdAt\':true\">\n                    <td><span class=\"text-gray-light text-small\">{{ inscription.createdAt | date:\'dd/MM/yy\' }}</span></td>\n                    <td>\n                        <a dialog-href-deprecated=\"inscription.detail({id: inscription.id})\" ui-sref=\"inscription.detail.view({id: inscription.id, session: session.id})\">{{ inscription.trainee.fullName }}</a>\n		    </td>\n                    <td class=\"text-right\">\n		            <div class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.inscriptionStatusClass(inscription.inscriptionstatus.status, \'btn\')\" data-toggle=\"dropdown\">{{ inscription.inscriptionstatus.name }} <span class=\"caret\"></span></button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in inscriptionstatus track by status.id\" ng-class=\"{disabled :inscription.inscriptionstatus.id == status.id}\"><a href=\"\" ng-click=\"updateInscriptionStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.inscriptionstatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		   </div>\n\n		            <div ng-if=\"inscription.presencestatus || inscription.inscriptionstatus.status == 2\" class=\"btn-group dropdown\">\n                		<button class=\"btn btn-xs dropdown-toggle\" ng-class=\"$root.presenceStatusClass(inscription.presencestatus.status, \'btn\')\" data-toggle=\"dropdown\">\n                    			<span ng-if=\"inscription.presencestatus\">{{ inscription.presencestatus.name }}</span>\n                    			<span ng-if=\"!inscription.presencestatus\"><em>Statut de présence</em></span>\n                    			<span class=\"caret\"></span>\n                		</button>\n                		<ul class=\"dropdown-menu text-small\">\n                    			<li ng-repeat=\"status in presencestatus track by status.id\" ng-class=\"{disabled :inscription.presencestatus.id == status.id}\"><a href=\"\" ng-click=\"updatePresenceStatus(status)\"><i class=\"fa fa-check\" ng-if=\"inscription.presencestatus.id == status.id\"></i> {{ status.name }}</a></li>\n                		</ul>\n            		   </div>\n\n                    </td>\n                </tr>\n                </tbody>\n            </table>\n        </div>\n\n        <div class=\"block\" ng-if=\"session.displayonline === true && session.registration !== 2\">\n            <div class=\"block-body\">\n                <div input-copy-clipboard=\"session.publicUrl\"></div>\n            </div>\n        </div>\n\n        <div class=\"block\" ng-if=\"session.registration === 2\">\n            <div class=\"block-body\">\n                <div input-copy-clipboard=\"session.privateUrl\"></div>\n            </div>\n        </div>\n    </div>\n</div>\n");
 $templateCache.put("training/session/directives/participants-summary.block.html","<div class=\"block block-inscriptions\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <!-- title -->\n            <span class=\"h4\"><span class=\"fa fa-graduation-cap\"></span> Participants</span>\n            <!-- badge -->\n            <span class=\"badge pull-right\">{{ getTotal() }}</span>\n        </div>\n    </div>\n\n    <div class=\"block-body\">\n        <ul class=\"list-unstyled text-gray\">\n            <li ng-repeat=\"public in publics\">\n                <label class=\"text-small\">{{ public.name }}</label>\n                <span class=\"pull-right inline-block\" sf-xeditable=\"getFormElement(public)\" data-mode=\"popup\" data-placement=\"left\">{{ getCount(public) }}</span>\n            </li>\n        </ul>\n    </div>\n</div>\n");
 $templateCache.put("training/session/directives/registration-label.html","<span ng-if=\"session.registration\">\n    <span ng-if=\"!session.registration\" class=\"label label-danger\" ng-class=\"class\">désactivées</span>\n    <span ng-if=\"session.registration == 3 && session.registrable\" class=\"label label-success\" ng-class=\"class\" tooltip=\"Inscriptions ouvertes\">ouvertes</span>\n    <span ng-if=\"session.registration == 2 && session.registrable\" class=\"label label-warning\" ng-class=\"class\" tooltip=\"Inscriptions privées\">privées</span>\n    <span ng-if=\"session.registration == 1 && !session.registrable\" class=\"label label-danger\" ng-class=\"class\" tooltip=\"Inscriptions fermées\">fermées</span>\n    <span ng-if=\"session.registration > 1 && !session.registrable\">\n        <span ng-if=\"$moment().isAfter(session.limitRegistrationDate)\" class=\"label label-danger\" ng-class=\"class\" tooltip=\"Date limite d\'inscription atteinte : {{ session.limitRegistrationDate|date: \'dd/MM/yyyy\' }}\">terminées</span>\n        <span ng-if=\"!$moment().isAfter(session.limitRegistrationDate) && session.numberOfAcceptedRegistrations >= session.maximumNumberOfRegistrations\" class=\"label label-danger\" ng-class=\"class\" tooltip=\"Nombre max de participants atteint : {{ session.maximumNumberOfRegistrations }}\">complet</span>\n    </span>\n</span>\n");
-$templateCache.put("training/session/directives/resumeSession.block.html","<div class=\"block block-session\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <span class=\"h4\"><span class=\"fa fa-calendar\"></span> {{ session.training.name }} - {{ session.name }}</span>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <ul class=\"summary\">\n            <li><label>Thématique</label> {{ session.training.theme.name }} </li>\n            <li><label>Date(s)</label> {{ session.dateRange }}</li>\n            <li><label>Durée</label> {{ session.hourNumber  + \' heure(s) sur \' + session.dayNumber + \' jour(s)\' }}</li>\n            <li><label>Lieu</label> {{ session.place.name }}</li>\n        </ul>\n    </div>\n</div>");
+$templateCache.put("training/session/directives/resumeSession.block.html","<div class=\"block block-session\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <span class=\"h4\"><span class=\"fa fa-calendar\"></span> {{ session.training.name }} - {{ session.name }}</span>\n        </div>\n    </div>\n    <div class=\"block-body\">\n        <ul class=\"summary\">\n            <li><label>Thématique</label> {{ session.training.theme.name }} </li>\n            <li><label>Date(s)</label> du {{ session.datebegin | date: \'dd/MM/yyyy\'}} au {{ session.dateend | date: \'dd/MM/yyyy\'}}</li>\n            <li><label>Durée</label> {{ session.hournumber  + \' heure(s) sur \' + session.daynumber + \' jour(s)\' }}</li>\n            <li><label>Lieu</label> {{ session.place.name }}</li>\n        </ul>\n    </div>\n</div>");
 $templateCache.put("training/session/directives/trainers.block.html","<div class=\"block block-trainers\">\n    <div class=\"block-title\">\n        <div class=\"full-width\">\n            <a ui-sref=\"trainer.table({session: session.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-user\"></span>Formateurs</a>\n            <div class=\"pull-right\">\n                <a class=\"btn btn-fa btn-sm\" href=\"\" tooltip=\"Ajouter un formateur\" tooltip-placement=\"left\" ng-click=\"addTrainer()\"><span class=\"fa fa-plus\"></span></a><!--\n                --><span class=\"badge\">{{ session.participations.length }}</span>\n            </div>\n        </div>\n    </div>\n\n    <div class=\"block-body\">\n        <div class=\"well well-empty well-sm\" ng-if=\"!session.participations.length\">\n            {{ emptyMsg }}\n        </div>\n        <div ng-if=\"session.participations.length\">\n            <span ng-repeat=\"participation in session.participations\">\n                <button type=\"button\" class=\"close close-inline\" ng-click=\"removeTrainer(participation)\"><span aria-hidden=\"true\">&times;</span></button>\n                <a href=\"\" ui-sref=\"trainer.detail.view({session: participation.session.id, id: participation.trainer.id})\"> <!-- ng-click=\"editParticipation(participation)\" -->{{ participation.trainer.fullname }}</a>\n                {{$last ? \'\' : \', \'}}\n            </span>\n            <br>\n            <br>\n            <a class=\"btn btn-xs btn-default\" href=\"\" ng-click=\"sendConvo()\"><span class=\"fa fa-envelope\"></span> Envoyer les convocations</a>\n        </div>\n    </div>\n</div>\n");
-$templateCache.put("training/session/widget/session.html","<div ng-if=\"items.length\">\n    <table class=\"table table-hover table-search table-condensed\">\n        <thead>\n        <tr>\n            <th>Date</th>\n            <th>Type</th>\n            <th>Titre</th>\n            <th>Inscriptions</th>\n            <th></th>\n        </tr>\n        </thead>\n        <tbody>\n            <tr ng-repeat=\"item in items\">\n                <td><a href=\"\" ui-sref=\"session.detail.view({ id: item.id, training: item.training.id })\" ui-sref-widget-opts>{{ item.datebegin|date: \'dd/MM/yyyy\' }}</a></td>\n                <td>{{ item.training.TypeLabel }}</td>\n                <td><span class=\"fa fa-star fa-highlight\" ng-if=\"item.promote\" title=\"Session promue\"></span> <a href=\"\" ui-sref=\"training.detail.view({ id: item.training.id })\">{{ item.training.name }}</a></td>\n                <td>\n                    <span ng-repeat=\"stat in item.inscriptionStats |filter:{status:\'!2\'}| orderBy:\'count\':1\">\n                        <a href=\"\" ui-sref=\"inscription.table({session: item.id, status: stat.id})\" class=\"label label-default\" tooltip=\"{{ stat.name }} : {{ stat.count }}\" tooltip-placement=\"bottom\" ng-class=\"$root.inscriptionStatusClass(stat.status)\">{{ stat.count }}</a>\n                    </span>\n                </td>\n                <td>\n                    <a registration-stats-label=\"item\"></a>\n                </td>\n            </tr>\n        </tbody>\n    </table>\n    <pagination ng-if=\"search.result.total > search.query.size\" total-items=\"search.result.total\" items-per-page=\"search.query.size\" ng-model=\"search.query.page\" class=\"pagination-sm\" max-size=\"5\" previous-text=\"&lsaquo;\" next-text=\"&rsaquo;\"></pagination>\n</div>\n\n<div class=\"widget-empty-msg\" ng-if=\"!items.length && !loading\">{{ options.emptymsg || \'Aucune session dans cette liste.\' }}</div>\n");}]);
+$templateCache.put("trainee/states/table/table.html","<div class=\"full-height-container is-full-width is-absolute is-direction-column\">\n\n    <!-- Results -->\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <table search-table ng-class=\"{loading: search.processing}\">\n                <thead>\n                    <tr>\n                        <th></th>\n                        <th search-table-th field=\"organization.name\">Centre</th>\n                        <th search-table-th field=\"title\">Civilite</th>\n                        <th search-table-th field=\"lastname\">Nom</th>\n                        <th search-table-th field=\"createdAt\">Inscription</th>\n                        <th search-table-th field=\"institution.name\">Etablissement</th>\n                        <th search-table-th field=\"publictype\">Catégorie de personnel</th>\n                    </tr>\n                </thead>\n                <tbody>\n                    <tr ng-repeat=\"item in search.result.items\" ng-class=\"{danger: !item.isActive, warning: isSelected(item.id)}\">\n                        <td ng-click=\"switchSelect(item.id)\" stop-event><i class=\"fa\" ng-class=\"{\'fa-square-o\': !isSelected(item.id), \'fa-check-square-o\': isSelected(item.id)}\"></i></td>\n                        <td>{{ item.organization.name }}</td>\n                        <td>{{ item.title.name ? item.title.name : item.title }}</td>\n                        <td><a href=\"\" ui-sref=\"trainee.detail.view({ id: item.id })\">{{ item.fullname }}</a></td>\n                        <td>{{ item.createdAt | date: \'dd/MM/yyyy\' }}</td>\n                        <td>{{ item.institution.name }}</td>\n                        <td>{{ item.publictype.name ? item.publictype.name : item.publictype }}</td>\n                    </tr>\n                </tbody>\n            </table>\n        </div>\n    </div>\n    <div ng-if=\"search.result.total\" class=\"full-height-item is-full-width\">\n        <div search-table-controls></div>\n    </div>\n\n    <!-- No results -->\n    <div ng-if=\"search.executed && !search.result.total\" class=\"full-height-item is-full-width is-grow\">\n        <div class=\"col-xs-12\">\n            <h1>Oops!</h1>\n            <p>Il n\'y a aucune personne correspondante à votre recherche.</p>\n        </div>\n    </div>\n\n</div>\n");
+$templateCache.put("trainee/states/detail/result.html","<a ui-sref=\"trainee.detail.view({id: result.id})\">\n    <label>{{ result.fullname }}</label>\n    <p class=\"list-group-item-text\">\n        <span ng-if=\"result.institution\"><i class=\"fa fa-building\"></i> {{ result.institution.name }}</span>\n    </p>\n</a>\n\n");
+$templateCache.put("trainee/states/detail/trainee.html","<form sf-xeditable-form=\"form\" sf-href=\'trainee.view({id: trainee.id})\' on-success=\"onSuccess(data)\">\n    <div class=\"row\">\n        <div class=\"col-md-8\">\n\n            <div class=\"btn-group pull-right\">\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"{{ trainee.isActive ? \'Désactiver le compte\' : \'Activer le compte\' }}\" ng-if=\"trainee._accessRights.edit\" ng-click=\"toggleActivation()\">\n                    <span class=\"fa\" ng-class=\"{\'fa-thumbs-o-up\': !trainee.isActive, \'fa-thumbs-o-down\': trainee.isActive }\"></span>\n                </a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Publipostage\" ng-click=\"$dialog.open(\'batch.publipost\', { items: [trainee.id], service: \'trainee\' })\"><span class=\"fa fa-file-word-o\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le mot de passe\" ng-if=\"trainee._accessRights.edit\" ng-click=\"changePassword()\"><span class=\"fa fa-key\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Changer le centre de rattachement\" ng-if=\"$user.hasAccessRight(\'sygefor_trainee.rights.trainee.all.update\')\" ng-click=\"changeOrganization()\"><span class=\"fa fa-university\"></span></a>\n                <a class=\"btn btn-fa\" href=\"\" tooltip=\"Supprimer\" ng-if=\"$user.hasAccessRight(\'sygefor_trainee.rights.trainee.all.update\')\" ng-click=\"delete()\"><span class=\"fa fa-trash-o\"></span></a>\n            </div>\n\n            <div class=\"pre-title\">Inscrit le {{ trainee.createdAt|date: \'dd/MM/yyyy\' }} - {{ trainee.organization.name }}</div>\n\n            <!--<h2><span ng-class=\"{\'invalidated\': !trainee.isActive }\">{{ trainee.fullname }}</span></h2> -->\n            <h2><span>{{ trainee.fullname }}</span></h2>\n\n            <div class=\"row\">\n                <div class=\"col-lg-6\">\n                    <h3>Informations personnelles</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Civilité</label> {{ trainee.title.name }}</li>\n                        <li><label>Nom</label> {{ trainee.lastname }}</li>\n                        <li><label>Prénom</label> {{ trainee.firstname }}</li>\n                        <li><label>Date de naissance</label> {{ trainee.birthdate }}</li>\n                        <li><label>Email</label> {{ trainee.email }}</li>\n                        <li><label>Téléphone</label> <span sf-xeditable=\"form.children.phonenumber\">{{ trainee.phonenumber }}</span></li>\n                    </ul>\n                </div>\n\n                <div class=\"col-lg-6\">\n                    <h3>Adresse</h3>\n                    <hr>\n                    <ul class=\"summary\">\n                        <li><label>Adresse</label> <span sf-xeditable=\"form.children.address\" data-type=\"textarea\">{{ trainee.address }}</span></li>\n                        <li><label>Code postal</label> <span sf-xeditable=\"form.children.zip\">{{ trainee.zip }}</span></li>\n                        <li><label>Ville</label> <span sf-xeditable=\"form.children.city\">{{ trainee.city }}</span></li>\n                    </ul>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Informations professionnelles</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Etablissement</label> {{ trainee.institution.name }}</li>\n                                <li><label>Campus</label> {{ trainee.campus }}</li>\n                                <li><label>Catégorie de public</label> {{ trainee.publictype.machinename }}</li>\n                                <li><label>Service</label> {{ trainee.service }}</li>\n                                <li><label>Statut</label> {{ trainee.amustatut }}</li>\n                                <li><label>BAP</label> {{ trainee.bap }}</li>\n                                <li><label>Corps</label> {{ trainee.corps }}</li>\n                                <li><label>Catégorie</label> {{ trainee.category }}</li>\n                                <li><label>Fonction exercée</label> <span sf-xeditable=\"form.children.fonction\">{{ trainee.fonction }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Domaine disciplinaire</label> <span sf-xeditable=\"form.children.disciplinaryDomain\" on-change=\"unset(\'disciplinary\')\">{{ trainee.disciplinaryDomain.name }}</span></li>\n                                <li ng-show=\"trainee.disciplinaryDomain\"><label>Discipline</label> <span sf-xeditable=\"form.children.disciplinary\">{{ trainee.disciplinary.name }}</span></li>\n                                <li><label>Payant</label> <span sf-xeditable=\"form.children.isPaying\">{{ trainee.isPaying ? \'Oui\' : \'Non\' }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Responsable hiérarchique</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Nom</label> <span sf-xeditable=\"form.children.lastnamesup\">{{ trainee.lastnamesup }}</span></li>\n                                <li><label>Prénom</label> <span sf-xeditable=\"form.children.firstnamesup\">{{ trainee.firstnamesup }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Mail</label> <span sf-xeditable=\"form.children.emailsup\">{{ trainee.emailsup }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <div class=\"row mb-1\">\n                <div class=\"col-lg-12\">\n                    <h3>Correspondant formation</h3>\n                    <hr>\n                    <div class=\"row\">\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Nom</label> <span sf-xeditable=\"form.children.lastnamecorr\">{{ trainee.lastnamecorr }}</span></li>\n                                <li><label>Prénom</label> <span sf-xeditable=\"form.children.firstnamecorr\">{{ trainee.firstnamecorr }}</span></li>\n                            </ul>\n                        </div>\n                        <div class=\"col-lg-6\">\n                            <ul class=\"summary\">\n                                <li><label>Mail</label> <span sf-xeditable=\"form.children.emailcorr\">{{ trainee.emailcorr }}</span></li>\n                            </ul>\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <ul class=\"nav nav-tabs\">\n                <li ng-click=\"tab = \'inscriptions\'\" class=\"active\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-graduation-cap\"></span> Inscriptions ({{ trainee.inscriptions.length }})</a></li>\n                <li ng-click=\"tab = \'alerts\'\" ><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-bell\"></span> Alertes ({{ trainee.alerts.length }})</a></li>\n                <li ng-click=\"tab = \'messages\'\"><a href=\"\" data-toggle=\"tab\"><span class=\"fa fa-send\"></span> Messages ({{ trainee.messages.length ? trainee.messages.length : 0 }})</a></li>\n            </ul>\n\n            <!--\n            INSCRIPTIONS\n            -->\n            <div ng-show=\"!tab || tab === \'inscriptions\'\">\n                <div ng-if=\"!trainee.inscriptions.length\" class=\"well well-empty well-sm\">\n                    Il n\'y a aucune inscription pour ce stagiaire.\n                </div>\n\n                <table ng-if=\"trainee.inscriptions.length\" class=\"table table-hover table-condensed table-responsive table-nohead\">\n                    <!--<thead>-->\n                        <!--<th>Date d\'inscription</th>-->\n                        <!--<th>Centre</th>-->\n                        <!--<th>Fiche de l\'inscription</th>-->\n                        <!--<th>Fiche de la session</th>-->\n                        <!--<th>Statut d\'inscription</th>-->\n                        <!--<th>Statut de présence</th>-->\n                    <!--</thead>-->\n                    <tbody>\n                    <tr ng-repeat=\"inscription in trainee.inscriptions | filter:isViewable | orderBy:\'createdAt\':true\">\n                        <td>{{ inscription.createdAt | date:\'dd/MM/yy\' }}</td>\n                        <td>{{ inscription.session.training.organization.name }}</td>\n                        <td><a ui-sref-access=\"inscription._accessRights.view\" ui-sref=\"inscription.detail.view({id: inscription.id, session: session.id})\">{{ inscription.session.training.name }}</a></td>\n                        <td>{{ inscription.session.training.typeLabel }} - Session du <a ui-sref-access=\"inscription.session._accessRights.view\" ui-sref=\"session.detail.view({id: inscription.session.id})\">{{ inscription.session.datebegin | date:\'dd/MM/yyyy\' }}</a></td>\n                        <td><span class=\"label\" ng-class=\"$root.presenceStatusClass(inscription.presencestatus.status)\">{{ inscription.presencestatus.name }}</span></td>\n                        <td><span class=\"label\" ng-hide=\"inscription.presencestatus\" ng-class=\"$root.inscriptionstatusClass(inscription.inscriptionstatus.status)\">{{ inscription.inscriptionstatus.name }}</span></td>\n                    </tr>\n                    </tbody>\n                </table>\n            </div>\n\n            <!--\n             Alertes\n            -->\n            <div ng-show=\"tab === \'alerts\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div>\n                            <div ng-if=\"!trainee.alerts.length\" class=\"well well-empty well-sm\">\n                                Il n\'y a aucune inscription aux alertes pour ce stagiaire.\n                            </div>\n\n                            <table ng-if=\"trainee.alerts.length\" class=\"table table-hover table-search table-condensed\">\n                                <tbody>\n                                <tr ng-repeat=\"alert in trainee.alerts | filter:filter | orderBy:\'createdAt\':true\">\n                                    <td> {{ alert.createdAt | date: \'dd/MM/yyyy\' }} </td>\n                                    <td> {{ alert.session.training.name }} </td>\n                                </tr>\n                                </tbody>\n                            </table>\n\n                        </div>\n                    </div>\n                </div>\n            </div>\n\n            <!--\n             Emails\n            -->\n            <div ng-show=\"tab === \'messages\'\">\n                <div class=\"row mb-1\">\n                    <div class=\"col-lg-12\">\n                        <div entity-emails trainee=\"trainee.id\"></div>\n                    </div>\n                </div>\n            </div>\n        </div>\n\n        <div class=\"col-md-4 sidebar\">\n            <div class=\"block block-institution\" ng-show=\"trainee.institution\">\n                <div class=\"block-title\">\n                    <div class=\"btn-group full-width\">\n                        <a ui-sref=\"institution.detail.view({id: trainee.institution.id})\" class=\"btn btn-link h4\"><span class=\"fa fa-institution\"></span>Unité : {{ trainee.institution.name }}</a>\n                    </div>\n                </div>\n\n                <div class=\"block-body text-gray-light text-light\">\n                    <div class=\"row mb-1\">\n                        <div class=\"col-xs-12\">\n                            <span>{{ trainee.institution.address }} {{ trainee.institution.zip }} {{ trainee.institution.city }}</span>\n                        </div>\n                    </div>\n\n                    <div class=\"row mb-1\">\n                        <div class=\"col-xs-12\">\n                            <div><strong><span class=\"fa fa-user\"></span> Directeur</strong></div>\n                            <span>{{ trainee.institution.manager.fullname }}</span><br>\n                            <span ng-if=\"trainee.institution.manager.email\"><a href=\"mailto:{{ trainee.institution.manager.email }}\" target=\"_blank\">{{ trainee.institution.manager.email }}</a><br></span>\n                            <span ng-if=\"trainee.institution.manager.phonenumber\">{{ trainee.institution.manager.phonenumber }}</span>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</form>");}]);

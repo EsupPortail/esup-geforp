@@ -440,7 +440,7 @@ class TaxonomyController extends AbstractController
      * @Route("/get_terms/{vocabularyId}", name="taxonomy.get", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View
      */
-    public function getTermsAction(VocabularyRegistry $vocRegistry, $vocabularyId)
+    public function getTermsAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId)
     {
         /*
          * @var AbstractTerm
@@ -451,7 +451,7 @@ class TaxonomyController extends AbstractController
         }
 
         $userOrg = $this->getUser()->getOrganization();
-        $terms = $this->getRootTerms($vocabulary, $userOrg);
+        $terms = $this->getRootTerms($doctrine, $vocabulary, $userOrg);
 
         return $terms;
     }

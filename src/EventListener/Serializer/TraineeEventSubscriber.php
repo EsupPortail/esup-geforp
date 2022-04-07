@@ -30,19 +30,21 @@ class TraineeEventSubscriber implements EventSubscriberInterface
     public function onPostSerialize(ObjectEvent $event)
     {
         //$groups = $event->getContext()->attributes->get('groups');
-        $groups = $event->getContext()->getAttribute('groups');
-        $trainee = $event->getObject();
-        if ($trainee instanceof AbstractTrainee && in_array('api.token', $groups, true)) {
-            $inscriptions = array();
-            /** @var AbstractInscription $inscription */
-            foreach ($trainee->getInscriptions() as $inscription) {
-                $inscriptions[] = array(
-                    'id' => $inscription->getId(),
-                    'session' => $inscription->getSession()->getId(),
-                    'inscriptionStatus' => $inscription->getInscriptionstatus()->getId(),
-                );
+        if ($event->getContext()->hasAttribute('groups')) {
+            $groups = $event->getContext()->getAttribute('groups');
+            $trainee = $event->getObject();
+            if ($trainee instanceof AbstractTrainee && in_array('api.token', $groups, true)) {
+                $inscriptions = array();
+                /** @var AbstractInscription $inscription */
+                foreach ($trainee->getInscriptions() as $inscription) {
+                    $inscriptions[] = array(
+                        'id' => $inscription->getId(),
+                        'session' => $inscription->getSession()->getId(),
+                        'inscriptionStatus' => $inscription->getInscriptionstatus()->getId(),
+                    );
+                }
+                $event->getVisitor()->addData('registrations', $inscriptions);
             }
-            $event->getVisitor()->addData('registrations', $inscriptions);
         }
     }
 }

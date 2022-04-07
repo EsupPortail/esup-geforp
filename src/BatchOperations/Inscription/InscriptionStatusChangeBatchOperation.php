@@ -9,15 +9,18 @@
 
 namespace App\BatchOperations\Inscription;
 
+use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use App\BatchOperations\AbstractBatchOperation;
-use Aoo\Entity\Core\AbstractInscription;
+use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\Term\Inscriptionstatus;
 use App\Entity\Core\Term\Presencestatus;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Class MailingBatchOperation.
@@ -27,10 +30,20 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
     /** @var ContainerBuilder $container */
     private $container;
 
+    private $security;
+    private $vocRegistry;
+
     /**
      * @var string
      */
-    protected $targetClass = 'SygeforCoreBundle:AbstractInscription';
+    protected $targetClass = AbstractInscription::class;
+
+    public function __construct(Security $security, VocabularyRegistry $vocRegistry)
+    {
+        $this->security = $security;
+        $this->vocRegistry =$vocRegistry;
+    }
+
 
     /**
      * @param ContainerInterface $container
@@ -49,18 +62,18 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
     public function execute(array $idList = array(), array $options = array())
     {
         $inscriptions = $this->getObjectList($idList);
-        $em = $this->container->get('doctrine.orm.entity_manager');
-        $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
-        $repoPresenceStatus = $em->getRepository(Presencestatus::class);
+        //$em = $this->container->get('doctrine.orm.entity_manager');
+        $repoInscriptionStatus = $this->doctrine->getRepository(Inscriptionstatus::class);
+        $repoPresenceStatus = $this->doctrine->getRepository(Presencestatus::class);
 
-        $inscriptionStatus = (empty($options['inscriptionStatus'])) ? null : $repoInscriptionStatus->find($options['inscriptionStatus']);
-        $presenceStatus = (empty($options['presenceStatus'])) ? null : $repoPresenceStatus->find($options['presenceStatus']);
+        $inscriptionStatus = (empty($options['inscriptionstatus'])) ? null : $repoInscriptionStatus->find($options['inscriptionstatus']);
+        $presenceStatus = (empty($options['presencestatus'])) ? null : $repoPresenceStatus->find($options['presencestatus']);
 
         //changing status
         $arrayInscriptionsGranted = array();
         /** @var AbstractInscription $inscription */
         foreach ($inscriptions as $inscription) {
-            if ($this->container->get('security.context')->isGranted('EDIT', $inscription)) {
+//            if ($this->container->get('security.context')->isGranted('EDIT', $inscription)) {
                 //setting new inscription status
                 if ($inscriptionStatus) {
                     $inscription->setInscriptionstatus($inscriptionStatus);
@@ -68,9 +81,9 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                     $inscription->setPresencestatus($presenceStatus);
                 }
                 $arrayInscriptionsGranted[] = $inscription;
-            }
+//            }
         }
-        $em->flush();
+        $this->doctrine->getManager()->flush();
 
 	    // if asked, a mail sent to user
 	    if (isset($options['sendMail']) && ($options['sendMail'] === true) && (count($arrayInscriptionsGranted) > 0)) {
@@ -97,42 +110,42 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
      */
     public function getModalConfig($options = array())
     {
-        $userOrg = $this->container->get('security.context')->getToken()->getUser()->getOrganization();
-        $templateTerm = $this->container->get('sygefor_core.vocabulary_registry')->getVocabularyById('sygefor_core.vocabulary_email_template');
-        $attachmentTerm = $this->container->get('sygefor_core.vocabulary_registry')->getVocabularyById('sygefor_core.vocabulary_publipost_template');
+        $userOrg = $this->security->getUser()->getOrganization();
+        $templateTerm = $this->vocRegistry->getVocabularyById(5); // vocabulary_email_template
+        $attachmentTerm = $this->vocRegistry->getVocabularyById(1); //vocabulary_publipost_template
 
         /** @var EntityManager $em */
-        $em = $this->container->get('doctrine.orm.entity_manager');
+        $em = $this->doctrine->getManager();
 
         /** @var EntityRepository $repo */
         $repo = $em->getRepository(get_class($templateTerm));
         $attRepo = $em->getRepository(get_class($attachmentTerm));
 
-        if (!empty($options['inscriptionStatus'])) {
+        if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
-            $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionStatus']);
-            $findCriteria = array('inscriptionStatus' => $inscriptionStatus);
+            $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionstatus']);
+            $findCriteria = array('inscriptionstatus' => $inscriptionStatus);
             if ($userOrg) {
                 $findCriteria['organization'] = $userOrg;
             }
             $templates = $repo->findBy($findCriteria);
         }
-        else if (!empty($options['presenceStatus'])) {
+        else if (!empty($options['presencestatus'])) {
             $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
-            $presenceStatus = $repoInscriptionStatus->findById($options['presenceStatus']);
-            $findCriteria = array('presenceStatus' => $presenceStatus);
+            $presenceStatus = $repoInscriptionStatus->findById($options['presencestatus']);
+            $findCriteria = array('presencestatus' => $presenceStatus);
             if ($userOrg) {
                 $findCriteria['organization'] = $userOrg;
             }
             $templates = $repo->findBy($findCriteria);
         }
         else {
-            $templates = $repo->findBy(array('inscriptionStatus' => null, 'presenceStatus' => null));
+            $templates = $repo->findBy(array('inscriptionstatus' => null, 'presencestatus' => null));
         }
         $attTemplates = $attRepo->findBy(array('organization' => $userOrg ? $userOrg : ''));
 
         return array(
-            'ccResolvers' => $this->container->get('sygefor_core.registry.email_cc_resolver')->getSupportedResolvers($options['targetClass']),
+            'ccResolvers' => null, //$this->container->get('sygefor_core.registry.email_cc_resolver')->getSupportedResolvers($options['targetClass']),
             'templates' => $templates,
             'attachmentTemplates' => $attTemplates,
         );

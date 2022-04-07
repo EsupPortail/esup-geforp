@@ -32,7 +32,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         return $http.post(url, {
             "query": {
                 "match": {
-                    "fullName.autocomplete": {
+                    "fullname.autocomplete": {
                         "query":    angular.lowercase(pref)
                     }
                 }
@@ -41,7 +41,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         ).then(function (res) {
             var adresses = [];
             angular.forEach (res.data.items, function (item) {
-                adresses.push ({label: item.fullName, value:item.id, organization: (item.organization.name) ? item.organization.name : '', institution: (item.institution.name) ? item.institution.name : '', contracted: (item.institution.contracted ? item.institution.contracted : false)})
+                adresses.push ({label: item.fullname, value:item.id, organization: (item.organization.name) ? item.organization.name : '', institution: (item.institution.name) ? item.institution.name : '', contracted: (item.institution.contracted ? item.institution.contracted : false)})
             });
 
             return adresses;

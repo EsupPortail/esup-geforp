@@ -7,8 +7,8 @@
     <div class="block-body">
         <ul class="summary">
             <li><label>Thématique</label> {{ session.training.theme.name }} </li>
-            <li><label>Date(s)</label> {{ session.dateRange }}</li>
-            <li><label>Durée</label> {{ session.hourNumber  + ' heure(s) sur ' + session.dayNumber + ' jour(s)' }}</li>
+            <li><label>Date(s)</label> du {{ session.datebegin | date: 'dd/MM/yyyy'}} au {{ session.dateend | date: 'dd/MM/yyyy'}}</li>
+            <li><label>Durée</label> {{ session.hournumber  + ' heure(s) sur ' + session.daynumber + ' jour(s)' }}</li>
             <li><label>Lieu</label> {{ session.place.name }}</li>
         </ul>
     </div>

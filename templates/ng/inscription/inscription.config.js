@@ -12,21 +12,21 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
         resolve: {
             session: function($stateParams, $entityManager) {
                 if($stateParams.session) {
-                    return $entityManager('SygeforTrainingBundle:Session\\AbstractSession').find($stateParams.session);
+                    return $entityManager('App\\Entity\\Core\\AbstractSession').find($stateParams.session);
                 }
                 return null;
             },
             trainee: function($stateParams, $entityManager) {
                 if($stateParams.trainee) {
-                    return $entityManager('SygeforTraineeBundle:AbstractTrainee').find($stateParams.trainee);
+                    return $entityManager('App\\Entity\\Core\\AbstractTrainee').find($stateParams.trainee);
                 }
                 return null;
             },
             inscriptionStatusList: function ($taxonomy) {
-                return $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status');
+                return $taxonomy.getIndexedTerms(9);
             },
             presenceStatusList: function ($taxonomy) {
-                return $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status');
+                return $taxonomy.getIndexedTerms(10);
             },
             search: function ($searchFactory, $stateParams, session, trainee, $user, inscriptionStatusList) {
                 var search = $searchFactory('inscription.search');
@@ -51,7 +51,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 // stagiaire
                 return [
                     { label: "Public", sref: "trainee.table" },
-                    { label: trainee.fullName, sref: "trainee.detail.view({id: " + trainee.id + " })" },
+                    { label: trainee.fullname, sref: "trainee.detail.view({id: " + trainee.id + " })" },
                     { label: "Inscriptions", sref: "inscription.table({trainee: " + trainee.id + "})" }
                 ];
             }
@@ -62,7 +62,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                     { label: $trainingBundle.getType(session.training.type).label, sref: "training.table({type: " + session.training.type + "})" },
                     { label: session.training.name, sref: "training.detail.view({id: " + session.training.id + " })" },
                     { label: 'Sessions', sref: "session.table({training: " + session.training.id + "})" },
-                    { label: $filter('date')(session.dateBegin, 'dd MMMM y'), sref: "session.detail.view({id: " + session.id + ", training: " + session.training.id + "})"},
+                    { label: $filter('date')(session.datebegin, 'dd MMMM y'), sref: "session.detail.view({id: " + session.id + ", training: " + session.training.id + "})"},
                     { label: "Inscriptions", sref: "inscription.table({session: " + session.id + "})" }
                 ];
             }
@@ -99,7 +99,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                             }
                         },
                         breadcrumb: {
-                            label: "{{ data.inscription.trainee.lastName }} {{ data.inscription.trainee.firstName }}"
+                            label: "{{ data.inscription.trainee.lastname }} {{ data.inscription.trainee.firstname }}"
                         }
                     }
                 }
@@ -125,17 +125,17 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
     // update status dialog
                 $dialogProvider.dialog("inscription.changeStatus", /* @ngInject */ {
                     controller: 'InscriptionStatusChange',
-                    templateUrl: 'inscription/batch/inscriptionStatusChange/programmationChange.html',
+                    templateUrl: 'inscription/batch/inscriptionStatusChange/inscriptionStatusChange.html',
                     size: 'lg',
                     resolve: {
                         config: function ($http, $dialogParams) {
                             var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_inscription.batch.inscription_status_change'});
-                            var optionsArray = {targetClass: 'SygeforInscriptionBundle:AbstractInscription'};
-                            if (typeof $dialogParams.inscriptionStatus != 'undefined') {
-                    optionsArray['inscriptionStatus'] = $dialogParams.inscriptionStatus.id;
+                            var optionsArray = {targetClass: 'App\\Entity\\Core\\AbstractInscription'};
+                            if (typeof $dialogParams.inscriptionstatus != 'undefined') {
+                    optionsArray['inscriptionstatus'] = $dialogParams.inscriptionstatus.id;
                 }
-                if (typeof $dialogParams.presenceStatus != 'undefined') {
-                    optionsArray['presenceStatus'] = $dialogParams.presenceStatus.id;
+                if (typeof $dialogParams.presencestatus != 'undefined') {
+                    optionsArray['presencestatus'] = $dialogParams.presencestatus.id;
                 }
                 return $http.get(url, {params: {options: optionsArray}}).then(function (response) {
                     return response.data;
@@ -171,7 +171,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
 
     // duplicate dialog
     $dialogProvider.dialog('inscription.duplicate', /* @ngInject */ {
-        templateUrl: 'trainingbundle/session/dialogs/crud/duplicate.html',
+        templateUrl: 'training/session/dialogs/crud/duplicate.html',
         resolve:{
             data: function ($http, $dialogParams) {
                 var url = Routing.generate('session.duplicate', {id: 0, inscriptionIds: angular.toJson($dialogParams.items)});

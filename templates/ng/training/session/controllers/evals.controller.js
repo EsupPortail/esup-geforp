@@ -5,7 +5,8 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
 
     // fetch all status and count
     $q.all([
-        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
+//        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
+        $taxonomy.getIndexedTerms(2)
     ]).then(function(crit )  {
         $scope.crit = crit[0];
     });

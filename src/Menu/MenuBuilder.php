@@ -109,6 +109,14 @@ class MenuBuilder
                 ));
 //            }
 
+//            if($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\InscriptionBundle\Entity\AbstractInscription')) {
+                $menu->addChild('inscriptions', array(
+                    'label' => 'Inscriptions',
+                    'icon'  => 'graduation-cap',
+                    'uri'   => $this->router->generate('core.index') . '#/inscription',
+                ));
+//            }
+
 //            if($this->authorizationChecker->isGranted('VIEW', 'SygeforInstitutionBundle:AbstractInstitution')) {
                 $menu->addChild('institutions', array(
                     'label' => 'Etablissements',

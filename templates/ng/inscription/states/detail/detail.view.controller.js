@@ -7,18 +7,18 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.$trainingBundle = $trainingBundle;
     $scope.$moment = moment;
 
-    $scope.inscriptionStatus = inscriptionStatusList;
-    $scope.presenceStatus = angular.copy(presenceStatusList);
+    $scope.inscriptionstatus = inscriptionStatusList;
+    $scope.presencestatus = angular.copy(presenceStatusList);
 
-    $scope.$watch('inscription.presenceStatus', function() {
-        if ($scope.inscription.presenceStatus && $scope.inscription.presenceStatus.id !== 0) {
-            $scope.presenceStatus[0] = {
+    $scope.$watch('inscription.presencestatus', function() {
+        if ($scope.inscription.presencestatus && $scope.inscription.presencestatus.id !== 0) {
+            $scope.presencestatus[0] = {
                 id: 0,
                 name: 'Aucun'
             };
         }
-        else if ($scope.presenceStatus[0] !== undefined) {
-            $scope.presenceStatus = angular.copy(presenceStatusList);
+        else if ($scope.presencestatus[0] !== undefined) {
+            $scope.presencestatus = angular.copy(presenceStatusList);
         }
     });
 
@@ -32,10 +32,10 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.updateInscriptionStatus = function(status) {
         return $dialog.open('inscription.changeStatus', {
             items: [$scope.inscription.id],
-            inscriptionStatus: status,
-            presenceStatus: undefined
+            inscriptionstatus: status,
+            presencestatus: undefined
         }).then(function() {
-            $scope.inscription.inscriptionStatus = status;
+            $scope.inscription.inscriptionstatus = status;
 	        $scope.updateActiveItem($scope.inscription);
         });
     }
@@ -50,10 +50,10 @@ sygeforApp.controller('InscriptionDetailViewController', ['$scope', '$state', '$
     $scope.updatePresenceStatus = function(status) {
         return $dialog.open('inscription.changeStatus', {
             items: [$scope.inscription.id],
-            presenceStatus: status,
-            inscriptionStatus: undefined
+            presencestatus: status,
+            inscriptionstatus: undefined
         }).then(function() {
-            $scope.inscription.presenceStatus = status;
+            $scope.inscription.presencestatus = status;
 	        $scope.updateActiveItem($scope.inscription);
         });
     }

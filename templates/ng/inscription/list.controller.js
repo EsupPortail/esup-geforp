@@ -23,8 +23,8 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                             return $dialog
                                 .open('inscription.changeStatus', {
                                     items: items,
-                                    inscriptionStatus: item,
-                                    presenceStatus: undefined,
+                                    inscriptionstatus: item,
+                                    presencestatus: undefined,
                                     session: ( session ) ? session.id : 0
                                 })
                                 .then(function () {
@@ -34,7 +34,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                                     for (var keySearch in $scope.search.result.items) {
                                         for (var keyItem in items) {
                                             if (items[keyItem] === $scope.search.result.items[keySearch].id) {
-                                                $scope.search.result.items[keySearch].inscriptionStatus = item;
+                                                $scope.search.result.items[keySearch].inscriptionstatus = item;
                                             }
                                         }
                                     }
@@ -60,8 +60,8 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                             return $dialog
                                 .open('inscription.changeStatus', {
                                     items: items,
-                                    presenceStatus: item,
-                                    inscriptionStatus: undefined,
+                                    presencestatus: item,
+                                    inscriptionstatus: undefined,
                                     session: ( session ) ? session.id : 0
                                 })
                                 .then(function () {
@@ -71,7 +71,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                                     for (var keySearch in $scope.search.result.items) {
                                         for (var keyItem in items) {
                                             if (items[keyItem] === $scope.search.result.items[keySearch].id) {
-                                                $scope.search.result.items[keySearch].presenceStatus = item;
+                                                $scope.search.result.items[keySearch].presencestatus = item;
                                             }
                                         }
                                     }

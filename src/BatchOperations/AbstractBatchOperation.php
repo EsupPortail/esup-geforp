@@ -2,7 +2,10 @@
 
 namespace App\BatchOperations;
 
+use App\Entity\Core\AbstractInscription;
+use App\Entity\Inscription;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Class AbstractBatchOperation.
@@ -25,9 +28,9 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     protected $targetClass;
 
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    protected $em;
+    protected $doctrine;
 
     /**
      * @var array
@@ -85,11 +88,11 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     }
 
     /**
-     * @param EntityManager $em
+     * @param ManagerRegistry $doctrine
      */
-    public function setEm(EntityManager $em)
+    public function setDoctrine(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -109,7 +112,9 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
      */
     protected function getObjectList($idList)
     {
-        $entities = $this->em->getRepository($this->targetClass)->findBy(array('id' => $idList));
+        dump($this->getTargetClass());
+        //$entities = $this->em->getRepository($this->targetClass)->findBy(array('id' => $idList));
+        $entities = $this->doctrine->getRepository(Inscription::class)->findBy(array('id' => $idList));
         $this->reorderByKeys($entities, $idList);
 
         return $entities;

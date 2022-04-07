@@ -2,6 +2,9 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Inscription;
+use App\Form\Type\BaseInscriptionType;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
@@ -11,7 +14,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\Term\Inscriptionstatus;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use App\Form\Type\AbstractInscriptionType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
@@ -28,7 +30,7 @@ abstract class AbstractInscriptionController extends AbstractController
      * @Route("/search", name="inscription.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
         /*
         $search = $this->get('sygefor_inscription.search');
@@ -41,31 +43,41 @@ abstract class AbstractInscriptionController extends AbstractController
 
         return $search->search();
         */
+        $inscriptions = $doctrine->getRepository(Inscription::class)->findAll();
+        $nbInscriptions  = count($inscriptions);
+
         $ret = array(
-            'total' => 0,
+            'total' => $nbInscriptions,
             'pageSize' => 0,
-            'items' => array(),
+            'items' => $inscriptions,
         );
         return $ret;
     }
 
     /**
      * @Route("/create/{session}", name="inscription.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="SygeforCoreBundle:AbstractSession", options={"id" = "session"})
+     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
-    public function createAction(Request $request, AbstractSession $session)
+    public function createAction(Request $request, AbstractSession $session, ManagerRegistry $doctrine)
     {
         /** @var AbstractInscription $inscription */
-        $inscription = $this->createInscription($session);
-        /** @var AbstractInscriptionType $inscriptionClass */
-        $inscriptionClass = $inscription::getFormType();
+        $inscription = $this->createInscription($session, $doctrine);
+        /** @var BaseInscriptionType $inscriptionClass */
+//        $inscriptionClass = $inscription::getFormType();
+        $inscriptionClass = BaseInscriptionType::class;
 
-        $form = $this->createForm(new $inscriptionClass($session->getTraining()->getOrganization()), $inscription);
+        $form = $this->createForm($inscriptionClass, $inscription,
+            array('attr' => array(
+                'organization' => $session->getTraining()->getOrganization())
+            )
+        );
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $inscription->setCreatedAt(new \DateTime('now'));
+                $inscription->setUpdatedAt(new \DateTime('now'));
+                $em = $doctrine->getManager();
                 $em->persist($inscription);
                 $em->flush();
             }
@@ -76,26 +88,31 @@ abstract class AbstractInscriptionController extends AbstractController
 
     /**
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="inscription.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("inscription", class="SygeforCoreBundle:AbstractInscription", options={"id" = "id"})
+     * @ParamConverter("inscription", class="App\Entity\Core\AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
-    public function viewAction(AbstractInscription $inscription, Request $request)
+    public function viewAction(AbstractInscription $inscription, Request $request, ManagerRegistry $doctrine)
     {
-        if (!$this->get('security.context')->isGranted('EDIT', $inscription)) {
+/*        if (!$this->get('security.context')->isGranted('EDIT', $inscription)) {
             if ($this->get('security.context')->isGranted('VIEW', $inscription)) {
                 return array('inscription' => $inscription);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }
+        }*/
 
         /** @var AbstractInscriptionType $inscriptionClass */
-        $inscriptionClass = $inscription::getFormType();
-        $form = $this->createForm(new $inscriptionClass($inscription->getSession()->getTraining()->getOrganization()), $inscription);
+//        $inscriptionClass = $inscription::getFormType();
+        $inscriptionClass = BaseInscriptionType::class;
+
+        $form = $this->createForm($inscriptionClass, $inscription,
+            array('attr' => array(
+                'organization' => $inscription->getOrganization())
+            ));
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $em->flush();
             }
         }
@@ -106,15 +123,15 @@ abstract class AbstractInscriptionController extends AbstractController
     /**
      * @Route("/{id}/remove", name="inscription.delete", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("inscription", class="SygeforCoreBundle:AbstractInscription", options={"id" = "id"})
+     * @ParamConverter("inscription", class="App\Entity\Core\AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
-    public function deleteAction(AbstractInscription $inscription)
+    public function deleteAction(AbstractInscription $inscription, ManagerRegistry $doctrine)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->remove($inscription);
         $em->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $this->get('fos_elastica.index')->refresh();
 
         return array();
     }
@@ -124,13 +141,13 @@ abstract class AbstractInscriptionController extends AbstractController
      *
      * @return AbstractInscription
      */
-    protected function createInscription($session)
+    protected function createInscription($session, $doctrine)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $inscription = new $this->inscriptionClass();
         $inscription->setSession($session);
-		$defaultInscriptionStatus = $em->getRepository(Inscriptionstatus::class)->findOneBy(['machineName' => 'waiting']);
-        $inscription->setInscriptionStatus($defaultInscriptionStatus);
+		$defaultInscriptionStatus = $em->getRepository(Inscriptionstatus::class)->findOneBy(['machinename' => 'waiting']);
+        $inscription->setInscriptionstatus($defaultInscriptionStatus);
 
         return $inscription;
     }

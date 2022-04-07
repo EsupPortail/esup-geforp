@@ -1,7 +1,7 @@
 <div class="modal-header">
     <button type="button" class="close" ng-click="cancel()">×</button>
-    <h4 class="modal-title" ng-if="inscriptionStatus">Modification du statut d'inscription</h4>
-    <h4 class="modal-title" ng-if="presenceStatus">Modification du statut de présence</h4>
+    <h4 class="modal-title" ng-if="inscriptionstatus">Modification du statut d'inscription</h4>
+    <h4 class="modal-title" ng-if="presencestatus">Modification du statut de présence</h4>
 </div>
 <div class="modal-body">
     <form novalidate class="form-horizontal" role="form">
@@ -11,16 +11,16 @@
                 <span class="form-control">{{ items.length }}</span>
             </div>
         </div>
-        <div class="form-group" ng-show="inscriptionStatus">
+        <div class="form-group" ng-show="inscriptionstatus">
             <label class="col-sm-3 control-label">Nouveau statut</label>
             <div class="col-sm-9">
-                <span class="form-control">{{ inscriptionStatus.name }}</span>
+                <span class="form-control">{{ inscriptionstatus.name }}</span>
             </div>
         </div>
-        <div class="form-group" ng-show="presenceStatus">
+        <div class="form-group" ng-show="presencestatus">
             <label class="col-sm-3 control-label">Nouveau statut</label>
             <div class="col-sm-9">
-                <span class="form-control">{{ presenceStatus.name }}</span>
+                <span class="form-control">{{ presencestatus.name }}</span>
             </div>
         </div>
         <div class="form-group">

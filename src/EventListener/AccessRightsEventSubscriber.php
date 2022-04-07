@@ -67,12 +67,14 @@ class AccessRightsEventSubscriber implements EventSubscriberInterface
     {
 //        $groups = $context->attributes->get('groups');
 //        foreach ($groups->getOrElse(array()) as $group) {
-       $groups = $context->getAttribute('groups');
-       foreach ($groups as $group) {
-            if ($group === 'api' || strpos($group, 'api.') === 0) {
-                return true;
-            }
-        }
+       if ($context->hasAttribute('groups')) {
+           $groups = $context->getAttribute('groups');
+           foreach ($groups as $group) {
+               if ($group === 'api' || strpos($group, 'api.') === 0) {
+                   return true;
+               }
+           }
+       }
 
         return false;
     }

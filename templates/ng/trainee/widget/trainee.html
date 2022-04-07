@@ -12,8 +12,8 @@
         <tbody>
             <tr ng-repeat="item in items">
                 <td>{{ item.createdAt|date: 'dd/MM/yyyy' }}</td>
-                <td><a href="" ui-sref="trainee.detail.view({ id: item.id })" ui-sref-widget-opts>{{ item.fullName }}</a></td>
-                <td>{{ item.publicCategory }}</td>
+                <td><a href="" ui-sref="trainee.detail.view({ id: item.id })" ui-sref-widget-opts>{{ item.fullname }}</a></td>
+                <td>{{ item.publictype.name }}</td>
                 <td>{{ item.institution.name }}</td>
                 <td>
                     <span class="label" ng-class="{'label-danger' : item.isActive == false, 'label-default' : item.isActive == true}">

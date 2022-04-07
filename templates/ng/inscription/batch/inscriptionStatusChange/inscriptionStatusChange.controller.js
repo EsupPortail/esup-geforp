@@ -6,8 +6,8 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     $scope.service = 'sygefor_inscription.batch.inscription_status_change';
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
-    $scope.inscriptionStatus = $dialogParams.inscriptionStatus;
-    $scope.presenceStatus = $dialogParams.presenceStatus;
+    $scope.inscriptionstatus = $dialogParams.inscriptionstatus;
+    $scope.presencestatus = $dialogParams.presencestatus;
     $scope.send = {Mail: !!config.templates.length};
     $scope.attachmentTemplates = config.attachmentTemplates;
     $scope.attachments = [];
@@ -60,22 +60,22 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         var data = {
             options: {
                 //inscriptionStatus: $scope.inscriptionStatus.id,
-                targetClass: 'SygeforInscriptionBundle:AbstractInscription',
+                targetClass: 'App\\Entity\\Core\\AbstractInscription',
                 sendMail: $scope.send.Mail,
                 subject: $scope.message.subject,
                 message: $scope.message.body,
                 attachmentTemplates: attTemplates,
-                objects: {'SygeforTrainingBundle:Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
+                objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
             ids: $scope.items.join(",")
         };
 
-        if (typeof $scope.inscriptionStatus != 'undefined') {
-            data['options']['inscriptionStatus'] = $scope.inscriptionStatus.id
+        if (typeof $scope.inscriptionstatus != 'undefined') {
+            data['options']['inscriptionstatus'] = $scope.inscriptionstatus.id
         }
 
-        if (typeof $scope.presenceStatus != 'undefined') {
-            data['options']['presenceStatus'] = $scope.presenceStatus.id
+        if (typeof $scope.presencestatus != 'undefined') {
+            data['options']['presencestatus'] = $scope.presencestatus.id
         }
 
         $http.post(url, data).success(function() {
@@ -87,7 +87,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $dialog.open('batch.emailPreview', {
             ids: $scope.items[0],
             options: {
-                targetClass: 'SygeforInscriptionBundle:AbstractInscription',
+                targetClass: 'App\\Entity\\Core\\AbstractInscription',
                 subject: $scope.message.subject,
                 message: $scope.message.body
             }

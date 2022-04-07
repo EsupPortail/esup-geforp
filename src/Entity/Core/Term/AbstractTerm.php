@@ -60,7 +60,7 @@ abstract class AbstractTerm implements VocabularyInterface
      * @var string
      * @ORM\Column(name="machine_name", type="string", length=255, nullable=true)
      */
-    protected $machineName;
+    protected $machinename;
 
     /**
      * @return mixed
@@ -171,17 +171,17 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @return string|null
      */
-    public function getMachineName()
+    public function getMachinename()
     {
-        return $this->machineName;
+        return $this->machinename;
     }
 
     /**
      * @param string
      */
-    public function setMachineName($machineName)
+    public function setMachinename($machineName)
     {
-        $this->machineName = $machineName;
+        $this->machinename = $machineName;
     }
 
     /**
@@ -191,7 +191,7 @@ abstract class AbstractTerm implements VocabularyInterface
      */
     public function isLocked($machineName = null)
     {
-        return !empty($this->machineName);
+        return !empty($this->machinename);
     }
 
     /**
@@ -201,9 +201,9 @@ abstract class AbstractTerm implements VocabularyInterface
      *
      * @return bool
      */
-    public function isMachineName($machineName)
+    public function isMachinename($machineName)
     {
-        return $this->machineName === $machineName;
+        return $this->machinename === $machineName;
     }
 
     /**

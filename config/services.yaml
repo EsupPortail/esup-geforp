@@ -21,7 +21,6 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     app.menu_builder:
@@ -40,7 +39,6 @@ services:
     App\Listener\SessionListener:
         tags:
             - { name: doctrine.event_subscriber }
-
 
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder

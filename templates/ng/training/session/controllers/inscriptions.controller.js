@@ -15,8 +15,10 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
 
     // fetch all status and count
     $q.all([
-        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status'),
-        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status')
+/*        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_inscription_status'),
+        $taxonomy.getIndexedTerms('sygefor_inscription.vocabulary_presence_status')*/
+        $taxonomy.getIndexedTerms(9),
+        $taxonomy.getIndexedTerms(10)
     ]).then(function(status )  {
         $scope.status.inscription = status[0];
         $scope.status.presence = status[1];
@@ -57,7 +59,7 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
             inscriptionstatus: status,
-            presenceStatus : undefined
+            presencestatus : undefined
         }).then(function() {
             inscription.inscriptionstatus = status;
 
@@ -76,10 +78,10 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
         inscription.inscriptionstatus = undefined;
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
-            presenceStatus: status,
+            presencestatus: status,
             inscriptionstatus: undefined
         }).then(function() {
-            inscription.presenceStatus = status;
+            inscription.presencestatus = status;
 
             recalculateStats();
         });
