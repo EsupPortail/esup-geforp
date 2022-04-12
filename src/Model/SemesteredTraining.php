@@ -8,7 +8,7 @@
  * Time: 11:13.
  */
 
-namespace App\Entity;
+namespace App\Model;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;

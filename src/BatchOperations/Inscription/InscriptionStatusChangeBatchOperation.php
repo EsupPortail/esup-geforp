@@ -9,6 +9,7 @@
 
 namespace App\BatchOperations\Inscription;
 
+use App\BatchOperations\Generic\EmailingBatchOperation;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -16,10 +17,13 @@ use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\Term\Inscriptionstatus;
 use App\Entity\Core\Term\Presencestatus;
+use App\Entity\DateSession;
+use App\Entity\Presence;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\Security;
 
 /**
@@ -32,16 +36,18 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
 
     private $security;
     private $vocRegistry;
+    private $emailBatch;
 
     /**
      * @var string
      */
     protected $targetClass = AbstractInscription::class;
 
-    public function __construct(Security $security, VocabularyRegistry $vocRegistry)
+    public function __construct(Security $security, VocabularyRegistry $vocRegistry, EmailingBatchOperation $emailBatch)
     {
         $this->security = $security;
         $this->vocRegistry =$vocRegistry;
+        $this->emailBatch = $emailBatch;
     }
 
 
@@ -83,22 +89,97 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                 $arrayInscriptionsGranted[] = $inscription;
 //            }
         }
+
+        if ($presenceStatus || isset($options['presencestatus'])) {
+            // Si le statut de présence est passé à Absent, Présent ou Partiel, on remplit automatiquement le tableau des présences
+            if (($presenceStatus->getName() == "Présent") || ($presenceStatus->getName() == "Absent") || ($presenceStatus->getName() == "Partiel")) {
+                foreach ($inscriptions as $inscription) {
+                    $session = $inscription->getSession();
+                    $nbPres = count($inscription->getPresences());
+
+                    // Si on a déjà rempli un tableau de présence, on met à jour seulement les statuts, sinon on crée le tableau complet
+                    if ($nbPres < 1) {
+                        foreach ($session->getDates() as $date) {
+                            // Test sur le nombre de jours à afficher
+                            $dateDeb = $date->getDatebegin();
+                            $dateFin = $date->getDateend();
+                            $diff = $dateDeb->diff($dateFin)->format('%a');
+
+                            for ($j = 0; $j < $diff + 1; $j++) {
+                                $dateDeb2 = clone $dateDeb;
+                                $dateDeb2->modify("+$j days");
+                                $presence = new Presence();
+                                $presence->setDatebegin($dateDeb2);
+                                if ($date->getSchedulemorn() != null)
+                                    if ($presenceStatus->getName() != "Partiel") {
+                                        $presence->setMorning($presenceStatus->getName());
+                                    } else {
+                                        $presence->setMorning("Présent");
+                                    }
+                                else
+                                    $presence->setMorning("");
+                                if ($date->getScheduleafter() != null)
+                                    if ($presenceStatus->getName() != "Partiel") {
+                                        $presence->setAfternoon($presenceStatus->getName());
+                                    } else {
+                                        $presence->setAfternoon("Présent");
+                                    }
+                                else
+                                    $presence->setAfternoon("");
+                                $presence->setInscription($inscription);
+                                $inscription->addPresence($presence);
+                            }
+                        }
+                    } else {
+                        // Récupération des présences et modif des statuts
+                        foreach ($inscription->getPresences() as $presence) {
+                            if ($presence->getMorning() != "")
+                                if ($presenceStatus->getName() != "Partiel") {
+                                    $presence->setMorning($presenceStatus->getName());
+                                } else {
+                                    $presence->setMorning("Présent");
+                                }
+                            else
+                                $presence->setMorning("");
+                            if ($presence->getAfternoon() != "")
+                                if ($presenceStatus->getName() != "Partiel") {
+                                    $presence->setAfternoon($presenceStatus->getName());
+                                } else {
+                                    $presence->setAfternoon("Présent");
+                                }
+                            else
+                                $presence->setAfternoon("");
+                        }
+                    }
+                }
+
+            }
+        }
         $this->doctrine->getManager()->flush();
 
-	    // if asked, a mail sent to user
-	    if (isset($options['sendMail']) && ($options['sendMail'] === true) && (count($arrayInscriptionsGranted) > 0)) {
-		    return $this->container->get('sygefor_core.batch.email')->sendEmails(
-			    $arrayInscriptionsGranted,
-			    $options['subject'],
-			    isset($options['cc']) ? $options['cc'] : null,
-			    isset($options['additionalCC']) ? $options['additionalCC'] : null,
-			    $options['message'],
-			    true,
-			    isset($options['templateAttachments']) ? $options['templateAttachments'] : array(),
-			    isset($options['attachment']) ? $options['attachment'] : array(),
-			    null
-		    );
-	    }
+        //if asked, a mail sent to user
+        if (isset($options['sendMail']) && ($options['sendMail'] === true) && (count($arrayInscriptionsGranted) > 0)) {
+            //managing attachments
+            foreach ($arrayInscriptionsGranted as $inscription) {
+                $attachments = array();
+                if ($options['attachmentTemplates']) {
+                    $repo = $this->doctrine->getRepository('App\Entity\Core\Publiposttemplate');
+                    foreach ($options['attachmentTemplates'] as $tplId) {
+                        $tpl           = $repo->find($tplId);
+                        $attachments[] = $this->container->get('sygefor_core.batch.publipost.inscription')->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
+                    }
+                }
+
+                //sending with e-mail service
+                $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false);
+
+                //removing files
+                /** @var File[] $attachments */
+                foreach ($attachments as $att) {
+                    unlink($att->getPathname());
+                }
+            }
+        }
 
 	    return count($arrayInscriptionsGranted);
     }
@@ -118,8 +199,8 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
         $em = $this->doctrine->getManager();
 
         /** @var EntityRepository $repo */
-        $repo = $em->getRepository(get_class($templateTerm));
-        $attRepo = $em->getRepository(get_class($attachmentTerm));
+        $repo = $this->doctrine->getRepository(get_class($templateTerm));
+        $attRepo = $this->doctrine->getRepository(get_class($attachmentTerm));
 
         if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);

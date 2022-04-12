@@ -1,17 +1,17 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: maxime
  * Date: 05/06/14
  * Time: 14:54.
  */
-
 namespace App\Utils\HumanReadable;
 
-use Html2Text\Html2Text;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * Accesses an object property using human readable objects and property names given in config
@@ -19,11 +19,13 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  */
 class HumanReadablePropertyAccessor
 {
-    /** @var HumanReadablePropertyAccessorFactory */
-    protected $accessorFactory;
+    /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
+    private $accessorFactory;
 
-    /** currently accessed object */
-    protected $object;
+    /**
+     * @var object currently accessed objectg
+     */
+    private $object;
 
     /**
      * @param $object
@@ -31,69 +33,6 @@ class HumanReadablePropertyAccessor
     public function __construct($object)
     {
         $this->object = $object;
-    }
-
-    /**
-     * @param mixed $accessorFactory
-     */
-    public function setAccessorFactory($accessorFactory)
-    {
-        $this->accessorFactory = $accessorFactory;
-    }
-
-    /**
-     * @param $property
-     *
-     * @return bool
-     */
-    public function __isset($property)
-    {
-        return true;
-//        $accessor = new PropertyAccessor();
-
-//        $property = $this->getRealPropertyName($property);
-//        return $property ? $accessor->isReadable($this->object, $property) : false;
-    }
-
-    /**
-     * Magic getter for property path.
-     *
-     * @param $property string on the form 'myObjectAlias.MyPropertyAlias'
-     *
-     * @return mixed
-     */
-    public function __get($property)
-    {
-        try {
-            $accessor = new PropertyAccessor();
-            list($rootProperty, $otherProperties) = $this->firstPropertyLevels($property);
-            $rootProperty = $this->getRealPropertyName($rootProperty) ?: $rootProperty;
-            $value = $rootProperty ? $accessor->getValue($this->object, $rootProperty) : 'Propriété non défini';
-        } catch (NoSuchPropertyException $e) {
-            return 'Propriété non définie';
-        }
-            // if property is empty like category.name but category is null
-        catch (UnexpectedTypeException $e) {
-            return null;
-        }
-
-        if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
-            if (!empty($otherProperties)) {
-                return $this->continueAccessProperties($otherProperties, $value);
-            }
-
-            return $this->accessorFactory->getAccessor($value);
-        } elseif ($value instanceof \Traversable) {
-            $array = array();
-            foreach ($value as $val) {
-                $array[] = $this->accessorFactory->getAccessor($val);
-            }
-
-            return $array;
-        }
-
-        // reformat the scalar property if needed
-        return $this->format($property, $value);
     }
 
     /**
@@ -107,13 +46,17 @@ class HumanReadablePropertyAccessor
         $return = array();
 
         foreach ($catalog['fields'] as $name => $options) {
+
             if ((is_object($this->$name)) && $this->accessorFactory->hasEntry(get_class($this->$name))) {
                 $return[$name] = $this->accessorFactory->getAccessor($this->$name)->toArray();
-            } elseif (is_object($this->$name) && get_class($this->$name) === get_class($this)) {
+            }
+            else if (is_object($this->$name) && get_class($this->$name) === get_class($this)) {
                 $return[$name] = $this->$name->toArray();
-            } elseif (empty($this->$name)) {
+            }
+            else if (empty($this->$name)) {
                 $return[$name] = array();
-            } else {
+            }
+            else {
                 $return[$name] = $this->$name;
             }
         }
@@ -122,94 +65,164 @@ class HumanReadablePropertyAccessor
     }
 
     /**
+     * magic getter for property path.
+     *
+     * @param $property a string on the form 'myObjectAlias.MypropertyAlias'
+     *
+     * @return mixed|null
+     */
+    public function __get($property)
+    {
+        switch ($property) {
+            case 'email':
+                //specific behaviour for retrieving mail attached to an entity (such as trainee, inscription, trainer, ...)
+                $mailPath = $this->accessorFactory->getMailPath(get_class($this->object));
+                if ($mailPath !== null) {
+                    $accessor = PropertyAccess::createPropertyAccessor();
+
+                    return $accessor->getValue($this->object, $mailPath);
+                }
+                break;
+            case 'emailSup':
+                $path = 'trainee.emailSup';
+                $accessor = PropertyAccess::createPropertyAccessor();
+                return $accessor->getValue($this->object, $path);
+            case 'emailCorr':
+                $path = 'trainee.emailCorr';
+                $accessor = PropertyAccess::createPropertyAccessor();
+                return $accessor->getValue($this->object, $path);
+            case 'dates':
+                $path = 'session.dates';
+                $accessor = PropertyAccess::createPropertyAccessor();
+                return $accessor->getValue($this->object, $path);
+            default:
+                //default behaviour
+                //path
+                $expl = explode('.', $property);
+                //path may or may not contains dots. In the former case we need to split it in prefix and suffix parts.
+                if (count($expl) === 1) {
+                    $prefix = $property;
+                    $suffix = '';
+                }
+                else {
+                    $prefix = $expl[0];
+                    $suffix = implode('.', array_slice($expl, 1));
+                }
+
+                $path = $this->accessProperty($prefix);
+                //trying to get property for path suffix
+                try {
+                    $accessor = PropertyAccess::createPropertyAccessor();
+                    $value = $accessor->getValue($this->object, $path);
+
+                }
+                catch (NoSuchPropertyException $e) {
+                    // asked property was not found in object
+                    // (alias did not correspond to something that actually exits
+                    // thus an explicit mention is returned and is displayed in result file
+                    return 'Non défini';
+                }
+                catch (UnexpectedTypeException $e) {
+                    // asked property was not found in object
+                    // (alias did not correspond to something that actually exits
+                    // thus an explicit mention is returned and is displayed in result file
+                    return 'Non défini';
+                }
+                // if suffix is not empty, we continue along path
+                if ($suffix !== '') {
+                    if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
+                        //new property accessor for object.
+
+                        /** @var HumanReadablePropertyAccessor $nextAccessor */
+                        $nextAccessor = $this->accessorFactory->getAccessor($value);
+                        if ($nextAccessor) {
+                            try {
+                                return $nextAccessor->$suffix;
+                            }
+                            catch (\Exception $e) {
+                                return 'Non défini';
+                            }
+                        }
+                    }
+                } else { //we reached end of path
+                    if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
+                        return $this->accessorFactory->getAccessor($value);
+                    }
+                    else if ($value instanceof \Traversable) {
+                        $arr = new ArrayCollection();
+                        foreach ($value as $val) {
+                            if ($this->accessorFactory->hasEntry(get_class($val))) {
+                                $arr->add($this->accessorFactory->getAccessor($val));
+                            }
+                        }
+                        return $arr;
+                    }
+                }
+
+                //an attempt of formatting is done
+                return $this->format($prefix, $value);
+                break;
+        }
+    }
+
+    /**
+     * @param $name
+     *
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        //@todo hm: refine this
+        return true;
+    }
+
+    /**
+     * magic function for string conversion.
+     *
      * @return string
      */
     public function __toString()
     {
-        return (string) $this->object;
+        return '';
     }
 
-    /**
-     * Return first level like stagiaire for stagiaire.nom.
-     *
-     * @param $property
-     *
-     * @return mixed
-     *
-     * @throws \Exception
-     */
-    protected function firstPropertyLevels($property)
+    private function accessProperty($property)
     {
-        $expl = explode('.', $property);
-        if (count($expl) === 1) {
-            $rootProperty = $property;
-            $otherProperties = '';
-        } else {
-            // make work stagiaire.nom instead of inscription.stagiaire.nom if object is an inscription for i.e.
-            if ($expl[0] === $this->accessorFactory->getEntityAlias(get_class($this->object))) {
-                $expls = array();
-                foreach ($expl as $key => $value) {
-                    if (isset($expl[$key + 1])) {
-                        $expls[$key] = $expl[$key + 1];
-                    }
-                }
-                $expl = $expls;
-            }
-            $rootProperty = $expl[0];
-            $otherProperties = implode('.', array_slice($expl, 1));
-        }
-
-        return array($rootProperty, $otherProperties);
+        return $this->accessorFactory->getPropertyForAlias(get_class($this->object), $property);
     }
 
     /**
-     * @param string $otherProperties
-     * @param mixed  $value
-     *
+     * @param mixed $accessorFactory
+     */
+    public function setAccessorFactory($accessorFactory)
+    {
+        $this->accessorFactory = $accessorFactory;
+    }
+
+    /**
      * @return mixed
      */
-    protected function continueAccessProperties($otherProperties, $value)
+    public function getAccessorFactory()
     {
-        if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
-            /** @var HumanReadablePropertyAccessor $nextAccessor */
-            $nextAccessor = $this->accessorFactory->getAccessor($value);
-            if ($nextAccessor) {
-                try {
-                    return $nextAccessor->$otherProperties;
-                } catch (\Exception $e) {
-                    return 'Non défini';
-                }
-            }
-        }
-
-        return null;
+        return $this->accessorFactory;
     }
 
     /**
-     * Get the PHP property name instead of the human readable alias (ie: nom => name).
-     *
-     * @param $property
-     *
-     * @return null|string
+     * @param mixed $object
      */
-    protected function getRealPropertyName($property)
+    public function setObject($object)
     {
-        if ($property === 'email') {
-            $property = $this->accessorFactory->getMailPath(get_class($this->object)) ?: $property;
-        }
-
-        return $this->accessProperty($property);
+        $this->object = $object;
     }
 
     /**
      * returns a formatted version of requested value. useful for date for the moment.
      *
-     * @param $prefix
      * @param $value
      *
      * @return mixed
      */
-    protected function format($prefix, $value)
+    private function format($prefix, $value)
     {
         $format = $this->accessorFactory->getFormatForAlias(get_class($this->object), $prefix);
         $type = $this->accessorFactory->getTypeForAlias(get_class($this->object), $prefix);
@@ -229,15 +242,4 @@ class HumanReadablePropertyAccessor
         return $value;
     }
 
-    /**
-     * Get real propery name from catalog.
-     *
-     * @param $property
-     *
-     * @return null|string
-     */
-    protected function accessProperty($property)
-    {
-        return $this->accessorFactory->getPropertyForAlias(get_class($this->object), $property);
-    }
 }

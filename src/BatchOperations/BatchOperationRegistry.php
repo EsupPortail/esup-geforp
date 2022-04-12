@@ -9,10 +9,14 @@
 
 namespace App\BatchOperations;
 
+use App\BatchOperations\Generic\EmailingBatchOperation;
 use App\BatchOperations\Inscription\InscriptionStatusChangeBatchOperation;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Security;
+use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
 
 /**
  * Class BatchOperationRegistry.
@@ -24,13 +28,19 @@ class BatchOperationRegistry
      */
     private $operations = array();
 
-    public function __construct(Security $security, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine)
+    public function __construct(Security $security, ContainerInterface $container, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpa)
     {
         $this->operations = array();
 
         // Construction de la liste des batch operations 'en dur'
         $i=0;
-        $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry);
+        $conf = $container->getParameter('batch');
+        $hrpa->setTermCatalog($conf['mailing']);
+        $emailingBatch = new EmailingBatchOperation($security, $vocabularyRegistry, $mailer, $hrpa);
+        $emailingBatch->setDoctrine($doctrine);
+        $this->addBatchOperation($emailingBatch, $i);
+        $i++;
+        $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatch);
         $operation->setDoctrine($doctrine);
         $this->addBatchOperation($operation, $i);
         $i++;
@@ -80,8 +90,11 @@ class BatchOperationRegistry
     {
         $id = 100000;
         switch ($servicename) {
-            case 'sygefor_inscription.batch.inscription_status_change':
+            case 'sygefor_core.batch.email':
                 $id = 0;
+                break;
+            case 'sygefor_inscription.batch.inscription_status_change':
+                $id = 1;
                 break;
         }
         if (isset($this->operations[$id])) {

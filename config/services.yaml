@@ -3,7 +3,363 @@
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+
 parameters:
+    batch:
+        convert_type:
+            semestered_training:
+                class: 'App\Entity\Core\AbstractTraining'
+        csv:
+            user:
+                class: 'App\Entity\User'
+                filename: 'utilisateurs.csv'
+                fields:
+                    username: Nom
+                    email: Email
+                    organization.name: Centre
+            session:
+                class: 'App\Entity\Core\AbstractSession'
+                filename: 'session.csv'
+                fields:
+                    id: "Numéro"
+                    training.name: "Nom du stage"
+                    name: "Nom de la session"
+                    training.theme: "Thématique"
+                    training.category: "Catégorie de stage"
+                    dateBegin: { label: "Date de début", type: "date" }
+                    dateEnd: { label: "Date de fin", type: "date" }
+                    dayNumber: "Nombre de jours théoriques"
+                    registration: { label: "Type d'inscriptions", type: "typinsc" }
+                    training.tags: "Tags du stage"
+                    date.lieu: "Lieu de formation"
+                    status: { label: "Statut de la session", type: "statut" }
+                    training.supervisor.name: "Nom du responsable pédagogique"
+                    training.supervisor.first_name: "Prénom du responsable pédagogique"
+                    trainers.fullName: "Formateur(s)"
+                    inscription.listeatt: "Nombre d'inscriptions en liste d'attente"
+                    inscription.refus: "nombre d'inscription refusées"
+                    inscription.convoke: "Nombre de convoqués"
+                    inscription.presence.nbheures: "Nombre d'heures de présence effective"
+                    maximumNumberOfRegistrations: 'Nombre de places'
+                    numberOfRegistrations: "Nombre d'inscrits"
+                    numberOfParticipants: 'Nombre de présents effectifs'
+                    presence.partiel: 'Nombre de présences partielles'
+                    presence.absent: "Nombre d'absents"
+                    presence.excuse: "Nombre d'excusés"
+                    session.presence.nbheures: "Nombre d'heures de présence théorique pour les présents"
+                    hourNumber: "Durée réelle de la session"
+                    teachingCost: "Coût pédagogique"
+                    vacationCost: "Coût vacation"
+                    accommodationCost: "Coût hébergement"
+                    mealCost: "Coût repas"
+                    transportCost: "Coût transport"
+                    materialCost: "Coût support"
+                    totalCost: "Coût total"
+                    training.designated_public: "Public désigné"
+                    evalResume: "Evaluations"
+            semestered_training:
+                class: 'App\Model\SemesteredTraining'
+                filename: 'formation.csv'
+                fields:
+                    training.id: { label: 'Identifiant' }
+                    year: { label: 'Année' }
+                    semester: { label: 'Semestre' }
+                    training.name: { label: 'Intitulé' }
+                    training.theme: { label: 'Thématique' }
+                    sessionsCount: { label: 'nombre de sessions' }
+                    nextSession.dateBegin: { label: 'Prochaine', type: 'date' }
+                    lastSession.dateBegin: { label: 'Dernière', type: 'date' }
+                    tags: { label: 'Tags' }
+            trainee:
+                class: 'App\Entity\Core\AbstractTrainee'
+                filename: 'stagiaire.csv'
+                fields:
+                    title: "Civilité"
+                    lastName: "Nom"
+                    firstName: "Prénom"
+                    email: "Email"
+                    phoneNumber: "Téléphone"
+                    institution.name: "Etablissement"
+                    publicType: "Catégorie de public"
+                    status: "Statut"
+                    disciplinary: "Discipline"
+                    disciplinaryDomain: "Domaine disciplinaire"
+                    address: "Adresse"
+                    zip: "Code postal"
+                    city: "Ville"
+            trainer:
+                class: 'App\Entity\Core\AbstractTrainer'
+                filename: 'formateur.csv'
+                fields:
+                    createdAt: { label: "Date d'inscription", type: "date" }
+                    title: "Civilité"
+                    fullName: "Nom"
+                    organization.name: "Centre"
+                    email: "Email"
+                    phoneNumber: "Téléphone"
+                    webSite: "Site Web"
+                    institution.name: "Unité"
+                    address: "Adresse"
+                    zip: "Code postal"
+                    city: "Ville"
+            inscription:
+                class: 'App\Entity\Core\AbstractInscription'
+                filename: 'inscription.csv'
+                fields:
+                    trainee.lastName: "Nom du stagiaire"
+                    trainee.firstName: "Prénom du stagiaire"
+                    trainee.title: "Civilité du stagiaire"
+                    trainee.birthDate: "Date de naissance"
+                    trainee.email: "Email du stagiaire"
+                    trainee.institution: "Etablissement"
+                    trainee.service: "Service"
+                    trainee.amuStatut: "Statut"
+                    trainee.fonction: "Fonction exercée"
+                    trainee.category: "Catégorie"
+                    trainee.corps: "Corps"
+                    trainee.bap: "BAP"
+                    trainee.address: "Adresse du stagiaire"
+                    trainee.zip: "Code postal"
+                    trainee.city: "Ville"
+                    trainee.lastNameSup: "Nom du supérieur hiérarchique"
+                    trainee.firstNameSup: "Prénom du supérieur hiérarchique"
+                    session.training.name: "Intitulé du stage"
+                    session.name: "Intitulé de la session"
+                    session.id: "Numéro de la session"
+                    session.dateBegin: { label: 'Date de la session', type: "date" }
+                    session.training.supervisor.name: "Nom du responsable pédagogique"
+                    session.training.supervisor.first_name: "Prénom du responsable pédagogique"
+                    session.training.theme: "Domaine de formation"
+                    session.dayNumber: "Nombre de jours"
+                    inscriptionStatus: "Statut de l'inscription"
+                    presenceStatus: "Statut de présence"
+                    presence.nbheures: "Nombre d'heures de présence"
+                    actiontype: "Type d'inscription"
+                    dif: "CPF"
+            institution:
+                class: 'SygeforMyCompanyBundle:Institution'
+                filename: 'unite.csv'
+                fields:
+                    name: "Nom"
+                    organization.name: "Centre"
+                    createdAt: { label: "Date de création", type: "date" }
+                    address: "Adresse"
+                    zip: "Code postal"
+                    city: "Ville"
+                    manager.fullName: "Directeur de l'établissement"
+                    manager.phoneNumber: "Téléphone"
+                    manager.email: "Email"
+        mailing:
+            organization:
+                class: 'App\Entity\Organization'
+                excludeFromFormType: true
+                alias: 'centre'
+                fields:
+                    nom: { property: name }
+                    code: { property: code }
+            typeAction:
+                class: 'App\Entity\Core\Term\Actiontype'
+                fields:
+                    nom: { property: name }
+            inscription:
+                class: 'App\Entity\Inscription'
+                emailPath: 'trainee.email'
+                alias: 'inscription'
+                fields:
+                    id: { property: id }
+                    centre: { property: organization }
+                    date: { property: createdAt }
+                    session: { property: session }
+                    stagiaire: { property: trainee }
+                    presences: { property: presences }
+                    statutInscription: { property: inscriptionstatus.name }
+                    statutPresence: { property: presencestatus.name }
+                    dates: { property: session.dates }
+                    dateDebut: { property: session.dateDebut }
+                    domaine: { property: session.formation.theme }
+                    typeAction: { property: actiontype }
+                    listeFormateurs: { property: session.listeFormateurs }
+                    refuse: { property: refuse }
+            trainee:
+                class: 'App\Entity\Trainee'
+                alias: 'stagiaire'
+                emailPath: 'email'
+                fields:
+                    centre: { property: organization }
+                    # PersonTrait
+                    civilite: { property: title }
+                    nomComplet: { property: fullname }
+                    nomNaissance: { property: maidenName }
+                    nom: { property: lastname }
+                    prenom: { property: firstname }
+                    # CoordinatesTrait
+                    adresse: { property: address }
+                    codePostal: { property: zip }
+                    ville: { property: city }
+                    email: { property: email }
+                    telephone: { property: phonenumber }
+                    # ProfessionalSituationTrait
+                    institution: { property: institution }
+                    service: { property: service }
+                    corps: { property: corps }
+                    bap: { property: bap }
+                    fonction: { property: fonction }
+                    public: { property: publictype.name }
+                    statut: { property: status }
+                    payant: { property: isPaying }
+                    # Trainee
+                    inscriptions: { property: inscriptions }
+            trainer:
+                class: 'App\Entity\Trainer'
+                # excludeFromFormType: true
+                alias: 'formateur'
+                emailPath: 'email'
+                fields:
+                    #personTrait
+                    civilite: { property: title }
+                    nomComplet: { property: fullname }
+                    nom: { property: lastname }
+                    prenom: { property: firstname }
+                    # CoordinatesTrait
+                    adresse: { property: address }
+                    codePostal: { property: zip }
+                    ville: { property: city }
+                    email: { property: email }
+                    fax: { property: faxnumber }
+                    site: { property: website }
+                    #coordinatesTrait
+                    etablissement: { property: institution }
+                    service: { property: service }
+                    statut: { property: status }
+                    # other fields
+                    sessions: { property: sessions }
+            session:
+                class: 'App\Entity\Session'
+                alias: 'session'
+                emailPath: 'trainer.email'
+                fields:
+                    # AbstractSession
+                    nom: { property: "name" }
+                    dateDebut: { property: "datebegin", type: "date" }
+                    dateFin: { property: "dateend", type: "date" }
+                    dates: { property: "dates" }
+                    formation: { property: "training" }
+                    formateurs: { property: "trainersListString" }
+                    listeFormateurs: { property: "trainers" }
+                    formateur: { property: "participations[0].trainer" }
+                    nombrePlaces: { property: "maximumnumberofregistrations" }
+                    nombreInscrits: { property: "numberofregistrations" }
+                    dateLimiteInscription: { property: "limitregistrationdate" }
+                    nombreHeures: { property: "hournumber" }
+                    nombreJours: { property: "daynumber" }
+                    horaires: { property: "schedule" }
+                    participantsMax: { property: "maximumnumberofregistrations" }
+                    lieu: { property: "place.name" }
+                    adresse: { property: "place.fullAddress" }
+                    programme: { property: "training.program" }
+                    commentaires: { property: "comments" }
+                    #nombrePresents: { property: "numberOfPresentPeople" }
+                    inscriptions: { property: "inscriptions" }
+                    participations: { property: "participations" }
+                    url: { property: "frontUrl" }
+                    theme: { property: "training.theme.name" }
+                    # Session
+                    tarif: { property: "price" }
+            training:
+                class: 'App\Entity\Core\AbstractTraining'
+                excludeFromFormType: true
+                alias: 'formation'
+                fields:
+                    # Training
+                    nom: { property: name }
+                    theme: { property: theme.name }
+                    centre: { property: organization }
+                    numero: { property: number }
+                    sessions: { property: sessions }
+                    programme: { property: program }
+                    description: { property: description }
+                    methodes: { property: teachingMethods }
+                    etablissement: { property: institution }
+                    responsable: { property: supervisor.name }
+                    categorie: { property: category.name }
+                    typeIntervention: { property: interventionType }
+                    initiativeExterne: { property: externalInitiative }
+                    # Internship && Long training
+                    prerequis: { property: prerequisites }
+                    public: { property: publictype.name }
+                    # Long training
+                    modules: { property: modules }
+                    # Meeting
+                    nationale: { property: national }
+            participation:
+                class: 'App\Entity\Participation'
+                alias: 'participation'
+                emailPath: 'trainer.email'
+                fields:
+                    id: { property: id }
+                    formateur: { property: trainer }
+                    session: { property: session }
+                    dates: { property: session.dates }
+            internship:
+                class: 'App\Entity\Internship'
+                parent: training
+            date:
+                class: 'App\Entity\DateSession'
+                alias: 'date'
+                fields:
+                    dateDebut: { property: datebegin }
+                    dateFin: { property: dateend }
+                    horairesMatin: { property: schedulemorn }
+                    horairesAprem: { property: scheduleafter }
+                    nbHeuresMatin: { property: hournumbermorn }
+                    nbHeuresApr: { property: hournumberafter }
+                    lieu: { property: place }
+            institution:
+                class: 'App\Entity\Institution'
+                alias: 'institution'
+                excludeFromFormType: true
+                fields:
+                    nom: { property: name }
+            alert:
+                class: 'App\Entity\Alert'
+                alias: 'alert'
+                excludeFromFormType: true
+                emailPath: 'trainee.email'
+                fields:
+                    id: { property: id }
+                    trainee: { property: trainee }
+                    session: { property: session }
+                    dates: { property: session.dates }
+                    email: { property: trainee.email }
+            presence:
+                class: 'App\Entity\Presence'
+                alias: 'presence'
+                excludeFromFormType: true
+                fields:
+                    dateDebut: { property: dateBegin }
+                    morning: { property: morning }
+                    afternoon: { property: afternoon }
+        pdf:
+            training:
+                class: 'App\Entity\Core\AbstractTraining'
+                template: 'SygeforMyCompanyBundle:Training:pdf.html.twig'
+                templateDiscriminator: 'type'
+                templates:
+                    internship: 'SygeforMyCompanyBundle:Training:pdf/internship.html.twig'
+                    long_training: 'SygeforMyCompanyBundle:Training:pdf/longtraining.html.twig'
+                    meeting: 'SygeforMyCompanyBundle:Training:pdf/meeting.html.twig'
+
+            inscription.attestation:
+                class: 'App\Entity\Inscription'
+                template: 'SygeforMyCompanyBundle:Inscription:attestation.pdf.twig'
+                key: inscription
+                filename: "attestation.pdf"
+
+
+
+
+#imports:
+#    - { resource: "packages/batch.yml" }
 
 services:
     # default configuration for services in *this* file
@@ -39,6 +395,7 @@ services:
     App\Listener\SessionListener:
         tags:
             - { name: doctrine.event_subscriber }
+
 
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder

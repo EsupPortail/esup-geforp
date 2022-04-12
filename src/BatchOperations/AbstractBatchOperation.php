@@ -112,7 +112,6 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
      */
     protected function getObjectList($idList)
     {
-        dump($this->getTargetClass());
         //$entities = $this->em->getRepository($this->targetClass)->findBy(array('id' => $idList));
         $entities = $this->doctrine->getRepository(Inscription::class)->findBy(array('id' => $idList));
         $this->reorderByKeys($entities, $idList);
