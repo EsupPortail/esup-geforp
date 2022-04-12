@@ -56,7 +56,7 @@ class AbstractSessionType extends AbstractType
                 'label'    => "Horaires",
                 'required' => false
             ))
-            ->add('hourNumber', TextType::class, array(
+            ->add('hournumber', TextType::class, array(
                 'label'    => "Nombre d'heures",
                 'required' => true,
                 'attr'     => array(
@@ -64,7 +64,7 @@ class AbstractSessionType extends AbstractType
                     'max' => 999,
                 ),
             ))
-            ->add('dayNumber', TextType::class, array(
+            ->add('daynumber', TextType::class, array(
                 'label'    => 'Nombre de jours',
                 'required' => true,
                 'attr'     => array(
