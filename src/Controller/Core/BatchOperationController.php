@@ -96,7 +96,6 @@ class BatchOperationController extends AbstractController
 
         //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($service);
         $batchOperation = $batchReg->getByName($service);
-
         if (method_exists($batchOperation, 'getModalConfig')) {
             return $batchOperation->getModalConfig($options);
         }
@@ -110,10 +109,11 @@ class BatchOperationController extends AbstractController
      * @Route("/batchoperation/{service}/get/{file}/as/{filename}", name="sygefor_core.batch_operation.get_file", options={"expose"=true}, defaults={"_format" = "json", "filename"=null})
      * @Rest\View
      */
-    public function fileDownloadAction($service, $file, $filename = null, Request $request)
+    public function fileDownloadAction($service, BatchOperationRegistry $batchReg, $file, $filename = null, Request $request)
     {
         $pdf = ($request->get('pdf') === 'true') ? true : false;
-        $batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($service);
+        //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($service);
+        $batchOperation = $batchReg->getByName($service);
 
         if (method_exists($batchOperation, 'sendFile')) {
             return $batchOperation->sendFile($file, $filename ? $filename : 'publipostage.odt', array('pdf' => $pdf));

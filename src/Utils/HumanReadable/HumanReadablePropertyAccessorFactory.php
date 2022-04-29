@@ -94,6 +94,7 @@ class HumanReadablePropertyAccessorFactory
     public function getKnownEntities($includeExcludedEntities = true)
     {
         $entityTypes = array();
+        dump($this->termCatalog);
         foreach ($this->termCatalog as $entity) {
             if ($includeExcludedEntities || (!isset($entity['excludeFromFormType']) || $entity['excludeFromFormType'] !== true)) {
                 $entityTypes[$entity['class']] = ucfirst($entity['alias']);

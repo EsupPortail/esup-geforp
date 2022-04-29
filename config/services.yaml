@@ -5,6 +5,9 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    front_url: 'https://127.0.0.1:8000'
+    wkhtmltopdf_bin: ../bin/wkhtmltopdf-amd64
+    unoconv_bin: ../bin/unoconv
     batch:
         convert_type:
             semestered_training:
@@ -159,6 +162,7 @@ parameters:
                     code: { property: code }
             typeAction:
                 class: 'App\Entity\Core\Term\Actiontype'
+                alias: 'typeaction'
                 fields:
                     nom: { property: name }
             inscription:

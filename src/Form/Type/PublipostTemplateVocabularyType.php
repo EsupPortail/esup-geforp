@@ -10,6 +10,7 @@
 namespace App\Form\Type;
 
 use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,9 +25,12 @@ class PublipostTemplateVocabularyType extends VocabularyType
      */
     protected $HRPAFactory;
 
-    public function __construct(HumanReadablePropertyAccessorFactory $HRPAfactory)
+    public function __construct(ContainerInterface $container, HumanReadablePropertyAccessorFactory $HRPAfactory)
     {
+        // Recup de la conf batch mailing
         $this->HRPAFactory = $HRPAfactory;
+        $conf = $container->getParameter('batch');
+        $this->HRPAFactory->setTermCatalog($conf['mailing']);
     }
 
     /**
@@ -39,9 +43,10 @@ class PublipostTemplateVocabularyType extends VocabularyType
     {
         parent::buildForm($builder, $options);
 
+        $tab = array_flip($this->HRPAFactory->getKnownEntities(false));
         $builder->add('entity', ChoiceType::class, array(
             'label' => 'Entité associée',
-            'choices' =>array('Stagiaire'=> 'Stagiaire') //$this->HRPAFactory->getKnownEntities(false),
+            'choices' => $tab,
         ));
 
         $builder->add('file', FileType::class, array(

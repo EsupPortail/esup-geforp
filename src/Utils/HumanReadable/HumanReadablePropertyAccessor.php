@@ -91,10 +91,6 @@ class HumanReadablePropertyAccessor
                 $path = 'trainee.emailCorr';
                 $accessor = PropertyAccess::createPropertyAccessor();
                 return $accessor->getValue($this->object, $path);
-            case 'dates':
-                $path = 'session.dates';
-                $accessor = PropertyAccess::createPropertyAccessor();
-                return $accessor->getValue($this->object, $path);
             default:
                 //default behaviour
                 //path
@@ -128,6 +124,7 @@ class HumanReadablePropertyAccessor
                     // thus an explicit mention is returned and is displayed in result file
                     return 'Non défini';
                 }
+
                 // if suffix is not empty, we continue along path
                 if ($suffix !== '') {
                     if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
@@ -145,17 +142,21 @@ class HumanReadablePropertyAccessor
                         }
                     }
                 } else { //we reached end of path
-                    if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
-                        return $this->accessorFactory->getAccessor($value);
-                    }
-                    else if ($value instanceof \Traversable) {
-                        $arr = new ArrayCollection();
-                        foreach ($value as $val) {
-                            if ($this->accessorFactory->hasEntry(get_class($val))) {
-                                $arr->add($this->accessorFactory->getAccessor($val));
-                            }
+                    if (is_object($value) && (get_class($value) === 'DateTime')) {
+                        // Cas des dates : on ne cherche pas la classe
+                    }else {
+                        if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
+                            return $this->accessorFactory->getAccessor($value);
                         }
-                        return $arr;
+                        else if ($value instanceof \Traversable) {
+                            $arr = new ArrayCollection();
+                            foreach ($value as $val) {
+                                if ($this->accessorFactory->hasEntry(get_class($val))) {
+                                    $arr->add($this->accessorFactory->getAccessor($val));
+                                }
+                            }
+                            return $arr;
+                        }
                     }
                 }
 

@@ -10,10 +10,12 @@
 namespace App\BatchOperations;
 
 use App\BatchOperations\Generic\EmailingBatchOperation;
+use App\BatchOperations\Generic\MailingBatchOperation;
 use App\BatchOperations\Inscription\InscriptionStatusChangeBatchOperation;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
@@ -28,18 +30,50 @@ class BatchOperationRegistry
      */
     private $operations = array();
 
-    public function __construct(Security $security, ContainerInterface $container, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpa)
+    public function __construct(Security $security, ParameterBagInterface $parameterBag, ContainerInterface $container, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpa)
     {
         $this->operations = array();
 
         // Construction de la liste des batch operations 'en dur'
         $i=0;
         $conf = $container->getParameter('batch');
-        $hrpa->setTermCatalog($conf['mailing']);
-        $emailingBatch = new EmailingBatchOperation($security, $vocabularyRegistry, $mailer, $hrpa);
+
+        // operation batch : envoi email
+        $confMail = $conf['mailing'];
+        $hrpa->setTermCatalog($confMail);
+        $emailingBatch = new EmailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $mailer, $hrpa);
         $emailingBatch->setDoctrine($doctrine);
         $this->addBatchOperation($emailingBatch, $i);
         $i++;
+
+        // operation batch : publipostage session
+        $mailingBatch = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
+        $mailingBatch->setContainer($container);
+        $mailingBatch->setDoctrine($doctrine);
+        $mailingBatch->setTargetClass('App\Entity\Session');
+        $mailingBatch->setOptions($confMail['session']);
+        $this->addBatchOperation($mailingBatch, $i);
+        $i++;
+
+        // operation batch : publipostage trainee
+        $mailingBatchTrainee = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
+        $mailingBatchTrainee->setContainer($container);
+        $mailingBatchTrainee->setDoctrine($doctrine);
+        $mailingBatchTrainee->setTargetClass('App\Entity\Trainee');
+        $mailingBatchTrainee->setOptions($confMail['trainee']);
+        $this->addBatchOperation($mailingBatchTrainee, $i);
+        $i++;
+
+        // operation batch : publipostage trainer
+        $mailingBatchTrainer = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
+        $mailingBatchTrainer->setContainer($container);
+        $mailingBatchTrainer->setDoctrine($doctrine);
+        $mailingBatchTrainer->setTargetClass('App\Entity\Trainer');
+        $mailingBatchTrainer->setOptions($confMail['trainer']);
+        $this->addBatchOperation($mailingBatchTrainer, $i);
+        $i++;
+
+        // operation batch : changement de statut d'inscription
         $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatch);
         $operation->setDoctrine($doctrine);
         $this->addBatchOperation($operation, $i);
@@ -93,8 +127,17 @@ class BatchOperationRegistry
             case 'sygefor_core.batch.email':
                 $id = 0;
                 break;
-            case 'sygefor_inscription.batch.inscription_status_change':
+            case 'sygefor_core.batch.publipost.session':
                 $id = 1;
+                break;
+            case 'sygefor_core.batch.publipost.trainee':
+                $id = 2;
+                break;
+            case 'sygefor_core.batch.publipost.trainer':
+                $id = 3;
+                break;
+            case 'sygefor_inscription.batch.inscription_status_change':
+                $id = 4;
                 break;
         }
         if (isset($this->operations[$id])) {

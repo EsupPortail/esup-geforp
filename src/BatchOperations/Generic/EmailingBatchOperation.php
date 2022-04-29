@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bundle\MonologBundle\SwiftMailer\MessageFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Core\AbstractTrainee;
 use Symfony\Component\Mime\Message;
@@ -29,6 +30,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
     /** @var  ContainerBuilder $container */
     protected $container;
 
+    protected $parameterBag;
     protected $security;
     protected $vocRegistry;
     protected $mailer;
@@ -36,8 +38,9 @@ class EmailingBatchOperation extends AbstractBatchOperation
 
     protected $targetClass = AbstractTrainee::class;
 
-    public function __construct(Security $security, VocabularyRegistry $vocRegistry, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpaf)
+    public function __construct(Security $security, ParameterBagInterface $parameterBag, VocabularyRegistry $vocRegistry, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpaf)
     {
+        $this->parameterBag = $parameterBag;
         $this->security = $security;
         $this->vocRegistry = $vocRegistry;
         $this->mailer = $mailer;
@@ -298,17 +301,18 @@ class EmailingBatchOperation extends AbstractBatchOperation
         $HRPA = $this->hrpaf->getAccessor($entity);
 
         $newContent = preg_replace_callback('/\[(.*?)\]/',
-            function ($matches) use ($HRPA) {
+            function ($matches) use ($HRPA, $entity) {
                 $property = $matches[1];
                 if ($property=="dates"){
-                    $Dates = $HRPA->$property;
+                    $session = $entity->getSession();
+                    $Dates = $session->getDates();
                     $Texte = "";
                     foreach ($Dates as $date) {
-                        if ($date->dateFin == $date->dateDebut) {
-                            $Texte .= $date->dateDebut."        ".$date->horairesMatin."        ".$date->horairesAprem."        ".$date->lieu."\n";
+                        if ($date->getDateend() == $date->getDatebegin()) {
+                            $Texte .= $date->getDatebegin()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
                         }
                         else {
-                            $Texte .= $date->dateDebut." au ".$date->dateFin."        ".$date->horairesMatin."        ".$date->horairesAprem."        ".$date->lieu."\n";
+                            $Texte .= $date->getDatebegin()->format('d/m/Y')." au ".$date->getDateend()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
                         }
                     }
                     return $Texte;
@@ -316,7 +320,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 else {
                     if ($property=="lien") {
                         //$Texte = "https://sygefor3.univ-amu.fr/account/registration/" .$HRPA->id  . "/valid";
-                        $Texte = $this->container->getParameter('front_url') . "/account/registration/" . $HRPA->id . "/valid";
+                        $Texte = $this->parameterBag->get('front_url') . "/account/registration/" . $HRPA->id . "/valid";
                         $Texte = "<a href=\"$Texte\">$Texte</a>";
                         return $Texte;
                     }
