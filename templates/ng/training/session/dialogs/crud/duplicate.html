@@ -14,19 +14,19 @@
         </div>
         
         <div class="form-group">
-            <label class="col-sm-3 control-label" for="form.children.dateBegin.id">Date(s)</label>
+            <label class="col-sm-3 control-label" for="form.children.datebegin.id">Date(s)</label>
             <div class="col-sm-9">
                 <div class="controls form-inline input-daterange" bs-datepicker bs-datepicker-view-date="{{ $moment().add('month', 6).year() }}-{{ $moment().add('month', 6).quarter() < 3 ? '01' : '07' }}-01">
-                    <span ng-class="{'has-error': form.children.dateBegin.errors.length }">
-                        <input type="text" class="form-control input-datepicker" ng-model="form.children.dateBegin.value" />
+                    <span ng-class="{'has-error': form.children.datebegin.errors.length }">
+                        <input type="text" class="form-control input-datepicker" ng-model="form.children.datebegin.value" />
                     </span>
                     <label>au</label>
                     <span ng-class="{'has-error': form.children.dateEnd.errors.length }">
                         <input type="text" class="form-control input-datepicker" ng-model="form.children.dateEnd.value" />
                     </span>
                 </div>
-                <span ng-class="{'has-error': form.children.dateBegin.errors.length+form.children.dateEnd.errors }">
-                    <div ng-if="error.length" ng-repeat="error in form.children.dateBegin.errors" class="help-block">{{ error }}</div>
+                <span ng-class="{'has-error': form.children.datebegin.errors.length+form.children.dateEnd.errors }">
+                    <div ng-if="error.length" ng-repeat="error in form.children.datebegin.errors" class="help-block">{{ error }}</div>
                     <div ng-if="error.length" ng-repeat="error in form.children.dateEnd.errors" class="help-block">{{ error }}</div>
                 </span>
             </div>

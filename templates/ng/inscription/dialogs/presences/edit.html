@@ -1,6 +1,6 @@
 <div class="modal-header">
     <button type="button" class="close" ng-click="dialog.dismiss()" aria-hidden="true">×</button>
-    <h4 class="modal-title"><i class="fa fa-graduation-cap"></i> Editer les présences pour la journée du {{ presence.dateBegin|date: 'dd/MM/yyyy' }}</h4>
+    <h4 class="modal-title"><i class="fa fa-graduation-cap"></i> Editer les présences pour la journée du {{ presence.datebegin|date: 'dd/MM/yyyy' }}</h4>
 </div>
 
 <form sf-href="presence.edit({presence: dialog.params.presence.id})" sf-form="form" json-path="form" on-success="onSuccess(data)" class="form-horizontal" novalidate>

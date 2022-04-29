@@ -15,9 +15,9 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="presence in inscription.presences | orderBy:'dateBegin':false" >
+            <tr ng-repeat="presence in inscription.presences | orderBy:'datebegin':false" >
                 <!--form sf-xeditable-form="form" sf-href='dates.edit({dates: date })' on-success="onSuccess(data)"-->
-                    <td>{{ presence.dateBegin|date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ presence.datebegin|date: 'dd/MM/yyyy' }}</td>
                     <td>{{ presence.morning }}</td>
                     <td>{{ presence.afternoon }}</td>
                     <td><a class="btn btn-fa" href="" ng-click="editPresence(presence)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>

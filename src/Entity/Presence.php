@@ -35,7 +35,7 @@ class Presence
      * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $dateBegin;
+    protected $datebegin;
 
     /**
      * @ORM\Column(name="morning", type="string", length=512, nullable=true)
@@ -86,17 +86,17 @@ class Presence
     /**
      * @return mixed
      */
-    public function getDateBegin()
+    public function getDatebegin()
     {
-        return $this->dateBegin;
+        return $this->datebegin;
     }
 
     /**
      * @param mixed $dateBegin
      */
-    public function setDateBegin($dateBegin)
+    public function setDatebegin($dateBegin)
     {
-        $this->dateBegin = $dateBegin;
+        $this->datebegin = $dateBegin;
     }
 
     /**

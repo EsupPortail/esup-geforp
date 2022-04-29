@@ -54,7 +54,7 @@ class Inscription extends AbstractInscription
     /**
      * @var ArrayCollection $presences
      * @ORM\OneToMany(targetEntity="App\Entity\Presence", mappedBy="inscription", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"dateBegin" = "ASC"})
+     * @ORM\OrderBy({"datebegin" = "ASC"})
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
     protected $presences;

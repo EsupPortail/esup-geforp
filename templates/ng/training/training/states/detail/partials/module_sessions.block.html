@@ -13,8 +13,8 @@
         <div ng-if="sessionsWithoutModule.length > 0">
             <div class="text-muted">Session(s) sans module</div>
             <ul class="list-circle">
-                <li ng-repeat="session in sessionsWithoutModule | orderBy:'dateBegin':true" ng-class="{past: $moment(session.dateBegin) < $moment()}">
-                    <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.dateBegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
+                <li ng-repeat="session in sessionsWithoutModule | orderBy:'datebegin':true" ng-class="{past: $moment(session.datebegin) < $moment()}">
+                    <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.datebegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
 
                     <!-- stats -->
                     &nbsp;&nbsp;
@@ -38,8 +38,8 @@
                 <span class="fa" ng-class="{'fa-check-square-o': module.mandatory, 'fa-square-o': !module.mandatory}"></span>
             </div>
             <ul class="list-circle">
-                <li ng-repeat="session in module.sessions | orderBy:'dateBegin':true" ng-class="{past: $moment(session.dateBegin) < $moment()}">
-                    <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.dateBegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
+                <li ng-repeat="session in module.sessions | orderBy:'datebegin':true" ng-class="{past: $moment(session.datebegin) < $moment()}">
+                    <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.datebegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
 
                     <!-- stats -->
                     &nbsp;&nbsp;

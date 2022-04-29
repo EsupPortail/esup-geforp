@@ -120,7 +120,7 @@
             </div>
         </div>
 
-        <div class="alert alert-warning well-sm"><strong>Important :</strong> les informations présentées ci-dessus <strong>sont datées de la date de la session</strong> ({{ inscription.session.dateBegin|date: 'dd/MM/yyyy' }}).
+        <div class="alert alert-warning well-sm"><strong>Important :</strong> les informations présentées ci-dessus <strong>sont datées de la date de la session</strong> ({{ inscription.session.datebegin|date: 'dd/MM/yyyy' }}).
             <span ng-if="inscription.trainee._accessRights.view">Pour obtenir des informations à jour, vous pouvez <a ui-sref="trainee.detail.view({id: inscription.trainee.id})" class="alert-link">consulter le profil du participant <i class="fa fa-external-link"></i></a>.</span>
             <span ng-if="!inscription.trainee._accessRights.view">Pour obtenir des informations à jour, contactez un administrateur de l'{{ inscription.trainee.organization.name }}.</span>
         </div>
