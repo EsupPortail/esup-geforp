@@ -11,7 +11,7 @@
         </thead>
         <tbody>
             <tr ng-repeat="item in items">
-                <td>{{ item.createdAt|date: 'dd/MM/yyyy' }}</td>
+                <td>{{ item.createdat|date: 'dd/MM/yyyy' }}</td>
                 <td><a href="" ui-sref="trainee.detail.view({ id: item.id })" ui-sref-widget-opts>{{ item.fullname }}</a></td>
                 <td>{{ item.publictype.name }}</td>
                 <td>{{ item.institution.name }}</td>

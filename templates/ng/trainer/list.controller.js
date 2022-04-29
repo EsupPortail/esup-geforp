@@ -4,7 +4,7 @@
 sygeforApp.controller('TrainerListController', ['$scope', '$user', '$injector', 'search', 'BaseListController', '$state', '$timeout', '$dialog', function($scope, $user, $injector, search, BaseListController, $state, $timeout, $dialog) {
     $injector.invoke(BaseListController, this, {key: 'trainer', $scope: $scope, $search: search});
 
-    // by default, order by createdAt
+    // by default, order by createdat
     $scope.search.query.sorts = {'lastName.source': 'asc'};
 
     // facets

@@ -12,7 +12,7 @@
                 <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="$user.hasAccessRight('sygefor_trainee.rights.trainee.all.update')" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
-            <div class="pre-title">Inscrit le {{ trainee.createdAt|date: 'dd/MM/yyyy' }} - {{ trainee.organization.name }}</div>
+            <div class="pre-title">Inscrit le {{ trainee.createdat|date: 'dd/MM/yyyy' }} - {{ trainee.organization.name }}</div>
 
             <!--<h2><span ng-class="{'invalidated': !trainee.isActive }">{{ trainee.fullname }}</span></h2> -->
             <h2><span>{{ trainee.fullname }}</span></h2>
@@ -135,8 +135,8 @@
                         <!--<th>Statut de présence</th>-->
                     <!--</thead>-->
                     <tbody>
-                    <tr ng-repeat="inscription in trainee.inscriptions | filter:isViewable | orderBy:'createdAt':true">
-                        <td>{{ inscription.createdAt | date:'dd/MM/yy' }}</td>
+                    <tr ng-repeat="inscription in trainee.inscriptions | filter:isViewable | orderBy:'createdat':true">
+                        <td>{{ inscription.createdat | date:'dd/MM/yy' }}</td>
                         <td>{{ inscription.session.training.organization.name }}</td>
                         <td><a ui-sref-access="inscription._accessRights.view" ui-sref="inscription.detail.view({id: inscription.id, session: session.id})">{{ inscription.session.training.name }}</a></td>
                         <td>{{ inscription.session.training.typeLabel }} - Session du <a ui-sref-access="inscription.session._accessRights.view" ui-sref="session.detail.view({id: inscription.session.id})">{{ inscription.session.datebegin | date:'dd/MM/yyyy' }}</a></td>
@@ -160,8 +160,8 @@
 
                             <table ng-if="trainee.alerts.length" class="table table-hover table-search table-condensed">
                                 <tbody>
-                                <tr ng-repeat="alert in trainee.alerts | filter:filter | orderBy:'createdAt':true">
-                                    <td> {{ alert.createdAt | date: 'dd/MM/yyyy' }} </td>
+                                <tr ng-repeat="alert in trainee.alerts | filter:filter | orderBy:'createdat':true">
+                                    <td> {{ alert.createdat | date: 'dd/MM/yyyy' }} </td>
                                     <td> {{ alert.session.training.name }} </td>
                                 </tr>
                                 </tbody>

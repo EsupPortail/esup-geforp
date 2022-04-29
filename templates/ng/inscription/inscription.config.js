@@ -30,7 +30,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             },
             search: function ($searchFactory, $stateParams, session, trainee, $user, inscriptionStatusList) {
                 var search = $searchFactory('inscription.search');
-                search.query.sorts = {'createdAt': 'desc'};
+                search.query.sorts = {'createdat': 'desc'};
                 if(session) {
                     search.filters["session.id"] = session.id;
                 } else if(trainee) {
@@ -228,7 +228,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                     'session.training.organization.name.source': $user.organization.name,
                     'inscriptionStatus.name.source': 'En attente'
                 },
-                sorts: {'createdAt': 'desc'}
+                sorts: {'createdat': 'desc'}
             }
         }
     });

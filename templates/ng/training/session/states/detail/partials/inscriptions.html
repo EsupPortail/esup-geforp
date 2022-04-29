@@ -41,9 +41,8 @@
             </tr>
         </thead-->
         <tbody>
-            <tr ng-repeat="inscription in session.inscriptions | filter:filter | orderBy:'createdAt':true">
-<!--                <td><a title="Voir l'inscription" href="" ui-sref="inscription.detail.view({ id: inscription.id, session: inscription.session.id })">{{ inscription.createdAt|date: 'dd/MM/yyyy' }}</a></td> -->
-                <td><a title="Voir l'inscription" href="" ui-sref="inscription.detail.view({ id: inscription.id, session: inscription.session.id })">05/04/2022</a></td>
+            <tr ng-repeat="inscription in session.inscriptions | filter:filter | orderBy:'createdat':true">
+                <td><a title="Voir l'inscription" href="" ui-sref="inscription.detail.view({ id: inscription.id, session: inscription.session.id })">{{ inscription.createdat|date: 'dd/MM/yyyy' }}</a></td>
                 <td>
                     <a title="Voir le profil du stagiaire" href="" ui-sref="trainee.detail.view({ id: inscription.trainee.id })">{{ inscription.trainee.fullname }}</a>
                 </td>

@@ -14,7 +14,7 @@
         <h2>Inscription de {{ inscription.trainee.fullname }}</h2>
 
         <div>
-            <strong>Date :</strong> {{ inscription.createdAt | date: 'dd/MM/yyyy HH:mm' }}<br>
+            <strong>Date :</strong> {{ inscription.createdat | date: 'dd/MM/yyyy HH:mm' }}<br>
 
             <div class="btn-group dropdown">
                 <button class="btn btn-xs dropdown-toggle" ng-class="$root.inscriptionStatusClass(inscription.inscriptionstatus.status, 'btn')" data-toggle="dropdown">{{ inscription.inscriptionstatus.name }} <span class="caret"></span></button>

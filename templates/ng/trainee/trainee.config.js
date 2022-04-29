@@ -185,12 +185,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 size: 10,
                 filters:{
                     'organization.name.source': $user.organization.name,
-                    "createdAt": {
+                    "createdat": {
                         "type": "range",
                         "gte": $filter('date')(date, 'yyyy-MM-dd', 'Europe/Paris')
                     }
                 },
-                sorts: {'createdAt': 'desc'}
+                sorts: {'createdat': 'desc'}
             }
         }
     });

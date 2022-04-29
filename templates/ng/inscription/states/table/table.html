@@ -7,7 +7,7 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th search-table-th field="createdAt">Date</th>
+                        <th search-table-th field="createdat">Date</th>
                         <th ng-hide="$stateParams.trainee" search-table-th field="trainee.fullname">Stagiaire</th>
                         <th ng-hide="$stateParams.session" search-table-th field="session.datebegin">Session</th>
                         <th search-table-th field="trainee.publictype.name">Type de personnel</th>
@@ -20,8 +20,7 @@
                 <tbody>
                     <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
                         <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
-<!--                        <td><a href="" ui-sref="inscription.detail.view({ id: item.id })">{{ item.createdAt|date: 'dd/MM/yyyy' }}</a></td> -->
-                        <td><a href="" ui-sref="inscription.detail.view({ id: item.id })">05/04/2022</a></td>
+                        <td><a href="" ui-sref="inscription.detail.view({ id: item.id })">{{ item.createdat|date: 'dd/MM/yyyy' }}</a></td>
                         <td ng-hide="$stateParams.trainee"><a href="" ui-sref="trainee.detail.view({ id: item.trainee.id })">{{ item.trainee.fullname }}</a></td>
                         <td ng-hide="$stateParams.session"><a href="" ui-sref="session.detail.view({ id: item.session.id })">{{ item.session.datebegin|date: 'dd/MM/yyyy' }} - {{ item.session.training.name }}</a></td>
                         <td>{{ item.trainee.publictype.name }}</td>

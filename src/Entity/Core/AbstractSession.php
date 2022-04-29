@@ -10,7 +10,6 @@ use App\Form\Type\AbstractSessionType;
 use App\Security\AccessRight\SerializedAccessRights;
 use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Component\Validator\Constraints as Assert;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Session.
@@ -26,7 +25,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 abstract class AbstractSession implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
     use MaterialTrait;
 
@@ -67,7 +66,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     /**
      * @ORM\OneToMany(targetEntity="AbstractInscription", mappedBy="session", fetch="EXTRA_LAZY", cascade={"remove"})
-     * @ORM\OrderBy({"createdAt" = "DESC"})
+     * @ORM\OrderBy({"createdat" = "DESC"})
      * @Serializer\Groups({"session"})
      */
     protected $inscriptions;

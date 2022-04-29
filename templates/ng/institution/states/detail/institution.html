@@ -9,7 +9,7 @@
                 <a class="btn btn-fa" href="" tooltip="Supprimer"  ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
-            <div class="pre-title">Créé le {{ institution.createdAt|date: 'dd/MM/yyyy' }} - {{ institution.organization.name }}</div>
+            <div class="pre-title">Créé le {{ institution.createdat|date: 'dd/MM/yyyy' }} - {{ institution.organization.name }}</div>
             <h2><span sf-xeditable="form.children.name">{{ institution.name }}</span></h2>
 
             <div class="row">

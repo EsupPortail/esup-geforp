@@ -1,7 +1,7 @@
 <a ui-sref="inscription.detail.view({id: result.id})" title="{{ result.session.training.name }} - {{ result.session.datebegin | date: 'dd/MM/yyyy' }}">
     <div class="list-group-item-title">{{ result.trainee.fullname }}</div>
     <div class="list-group-item-text">
-        {{ result.createdAt | date: 'dd/MM/yyyy HH:mm' }}
+        {{ result.createdat | date: 'dd/MM/yyyy HH:mm' }}
     </div>
     <div class="list-group-item-text">
         {{ result.session.training.name | characters:80 }} - {{ result.session.datebegin | date: 'dd/MM/yyyy' }}

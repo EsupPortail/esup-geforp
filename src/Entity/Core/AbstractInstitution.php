@@ -12,7 +12,6 @@ use App\Security\AccessRight\SerializedAccessRights;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\Type\BaseInstitutionType as FormType;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Institution.
@@ -25,7 +24,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 abstract class AbstractInstitution implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
     use CoordinatesTrait;
 

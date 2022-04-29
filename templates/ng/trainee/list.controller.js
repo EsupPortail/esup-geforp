@@ -60,7 +60,7 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
             label: 'Unité',
             size: 10
         },
-        'createdAt' : {
+        'createdat' : {
             label: 'Inscription',
             type: 'range'
         },

@@ -13,7 +13,7 @@ use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Form\Type\AbstractInscriptionType;
 use App\Security\AccessRight\SerializedAccessRights;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
+use App\Entity\Core\TimestampableTrait;
 
 /**
  * Trainee.
@@ -28,7 +28,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 abstract class AbstractInscription implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
     /**
      * @var int id

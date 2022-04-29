@@ -170,7 +170,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
         'trainee.fullName.source' : {
             label: 'Stagiaire'
         },
-        'session.dateBegin' : {
+        'session.datebegin' : {
             label: 'Date de session',
             type: 'range'
         },

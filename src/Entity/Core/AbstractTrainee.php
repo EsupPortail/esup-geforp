@@ -14,7 +14,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\BaseTraineeType;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Trainee.
@@ -29,7 +28,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 abstract class AbstractTrainee implements UserInterface, \Serializable, SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
     use AccountTrait;
     use ProfessionalSituationTrait;

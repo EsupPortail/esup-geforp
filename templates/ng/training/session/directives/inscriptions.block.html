@@ -45,8 +45,8 @@
         <div ng-if="session.inscriptions.length">
             <table class="table table-condensed table-nohead">
                 <tbody>
-                <tr ng-repeat="inscription in session.inscriptions | filter:filter | orderBy:'createdAt':true">
-                    <td><span class="text-gray-light text-small">{{ inscription.createdAt | date:'dd/MM/yy' }}</span></td>
+                <tr ng-repeat="inscription in session.inscriptions | filter:filter | orderBy:'createdat':true">
+                    <td><span class="text-gray-light text-small">{{ inscription.createdat | date:'dd/MM/yy' }}</span></td>
                     <td>
                         <a dialog-href-deprecated="inscription.detail({id: inscription.id})" ui-sref="inscription.detail.view({id: inscription.id, session: session.id})">{{ inscription.trainee.fullName }}</a>
 		    </td>

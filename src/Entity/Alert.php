@@ -49,10 +49,10 @@ class Alert
 
     /**
      * @var \DateTime
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(name="created_at",type="datetime", nullable=true)
      * @Serializer\Groups({"inscription", "session", "trainee", "trainer", "api"})
      */
-    protected $createdAt;
+    protected $createdat;
 
 
     /**
@@ -106,17 +106,17 @@ class Alert
     /**
      * @return \DateTime
      */
-    public function getCreateddAt()
+    public function getCreatedat()
     {
-        return $this->createdAt;
+        return $this->createdat;
     }
 
     /**
-     * @param \DateTime $createdAt
+     * @param \DateTime $createdat
      */
-    public function setCreatedAt($createdAt)
+    public function setCreatedat($createdAt)
     {
-        $this->createdAt = $createdAt;
+        $this->createdat = $createdAt;
     }
 
     /**

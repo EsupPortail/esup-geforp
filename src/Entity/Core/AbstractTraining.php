@@ -3,7 +3,6 @@
 namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 use JMS\Serializer\Annotation as Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Form\Type\AbstractTrainingType;
@@ -26,7 +25,7 @@ use App\Security\AccessRight\SerializedAccessRights;
 abstract class AbstractTraining implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
 //    use MaterialTrait;
 
@@ -204,7 +203,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     public function __clone()
     {
         $this->id = null;
-        $this->setCreatedAt(new \DateTime());
+        $this->setCreatedat(new \DateTime());
 
         //sessions are not copied.
         $this->materials = new ArrayCollection();

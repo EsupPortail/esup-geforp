@@ -14,7 +14,6 @@ use App\Entity\Core\Term\Trainertype;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * Trainer.
@@ -28,7 +27,7 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 abstract class AbstractTrainer implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
-    use TimestampableEntity;
+    use TimestampableTrait;
 
     use PersonTrait;
     use CoordinatesTrait;
