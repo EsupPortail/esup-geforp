@@ -21,9 +21,9 @@
                         <!--li class="dropdown-header">Filtrer par statut</li-->
                         <li><a href="" ng-click="resetFilter()"><i class="fa fa-check" ng-if="!filter.inscriptionStatus && !filter.presenceStatus"></i> Tous les statuts ({{ session.inscriptions.length }})</a></li>
                         <li class="divider"></li>
-                        <li ng-repeat="status in status.inscription track by status.id" ng-class="{disabled :status.count == 0}"><a href="" ng-click="filterByStatus('inscription', status)"><i class="fa fa-check" ng-if="filter.inscriptionStatus.id == status.id"></i> {{ status.name }} ({{ status.count }})</a></li>
+                        <li ng-repeat="status in status.inscription track by status.id" ng-class="{disabled :status.count == 0}"><a href="" ng-click="filterByStatus('inscription', status)"><i class="fa fa-check" ng-if="filter.inscriptionstatus.id == status.id"></i> {{ status.name }} ({{ status.count }})</a></li>
                         <li class="divider"></li>
-                        <li ng-repeat="status in status.presence track by status.id" ng-class="{disabled :status.count == 0}"><a href="" ng-click="filterByStatus('presence', status)"><i class="fa fa-check" ng-if="filter.presenceStatus.id == status.id"></i> {{ status.name }} ({{ status.count }})</a></li>
+                        <li ng-repeat="status in status.presence track by status.id" ng-class="{disabled :status.count == 0}"><a href="" ng-click="filterByStatus('presence', status)"><i class="fa fa-check" ng-if="filter.presencestatus.id == status.id"></i> {{ status.name }} ({{ status.count }})</a></li>
                     </ul>
                 </span>
             </span>
@@ -32,7 +32,7 @@
             <!-- operation -->
             <div class="pull-right">
                 <a ng-if="session._accessRights.edit" class="btn btn-fa btn-sm" href="" tooltip="Ajouter une inscription" tooltip-placement="left" ng-click="addInscription()"><span class="fa fa-plus"></span></a><!--
-                --><span class="badge" ng-class="inscriptionBadgeClassName()" tooltip="{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumNumberOfRegistrations }} places" tooltip-placement="left">{{ totalAcceptedInscriptions() }} / {{ session.maximumNumberOfRegistrations }}</span>
+                --><span class="badge" ng-class="inscriptionBadgeClassName()" tooltip="{{ totalAcceptedInscriptions() }} acceptés sur {{ session.maximumnumberofregistrations }} places" tooltip-placement="left">{{ totalAcceptedInscriptions() }} / {{ session.maximumnumberofregistrations }}</span>
             </div>
         </div>
     </div>

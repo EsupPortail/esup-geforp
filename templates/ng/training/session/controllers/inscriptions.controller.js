@@ -110,7 +110,7 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      */
     $scope.filterByStatus = function(type, status) {
         $scope.resetFilter();
-        $scope.filter[type + 'Status'] = {id: status.id };
+        $scope.filter[type + 'status'] = {id: status.id };
         $scope.filterLabel = status.name + '(' + status.count + ')';
     }
 

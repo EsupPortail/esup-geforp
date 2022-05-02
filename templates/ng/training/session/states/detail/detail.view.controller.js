@@ -71,7 +71,7 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
         }
 
 
-        $dialog.open('batch.email', {items: items, targetClass: 'SygeforMyCompanyBundle:Alert'});
+        $dialog.open('batch.email', {items: items, targetClass: 'App\\Entity\\Alert'});
     };
 
 }]);
