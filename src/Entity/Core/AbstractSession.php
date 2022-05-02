@@ -306,7 +306,7 @@ abstract class AbstractSession implements SerializedAccessRights
         $array = array();
         /** @var AbstractParticipation $participation */
         foreach ($this->getParticipations() as $participation) {
-            $array[] = $participation->getTrainer()->getFullName();
+            $array[] = $participation->getTrainer()->getFullname();
         }
 
         return implode(', ', $array);

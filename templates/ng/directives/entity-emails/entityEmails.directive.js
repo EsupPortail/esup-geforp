@@ -37,16 +37,16 @@ sygeforApp.directive('entityEmails', ['$searchFactory', function($searchFactory)
         var search = $searchFactory('email.search');
         if (scope.trainee) {
             search.query.filters['trainee.id'] = scope.trainee;
-            search.query.filters['userFrom.organization.id'] = scope.$user.organization.id;
+            search.query.filters['userfrom.organization.id'] = scope.$user.organization.id;
         }
         else if (scope.session) {
             search.query.filters['session.id'] = scope.session;
         }
         else if (scope.trainer) {
             search.query.filters['trainer.id'] = scope.trainer;
-            search.query.filters['userFrom.organization.id'] = scope.$user.organization.id;
+            search.query.filters['userfrom.organization.id'] = scope.$user.organization.id;
         }
-        search.query.sorts = {'sendAt': 'desc'};
+        search.query.sorts = {'sendat': 'desc'};
         search.query.size = 20;
         scope.search = search;
         search.search().then(function() {

@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -28,7 +29,7 @@ class EmailController extends AbstractController
      * @Route("/search", name="email.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "email"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
         /*
         $search = $this->get('sygefor_email.search');
@@ -48,17 +49,20 @@ class EmailController extends AbstractController
 
         return $search->search();*/
 
+        $emails = $doctrine->getRepository(Email::class)->findAll();
+        $nbEmails  = count($emails);
+
         $ret = array(
-            'total' => array(),
+            'total' => $nbEmails,
             'pageSize' => 0,
-            'items' => 0,
+            'items' => $emails
         );
         return $ret;
     }
 
     /**
      * @Route("/view/{id}", requirements={"id" = "\d+"}, name="email.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("email", class="SygeforCoreBundle:Email", options={"id" = "id"})
+     * @ParamConverter("email", class="App\Entity\Core\Email", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session", "user"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewAction(Email $email)

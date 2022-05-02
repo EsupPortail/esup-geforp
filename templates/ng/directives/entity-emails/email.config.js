@@ -11,7 +11,7 @@ sygeforApp.config(["$dialogProvider", function($dialogProvider) {
             $scope.dialog.params = $dialogParams;
             $scope.email = email;
         },
-        templateUrl: 'mycompanybundle/directives/entity-emails/email.html',
+        templateUrl: 'directives/entity-emails/email.html',
         size: 'lg',
         resolve:{
             email: function ($http, $dialogParams){

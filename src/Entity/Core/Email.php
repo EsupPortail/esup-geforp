@@ -32,16 +32,16 @@ class Email
     /**
      * @var User
      * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
+     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL", name="user_from_id")
      * @Serializer\Groups({"user"})
      */
-    protected $userFrom;
+    protected $userfrom;
 
     /**
      * @var string
      * @ORM\Column(name="emailFrom", type="string", length=128, nullable=true)
      */
-    protected $emailFrom;
+    protected $emailfrom;
 
     /**
      * @var AbstractTrainee
@@ -67,9 +67,9 @@ class Email
     /**
      * @var \DateTime
      *
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(name="send_at", type="datetime", nullable=true)
      */
-    protected $sendAt;
+    protected $sendat;
 
     /**
      * @var string
