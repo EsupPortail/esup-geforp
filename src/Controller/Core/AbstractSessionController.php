@@ -68,13 +68,13 @@ abstract class AbstractSessionController extends AbstractController
         /** @var AbstractSession $session */
         $session = new $this->sessionClass();
         $session->setTraining($training);
+        $session->setName($training->getName());
         $form = $this->createForm($session::getFormType(), $session);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
 
             if ($form->isSubmitted() && $form->isValid()) {
-                dump($session->getDisplayonline());
                 $session->setCreatedAt(new \DateTime('now'));
                 $session->setUpdatedAt(new \DateTime('now'));
                 $em = $doctrine->getManager();
@@ -165,16 +165,18 @@ abstract class AbstractSessionController extends AbstractController
                 'label' => 'Intitulé de la session',
             ))
             ->add('datebegin', DateType::class, array(
-                'required' => true,
+                'label' => 'Date de début',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
-                'label' => 'Date de début',
+                'html5' => false,
+                'required' => true,
             ))
             ->add('dateend', DateType::class, array(
-                'required' => false,
+                'label' => 'Date de fin',
                 'widget' => 'single_text',
                 'format' => 'dd/MM/yyyy',
-                'label' => 'Date de fin',
+                'html5' => false,
+                'required' => false,
             ));
 
         if (!empty($inscriptions)) {

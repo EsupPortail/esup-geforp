@@ -349,7 +349,7 @@ class Session extends AbstractSession
      * @return string
      * @return string
      */
-    public function getFrontUrl($front_root_url = 'https://sygefor3.univ-amu.fr', $apiSerialization = false)
+    public function getFronturl($front_root_url = 'https://sygefor3.univ-amu.fr', $apiSerialization = false)
     {
         $url = $front_root_url . '/training/' . $this->getTraining()->getId() . '/';
         if (!$apiSerialization) {
