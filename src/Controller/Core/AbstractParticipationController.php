@@ -70,6 +70,7 @@ abstract class AbstractParticipationController extends AbstractController
         /** @var AbstractParticipation $participation */
         $participation = new $this->participationClass();
         $participation->setSession($session);
+        $participation->setOrganization($session->getTraining()->getOrganization());
         $form = $this->createForm($participation::getFormType(), $participation);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
