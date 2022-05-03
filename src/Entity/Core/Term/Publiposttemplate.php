@@ -82,7 +82,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     protected function getTemplatesRootDir()
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__.'/../../../../../var/Publipost';
+        return __DIR__.'/../../../../var/Publipost';
     }
 
     /**
