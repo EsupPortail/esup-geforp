@@ -7,7 +7,7 @@ use JMS\Serializer\Annotation as Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Form\Type\AbstractTrainingType;
 use App\Entity\Core\AbstractInstitution;
-use App\Entity\Core\AbstractMaterial;
+use App\Entity\Core\Material;
 use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Trainingcategory;
@@ -179,7 +179,7 @@ abstract class AbstractTraining implements SerializedAccessRights
 
     /**
      * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\Core\AbstractMaterial", mappedBy="training", cascade={"remove", "persist"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Core\Material", mappedBy="training", cascade={"remove", "persist"})
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */

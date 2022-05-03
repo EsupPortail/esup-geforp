@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 
-use App\Entity\Core\AbstractMaterial;
+use App\Entity\Core\Material;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -14,7 +14,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\Entity
  * @ORM\Table(name="link_material")
  */
-class LinkMaterial extends AbstractMaterial
+class LinkMaterial extends Material
 {
     /**
      * @ORM\Column(name="url", type="string", nullable=false)

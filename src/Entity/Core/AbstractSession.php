@@ -27,8 +27,6 @@ abstract class AbstractSession implements SerializedAccessRights
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
 
-    use MaterialTrait;
-
     // registration states
     const REGISTRATION_DEACTIVATED = 0;
     const REGISTRATION_CLOSED = 1;
@@ -185,15 +183,18 @@ abstract class AbstractSession implements SerializedAccessRights
 
     /**
      * @var ArrayCollection
-     * @Serializer\Groups({"api.training", "api.attendance"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Core\Material", mappedBy="session", cascade={"remove", "persist"})
+     * @ORM\JoinColumn(nullable=true)
+     * @Serializer\Groups({"training", "session", "api.attendance"})
      */
-    protected $allPublicMaterials;
+    protected $materials;
 
     /**
      * @var ArrayCollection
      * @Serializer\Groups({"api.attendance"})
      */
-    protected $allPrivateMaterials;
+    protected $allMaterials;
+
 
     public function __construct()
     {
@@ -793,31 +794,50 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return ArrayCollection
      */
-    public function getAllPublicMaterials()
+    public function getMaterials()
     {
-        $trainingPublicMaterials = $this->getTraining()->getPublicMaterials();
-        $sessionPublicMaterials = $this->getPublicMaterials();
+        return $this->materials;
+    }
 
-        foreach ($sessionPublicMaterials as $material) {
-            $trainingPublicMaterials[] = $material;
+    /**
+     * @param ArrayCollection $materials
+     */
+    public function setMaterials($materials)
+    {
+        $this->materials = $materials;
+    }
+
+    /**
+     * @param Material $material
+     *
+     * @return bool
+     */
+    public function addMaterial($material)
+    {
+        if (!$this->materials->contains($material)) {
+            $material->setSession($this);
+            $this->materials->add($material);
+
+            return true;
         }
 
-        return $trainingPublicMaterials;
+        return false;
     }
 
     /**
      * @return ArrayCollection
      */
-    public function getAllPrivateMaterials()
+    public function getAllMaterials()
     {
-        $trainingPrivateMaterials = $this->getTraining()->getPrivateMaterials();
-        $sessionPrivateMaterials = $this->getPrivateMaterials();
+        return $this->allMaterials;
+    }
 
-        foreach ($sessionPrivateMaterials as $material) {
-            $trainingPrivateMaterials[] = $material;
-        }
-
-        return $trainingPrivateMaterials;
+    /**
+     * @param ArrayCollection $allMaterials
+     */
+    public function setAllMaterials($allMaterials)
+    {
+        $this->allMaterials = $allMaterials;
     }
 
     public function __toString()

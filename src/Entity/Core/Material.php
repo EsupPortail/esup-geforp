@@ -14,7 +14,7 @@ use JMS\Serializer\Annotation as Serializer;
  * @ORM\DiscriminatorMap({})
  * @ORM\InheritanceType("JOINED")
  */
-abstract class AbstractMaterial
+abstract class Material
 {
     /**
      * @var int

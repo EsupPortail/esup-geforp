@@ -3,7 +3,7 @@
 namespace App\Entity;
 
 
-use App\Entity\Core\AbstractMaterial;
+use App\Entity\Core\Material;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\UploadableTrait;
@@ -15,7 +15,7 @@ use App\Entity\Core\UploadableTrait;
  * @ORM\Table(name="file_material")
  * @ORM\HasLifecycleCallbacks
  */
-class FileMaterial extends AbstractMaterial
+class FileMaterial extends Material
 {
     use UploadableTrait;
 
@@ -47,6 +47,6 @@ class FileMaterial extends AbstractMaterial
     protected function getTemplatesRootDir()
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__ . '/../../../../../app/Resources/Material';
+        return __DIR__ . '/../../var/Material';
     }
 }

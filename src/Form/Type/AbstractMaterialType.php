@@ -9,7 +9,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\AbstractMaterial;
+use App\Entity\Core\Material;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -30,7 +30,7 @@ class AbstractMaterialType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-                'data_class' => AbstractMaterial::class,
+                'data_class' => Material::class,
                 'csrf_protection' => false)
         );
     }
