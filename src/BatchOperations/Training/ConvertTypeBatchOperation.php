@@ -4,23 +4,17 @@ namespace App\BatchOperations\Training;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
-use Elastica\Bulk;
-use Elastica\Bulk\Action;
-use Elastica\Client;
-use Elastica\Filter\Terms;
-use Elastica\Type;
-use FOS\ElasticaBundle\Elastica\Index;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Utils\Search\SearchService;
 use App\Model\SemesteredTraining;
 use App\Entity\Core\AbstractTraining;
 use App\Utils\TrainingTypeRegistry;
-use Symfony\Component\Security\Core\SecurityContext;
+use Symfony\Component\Security\Core\Security;
 
 class ConvertTypeBatchOperation extends AbstractBatchOperation
 {
-    /** @var EntityManager $securityContext */
-    protected $securityContext;
+    /** @var EntityManager $security */
+    protected $security;
 
     /** @var TrainingTypeRegistry $trainingTypeRegistry | get new entity type class */
     protected $trainingTypeRegistry;
@@ -34,33 +28,23 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
     /** @var SearchService $semesteredTrainingSearch */
     protected $semesteredTrainingSearch;
 
-    /** @var Client $elasticaClient */
-    protected $elasticaClient;
-
-    /** @var Index $elasticaIndex */
-    protected $elasticaIndex;
-
     /** @var Type $semesteredTrainingType */
     protected $semesteredTrainingType;
 
     /**
      * ConvertTypeBatchOperation constructor.
      *
-     * @param SecurityContext      $securityContext
+     * @param Security              $security
      * @param TrainingTypeRegistry $trainingTypeRegistry
      * @param SearchService        $semesteredTrainingSearch
-     * @param Client               $elasticaClient
-     * @param Index                $elasticaIndex
      * @param Type                 $semesteredTrainingType
      */
-    public function __construct(SecurityContext $securityContext, TrainingTypeRegistry $trainingTypeRegistry,
-                                SearchService $semesteredTrainingSearch, Client $elasticaClient, Index $elasticaIndex, Type $semesteredTrainingType)
+    public function __construct(Security $securityContext, TrainingTypeRegistry $trainingTypeRegistry,
+                                SearchService $semesteredTrainingSearch, Type $semesteredTrainingType)
     {
-        $this->securityContext = $securityContext;
+        $this->security = $securityContext;
         $this->trainingTypeRegistry = $trainingTypeRegistry;
         $this->semesteredTrainingSearch = $semesteredTrainingSearch;
-        $this->elasticaClient = $elasticaClient;
-        $this->elasticaIndex = $elasticaIndex;
         $this->semesteredTrainingType = $semesteredTrainingType;
     }
 
@@ -75,13 +59,13 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
         $type = $options[0]['type'];
         // get trainings from semestered trainings and verify if there are not several times the same training
         // not transform same training type and meetings
-        $entities = SemesteredTraining::getTrainingsByIds($idList, $this->em, array($type, 'meeting'));
+        $entities = SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager(), array($type, 'meeting'));
 
         // first create new entities and get old entity sessions
         foreach ($entities as $key => $entity) {
-            if ($this->securityContext->isGranted('EDIT', $entity)) {
+            if ($this->security->isGranted('EDIT', $entity)) {
                 // create new entity and copy common old entity properties
-                $this->createAndCopyEntity($entity, $type, $this->em, $key);
+                $this->createAndCopyEntity($entity, $type, $this->doctrine->getManager(), $key);
 
                 // transfer sessions to new training
                 $clonedTrainingSessions = new ArrayCollection();
@@ -97,23 +81,22 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
                 $this->correspondanceBetweenTrainings[$entity->getId()]->setSessions($clonedTrainingSessions);
             }
         }
-        $this->em->flush();
+        $this->doctrine->getManager()->flush();
 
         // then remove old entities
         $entityRemovedIds = array();
         foreach ($entities as $entity) {
-            if ($this->securityContext->isGranted('EDIT', $entity)) {
+            if ($this->security->isGranted('EDIT', $entity)) {
                 $entityRemovedIds[] = $entity->getId();
-                $this->em->remove($entity);
+                $this->doctrine->getManager()->remove($entity);
             }
         }
-        $this->em->flush();
+        $this->doctrine->getManager()->flush();
         // then reattributes old entities number to new ones
         foreach ($this->clonedTrainingNumbers as $values) {
             $values['entity']->setNumber($values['number']);
         }
-        $this->em->flush();
-        $this->elasticaIndex->refresh();
+        $this->doctrine->getManager()->flush();
 
         // remove cascade semestered training
         // some of them are not found by elastica because the semestered training could not have the same id because of session moved from old trainings to new one
@@ -125,7 +108,7 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
             $result = $this->semesteredTrainingSearch->search();
 
             // delete them
-            if (!empty($result['items'])) {
+/*            if (!empty($result['items'])) {
                 $bulk = new Bulk($this->elasticaClient);
                 $bulk->setIndex($this->elasticaIndex);
                 $bulk->setType($this->semesteredTrainingType);
@@ -136,9 +119,8 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
                 }
 
                 return $bulk->send();
-            }
+            }*/
         }
-        $this->elasticaIndex->refresh();
     }
 
     /**
@@ -150,7 +132,7 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
     protected function createAndCopyEntity(AbstractTraining $training, $type, EntityManager $em, $key)
     {
         // get database max number for organization
-        $query = $em->createQuery('SELECT MAX(t.number) FROM SygeforCoreBundle:AbstractTraining t WHERE t.organization = :organization')
+        $query = $em->createQuery('SELECT MAX(t.number) FROM App\Entity\Core\AbstractTraining t WHERE t.organization = :organization')
             ->setParameter('organization', $training->getOrganization());
         $max = (int) $query->getSingleScalarResult();
 

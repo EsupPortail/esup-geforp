@@ -21,7 +21,7 @@ parameters:
                     email: Email
                     organization.name: Centre
             session:
-                class: 'App\Entity\Core\AbstractSession'
+                class: 'App\Entity\Session'
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
@@ -29,9 +29,9 @@ parameters:
                     name: "Nom de la session"
                     training.theme: "Thématique"
                     training.category: "Catégorie de stage"
-                    dateBegin: { label: "Date de début", type: "date" }
-                    dateEnd: { label: "Date de fin", type: "date" }
-                    dayNumber: "Nombre de jours théoriques"
+                    datebegin: { label: "Date de début", type: "date" }
+                    dateend: { label: "Date de fin", type: "date" }
+                    daynumber: "Nombre de jours théoriques"
                     registration: { label: "Type d'inscriptions", type: "typinsc" }
                     training.tags: "Tags du stage"
                     date.lieu: "Lieu de formation"
@@ -43,23 +43,23 @@ parameters:
                     inscription.refus: "nombre d'inscription refusées"
                     inscription.convoke: "Nombre de convoqués"
                     inscription.presence.nbheures: "Nombre d'heures de présence effective"
-                    maximumNumberOfRegistrations: 'Nombre de places'
-                    numberOfRegistrations: "Nombre d'inscrits"
-                    numberOfParticipants: 'Nombre de présents effectifs'
+                    maximumnumberofregistrations: 'Nombre de places'
+                    numberofregistrations: "Nombre d'inscrits"
+                    numberofparticipants: 'Nombre de présents effectifs'
                     presence.partiel: 'Nombre de présences partielles'
                     presence.absent: "Nombre d'absents"
                     presence.excuse: "Nombre d'excusés"
                     session.presence.nbheures: "Nombre d'heures de présence théorique pour les présents"
-                    hourNumber: "Durée réelle de la session"
-                    teachingCost: "Coût pédagogique"
-                    vacationCost: "Coût vacation"
-                    accommodationCost: "Coût hébergement"
-                    mealCost: "Coût repas"
-                    transportCost: "Coût transport"
-                    materialCost: "Coût support"
+                    hournumber: "Durée réelle de la session"
+                    teachingcost: "Coût pédagogique"
+                    vacationcost: "Coût vacation"
+                    accommodationcost: "Coût hébergement"
+                    mealcost: "Coût repas"
+                    transportcost: "Coût transport"
+                    materialcost: "Coût support"
                     totalCost: "Coût total"
                     training.designated_public: "Public désigné"
-                    evalResume: "Evaluations"
+#                    evalResume: "Evaluations"
             semestered_training:
                 class: 'App\Model\SemesteredTraining'
                 filename: 'formation.csv'
@@ -72,9 +72,9 @@ parameters:
                     sessionsCount: { label: 'nombre de sessions' }
                     nextSession.dateBegin: { label: 'Prochaine', type: 'date' }
                     lastSession.dateBegin: { label: 'Dernière', type: 'date' }
-                    tags: { label: 'Tags' }
+#                    tags: { label: 'Tags' }
             trainee:
-                class: 'App\Entity\Core\AbstractTrainee'
+                class: 'App\Entity\Trainee'
                 filename: 'stagiaire.csv'
                 fields:
                     title: "Civilité"
@@ -85,8 +85,6 @@ parameters:
                     institution.name: "Etablissement"
                     publicType: "Catégorie de public"
                     status: "Statut"
-                    disciplinary: "Discipline"
-                    disciplinaryDomain: "Domaine disciplinaire"
                     address: "Adresse"
                     zip: "Code postal"
                     city: "Ville"
@@ -140,7 +138,7 @@ parameters:
                     actiontype: "Type d'inscription"
                     dif: "CPF"
             institution:
-                class: 'SygeforMyCompanyBundle:Institution'
+                class: 'App\Entity\Core\AbstractInstitution'
                 filename: 'unite.csv'
                 fields:
                     name: "Nom"
@@ -149,9 +147,6 @@ parameters:
                     address: "Adresse"
                     zip: "Code postal"
                     city: "Ville"
-                    manager.fullName: "Directeur de l'établissement"
-                    manager.phoneNumber: "Téléphone"
-                    manager.email: "Email"
         mailing:
             organization:
                 class: 'App\Entity\Organization'

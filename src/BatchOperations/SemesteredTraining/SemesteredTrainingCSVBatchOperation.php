@@ -6,7 +6,6 @@
  * Date: 28/04/14
  * Time: 10:43.
  */
-
 namespace App\BatchOperations\SemesteredTraining;
 
 use App\BatchOperations\Generic\CSVBatchOperation as BaseCSVBatchOperation;
@@ -17,10 +16,10 @@ class SemesteredTrainingCSVBatchOperation extends BaseCSVBatchOperation
     /**
      * @param $idList
      *
-     * @return \Sygefor\Bundle\CoreBundle\Model\SemesteredTraining[]
+     * @return App\Model\SemesteredTraining[]
      */
     protected function getObjectList($idList)
     {
-        return SemesteredTraining::getSemesteredTrainingsByIds($idList, $this->em);
+        return SemesteredTraining::getSemesteredTrainingsByIds($idList, $this->doctrine->getManager());
     }
 }

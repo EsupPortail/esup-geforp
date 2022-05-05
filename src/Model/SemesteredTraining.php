@@ -340,7 +340,7 @@ class SemesteredTraining
                 $dateFrom = ($params[2] === 2) ? $params[1].'-01-07 00:00:00' : $params[1].'-01-01 00:00:00';
                 $dateTo = ($params[2] === 2) ? $params[1].'-31-12 23:59:59' : $params[1].'-30-06 23:59:59';
 
-                $qb->orWhere('( t.id = :id'.$paramCount.' AND s.dateBegin < :dateTo'.$paramCount.' AND s.dateBegin > :dateFrom'.$paramCount.')');
+                $qb->orWhere('( t.id = :id'.$paramCount.' AND s.datebegin < :dateTo'.$paramCount.' AND s.datebegin > :dateFrom'.$paramCount.')');
                 $parameters = array_merge($parameters, array(
                     'id'.$paramCount => $params[0],
                     'dateTo'.$paramCount => $dateTo,
@@ -372,12 +372,12 @@ class SemesteredTraining
                 $sessions[$tId][$ys[0]][$ys[1]][] = $re;
             }
         }
-
         $semTrains = array();
         //for each training / year / semester, a SemesteredTraining object is built
         foreach ($idList as $id) {
             $params = explode('_', $id);
 
+            /*
             if (count($params) === 3) {
                 if (!empty($sessions[$params[0]][$params[1]][$params[2]])) {
                     //getting sessions
@@ -386,7 +386,12 @@ class SemesteredTraining
                 } else {
                     $semTrains[] = new self($params[1], $params[2], $em->getRepository(AbstractTraining::class)->find($params[0]), array());
                 }
-            }
+            }*/
+
+            // Construction semestered training
+            $train = $em->getRepository(AbstractTraining::class)->find($params[0]);
+            $semTrains[] = new self($train->getFirstsessionperiodyear(), $train->getFirstsessionperiodsemester(), $em->getRepository(AbstractTraining::class)->find($params[0]), array());
+
         }
         //var_dump($qb->getQuery());
         return $semTrains;

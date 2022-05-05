@@ -7,8 +7,8 @@ use App\Model\SemesteredTraining;
 
 class SemesteredTrainingConvertTypeBatchOperation extends BaseConvertTypeBatchOperation
 {
-    protected function getObjectList($idList)
+    protected function getObjectList($idList = array())
     {
-        return SemesteredTraining::getTrainingsByIds($idList, $this->em, array());
+        return SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager());
     }
 }

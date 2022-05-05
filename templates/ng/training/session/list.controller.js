@@ -85,7 +85,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             icon: 'fa-envelope-o',
             label: 'Envoyer un Email',
             execute: function (items, $dialog) {
-                return $dialog.open('batch.email', {items: items, targetClass: 'SygeforMyCompanyBundle:Session'})
+                return $dialog.open('batch.email', {items: items, targetClass: 'App\\Entity\\Core\\AbstractSession'})
             }
         },
     ];

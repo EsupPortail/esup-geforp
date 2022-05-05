@@ -9,9 +9,11 @@
 
 namespace App\BatchOperations;
 
+use App\BatchOperations\Generic\CSVBatchOperation;
 use App\BatchOperations\Generic\EmailingBatchOperation;
 use App\BatchOperations\Generic\MailingBatchOperation;
 use App\BatchOperations\Inscription\InscriptionStatusChangeBatchOperation;
+use App\BatchOperations\SemesteredTraining\SemesteredTrainingCSVBatchOperation;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -37,9 +39,10 @@ class BatchOperationRegistry
         // Construction de la liste des batch operations 'en dur'
         $i=0;
         $conf = $container->getParameter('batch');
+        // Recuperation parametres emails et publipostage
+        $confMail = $conf['mailing'];
 
         // operation batch : envoi email
-        $confMail = $conf['mailing'];
         $hrpa->setTermCatalog($confMail);
         $emailingBatch = new EmailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $mailer, $hrpa);
         $emailingBatch->setDoctrine($doctrine);
@@ -77,6 +80,56 @@ class BatchOperationRegistry
         $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatch);
         $operation->setDoctrine($doctrine);
         $this->addBatchOperation($operation, $i);
+        $i++;
+
+        // Recuperation conf CSV
+        $confCSV = $conf['csv'];
+        // operation batch : export CSV pour les sessions
+        $CSVBatchSession = new CSVBatchOperation($security);
+        $CSVBatchSession->setDoctrine($doctrine);
+        $CSVBatchSession->setTargetClass('App\Entity\Session');
+        $CSVBatchSession->setOptions($confCSV['session']);
+        $this->addBatchOperation($CSVBatchSession, $i);
+        $i++;
+
+        // operation batch : export CSV pour les trainings
+        $CSVBatchTraining = new SemesteredTrainingCSVBatchOperation($security);
+        $CSVBatchTraining->setDoctrine($doctrine);
+        $CSVBatchTraining->setTargetClass('App\Entity\Core\AbstractTraining');
+        $CSVBatchTraining->setOptions($confCSV['semestered_training']);
+        $this->addBatchOperation($CSVBatchTraining, $i);
+        $i++;
+
+        // operation batch : export CSV pour les inscriptions
+        $CSVBatchInscription = new CSVBatchOperation($security);
+        $CSVBatchInscription->setDoctrine($doctrine);
+        $CSVBatchInscription->setTargetClass('App\Entity\Inscription');
+        $CSVBatchInscription->setOptions($confCSV['inscription']);
+        $this->addBatchOperation($CSVBatchInscription, $i);
+        $i++;
+
+        // operation batch : export CSV pour les trainee
+        $CSVBatchTrainee = new CSVBatchOperation($security);
+        $CSVBatchTrainee->setDoctrine($doctrine);
+        $CSVBatchTrainee->setTargetClass('App\Entity\Trainee');
+        $CSVBatchTrainee->setOptions($confCSV['trainee']);
+        $this->addBatchOperation($CSVBatchTrainee, $i);
+        $i++;
+
+        // operation batch : export CSV pour les etablissements
+        $CSVBatchInstitution = new CSVBatchOperation($security);
+        $CSVBatchInstitution->setDoctrine($doctrine);
+        $CSVBatchInstitution->setTargetClass('App\Entity\Institution');
+        $CSVBatchInstitution->setOptions($confCSV['institution']);
+        $this->addBatchOperation($CSVBatchInstitution, $i);
+        $i++;
+
+        // operation batch : export CSV pour les formateurs
+        $CSVBatchTrainer = new CSVBatchOperation($security);
+        $CSVBatchTrainer->setDoctrine($doctrine);
+        $CSVBatchTrainer->setTargetClass('App\Entity\Trainer');
+        $CSVBatchTrainer->setOptions($confCSV['trainer']);
+        $this->addBatchOperation($CSVBatchTrainer, $i);
         $i++;
 
     }
@@ -138,6 +191,24 @@ class BatchOperationRegistry
                 break;
             case 'sygefor_inscription.batch.inscription_status_change':
                 $id = 4;
+                break;
+            case 'sygefor_core.batch.csv.session':
+                $id = 5;
+                break;
+            case 'sygefor_core.batch.csv.semestered_training':
+                $id = 6;
+                break;
+            case 'sygefor_core.batch.csv.inscription':
+                $id = 7;
+                break;
+            case 'sygefor_core.batch.csv.trainee':
+                $id = 8;
+                break;
+            case 'sygefor_core.batch.csv.institution':
+                $id = 9;
+                break;
+            case 'sygefor_core.batch.csv.trainer':
+                $id = 10;
                 break;
         }
         if (isset($this->operations[$id])) {

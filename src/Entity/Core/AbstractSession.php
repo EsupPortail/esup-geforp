@@ -9,6 +9,9 @@ use App\Entity\Core\Term\Sessiontype;
 use App\Form\Type\AbstractSessionType;
 use App\Security\AccessRight\SerializedAccessRights;
 use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Core\AbstractInscription;
+use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Core\ParticipantsSummary;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -839,6 +842,90 @@ abstract class AbstractSession implements SerializedAccessRights
     {
         $this->allMaterials = $allMaterials;
     }
+
+    /**
+     * @return mixed
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"session", "training"})
+     */
+    public function getNumberofparticipants()
+    {
+        $count = 0;
+        if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
+            foreach ($this->getParticipantsSummaries() as $summary) {
+                $count += $summary->getCount();
+            }
+        }
+        else {
+            /** @var AbstractInscription $inscription */
+            foreach ($this->getInscriptions() as $inscription) {
+                if ($inscription->getPresencestatus() && $inscription->getPresencestatus()->getStatus() === PresenceStatus::STATUS_PRESENT) {
+                    ++$count;
+                }
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getParticipantsSummaries()
+    {
+        return $this->participantsSummaries;
+    }
+
+    /**
+     * @param ArrayCollection $participantsSummaries
+     */
+    public function setParticipantsSummaries($participantsSummaries)
+    {
+        /** @var ParticipantsSummary $summary */
+        foreach ($participantsSummaries as $summary) {
+            $summary->setSession($this);
+        }
+        $this->participantsSummaries = $participantsSummaries;
+    }
+
+    /**
+     * @param ParticipantsSummary $participantsSummary
+     *
+     * @return bool
+     */
+    public function addParticipantsSummary($participantsSummary)
+    {
+        foreach ($this->participantsSummaries as $participantsSummaryOne) {
+            if ($participantsSummaryOne->getPublictype() === $participantsSummary->getPublictype() &&
+                $participantsSummaryOne->getSession() === $participantsSummary->getSession()) {
+                $participantsSummaryOne->setCount($participantsSummaryOne->getCount() + $participantsSummary->getCount());
+
+                return false;
+            }
+        }
+
+        $participantsSummary->setSession($this);
+        $this->participantsSummaries->add($participantsSummary);
+
+        return true;
+    }
+
+    /**
+     * @param ParticipantsSummary $participantsSummary
+     *
+     * @return bool
+     */
+    public function removeParticipantsSummary($participantsSummary)
+    {
+        if ($this->participantsSummaries->contains($participantsSummary)) {
+            $this->participantsSummaries->removeElement($participantsSummary);
+
+            return true;
+        }
+
+        return false;
+    }
+
 
     public function __toString()
     {

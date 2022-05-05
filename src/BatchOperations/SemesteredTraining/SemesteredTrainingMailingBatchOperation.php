@@ -6,7 +6,6 @@
  * Date: 28/04/14
  * Time: 10:41.
  */
-
 namespace App\BatchOperations\SemesteredTraining;
 
 use App\BatchOperations\Generic\MailingBatchOperation as BaseMailingBatchOperation;
@@ -22,10 +21,10 @@ class SemesteredTrainingMailingBatchOperation extends BaseMailingBatchOperation
      *
      * @param array $idList
      *
-     * @return CoreBundle\Model\SemesteredTraining[]
+     * @return \App\Model\SemesteredTraining[]
      */
     protected function getObjectList($idList)
     {
-        return SemesteredTraining::getSemesteredTrainingsByIds($this->idList, $this->em);
+        return SemesteredTraining::getSemesteredTrainingsByIds($this->idList, $this->doctrine->getManager());
     }
 }

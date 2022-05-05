@@ -6,12 +6,11 @@
  * Date: 23/06/14
  * Time: 10:13.
  */
+namespace Sygefor\Bundle\TrainingBundle\BatchOperations;
 
-namespace App\BatchOperations\Session;
-
-use App\BatchOperations\AbstractBatchOperation;
-use App\Entity\Core\AbstractInscription;
-use App\Entity\Core\AbstractSession;
+use Sygefor\Bundle\CoreBundle\BatchOperation\AbstractBatchOperation;
+use Sygefor\Bundle\InscriptionBundle\Entity\AbstractInscription;
+use Sygefor\Bundle\TrainingBundle\Entity\Session\AbstractSession;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -26,7 +25,7 @@ class SessionRegistrationChangeBatchOperation extends AbstractBatchOperation
     /**
      * @var string
      */
-    protected $targetClass = AbstractSession::class;
+    protected $targetClass = 'SygeforTrainingBundle:Session\AbstractSession';
 
     /**
      * @param ContainerInterface $container
@@ -46,12 +45,12 @@ class SessionRegistrationChangeBatchOperation extends AbstractBatchOperation
     {
         $em = $this->container->get('doctrine.orm.entity_manager');
         /* @var AbstractInscription[] $inscriptions */
-        $sessions = $this->getObjectList($idList);
+        $sessions     = $this->getObjectList($idList);
         $registration = $options['registration'];
         //changing status
         /** @var AbstractSession $session */
         foreach ($sessions as $session) {
-            if ($this->container->get('security.context')->isGranted('EDIT', $session->getTraining())) {
+            if($this->container->get('security.context')->isGranted('EDIT', $session->getTraining())) {
                 $session->setRegistration($registration);
             }
         }

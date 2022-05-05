@@ -55,8 +55,6 @@ class UserController extends AbstractController
         } */
 
         $users = $queryBuilder->orderBy('u.username')->getQuery()->getResult();
-        dump($users[0]);
-        dump($users);
 
         return $this->render('Core/views/User/index.html.twig', array(
             'users' => $users,

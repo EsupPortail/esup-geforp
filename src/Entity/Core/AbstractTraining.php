@@ -264,6 +264,11 @@ abstract class AbstractTraining implements SerializedAccessRights
         return $this->id;
     }
 
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     /**
      * @return AbstractOrganization
      */

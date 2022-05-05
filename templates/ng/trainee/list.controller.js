@@ -10,7 +10,7 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
         icon: 'fa-envelope-o',
         label: 'Envoyer un email',
         execute: function(items, $dialog) {
-            return $dialog.open('batch.email', { items: items, targetClass: 'SygeforTraineeBundle:AbstractTrainee' })
+            return $dialog.open('batch.email', { items: items, targetClass: 'App\\Entity\\Core\\AbstractTrainee' })
         }
         },
             {
