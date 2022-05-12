@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityRepository;
 use App\Entity\Core\Term\Title;
 use App\Entity\Organization;
 use App\Form\Type\AbstractAccountType;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractInstitution;

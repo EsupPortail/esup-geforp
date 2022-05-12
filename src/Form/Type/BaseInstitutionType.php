@@ -5,7 +5,7 @@ namespace App\Form\Type;
 use Doctrine\ORM\EntityRepository;
 use App\Entity\Organization;
 use Sygefor\Bundle\InstitutionBundle\Entity\Term\InstitutionType as InstitutionTypeTerm;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;

@@ -12,7 +12,7 @@ use App\Entity\Core\Term\Presencestatus;
 use App\Entity\Core\Term\Inscriptionstatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Form\Type\AbstractInscriptionType;
-use App\Security\AccessRight\SerializedAccessRights;
+use App\AccessRight\SerializedAccessRights;
 use App\Entity\Core\TimestampableTrait;
 
 /**

@@ -73,16 +73,16 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function createAction(Request $request, ManagerRegistry $doctrine)
+    public function createAction(Request $request, ManagerRegistry $doctrine, \Symfony\Component\Security\Core\Security $security)
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
         $trainee->setOrganization($this->getUser()->getOrganization());
 
         //trainee can't be created if user has no rights for it
-/*        if (!$this->get('security.context')->isGranted('CREATE', $trainee)) {
+        if ($security->isGranted('CREATE', $trainee)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm(AbstractTraineeType::class, $trainee);
         if ($request->getMethod() === 'POST') {
@@ -109,16 +109,16 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee)
+    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee, \Symfony\Component\Security\Core\Security $security)
     {
         // access right is checked inside controller, so to be able to send specific error message
-/*        if (!$this->get('security.context')->isGranted('EDIT', $trainee)) {
-            if ($this->get('security.context')->isGranted('VIEW', $trainee)) {
+        if (!$security->isGranted('EDIT', $trainee)) {
+            if ($security->isGranted('VIEW', $trainee)) {
                 return array('trainee' => $trainee);
             }
 
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
-        }*/
+        }
 
         $form = $this->createForm(AbstractTraineeType::class, $trainee);
         if ($request->getMethod() === 'POST') {
@@ -145,10 +145,10 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function toggleActivationAction(Request $request, AbstractTrainee $trainee)
+    public function toggleActivationAction(Request $request, AbstractTrainee $trainee, \Symfony\Component\Security\Core\Security $security)
     {
         //access right is checked inside controller, so to be able to send specific error message
-        if (!$this->get('security.context')->isGranted('EDIT', $trainee)) {
+        if (!$security->isGranted('EDIT', $trainee)) {
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
         }
 

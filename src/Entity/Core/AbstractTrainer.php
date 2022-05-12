@@ -5,7 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Security\AccessRight\SerializedAccessRights;
+use App\AccessRight\SerializedAccessRights;
 use App\Form\Type\AbstractTrainerType;
 use App\Entity\Core\PersonTrait\CoordinatesTrait;
 use App\Entity\Core\PersonTrait\PersonTrait;

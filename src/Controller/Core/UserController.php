@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Form\Type\AccessRightType;
 use ClassesWithParents\D;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,7 +19,7 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Security\Core\Security;
 use App\Entity\Core\User;
 use App\Repository\UserRepository;
 use App\Form\Type\AccountType;
@@ -248,16 +249,31 @@ class UserController extends AbstractController
      * @Route("/{id}/access-rights", requirements={"id" = "\d+"}, name="user.access_rights", options={"expose"=true})
      * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      */
-    public function accessRightsAction(Request $request, User $user)
+    public function accessRightsAction(Request $request, User $user, ManagerRegistry $doctrine, Security $security)
     {
+        $accessReg = new AccessRightRegistry($security);
+        // Transformation user rights
+        $rights = $user->getAccessRights(); $newRights = [];
+        foreach ($rights as $right) {
+            $newRights[]= $accessReg->getByName($right);
+        }
+        $user->setAccessRights($newRights);
+
         $builder = $this->createFormBuilder($user);
         $builder->add('accessRights', AccessRightType::class, array('label' => 'Droits d\'accès'));
         $form = $builder->getForm();
 
+
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                // Transformation user rights
+                $rights = $user->getAccessRights(); $newRights = [];
+                foreach ($rights as $right) {
+                    $newRights[]= $accessReg->getNameById($right);
+                }
+                $user->setAccessRights($newRights);
+                $doctrine->getManager()->flush();
                 $this->get('session')->getFlashBag()->add('success', "Les droits d'accès ont bien été enregistrés.");
 
                 return $this->redirect($this->generateUrl('user.access_rights', array('id' => $user->getId())));

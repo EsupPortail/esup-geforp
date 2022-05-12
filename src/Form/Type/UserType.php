@@ -11,7 +11,7 @@ namespace App\Form\Type;
 
 use App\Entity\Organization;
 use Doctrine\ORM\EntityRepository;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Core\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;

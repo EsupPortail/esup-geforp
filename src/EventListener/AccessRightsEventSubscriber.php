@@ -6,7 +6,7 @@ use JMS\Serializer\Context;
 use JMS\Serializer\EventDispatcher\EventSubscriberInterface;
 use JMS\Serializer\EventDispatcher\ObjectEvent;
 use JMS\Serializer\Metadata\StaticPropertyMetadata;
-use App\Security\AccessRight\SerializedAccessRights;
+use App\AccessRight\SerializedAccessRights;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
 /**

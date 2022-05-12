@@ -10,7 +10,7 @@ use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Theme;
 use App\Entity\Core\Term\Trainingcategory;
 use App\Entity\Core\AbstractTraining;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

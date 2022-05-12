@@ -9,7 +9,7 @@
 
 namespace App\Form\Type;
 
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -60,9 +60,14 @@ class AccessRightType extends AbstractType
         // $form->getData() return an array with index reseted
         // we need to set the right key for each initial right
         $initialRights = array();
-        $choices = $form->getConfig()->getOption('choice_list')->getChoices();
+        $choices = $form->getConfig()->getOption('choices');
+        // Transformer le tableau
+        $newChoices = array();
+        foreach ($choices as $choice) {
+                $newChoices = array_merge($newChoices, $choice);
+        }
         foreach ($form->getData() as $right) {
-            $key = array_search($right, $choices, true);
+            $key = array_search($right, $newChoices);
             $initialRights[$key] = $right;
         }
 
@@ -70,7 +75,7 @@ class AccessRightType extends AbstractType
         foreach ($initialRights as $key => $right) {
             // if unauthorized, force it the the submitted value
             if (!$this->accessRightsRegistry->hasAccessRight($right)) {
-                $rights[$key] = $right;
+                $rights[$key] =  $right;
             }
         }
 
@@ -97,7 +102,8 @@ class AccessRightType extends AbstractType
         foreach ($rightsGroups as $cat => $rightsIds) {
             $choices[$cat] = array();
             foreach ($rightsIds as $rightId) {
-                $choices[$cat][$rightId] = $this->accessRightsRegistry->getAccessRightById($rightId)->getLabel();
+//                $choices[$cat][$rightId] = $this->accessRightsRegistry->getAccessRightById($rightId)->getLabel();
+                $choices[$cat][$this->accessRightsRegistry->getAccessRightById($rightId)->getLabel()] = $rightId;
             }
         }
 

@@ -5,7 +5,7 @@ namespace App\Form\Type;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Institution;
 use Doctrine\ORM\EntityRepository;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Organization;
 use App\Entity\Core\Term\Title;
 use App\Entity\Core\AbstractTrainer;
@@ -22,7 +22,6 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\SecurityContext;
 
 
 /**

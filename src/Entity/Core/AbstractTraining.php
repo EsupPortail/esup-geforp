@@ -12,7 +12,7 @@ use App\Entity\Core\Term\Supervisor;
 use App\Entity\Core\Term\Tag;
 use App\Entity\Core\Term\Trainingcategory;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Security\AccessRight\SerializedAccessRights;
+use App\AccessRight\SerializedAccessRights;
 
 /**
  * @ORM\Entity

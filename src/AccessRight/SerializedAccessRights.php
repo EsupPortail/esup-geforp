@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Security\AccessRight;
+namespace App\AccessRight;
 
 /**
  * This interface is used by SerializationListener to automatically add the user access rights
  * during the entity serialization.
  *
- * @see Sygefor\Bundle\CoreBundle\Listener\SerializationListener
+ * @see App\Listener\SerializationListener
  */
 interface SerializedAccessRights
 {

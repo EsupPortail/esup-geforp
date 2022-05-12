@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\PersonTrait\AccountTrait;
 use App\Entity\Core\AbstractOrganization;
-use App\Security\AccessRight\SerializedAccessRights;
+use App\AccessRight\SerializedAccessRights;
 use App\Entity\Core\PersonTrait\ProfessionalSituationTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
