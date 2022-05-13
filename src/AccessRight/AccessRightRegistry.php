@@ -78,6 +78,22 @@ class AccessRightRegistry
      */
     private $security;
 
+    const RIGHT_NAMES =  array(
+        0 => "sygefor_core.rights.user.own", 1 => "sygefor_core.rights.user.all",
+        2 => "sygefor_core.rights.vocabulary.own", 3 => "sygefor_core.rights.vocabulary.national", 4 => "sygefor_core.rights.vocabulary.all",
+        5 => 'sygefor_training.rights.training.own.view', 6 => 'sygefor_training.rights.training.own.create', 7=> 'sygefor_training.rights.training.own.update', 8 => 'sygefor_training.rights.training.own.delete',
+        9 => 'sygefor_training.rights.training.all.view', 10 => 'sygefor_training.rights.training.all.create', 11 => 'sygefor_training.rights.training.all.update', 12 => 'sygefor_training.rights.training.all.delete',
+        13 => 'sygefor_trainee.rights.trainee.own.view', 14 => 'sygefor_trainee.rights.trainee.own.create', 15 => 'sygefor_trainee.rights.trainee.own.update', 16 => 'sygefor_trainee.rights.trainee.own.delete',
+        17 => 'sygefor_trainee.rights.trainee.all.view', 18 => 'sygefor_trainee.rights.trainee.all.create', 19 => 'sygefor_trainee.rights.trainee.all.update', 20 => 'sygefor_trainee.rights.trainee.all.delete',
+        21 => 'sygefor_inscription.rights.inscription.own.view', 22 => 'sygefor_inscription.rights.inscription.own.create', 23 => 'sygefor_inscription.rights.inscription.own.update', 24 => 'sygefor_inscription.rights.inscription.own.delete',
+        25 => 'sygefor_inscription.rights.inscription.all.view', 26 => 'sygefor_inscription.rights.inscription.all.create', 27 => 'sygefor_inscription.rights.inscription.all.update', 28 => 'sygefor_inscription.rights.inscription.all.delete',
+        29 => 'sygefor_institution.rights.institution.own.view', 30 => 'sygefor_institution.rights.institution.own.create', 31 => 'sygefor_institution.rights.institution.own.update', 32 => 'sygefor_institution.rights.institution.own.delete',
+        33 => 'sygefor_institution.rights.institution.all.view', 34 => 'sygefor_institution.rights.institution.all.create', 35 => 'sygefor_institution.rights.institution.all.update', 36 => 'sygefor_institution.rights.institution.all.delete',
+        37 => 'sygefor_trainer.rights.trainer.own.view', 38 => 'sygefor_trainer.rights.trainer.own.create', 39 => 'sygefor_trainer.rights.trainer.own.update', 40 => 'sygefor_trainer.rights.trainer.own.delete',
+        41 => 'sygefor_trainer.rights.trainer.all.view', 42 => 'sygefor_trainer.rights.trainer.all.create', 43 => 'sygefor_trainer.rights.trainer.all.update', 44 => 'sygefor_trainer.rights.trainer.all.delete'
+    );
+
+
     /**
      * class constructor.
      */
@@ -353,145 +369,12 @@ class AccessRightRegistry
     public function getByName($accessRightName)
     {
         $id = 100000;
-        switch ($accessRightName) {
-            case "sygefor_core.rights.user.own":
-                $id = 0;
-                break;
-            case "sygefor_core.rights.user.all":
-                $id = 1;
-                break;
-            case "sygefor_core.rights.vocabulary.own":
-                $id = 2;
-                break;
-            case "sygefor_core.rights.vocabulary.national":
-                $id = 3;
-                break;
-            case "sygefor_core.rights.vocabulary.all":
-                $id = 4;
-                break;
-            case 'sygefor_training.rights.training.own.view':
-                $id = 5;
-                break;
-            case 'sygefor_training.rights.training.own.create':
-                $id = 6;
-                break;
-            case 'sygefor_training.rights.training.own.update':
-                $id = 7;
-                break;
-            case 'sygefor_training.rights.training.own.delete':
-                $id = 8;
-                break;
-            case 'sygefor_training.rights.training.all.view':
-                $id = 9;
-                break;
-            case 'sygefor_training.rights.training.all.create':
-                $id = 10;
-                break;
-            case 'sygefor_training.rights.training.all.update':
-                $id = 11;
-                break;
-            case 'sygefor_training.rights.training.all.delete':
-                $id = 12;
-                break;
-            case 'sygefor_trainee.rights.trainee.own.view':
-                $id = 13;
-                break;
-            case 'sygefor_trainee.rights.trainee.own.create':
-                $id = 14;
-                break;
-            case 'sygefor_trainee.rights.trainee.own.update':
-                $id = 15;
-                break;
-            case 'sygefor_trainee.rights.trainee.own.delete':
-                $id = 16;
-                break;
-            case 'sygefor_trainee.rights.trainee.all.view':
-                $id = 17;
-                break;
-            case 'sygefor_trainee.rights.trainee.all.create':
-                $id = 18;
-                break;
-            case 'sygefor_trainee.rights.trainee.all.update':
-                $id = 19;
-                break;
-            case 'sygefor_trainee.rights.trainee.all.delete':
-                $id = 20;
-                break;
-            case 'sygefor_inscription.rights.inscription.own.view':
-                $id = 21;
-                break;
-            case 'sygefor_inscription.rights.inscription.own.create':
-                $id = 22;
-                break;
-            case 'sygefor_inscription.rights.inscription.own.update':
-                $id = 23;
-                break;
-            case 'sygefor_inscription.rights.inscription.own.delete':
-                $id = 24;
-                break;
-            case 'sygefor_inscription.rights.inscription.all.view':
-                $id = 25;
-                break;
-            case 'sygefor_inscription.rights.inscription.all.create':
-                $id = 26;
-                break;
-            case 'sygefor_inscription.rights.inscription.all.update':
-                $id = 27;
-                break;
-            case 'sygefor_inscription.rights.inscription.all.delete':
-                $id = 28;
-                break;
-            case 'sygefor_institution.rights.institution.own.view':
-                $id = 29;
-                break;
-            case 'sygefor_institution.rights.institution.own.create':
-                $id = 30;
-                break;
-            case 'sygefor_institution.rights.institution.own.update':
-                $id = 31;
-                break;
-            case 'sygefor_institution.rights.institution.own.delete':
-                $id = 32;
-                break;
-            case 'sygefor_institution.rights.institution.all.view':
-                $id = 33;
-                break;
-            case 'sygefor_institution.rights.institution.all.create':
-                $id = 34;
-                break;
-            case 'sygefor_institution.rights.institution.all.update':
-                $id = 35;
-                break;
-            case 'sygefor_institution.rights.institution.all.delete':
-                $id = 36;
-                break;
-            case 'sygefor_trainer.rights.trainer.own.view':
-                $id = 37;
-                break;
-            case 'sygefor_trainer.rights.trainer.own.create':
-                $id = 38;
-                break;
-            case 'sygefor_trainer.rights.trainer.own.update':
-                $id = 39;
-                break;
-            case 'sygefor_trainer.rights.trainer.own.delete':
-                $id = 40;
-                break;
-            case 'sygefor_trainer.rights.trainer.all.view':
-                $id = 41;
-                break;
-            case 'sygefor_trainer.rights.trainer.all.create':
-                $id = 42;
-                break;
-            case 'sygefor_trainer.rights.trainer.all.update':
-                $id = 43;
-                break;
-            case 'sygefor_trainer.rights.trainer.all.delete':
-                $id = 44;
-                break;
-        }
-        if (isset($this->rights[$id])) {
-            return $id;
+        $id = array_search($accessRightName, self::RIGHT_NAMES);
+        if ($id === false) {
+        } else {
+            if (isset($this->rights[$id])) {
+                return $id;
+            }
         }
 
         return;
@@ -505,145 +388,11 @@ class AccessRightRegistry
     public function getNameById($id)
     {
         $name = "sygefor";
-        switch ($id) {
-            case 0:
-                $name ="sygefor_core.rights.user.own";
-                break;
-            case 1:
-                $name ="sygefor_core.rights.user.all";
-                break;
-            case 2:
-                $name ="sygefor_core.rights.vocabulary.own";
-                break;
-            case 3:
-                $name ="sygefor_core.rights.vocabulary.national";
-                break;
-            case 4:
-                $name ="sygefor_core.rights.vocabulary.all";
-                break;
-            case 5:
-                $name ="sygefor_training.rights.training.own.view";
-                break;
-            case 6:
-                $name ="sygefor_training.rights.training.own.create";
-                break;
-            case 7:
-                $name ="sygefor_training.rights.training.own.update";
-                break;
-            case 8:
-                $name ="sygefor_training.rights.training.own.delete";
-                break;
-            case 9:
-                $name ="sygefor_training.rights.training.all.view";
-                break;
-            case 10:
-                $name ="sygefor_training.rights.training.all.create";
-                break;
-            case 11:
-                $name ="sygefor_training.rights.training.all.update";
-                break;
-            case 12:
-                $name ="sygefor_training.rights.training.all.delete";
-                break;
-            case 13:
-                $name ="sygefor_trainee.rights.trainee.own.view";
-                break;
-            case 14:
-                $name ="sygefor_trainee.rights.trainee.own.create";
-                break;
-            case 15:
-                $name ="sygefor_trainee.rights.trainee.own.update";
-                break;
-            case 16:
-                $name ="sygefor_trainee.rights.trainee.own.delete";
-                break;
-            case 17:
-                $name ="sygefor_trainee.rights.trainee.all.view";
-                break;
-            case 18:
-                $name ="sygefor_trainee.rights.trainee.all.create";
-                break;
-            case 19:
-                $name ="sygefor_trainee.rights.trainee.all.update";
-                break;
-            case 20:
-                $name ="sygefor_trainee.rights.trainee.all.delete";
-                break;
-            case 21:
-                $name ="sygefor_inscription.rights.inscription.own.view";
-                break;
-            case 22:
-                $name ="sygefor_inscription.rights.inscription.own.create";
-                break;
-            case 23:
-                $name ="sygefor_inscription.rights.inscription.own.update";
-                break;
-            case 24:
-                $name ="sygefor_inscription.rights.inscription.own.delete";
-                break;
-            case 25:
-                $name ="sygefor_inscription.rights.inscription.all.view";
-                break;
-            case 26:
-                $name ="sygefor_inscription.rights.inscription.all.create";
-                break;
-            case 27:
-                $name ="sygefor_inscription.rights.inscription.all.update";
-                break;
-            case 28:
-                $name ="sygefor_inscription.rights.inscription.all.delete";
-                break;
-            case 29:
-                $name ="sygefor_institution.rights.institution.own.view";
-                break;
-            case 30:
-                $name ="sygefor_institution.rights.institution.own.create";
-                break;
-            case 31:
-                $name ="sygefor_institution.rights.institution.own.update";
-                break;
-            case 32:
-                $name ="sygefor_institution.rights.institution.own.delete";
-                break;
-            case 33:
-                $name ="sygefor_institution.rights.institution.all.view";
-                break;
-            case 34:
-                $name ="sygefor_institution.rights.institution.all.create";
-                break;
-            case 35:
-                $name ="sygefor_institution.rights.institution.all.update";
-                break;
-            case 36:
-                $name ="sygefor_institution.rights.institution.all.delete";
-                break;
-            case 37:
-                $name ="sygefor_trainer.rights.trainer.own.view";
-                break;
-            case 38:
-                $name ="sygefor_trainer.rights.trainer.own.create";
-                break;
-            case 39:
-                $name ="sygefor_trainer.rights.trainer.own.update";
-                break;
-            case 40:
-                $name ="sygefor_trainer.rights.trainer.own.delete";
-                break;
-            case 41:
-                $name ="sygefor_trainer.rights.trainer.all.view";
-                break;
-            case 42:
-                $name ="sygefor_trainer.rights.trainer.all.create";
-                break;
-            case 43:
-                $name ="sygefor_trainer.rights.trainer.all.update";
-                break;
-            case 44:
-                $name ="sygefor_trainer.rights.trainer.all.delete";
-                break;
-        }
-        if (isset($this->rights[$id])) {
-            return $name;
+        if (isset (self::RIGHT_NAMES[$id])) {
+            $name = self::RIGHT_NAMES[$id];
+            if (isset($this->rights[$id])) {
+                return $name;
+            }
         }
 
         return;
