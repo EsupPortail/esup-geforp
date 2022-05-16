@@ -5,8 +5,7 @@
                 <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement" ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
                    <!--ng-if="$user.hasAccessRight('sygefor_trainer.rights.trainer.all.update')" -->
                 <a class="btn btn-fa" href="" tooltip="Publipostage" ng-click="$dialog.open('batch.publipost', { items: [trainer.id], service: 'trainer' })"><span class="fa fa-file-word-o"></span></a>
-<!--                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="trainer._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a> -->
-                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="trainer._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
             <div class="pre-title">Enregistré le {{ trainer.createdat|date: 'dd/MM/yyyy' }} - {{ trainer.organization.name }}</div>

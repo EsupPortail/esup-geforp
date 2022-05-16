@@ -3,10 +3,8 @@
         <div class="col-md-8">
 
             <div class="btn-group pull-right">
-<!--                <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement" ng-if="$user.hasAccessRight('sygefor_institution.rights.institution.all.update')" ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
-                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="institution._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a> -->
-                <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement" ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
-                <a class="btn btn-fa" href="" tooltip="Supprimer"  ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement" ng-if="$user.hasAccessRight('sygefor_institution.rights.institution.all.update')" ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="institution._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
             <div class="pre-title">Créé le {{ institution.createdat|date: 'dd/MM/yyyy' }} - {{ institution.organization.name }}</div>

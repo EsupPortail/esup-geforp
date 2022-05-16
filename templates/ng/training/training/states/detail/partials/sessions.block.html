@@ -4,9 +4,8 @@
         <div class="full-width">
             <a ui-sref="session.table({training: training.id})" class="btn btn-link h4"><span class="fa fa-calendar-o"></span>Sessions</a>
             <div class="pull-right">
-                <a class="btn btn-fa btn-sm" href="" tooltip="Ajouter une session" ng-click="addSession()"><span class="fa fa-plus"></span></a><!--
                 <a ng-if="training._accessRights.edit" class="btn btn-fa btn-sm" href="" tooltip="Ajouter une session" ng-click="addSession()"><span class="fa fa-plus"></span></a>
-                --><span class="badge">{{ training.sessions.length}}</span>
+                <span class="badge">{{ training.sessions.length}}</span>
             </div>
         </div>
     </div>

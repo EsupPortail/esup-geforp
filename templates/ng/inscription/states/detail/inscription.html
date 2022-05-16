@@ -5,8 +5,8 @@
             <a class="btn btn-fa" href="" tooltip="Attestation de stage" ng-if="inscription.presenceStatus.status == 1" ng-click="$dialog.open('batch.export.pdf', { items: [inscription.id], service: 'inscription.attestation' })"><span class="fa fa-file-pdf-o"></span></a>
             <a class="btn btn-fa" href="" tooltip="Voir le profil" ng-if="inscription.trainee._accessRights.view" ui-sref="trainee.detail.view({id: inscription.trainee.id})"><span class="fa fa-user"></span></a>
             <a class="btn btn-fa" href="" tooltip="Voir la session" ng-if="inscription.session.training._accessRights.view" ui-sref="session.detail.view({training: inscription.session.training.id, id: inscription.session.id})"><span class="fa fa-calendar-o"></span></a>
-<!--            <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="inscription._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a> -->
-            <a class="btn btn-fa" href="" tooltip="Supprimer" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+            <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="inscription._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+<!--            <a class="btn btn-fa" href="" tooltip="Supprimer" ng-click="delete()"><span class="fa fa-trash-o"></span></a> -->
         </div>
 
         <div class="pre-title">{{ inscription.session.datebegin|date: 'dd/MM/yyyy' }} - {{ inscription.session.training.name }}</div>
