@@ -5,7 +5,7 @@ namespace App\Controller\Core;
 use App\Entity\Session;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -60,6 +60,7 @@ abstract class AbstractSessionController extends AbstractController
 
     /**
      * @Route("/create/{training}", requirements={"id" = "\d+"}, name="session.create", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("EDIT", subject="training")
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "training"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
@@ -84,13 +85,13 @@ abstract class AbstractSessionController extends AbstractController
             }
         }
 
-/*        if (!$this->get('security.context')->isGranted('EDIT', $session)) {
-            if ($this->get('security.context')->isGranted('VIEW', $session)) {
+        if (!$this->isGranted('EDIT', $session->getTraining())) {
+            if ($this->isGranted('VIEW', $session->getTraining())) {
                 return array('session' => $session);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         return array('form' => $form->createView(), 'training' => $session->getTraining(), 'session' => $session);
     }
@@ -104,13 +105,13 @@ abstract class AbstractSessionController extends AbstractController
      */
     public function viewAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
     {
-/*        if (!$this->get('security.context')->isGranted('EDIT', $session)) {
-            if ($this->get('security.context')->isGranted('VIEW', $session)) {
+        if (!$this->isGranted('EDIT', $session->getTraining())) {
+            if ($this->isGranted('VIEW', $session->getTraining())) {
                 return array('session' => $session);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $sessionRegistration = $session->getRegistration();
         $form = $this->createForm($session::getFormType(), $session);
@@ -152,12 +153,12 @@ abstract class AbstractSessionController extends AbstractController
             // get session
             $session = $inscriptions[0]->getSession();
         }
-/*
+
         // new session can't be created if user has no rights for it
-        if (!$this->get('security.context')->isGranted('EDIT', $session->getTraining())) {
+        if (!$this->isGranted('EDIT', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
-*/
+
         $cloned = clone $session;
         $form = $this->createFormBuilder($cloned)
             ->add('name', null, array(
@@ -218,6 +219,9 @@ abstract class AbstractSessionController extends AbstractController
      */
     public function removeAction(AbstractSession $session, ManagerRegistry $doctrine)
     {
+        if (!$this->isGranted('DELETE', $session->getTraining())) {
+            throw new AccessDeniedException('Action non autorisée');
+        }
         $training = $session->getTraining();
         $em = $doctrine->getManager();
         $em->remove($session);

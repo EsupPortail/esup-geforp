@@ -857,10 +857,12 @@ abstract class AbstractSession implements SerializedAccessRights
             }
         }
         else {
-            /** @var AbstractInscription $inscription */
-            foreach ($this->getInscriptions() as $inscription) {
-                if ($inscription->getPresencestatus() && $inscription->getPresencestatus()->getStatus() === PresenceStatus::STATUS_PRESENT) {
-                    ++$count;
+            if ($this->getInscriptions() != null) {
+                /** @var AbstractInscription $inscription */
+                foreach ($this->getInscriptions() as $inscription) {
+                    if ($inscription->getPresencestatus() && $inscription->getPresencestatus()->getStatus() === PresenceStatus::STATUS_PRESENT) {
+                        ++$count;
+                    }
                 }
             }
         }
@@ -926,6 +928,25 @@ abstract class AbstractSession implements SerializedAccessRights
         return false;
     }
 
+    /**
+     * Get date range for OpenTBS.
+     *
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"Default", "session", "api"})
+     *
+     * @return string
+     */
+    public function getDateRange()
+    {
+        if ( ! $this->datebegin) {
+            return '';
+        }
+        if ( ! $this->dateend || $this->datebegin->format('d/m/y') === $this->dateend->format('d/m/y')) {
+            return 'le ' . $this->datebegin->format('d/m/Y');
+        }
+
+        return 'du ' . $this->datebegin->format('d/m/Y') . ' au ' . $this->dateend->format('d/m/Y');
+    }
 
     public function __toString()
     {

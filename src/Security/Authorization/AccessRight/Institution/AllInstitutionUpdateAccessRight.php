@@ -30,7 +30,7 @@ class AllInstitutionUpdateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Core\AbstractInstitution') {
+        if ($class === 'App\Entity\Institution') {
             return true;
         }
 

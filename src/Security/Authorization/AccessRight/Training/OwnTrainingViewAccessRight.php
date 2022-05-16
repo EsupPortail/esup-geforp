@@ -30,8 +30,8 @@ class OwnTrainingViewAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Core\AbstractTraining'
-            || $class === 'App\Entity\Core\AbstractSession'
+        if ($class === 'App\Entity\Internship'
+            || $class === 'App\Entity\Session'
             || $class === 'App\Model\SemesteredTraining'
         ) {
             return true;
@@ -39,7 +39,7 @@ class OwnTrainingViewAccessRight extends AbstractAccessRight
         try {
             $refl = new \ReflectionClass($class);
 
-            return $refl ? $refl->isSubclassOf('App\Entity\Core\AbstractTraining') : false;
+            return $refl ? $refl->isSubclassOf('App\Entity\Internship') : false;
         } catch (\ReflectionException $re){
             return false;
         }

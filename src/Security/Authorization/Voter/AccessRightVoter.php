@@ -81,7 +81,9 @@ class AccessRightVoter implements VoterInterface
             foreach ($token->getUser()->getAccessRights() as $accessRightId) {
                 //$className = is_string($object) ? $object : get_class($object);
                 $className = is_string($object) ? $object : ClassUtils::getRealClass(get_class($object));
-                $accessRight = $this->registry->getAccessRightById($accessRightId);
+                //$accessRight = $this->registry->getAccessRightById($accessRightId);
+                $id = $this->registry->getByName($accessRightId);
+                $accessRight = $this->registry->getAccessRightById($id);
                 if ($accessRight && $accessRight->supportsClass($className) && $accessRight->supportsAttribute($attribute)) {
                     if ($accessRight->isGranted($token, is_object($object) ? $object : null, $attribute)) {
                         return VoterInterface::ACCESS_GRANTED;

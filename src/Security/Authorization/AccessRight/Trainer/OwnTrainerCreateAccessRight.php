@@ -30,7 +30,7 @@ class OwnTrainerCreateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Core\AbstractTrainer') {
+        if ($class === 'App\Entity\Trainer') {
             return true;
         }
 

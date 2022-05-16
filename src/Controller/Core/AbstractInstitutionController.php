@@ -5,7 +5,7 @@ namespace App\Controller\Core;
 use App\Entity\Institution;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -57,9 +57,9 @@ abstract class AbstractInstitutionController extends AbstractController
         $institution->setOrganization($this->getUser()->getOrganization());
 
         //institution can't be created if user has no rights for it
-/*        if ( ! $this->get('security.context')->isGranted('CREATE', $institution)) {
+        if ( ! $this->isGranted('CREATE', $institution)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm(BaseInstitutionType::class, $institution);
         if ($request->getMethod() === 'POST') {
@@ -80,14 +80,15 @@ abstract class AbstractInstitutionController extends AbstractController
      * This action attach a form to the return array when the user has the permission to edit the institution.
      *
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="institution.view", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("VIEW", subject="institution")
      * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewAction(Request $request, ManagerRegistry $doctrine, AbstractInstitution $institution)
     {
-/*        if ( ! $this->get('security.context')->isGranted('EDIT', $institution)) {
+        if ( ! $this->isGranted('EDIT', $institution)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm(BaseInstitutionType::class, $institution);
         if ($request->getMethod() === 'POST') {
@@ -103,6 +104,7 @@ abstract class AbstractInstitutionController extends AbstractController
 
     /**
      * @Route("/{id}/changeorg", name="institution.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("EDIT", subject="institution")
      * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */
@@ -127,6 +129,7 @@ abstract class AbstractInstitutionController extends AbstractController
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="institution.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
+     * @IsGranted("DELETE", subject="institution")
      * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */

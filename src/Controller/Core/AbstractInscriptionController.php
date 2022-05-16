@@ -7,7 +7,7 @@ use App\Form\Type\BaseInscriptionType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractInscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -61,6 +61,9 @@ abstract class AbstractInscriptionController extends AbstractController
      */
     public function createAction(Request $request, AbstractSession $session, ManagerRegistry $doctrine)
     {
+        if (!$this->isGranted('EDIT',$session->getTraining())) {
+            throw new AccessDeniedException('Action non autorisée');
+        }
         /** @var AbstractInscription $inscription */
         $inscription = $this->createInscription($session, $doctrine);
         /** @var BaseInscriptionType $inscriptionClass */
@@ -88,18 +91,19 @@ abstract class AbstractInscriptionController extends AbstractController
 
     /**
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="inscription.view", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("VIEW", subject="inscription")
      * @ParamConverter("inscription", class="App\Entity\Core\AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewAction(AbstractInscription $inscription, Request $request, ManagerRegistry $doctrine)
     {
-/*        if (!$this->get('security.context')->isGranted('EDIT', $inscription)) {
-            if ($this->get('security.context')->isGranted('VIEW', $inscription)) {
+        if (!$this->isGranted('EDIT', $inscription)) {
+            if ($this->isGranted('VIEW', $inscription)) {
                 return array('inscription' => $inscription);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         /** @var AbstractInscriptionType $inscriptionClass */
 //        $inscriptionClass = $inscription::getFormType();
@@ -123,6 +127,7 @@ abstract class AbstractInscriptionController extends AbstractController
     /**
      * @Route("/{id}/remove", name="inscription.delete", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
+     * @IsGranted("DELETE", subject="inscription")
      * @ParamConverter("inscription", class="App\Entity\Core\AbstractInscription", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */

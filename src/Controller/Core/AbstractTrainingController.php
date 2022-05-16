@@ -9,11 +9,11 @@ use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Symfony\Component\Security\Core\Security;
 use JMS\Serializer\SerializationContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractSession;
@@ -78,9 +78,9 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         //training can't be created if user has no rights for it
-/*        if (!$this->get('security.context')->isGranted('CREATE', $training)) {
+        if (!$this->isGranted('CREATE', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
@@ -103,14 +103,15 @@ abstract class AbstractTrainingController extends AbstractController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="training.view", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("VIEW", subject="training")
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training)
     {
-/*        if (!$this->get('security.context')->isGranted('EDIT', $training)) {
+        if (!$this->isGranted('EDIT', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
@@ -137,6 +138,7 @@ abstract class AbstractTrainingController extends AbstractController
     /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="training.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
+     * @IsGranted("DELETE", subject="training")
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
@@ -188,9 +190,9 @@ abstract class AbstractTrainingController extends AbstractController
     public function duplicateAction(Request $request, AbstractTraining $training, $type)
     {
         //training can't be created if user has no rights for it
-/*        if ( ! $this->get('security.context')->isGranted('CREATE', $training)) {
+        if ( ! $this->isGranted('CREATE', $training)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         /** @var AbstractTraining $cloned */
         $cloned = null;

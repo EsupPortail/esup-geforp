@@ -30,7 +30,7 @@ class OwnInscriptionViewAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Core\AbstractInscription') {
+        if ($class === 'App\Entity\Inscription') {
             return true;
         }
 

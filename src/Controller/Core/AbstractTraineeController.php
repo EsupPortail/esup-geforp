@@ -7,7 +7,7 @@ use App\Form\Type\AbstractTraineeType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Entity\Core\AbstractTrainee;
@@ -73,14 +73,14 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function createAction(Request $request, ManagerRegistry $doctrine, \Symfony\Component\Security\Core\Security $security)
+    public function createAction(Request $request, ManagerRegistry $doctrine)
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
         $trainee->setOrganization($this->getUser()->getOrganization());
 
         //trainee can't be created if user has no rights for it
-        if ($security->isGranted('CREATE', $trainee)) {
+        if ($this->isGranted('CREATE', $trainee)) {
             throw new AccessDeniedException('Action non autorisée');
         }
 
@@ -104,16 +104,17 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      * 
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="trainee.view", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("VIEW", subject="trainee")
      * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
      */
-    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee, \Symfony\Component\Security\Core\Security $security)
+    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee)
     {
         // access right is checked inside controller, so to be able to send specific error message
-        if (!$security->isGranted('EDIT', $trainee)) {
-            if ($security->isGranted('VIEW', $trainee)) {
+        if (!$this->isGranted('EDIT', $trainee)) {
+            if ($this->isGranted('VIEW', $trainee)) {
                 return array('trainee' => $trainee);
             }
 
@@ -145,10 +146,10 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @return array
      */
-    public function toggleActivationAction(Request $request, AbstractTrainee $trainee, \Symfony\Component\Security\Core\Security $security)
+    public function toggleActivationAction(Request $request, AbstractTrainee $trainee)
     {
         //access right is checked inside controller, so to be able to send specific error message
-        if (!$security->isGranted('EDIT', $trainee)) {
+        if (!$this->isGranted('EDIT', $trainee)) {
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
         }
 
@@ -169,12 +170,13 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      *
      * @Route("/{id}/changepwd", name="trainee.changepwd", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
+     * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
+     * @IsGranted("EDIT", subject="trainee")
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
      */
-    public function changePasswordAction(Request $request, AbstractTrainee $trainee)
+    public function changePasswordAction(Request $request, AbstractTrainee $trainee, ManagerRegistry $doctrine)
     {
         $form = $this->createFormBuilder($trainee)
             ->add('plainPassword', RepeatedType::class, array(
@@ -195,7 +197,7 @@ abstract class AbstractTraineeController extends AbstractController
             if ($form->isValid()) {
                 // password encoding is handle by PasswordEncoderSubscriber
                 $trainee->setPassword(null);
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
             }
         }
 
@@ -208,14 +210,15 @@ abstract class AbstractTraineeController extends AbstractController
      *
      * @Route("/{id}/changeorg", name="trainee.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
      * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
+     * @IsGranted("EDIT", subject="trainee")
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      *
      * @return array
      */
-    public function changeOrganizationAction(Request $request, AbstractTrainee $trainee)
+    public function changeOrganizationAction(Request $request, AbstractTrainee $trainee, ManagerRegistry $doctrine)
     {
         // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainee.all.update')) {
+        if (!$this->isGranted('EDIT', $trainee)) {
             throw new AccessDeniedException();
         }
 
@@ -223,7 +226,7 @@ abstract class AbstractTraineeController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                $doctrine->getManager()->flush();
             }
         }
 
@@ -234,18 +237,19 @@ abstract class AbstractTraineeController extends AbstractController
      * @param AbstractTrainee $trainee
      *
      * @Route("/{id}/remove", name="trainee.delete", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("DELETE", subject="trainee")
      * @Method("POST")
      * @ParamConverter("trainee", class="SygeforCoreBundle:AbstractTrainee", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
      * 
      * @return array
      */
-    public function deleteAction(AbstractTrainee $trainee)
+    public function deleteAction(AbstractTrainee $trainee, ManagerRegistry $doctrine)
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $em->remove($trainee);
         $em->flush();
-        $this->get('fos_elastica.index')->refresh();
+//        $this->get('fos_elastica.index')->refresh();
 
         return array();
     }

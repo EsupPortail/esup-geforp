@@ -4,7 +4,7 @@ namespace App\Controller\Core;
 
 use App\Entity\Trainer;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -64,9 +64,9 @@ abstract class AbstractTrainerController extends AbstractController
         $trainer->setOrganization($this->getUser()->getOrganization());
 
         //trainer can't be created if user has no rights for it
-/*        if (!$this->get('security.context')->isGranted('CREATE', $trainer)) {
+        if (!$this->isGranted('CREATE', $trainer)) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm($trainer::getFormType(), $trainer);
         if ($request->getMethod() === 'POST') {
@@ -85,18 +85,19 @@ abstract class AbstractTrainerController extends AbstractController
 
     /**
      * @Route("/{id}/view", requirements={"id" = "\d+"}, name="trainer.view", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("VIEW", subject="trainer")
      * @ParamConverter("trainer", class="App\Entity\Core\AbstractTrainer", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewAction(AbstractTrainer $trainer, Request $request, ManagerRegistry $doctrine)
     {
-/*        if (!$this->get('security.context')->isGranted('EDIT', $trainer)) {
-            if ($this->get('security.context')->isGranted('VIEW', $trainer)) {
+        if (!$this->isGranted('EDIT', $trainer)) {
+            if ($this->isGranted('VIEW', $trainer)) {
                 return array('trainer' => $trainer);
             }
 
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm($trainer::getFormType(), $trainer);
         if ($request->getMethod() === 'POST') {
@@ -111,6 +112,7 @@ abstract class AbstractTrainerController extends AbstractController
 
     /**
      * @Route("/{id}/changeorg", name="trainer.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("EDIT", subject="trainer")
      * @ParamConverter("trainer", class="App\Entity\Core\AbstractTrainer", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
@@ -134,6 +136,7 @@ abstract class AbstractTrainerController extends AbstractController
 
     /**
      * @Route("/{id}/remove", name="trainer.delete", options={"expose"=true}, defaults={"_format" = "json"})
+     * @IsGranted("DELETE", subject="trainer")
      * @Method("POST")
      * @ParamConverter("trainer", class="App\Entity\Core\AbstractTrainer", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)

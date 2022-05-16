@@ -11,7 +11,7 @@ namespace App\Controller\Core;
 
 use App\Entity\Participation;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -67,6 +67,10 @@ abstract class AbstractParticipationController extends AbstractController
      */
     public function addParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
     {
+        if (!$this->isGranted('EDIT', $session->getTraining())) {
+            throw new AccessDeniedException('Action non autorisée');
+        }
+
         /** @var AbstractParticipation $participation */
         $participation = new $this->participationClass();
         $participation->setSession($session);
@@ -108,9 +112,9 @@ abstract class AbstractParticipationController extends AbstractController
     public function editParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractParticipation $participation)
     {
         // participation can't be created if user has no rights for it
-/*        if (!$this->get('security.context')->isGranted('EDIT', $participation->getSession())) {
+        if (!$this->isGranted('EDIT', $participation->getSession()->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
-        }*/
+        }
 
         $form = $this->createForm($participation::getFormType(), $participation);
         if ($request->getMethod() === 'POST') {
@@ -128,19 +132,20 @@ abstract class AbstractParticipationController extends AbstractController
     /**
      * @Route("/{session}/remove/{participation}", name="participation.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
+     * @IsGranted("EDIT", subject="session")
      * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
      * @ParamConverter("participation", class="App\Entity\Core\AbstractParticipation", options={"id" = "participation"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeParticipationAction(AbstractSession $session, ManagerRegistry $docrtine, AbstractParticipation $participation)
+    public function removeParticipationAction(AbstractSession $session, ManagerRegistry $doctrine, AbstractParticipation $participation)
     {
         $session->removeParticipation($participation);
 //        $session->updateTimestamps();
 //        $session->getTraining()->updateTimestamps();
         $session->setUpdatedAt(New \DateTime('now'));
         $session->getTraining()->setUpdatedAt(New \DateTime('now'));
-        $docrtine->getManager()->remove($participation);
-        $docrtine->getManager()->flush();
+        $doctrine->getManager()->remove($participation);
+        $doctrine->getManager()->flush();
 //        $this->get('fos_elastica.index')->refresh();
 
         return;

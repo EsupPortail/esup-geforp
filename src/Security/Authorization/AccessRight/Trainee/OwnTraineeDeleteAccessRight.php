@@ -30,7 +30,7 @@ class OwnTraineeDeleteAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Core\AbstractTrainee') {
+        if ($class === 'App\Entity\Trainee') {
             return true;
         }
     }
