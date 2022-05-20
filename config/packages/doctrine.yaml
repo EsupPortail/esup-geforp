@@ -6,6 +6,14 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '13'
     orm:
+        dql:
+            datetime_functions:
+                year: DoctrineExtensions\Query\Mysql\Year
+                ceil: DoctrineExtensions\Query\Mysql\Ceil
+                floor: DoctrineExtensions\Query\Mysql\Floor
+                month: DoctrineExtensions\Query\Mysql\Month
+                day: DoctrineExtensions\Query\Mysql\Day
+                date_format: DoctrineExtensions\Query\Mysql\DateFormat
         auto_generate_proxy_classes: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true

@@ -2,7 +2,12 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Core\Term\Theme;
+use App\Entity\Internship;
+use App\Entity\Organization;
 use App\Entity\Session;
+use App\Entity\Trainer;
+use App\Repository\SessionRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -35,7 +40,7 @@ abstract class AbstractSessionController extends AbstractController
      * @Route("/search", name="session.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
 /*        $search = $this->get('sygefor_training.session.search');
         $search->handleRequest($request);
@@ -47,13 +52,23 @@ abstract class AbstractSessionController extends AbstractController
 
         return $search->search(); */
 
-        $sessions = $doctrine->getRepository(Session::class)->findAll();
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $sessions = $sessionRepository->getSessionsList($keywords, $filters);
         $nbSessions  = count($sessions);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $sessionRepository);
 
         $ret = array(
             'total' => $nbSessions,
             'pageSize' => 0,
             'items' => $sessions,
+            'aggs' => $tabAggs
         );
         return $ret;
     }
@@ -322,5 +337,169 @@ abstract class AbstractSessionController extends AbstractController
                 $cloned->addMaterial($newMat);
             }
         }
+    }
+
+    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $sessionRepository)
+    {
+        $tabAggs = array();
+
+        // CONSTRUCTION CENTRES
+        if(isset( $aggs['training.organization.name.source'])){
+            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+
+            $i = 0; $tabOrg = array();
+            //Pour chaque centre on teste la requête
+            foreach($allOrganizations as $organization){
+                $nbSessionsOrg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $organization->getName());
+                if ($nbSessionsOrg > 0) {
+                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbSessionsOrg];
+                    $i++;
+                }
+            }
+            $tabAggs['training.organization.name.source']['buckets'] = $tabOrg;
+        }
+
+        // CONSTRUCTION ANNEES
+        if (isset($aggs['year'])) {
+            $curYear = date('Y');
+            $allYears = array();
+            for($i=2017; $i<=$curYear; $i++){
+                $allYears[] = $i;
+            }
+            $i = 0; $tabYears = array();
+            //Pour chaque année on teste la requête
+            foreach($allYears as $year){
+                $nbSessionsYear = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $year);
+                if ($nbSessionsYear > 0) {
+                    $tabYears[$i] = [ 'key' => $year, 'doc_count' => $nbSessionsYear];
+                    $i++;
+                }
+            }
+            $tabAggs['year']['buckets'] = $tabYears;
+        }
+
+        // CONSTRUCTION SEMESTRE
+        if (isset($aggs['semester'])) {
+            $allSemesters = array(1, 2);
+            $i = 0; $tabSemesters = array();
+            //Pour chaque semestre on teste la requête
+            foreach($allSemesters as $semester){
+                $nbSessionsSem = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $semester);
+                if ($nbSessionsSem > 0) {
+                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbSessionsSem];
+                    $i++;
+                }
+            }
+            $tabAggs['semester']['buckets'] = $tabSemesters;
+        }
+
+        // CONSTRUCTION THEMES
+        if(isset( $aggs['theme.name'])){
+            $allThemes = $doctrine->getRepository(Theme::class)->findAll();
+
+            $i = 0; $tabThemes = array();
+            //Pour chaque thème on teste la requête
+            foreach($allThemes as $theme){
+                $nbSessionsThemes = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $theme->getName());
+                if ($nbSessionsThemes > 0) {
+                    $tabThemes[$i] = [ 'key' => $theme->getName(), 'doc_count' => $nbSessionsThemes];
+                    $i++;
+                }
+            }
+            $tabAggs['theme.name']['buckets'] = $tabThemes;
+        }
+
+        // CONSTRUCTION INSCRIPTION (0,1,2,3)
+        if( isset($aggs['registration']) ) {
+            $allRegistrations = array(0, 1, 2, 3);
+            $i = 0; $tabReg = array();
+            //Pour chaque inscription on teste la requête
+            foreach($allRegistrations as $registration){
+                $nbSessionsReg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $registration);
+                if ($nbSessionsReg > 0) {
+                    $tabReg[$i] = [ 'key' => $registration, 'doc_count' => $nbSessionsReg];
+                    $i++;
+                }
+            }
+            $tabAggs['registration']['buckets'] = $tabReg;
+        }
+
+        // CONSTRUCTION STATUT (0,1,2)
+        if( isset($aggs['status']) ) {
+            $allStatus = array(0, 1, 2);
+            $i = 0; $tabStatus = array();
+            //Pour chaque status on teste la requête
+            foreach($allStatus as $status){
+                $nbSessionsStatus = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $status);
+                if ($nbSessionsStatus > 0) {
+                    $tabStatus[$i] = [ 'key' => $status, 'doc_count' => $nbSessionsStatus];
+                    $i++;
+                }
+            }
+            $tabAggs['status']['buckets'] = $tabStatus;
+        }
+
+        // CONSTRUCTION DISPLAYONLINE (0,1)
+        if( isset($aggs['displayOnline']) ) {
+            $allDisplay = array(0 => 'F', 1 => 'T');
+            $i = 0; $tabDis = array();
+            //Pour chaque status on teste la requête
+            foreach($allDisplay as $key => $display){
+                $nbSessionsDis = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $key);
+                if ($nbSessionsDis > 0) {
+                    $tabDis[$i] = [ 'key' => $display, 'doc_count' => $nbSessionsDis];
+                    $i++;
+                }
+            }
+            $tabAggs['displayOnline']['buckets'] = $tabDis;
+        }
+
+        // CONSTRUCTION PROMOTION (true,false) = (0,1)
+        if( isset($aggs['promote']) ) {
+            $allPromote = array(0, 1);
+            $i = 0; $tabPro = array();
+            //Pour chaque promote on teste la requête
+            foreach($allPromote as $promote){
+                $nbSessionsPro = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $promote);
+                if ($nbSessionsPro > 0) {
+                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbSessionsPro];
+                    $i++;
+                }
+            }
+            $tabAggs['promote']['buckets'] = $tabPro;
+        }
+
+        // CONSTRUCTION FORMATION (nom de la formation)
+        if( isset($aggs['training.name.source']) ) {
+            $allTraining = $doctrine->getRepository(Internship::class)->findAll();
+            $i = 0; $tabTra = array();
+            //Pour chaque promote on teste la requête
+            foreach($allTraining as $training){
+                $nbSessionsTra = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $training->getName());
+                if ($nbSessionsTra > 0) {
+                    $tabTra[$i] = [ 'key' => $training->getName(), 'doc_count' => $nbSessionsTra];
+                    $i++;
+                }
+            }
+            $tabAggs['training.name.source']['buckets'] = $tabTra;
+        }
+
+        // CONSTRUCTION FORMATEUR
+        if( isset($aggs['participations.trainer.fullName']) ) {
+            $allTrainers = $doctrine->getRepository(Trainer::class)->findAll();
+            $i = 0; $tabTra = array();
+            //Pour chaque trainer on teste la requête
+            foreach($allTrainers as $trainer){
+                $nbSessionsTra = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $trainer->getId());
+                if ($nbSessionsTra > 0) {
+                    $tabTra[$i] = [ 'key' => $trainer->getFullname(), 'doc_count' => $nbSessionsTra];
+                    $i++;
+                }
+            }
+            $tabAggs['participations.trainer.fullName']['buckets'] = $tabTra;
+        }
+
+
+        return $tabAggs;
     }
 }
