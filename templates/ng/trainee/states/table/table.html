@@ -5,26 +5,26 @@
         <div class="col-xs-12">
             <table search-table ng-class="{loading: search.processing}">
                 <thead>
-                    <tr>
-                        <th></th>
-                        <th search-table-th field="organization.name">Centre</th>
-                        <th search-table-th field="title">Civilite</th>
-                        <th search-table-th field="lastname">Nom</th>
-                        <th search-table-th field="createdat">Inscription</th>
-                        <th search-table-th field="institution.name">Etablissement</th>
-                        <th search-table-th field="publictype">Catégorie de personnel</th>
-                    </tr>
+                <tr>
+                    <th></th>
+                    <th search-table-th field="organization.name.source">Centre</th>
+                    <th search-table-th field="title">Civilite</th>
+                    <th search-table-th field="lastName.source">Nom</th>
+                    <th search-table-th field="createdAt">Inscription</th>
+                    <th search-table-th field="institution.name.source">Etablissement</th>
+                    <th search-table-th field="publicType.source">Catégorie de personnel</th>
+                </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in search.result.items" ng-class="{danger: !item.isActive, warning: isSelected(item.id)}">
-                        <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
-                        <td>{{ item.organization.name }}</td>
-                        <td>{{ item.title.name ? item.title.name : item.title }}</td>
-                        <td><a href="" ui-sref="trainee.detail.view({ id: item.id })">{{ item.fullname }}</a></td>
-                        <td>{{ item.createdat | date: 'dd/MM/yyyy' }}</td>
-                        <td>{{ item.institution.name }}</td>
-                        <td>{{ item.publictype.name ? item.publictype.name : item.publictype }}</td>
-                    </tr>
+                <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
+                    <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
+                    <td>{{ item.organization.name }}</td>
+                    <td>{{ item.title.name ? item.title.name : item.title }}</td>
+                    <td><a href="" ui-sref="trainee.detail.view({ id: item.id })">{{ item.fullname }}</a></td>
+                    <td>{{ item.createdat | date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ item.institution.name }}</td>
+                    <td>{{ item.publictype.name ? item.publictype.name : item.publictype }}</td>
+                </tr>
                 </tbody>
             </table>
         </div>

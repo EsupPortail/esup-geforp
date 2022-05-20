@@ -2,6 +2,14 @@
 
 namespace App\Repository;
 
+use App\Entity\Core\Term\Publictype;
+use App\Entity\Core\Term\Theme;
+use App\Entity\Core\Term\Title;
+use App\Entity\Institution;
+use App\Entity\Internship;
+use App\Entity\Organization;
+use App\Entity\Participation;
+use App\Entity\Trainer;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -95,4 +103,5 @@ class TraineeRepository extends EntityRepository implements UserProviderInterfac
 
         return $result;
     }
+
 }

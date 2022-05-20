@@ -7,13 +7,13 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
     // batch operations
     $scope.batchOperations = [
         {
-        icon: 'fa-envelope-o',
-        label: 'Envoyer un email',
-        execute: function(items, $dialog) {
-            return $dialog.open('batch.email', { items: items, targetClass: 'App\\Entity\\Core\\AbstractTrainee' })
-        }
+            icon: 'fa-envelope-o',
+            label: 'Envoyer un email',
+            execute: function(items, $dialog) {
+                return $dialog.open('batch.email', { items: items, targetClass: 'App\\Entity\\Core\\AbstractTrainee' })
+            }
         },
-            {
+        {
             icon: 'fa-download',
             label: 'Exporter',
             subitems: [
@@ -60,26 +60,12 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
             label: 'Unité',
             size: 10
         },
-        'createdat' : {
+        'createdAt' : {
             label: 'Inscription',
             type: 'range'
         },
         'publicType.source': {
-            label: 'Catégorie de public_old'
-        },
-        'isPaying': {
-            label: 'Payant',
-            values: {
-                'T': 'Oui',
-                'F': 'Non'
-            }
-        },
-        'isActive': {
-            label: 'Validé',
-            values: {
-                'T': 'Oui',
-                'F': 'Non'
-            }
+            label: 'Catégorie de public'
         }
     };
 }]);

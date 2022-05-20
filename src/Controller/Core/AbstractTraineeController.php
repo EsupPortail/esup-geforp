@@ -2,8 +2,13 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Institution;
 use App\Entity\Trainee;
+use App\Entity\Organization;
+use App\Entity\Core\Term\Publictype;
+use App\Entity\Core\Term\Title;
 use App\Form\Type\AbstractTraineeType;
+use App\Repository\TraineeSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -43,7 +48,7 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @throws \Exception
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, TraineeSearchRepository $traineeRepository)
     {
 /*        $search = $this->get('sygefor_trainee.search');
         $search->handleRequest($request);
@@ -54,13 +59,34 @@ abstract class AbstractTraineeController extends AbstractController
         }
 
         return $search->search(); */
-        $trainees = $doctrine->getRepository(Trainee::class)->findAll();
+/*        $trainees = $doctrine->getRepository(Trainee::class)->findAll();
         $nbTrainees  = count($trainees);
 
         $ret = array(
             'total' => $nbTrainees,
             'pageSize' => 0,
             'items' => $trainees,
+        );
+        return $ret;*/
+
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $trainees = $traineeRepository->getTraineesList($keywords, $filters);
+        $nbTrainees  = count($trainees);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $traineeRepository);
+
+        $ret = array(
+            'total' => $nbTrainees,
+            'pageSize' => 0,
+            'items' => $trainees,
+            'aggs' => $tabAggs
         );
         return $ret;
     }
@@ -252,5 +278,76 @@ abstract class AbstractTraineeController extends AbstractController
 //        $this->get('fos_elastica.index')->refresh();
 
         return array();
+    }
+
+    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $traineeRepository)
+    {
+        $tabAggs = array();
+
+        // CONSTRUCTION CENTRES
+        if(isset( $aggs['organization.name.source'])){
+            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+
+            $i = 0; $tabOrg = array();
+            //Pour chaque centre on teste la requête
+            foreach($allOrganizations as $organization){
+                $nbTraineesOrg = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $organization->getName());
+                if ($nbTraineesOrg > 0) {
+                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbTraineesOrg];
+                    $i++;
+                }
+            }
+            $tabAggs['organization.name.source']['buckets'] = $tabOrg;
+        }
+
+        // CONSTRUCTION CIVILITE
+        if(isset( $aggs['title'])){
+            $allTitles = $doctrine->getRepository(Title::class)->findAll();
+
+            $i = 0; $tabTitles = array();
+            //Pour chaque civilité on teste la requête
+            foreach($allTitles as $title){
+                $nbTraineesTitles = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $title->getName());
+                if ($nbTraineesTitles > 0) {
+                    $tabTitles[$i] = [ 'key' => $title->getName(), 'doc_count' => $nbTraineesTitles];
+                    $i++;
+                }
+            }
+            $tabAggs['title']['buckets'] = $tabTitles;
+        }
+
+        // CONSTRUCTION ETABLISSEMENT
+        if (isset($aggs['institution.name.source'])) {
+            $allInst = $doctrine->getRepository(Institution::class)->findAll();
+
+            $i = 0; $tabInst = array();
+            //Pour chaque établissement on teste la requête
+            foreach($allInst as $inst){
+                $nbTraineesInst = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $inst->getName());
+                if ($nbTraineesInst > 0) {
+                    $tabInst[$i] = [ 'key' => $inst->getName(), 'doc_count' => $nbTraineesInst];
+                    $i++;
+                }
+            }
+            $tabAggs['institution.name.source']['buckets'] = $tabInst;
+        }
+
+        // CONSTRUCTION PUBLIC TYPE
+        if(isset( $aggs['publicType.source'])){
+            $allPublictypes = $doctrine->getRepository(Publictype::class)->findAll();
+
+            $i = 0; $tabPublicTypes = array();
+            //Pour chaque public type on teste la requête
+            foreach($allPublictypes as $pt){
+                $nbTraineesPt = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $pt->getName());
+                if ($nbTraineesPt > 0) {
+                    $tabPublicTypes[$i] = [ 'key' => $pt->getName(), 'doc_count' => $nbTraineesPt];
+                    $i++;
+                }
+            }
+            $tabAggs['publicType.source']['buckets'] = $tabPublicTypes;
+        }
+
+        return $tabAggs;
     }
 }
