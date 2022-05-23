@@ -2,7 +2,10 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Core\Term\Theme;
 use App\Entity\Internship;
+use App\Entity\Organization;
+use App\Entity\Trainer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
@@ -18,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use App\Repository\TrainingRepository;
 use Sygefor\Bundle\TrainingBundle\SpreadSheet\TrainingBalanceSheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,7 +39,7 @@ abstract class AbstractTrainingController extends AbstractController
      * @Route("/search", name="training.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, TrainingRepository $trainingRepository)
     {
 /*        $search = $this->get('sygefor_training.semestered.search');
         $search->handleRequest($request);
@@ -46,6 +50,29 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         return $search->search(); */
+
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $trainings = $trainingRepository->getTrainingsList($keywords, $filters);
+        $nbTrainings  = count($trainings);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $trainingRepository);
+
+        $ret = array(
+            'total' => $nbTrainings,
+            'pageSize' => 0,
+            'items' => $trainings,
+            'aggs' => $tabAggs
+        );
+        return $ret;
+
+        /*
         $trainings = $doctrine->getRepository(Internship::class)->findAll();
         $nbTrainings  = count($trainings);
 
@@ -54,7 +81,7 @@ abstract class AbstractTrainingController extends AbstractController
             'pageSize' => 0,
             'items' => $trainings,
         );
-        return $ret;
+        return $ret;*/
     }
 
     /**
@@ -301,6 +328,110 @@ abstract class AbstractTrainingController extends AbstractController
         $bs = new TrainingBalanceSheet($training, $this->get('phpexcel'), $this->container);
 
         return $bs->getResponse();
+    }
+
+    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $trainingRepository)
+    {
+        $tabAggs = array();
+
+        // CONSTRUCTION CENTRES
+        if(isset( $aggs['training.organization.name.source'])){
+            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+
+            $i = 0; $tabOrg = array();
+            //Pour chaque centre on teste la requête
+            foreach($allOrganizations as $organization){
+                $nbTrainingsOrg = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $organization->getName());
+                if ($nbTrainingsOrg > 0) {
+                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbTrainingsOrg];
+                    $i++;
+                }
+            }
+            $tabAggs['training.organization.name.source']['buckets'] = $tabOrg;
+        }
+
+        // CONSTRUCTION ANNEES
+        if (isset($aggs['year'])) {
+            $curYear = date('Y');
+            $allYears = array();
+            for($i=2017; $i<=$curYear; $i++){
+                $allYears[] = $i;
+            }
+            $i = 0; $tabYears = array();
+            //Pour chaque année on teste la requête
+            foreach($allYears as $year){
+                $nbTrainingsYear = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $year);
+                if ($nbTrainingsYear > 0) {
+                    $tabYears[$i] = [ 'key' => $year, 'doc_count' => $nbTrainingsYear];
+                    $i++;
+                }
+            }
+            $tabAggs['year']['buckets'] = $tabYears;
+        }
+
+        // CONSTRUCTION SEMESTRE
+        if (isset($aggs['semester'])) {
+            $allSemesters = array(1, 2);
+            $i = 0; $tabSemesters = array();
+            //Pour chaque semestre on teste la requête
+            foreach($allSemesters as $semester){
+                $nbTrainingsSem = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $semester);
+                if ($nbTrainingsSem > 0) {
+                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbTrainingsSem];
+                    $i++;
+                }
+            }
+            $tabAggs['semester']['buckets'] = $tabSemesters;
+        }
+
+        // CONSTRUCTION THEMES
+        if(isset( $aggs['theme.name'])){
+            $allThemes = $doctrine->getRepository(Theme::class)->findAll();
+
+            $i = 0; $tabThemes = array();
+            //Pour chaque thème on teste la requête
+            foreach($allThemes as $theme){
+                $nbTrainingsThemes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $theme->getName());
+                if ($nbTrainingsThemes > 0) {
+                    $tabThemes[$i] = [ 'key' => $theme->getName(), 'doc_count' => $nbTrainingsThemes];
+                    $i++;
+                }
+            }
+            $tabAggs['theme.name']['buckets'] = $tabThemes;
+        }
+
+        // CONSTRUCTION PROMOTION (true,false) = (0,1)
+        if( isset($aggs['nextSession.promote']) ) {
+            $allPromote = array(0, 1);
+            $i = 0; $tabPro = array();
+            //Pour chaque promote on teste la requête
+            foreach($allPromote as $promote){
+                $nbTrainingsPro = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $promote);
+                if ($nbTrainingsPro > 0) {
+                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbTrainingsPro];
+                    $i++;
+                }
+            }
+            $tabAggs['nextSession.promote']['buckets'] = $tabPro;
+        }
+
+        // CONSTRUCTION FORMATEUR
+        if( isset($aggs['trainers.fullName']) ) {
+            $allTrainers = $doctrine->getRepository(Trainer::class)->findAll();
+            $i = 0; $tabTra = array();
+            //Pour chaque trainer on teste la requête
+            foreach($allTrainers as $trainer){
+                $nbTrainingsTra = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $trainer->getId());
+                if ($nbTrainingsTra > 0) {
+                    $tabTra[$i] = [ 'key' => $trainer->getFullname(), 'doc_count' => $nbTrainingsTra];
+                    $i++;
+                }
+            }
+            $tabAggs['trainers.fullName']['buckets'] = $tabTra;
+        }
+
+
+        return $tabAggs;
     }
 
 }
