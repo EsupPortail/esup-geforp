@@ -10,6 +10,7 @@
 namespace App\Controller\Core;
 
 use App\Entity\Participation;
+use App\Repository\ParticipationRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -37,7 +38,7 @@ abstract class AbstractParticipationController extends AbstractController
      * @Route("/participation/search", name="participation.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
-    public function participationSearchAction(Request $request, ManagerRegistry $doctrine)
+    public function participationSearchAction(Request $request, ManagerRegistry $doctrine, ParticipationRepository $participationRepository)
     {
         /** @var SearchService $search */
 /*        $search = $this->get('sygefor_participation.search');
@@ -49,13 +50,33 @@ abstract class AbstractParticipationController extends AbstractController
         }
 
         return $search->search(); */
-        $participations = $doctrine->getRepository(Participation::class)->findAll();
+/*        $participations = $doctrine->getRepository(Participation::class)->findAll();
         $nbParticipations  = count($participations);
 
         $ret = array(
             'total' => $nbParticipations,
             'pageSize' => 0,
             'items' => $participations,
+        );
+        return $ret; */
+
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $participations = $participationRepository->getParticipationsList($keywords, $filters);
+        $nbParticipations  = count($participations);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+
+        $ret = array(
+            'total' => $nbParticipations,
+            'pageSize' => 0,
+            'items' => $participations,
+            'aggs' => $tabAggs
         );
         return $ret;
     }
