@@ -15,6 +15,8 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Form\Type\ChangeOrganizationType;
 use App\Entity\Core\AbstractInstitution;
 use App\Form\Type\BaseInstitutionType;
+use App\Entity\Organization;
+use App\Repository\InstitutionRepository;
 
 
 /**
@@ -28,20 +30,26 @@ abstract class AbstractInstitutionController extends AbstractController
      * @Route("/search", name="institution.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, InstitutionRepository $institutionRepository)
     {
-/*        $search = $this->get('sygefor_institution.search');
-        $search->handleRequest($request);
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
 
-        return $search->search(); */
-
-        $institutions = $doctrine->getRepository(Institution::class)->findAll();
+        // Recherche avec les filtres
+        $institutions = $institutionRepository->getInstitutionsList($keywords, $filters);
         $nbInstitutions  = count($institutions);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $institutionRepository);
 
         $ret = array(
             'total' => $nbInstitutions,
             'pageSize' => 0,
             'items' => $institutions,
+            'aggs' => $tabAggs
         );
         return $ret;
     }
@@ -141,5 +149,44 @@ abstract class AbstractInstitutionController extends AbstractController
 //        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('institution.search'));
+    }
+
+    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $institutionRepository)
+    {
+        $tabAggs = array();
+
+        // CONSTRUCTION CENTRES
+        if(isset( $aggs['organization.name.source'])){
+            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+
+            $i = 0; $tabOrg = array();
+            //Pour chaque centre on teste la requête
+            foreach($allOrganizations as $organization){
+                $nbInstOrg = $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $organization->getName());
+                if ($nbInstOrg > 0) {
+                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbInstOrg];
+                    $i++;
+                }
+            }
+            $tabAggs['organization.name.source']['buckets'] = $tabOrg;
+        }
+
+        // CONSTRUCTION VILLE
+        if(isset( $aggs['city.source'])){
+            $allCities = $institutionRepository->getAllCities();
+
+            $i = 0; $tabCit = array();
+            //Pour chaque ville on teste la requête
+            foreach($allCities as $city){
+                $nbInstPub= $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $city);
+                if ($nbInstPub > 0) {
+                    $tabCit[$i] = [ 'key' => $city, 'doc_count' => $nbInstPub];
+                    $i++;
+                }
+            }
+            $tabAggs['city.source']['buckets'] = $tabCit;
+        }
+
+        return $tabAggs;
     }
 }
