@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use App\Repository\EmailRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
@@ -29,7 +30,7 @@ class EmailController extends AbstractController
      * @Route("/search", name="email.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "email"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, EmailRepository $emailRepository)
     {
         /*
         $search = $this->get('sygefor_email.search');
@@ -49,13 +50,33 @@ class EmailController extends AbstractController
 
         return $search->search();*/
 
-        $emails = $doctrine->getRepository(Email::class)->findAll();
+/*        $emails = $doctrine->getRepository(Email::class)->findAll();
         $nbEmails  = count($emails);
 
         $ret = array(
             'total' => $nbEmails,
             'pageSize' => 0,
             'items' => $emails
+        );
+        return $ret;*/
+
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $emails = $emailRepository->getEmailsList($keywords, $filters);
+        $nbEmails  = count($emails);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+
+        $ret = array(
+            'total' => $nbEmails,
+            'pageSize' => 0,
+            'items' => $emails,
+            'aggs' => $tabAggs
         );
         return $ret;
     }
