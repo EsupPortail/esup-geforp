@@ -2,7 +2,10 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Institution;
+use App\Entity\Organization;
 use App\Entity\Trainer;
+use App\Repository\TrainerRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -30,7 +33,7 @@ abstract class AbstractTrainerController extends AbstractController
      * @Route("/search", name="trainer.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, TrainerRepository $trainerRepository)
     {
         /** @var SearchService $search */
 /*        $search = $this->get('sygefor_trainer.search');
@@ -42,7 +45,7 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         return $search->search(); */
-        $trainers = $doctrine->getRepository(Trainer::class)->findAll();
+/*        $trainers = $doctrine->getRepository(Trainer::class)->findAll();
         $nbTrainers  = count($trainers);
 
         $ret = array(
@@ -50,7 +53,30 @@ abstract class AbstractTrainerController extends AbstractController
             'pageSize' => 0,
             'items' => $trainers,
         );
+        return $ret;*/
+
+        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
+        $filters = $request->request->get('filters', 'NO FILTERS');
+        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // Recherche avec les filtres
+        $trainers = $trainerRepository->getTrainersList($keywords, $filters);
+        $nbTrainers  = count($trainers);
+
+        // Recherche pour aggs et query_filters
+        $tabAggs = array();
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $trainerRepository);
+
+        $ret = array(
+            'total' => $nbTrainers,
+            'pageSize' => 0,
+            'items' => $trainers,
+            'aggs' => $tabAggs
+        );
         return $ret;
+
+
     }
 
     /**
@@ -149,5 +175,89 @@ abstract class AbstractTrainerController extends AbstractController
 //        $this->get('fos_elastica.index')->refresh();
 
         return;
+    }
+
+    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $trainerRepository)
+    {
+        $tabAggs = array();
+
+        // CONSTRUCTION CENTRES
+        if(isset( $aggs['organization.name.source'])){
+            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+
+            $i = 0; $tabOrg = array();
+            //Pour chaque centre on teste la requête
+            foreach($allOrganizations as $organization){
+                $nbTrOrg = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $organization->getName());
+                if ($nbTrOrg > 0) {
+                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbTrOrg];
+                    $i++;
+                }
+            }
+            $tabAggs['organization.name.source']['buckets'] = $tabOrg;
+        }
+
+        // CONSTRUCTION ETABLISSEMENT
+        if(isset( $aggs['institution.name.source'])){
+            $allInstitutions = $doctrine->getRepository(Institution::class)->findAll();
+
+            $i = 0; $tabInst = array();
+            //Pour chaque etablissement on teste la requête
+            foreach($allInstitutions as $institution){
+                $nbTrInst = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $institution->getName());
+                if ($nbTrInst > 0) {
+                    $tabInst[$i] = [ 'key' => $institution->getName(), 'doc_count' => $nbTrInst];
+                    $i++;
+                }
+            }
+            $tabAggs['institution.name.source']['buckets'] = $tabInst;
+        }
+
+        // CONSTRUCTION STATUT
+        if(isset( $aggs['isOrganization'])){
+            $allStatus = array(0, 1);
+
+            $i = 0; $tabSta = array();
+            foreach($allStatus as $status){
+                $nbTrSt= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $status);
+                if ($nbTrSt > 0) {
+                    $tabSta[$i] = [ 'key' => $status, 'doc_count' => $nbTrSt];
+                    $i++;
+                }
+            }
+            $tabAggs['isOrganization']['buckets'] = $tabSta;
+        }
+
+        // CONSTRUCTION PUBLIE
+        if(isset( $aggs['isPublic'])){
+            $allPub = array(0, 1);
+
+            $i = 0; $tabPub = array();
+            foreach($allPub as $pub){
+                $nbTrPub= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $pub);
+                if ($nbTrPub > 0) {
+                    $tabPub[$i] = [ 'key' => $pub, 'doc_count' => $nbTrPub];
+                    $i++;
+                }
+            }
+            $tabAggs['isPublic']['buckets'] = $tabPub;
+        }
+
+        // CONSTRUCTION ARCHIVE
+        if(isset( $aggs['isArchived'])){
+            $allArch = array(0, 1);
+
+            $i = 0; $tabArch = array();
+            foreach($allArch as $arch){
+                $nbTrArch= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $arch);
+                if ($nbTrArch > 0) {
+                    $tabArch[$i] = [ 'key' => $arch, 'doc_count' => $nbTrArch];
+                    $i++;
+                }
+            }
+            $tabAggs['isArchived']['buckets'] = $tabArch;
+        }
+
+        return $tabAggs;
     }
 }
