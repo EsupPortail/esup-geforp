@@ -26,11 +26,11 @@
                             <span registration-label="item" large></span>
                         </td>
                         <td>{{ $trainingBundle.statusStates[item.status] }}</td>
-                        <td>{{ item.numberOfRegistrations }}</td>
+                        <td>{{ item.numberofregistrations }}</td>
                         <td>
                             <a registration-stats-label="item" class="label-lg"></a>
                         </td>
-                        <td>{{ item.numberOfParticipants }}</td>
+                        <td>{{ item.numberofparticipants }}</td>
                         <td><span class="label label-lg" ng-class="item.displayonline ? 'label-success' : 'label-default'">{{ item.displayonline ? "Oui" : "Non" }}</span></td>
                     </tr>
                 </tbody>

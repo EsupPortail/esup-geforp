@@ -45,22 +45,22 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
             // future session
             if(session.registration) {
                 // inscription gérée individuellement
-                scope.label = session.numberOfAcceptedRegistrations + ' / ' + session.maximumNumberOfRegistrations;
-                scope.tooltip = session.numberOfAcceptedRegistrations + ' acceptés sur ' + session.maximumNumberOfRegistrations + ' places';
-                scope.classes.push(scope.$root.sessionInscriptionStatsClass(session.numberOfAcceptedRegistrations, session.maximumNumberOfRegistrations));
+                scope.label = session.numberofacceptedregistrations + ' / ' + session.maximumnumberofregistrations;
+                scope.tooltip = session.numberofacceptedRegistrations + ' acceptés sur ' + session.maximumnumberofregistrations + ' places';
+                scope.classes.push(scope.$root.sessionInscriptionStatsClass(session.numberofacceptedregistrations, session.maximumnumberofregistrations));
             } else {
                 // inscription gérée globalement
-                scope.label = session.numberOfParticipants + ' / ' + session.maximumNumberOfRegistrations;
-                scope.tooltip = session.numberOfParticipants + ' participants sur ' + session.maximumNumberOfRegistrations + ' places';
+                scope.label = session.numberofparticipants + ' / ' + session.maximumnumberofregistrations;
+                scope.tooltip = session.numberofparticipants + ' participants sur ' + session.maximumnumberofregistrations + ' places';
                 scope.classes.push('label-default');
             }
         } else {
             // past session
-            scope.label = session.numberOfParticipants;
-            scope.tooltip = session.numberOfParticipants + ' participants';
-            if(session.numberOfRegistrations) {
-                scope.label += ' / ' + session.numberOfRegistrations;
-                scope.tooltip += ' sur ' +  session.numberOfRegistrations + ' inscrits';
+            scope.label = session.numberofparticipants;
+            scope.tooltip = session.numberofparticipants + ' participants';
+            if(session.numberofregistrations) {
+                scope.label += ' / ' + session.numberofregistrations;
+                scope.tooltip += ' sur ' +  session.numberofregistrations + ' inscrits';
             }
             scope.classes.push('label-transparent');
         }

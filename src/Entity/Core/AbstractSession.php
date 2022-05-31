@@ -708,7 +708,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getAvailablePlaces()
     {
-        return $this->getMaximumnumberofregistrations() - $this->getNumberOfAcceptedRegistrations();
+        return $this->getMaximumnumberofregistrations() - $this->getNumberofacceptedregistrations();
     }
 
     /**
@@ -742,7 +742,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberOfAcceptedRegistrations()
+    public function getNumberofacceptedregistrations()
     {
         if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
