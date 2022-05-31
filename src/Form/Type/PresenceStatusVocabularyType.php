@@ -22,8 +22,8 @@ class PresenceStatusVocabularyType extends VocabularyType
             'multiple' => false,
             'required' => true,
             'choices' => array(
-                Presencestatus::STATUS_PRESENT => 'Présent',
-                Presencestatus::STATUS_ABSENT => 'Absent',
+                'Présent' => Presencestatus::STATUS_PRESENT,
+                'Absent' => Presencestatus::STATUS_ABSENT,
             ),
         ));
     }

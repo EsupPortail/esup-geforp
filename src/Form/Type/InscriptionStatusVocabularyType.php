@@ -28,10 +28,10 @@ class InscriptionStatusVocabularyType extends VocabularyType
             'multiple' => false,
             'required' => true,
             'choices' => array(
-                Inscriptionstatus::STATUS_ACCEPTED => 'Accepté',
-                Inscriptionstatus::STATUS_WAITING => 'En attente',
-                Inscriptionstatus::STATUS_PENDING => 'En attente de traitement',
-                Inscriptionstatus::STATUS_REJECTED => 'Rejeté',
+                'Accepté' => Inscriptionstatus::STATUS_ACCEPTED,
+                'En attente' => Inscriptionstatus::STATUS_WAITING,
+                'En attente de traitement' => Inscriptionstatus::STATUS_PENDING,
+                'Rejeté' => Inscriptionstatus::STATUS_REJECTED,
             ),
         ));
     }

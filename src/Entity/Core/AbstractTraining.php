@@ -625,4 +625,90 @@ abstract class AbstractTraining implements SerializedAccessRights
     {
         return 'training';
     }
+
+    /**
+     * @return mixed
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"session", "training"})
+     */
+    public function getLastsession()
+    {
+        if (empty($this->sessions)) {
+            return;
+        }
+        $now = new \DateTime();
+
+        $result = null;
+        $maxdif = 9999999999;
+        foreach ($this->sessions as $session) {
+            $dif = $now->getTimestamp() - $session->getDatebegin()->getTimeStamp();
+            if (($dif > 0) && ($dif < $maxdif)) {
+                $result = $session;
+                $maxdif = $dif;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"session", "training"})
+     */
+    public function getNextsession()
+    {
+        if (empty($this->sessions)) {
+            return;
+        }
+        $now = new \DateTime();
+
+        $result = null;
+        $maxdif = 9999999999;
+        foreach ($this->sessions as $session) {
+            $dif = $session->getDatebegin()->getTimestamp() - $now->getTimeStamp();
+            if (($dif > 0) && ($dif < $maxdif)) {
+                $result = $session;
+                $maxdif = $dif;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"session", "training"})
+     */
+    public function getSessionscount()
+    {
+        if (empty($this->sessions)) {
+            return 0;
+        }
+
+        return count($this->sessions);
+    }
+
+    /**
+     * @return mixed
+     * @Serializer\VirtualProperty
+     * @Serializer\Groups({"session", "training"})
+     */
+    public function getTrainers()
+    {
+        $trainers = array();
+        if ($this->sessions) {
+            foreach ($this->sessions as $session) {
+                if ($session->getParticipations() && $session->getParticipations()->count() > 0) {
+                    foreach ($session->getParticipations() as $participation) {
+                        // do not add several times the same trainer
+                        $trainers[$participation->getTrainer()->getId()] = $participation->getTrainer();
+                    }
+                }
+            }
+        }
+
+        return $trainers;
+    }
 }

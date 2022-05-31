@@ -4,7 +4,11 @@
 sygeforApp.controller('SessionParticipantsSummaryController', ['$scope', '$taxonomy', function($scope, $taxonomy)
 {
     $scope.publics = [];
-    $taxonomy.getTerms('sygefor_trainee.vocabulary_public_type').then(function(data) {
+/*    $taxonomy.getTerms('sygefor_trainee.vocabulary_public_type').then(function(data) {
+        $scope.publics = data;
+    });*/
+
+    $taxonomy.getIndexedTerms(9).then(function(data) {
         $scope.publics = data;
     });
 

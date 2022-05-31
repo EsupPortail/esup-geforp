@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\Sessiontype;
@@ -968,4 +969,5 @@ abstract class AbstractSession implements SerializedAccessRights
     {
         return 'session';
     }
+
 }
