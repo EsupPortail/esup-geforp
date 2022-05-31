@@ -246,12 +246,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 title: 'Derniers désistements',
                 size: 5,
                 filters:{
-                    'inscriptionStatus.machine_name': 'desist',
+                    'inscriptionStatus.name.source': 'Desistement',
                     "inscriptionStatusUpdatedAt": {
                         "type": "range",
                         "gte": $filter('date')(date, 'yyyy-MM-dd')
                     },
-                    'inscription.session.training.organization.name.source': $user.organization.name
+                    'session.training.organization.name.source': $user.organization.name
                 },
                 sorts: {'inscriptionStatusUpdatedAt': 'desc'}
             }
