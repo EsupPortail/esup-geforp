@@ -1,0 +1,25 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Contact</h1>
+                </div>
+            </div><!-- /row -->
+        </div> <!-- /container -->
+    </header>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <br><br>
+    <h3>Pour toute question sur le Plan de Formation ou les modalités d'inscription, vous pouvez contacter :
+    <br><br>
+        <div style="text-align: center"><a href="mailto:{{ contact_mail }}">{{ contact_mail }}</a></div>
+    <br><br>
+    </h3>
+</div>
+{% endblock body %}

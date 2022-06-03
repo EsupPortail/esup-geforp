@@ -1,0 +1,74 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% form_theme form 'SygeforFrontBundle:Account/alert:checkbox.html.twig' %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Mon compte</h1>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li><a href="{{ path('front.account.profile') }}" class="button secondary">Mon profil</a></li>
+                <li><a href="{{ path('front.account.registrations') }}" title="Pour gérer vos demandes d'inscription en cours et retrouver vos anciennes demandes" class="button secondary">Mes demandes d'inscription</a></li>
+                <li><a href="{{ path('front.account.attendances') }}" title="Pour retrouver toutes les formations suivies et accéder à leurs documents" class="button secondary">Mes formations suivies</a></li>
+                <li class="active"><a href="{{ path('front.account.alerts') }}" title="Pour retrouver toutes les alertes d'ouverture des formations" class="button secondary">Mes alertes</a></li>
+            </ul>
+        </div>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <section>
+            <div class="row">
+                <div class="col-md-12">
+                    {% if alerts | length == 0 %}
+                        <blockquote class="small">Vous n'êtes inscrit(e) à aucune alerte d'ouverture de session.</blockquote>
+                    {% else %}
+                        <div class="responsive-table-wrapper">
+                            <table class="table table-hover table-condensed table-responsive">
+                                <thead>
+                                <tr>
+                                    <th>Date de la session</th>
+                                    <th>Formation</th>
+                                    <th>Gérer mon abonnement</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% set counter = 0 %}
+                                {{ form_start(form) }}
+                                {% for alert in alerts %}
+                                    {% if alert.session.dateBegin > date('now') %}
+                                        <tr>
+                                            <td>{{ alert.session.dateBegin | date('m/Y') }}</td>
+                                            <td>
+                                                <a href="{{ path('front.public.training', {id: alert.session.training.id}) }}">{{ alert.session.training.name }}</a>
+                                            </td>
+                                            <td>{{ form_widget(form.alerts[counter].alert) }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    {% set counter = counter + 1 %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <button type="submit" class="btn btn-primary"> Valider les changements d'inscription aux alertes </button>
+                            </div>
+                        </div>
+                        <div style="display: none">
+                            {{ form_rest(form) }}
+                        </div>
+                        {{ form_end(form) }}
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock body %}

@@ -1,0 +1,74 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Document d'aide</h1>
+                </div>
+            </div><!-- /row -->
+        </div> <!-- /container -->
+    </header>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Bienvenue sur le site de la formation des personnels</h1>
+
+
+    Vous trouverez sur ce site les actions du Plan de Formation de l'Université
+    <br><br>
+    <h3>Comment créer mon espace stagiaire ?</h3>
+    <br>
+    Lorsque vous vous connectez sur <a href="{{ front_url }}" target="_blank">{{ front_url }}</a> , vous êtes invité à créer votre profil.<br><br>
+    Vous devez choisir votre établissement d’appartenance puis vous connecter en utilisant vos identifiants ENT habituels. Vous accédez ainsi à votre espace personnel.<br>
+    Une partie des informations est remplie automatiquement, mais vous devez compléter les champs laissés en blanc. Renseignez avec attention la rubrique concernant votre responsable : si la saisie est erronée, votre responsable ne pourra pas valider votre inscription.
+    <br><br>
+    <h3>Comment consulter le catalogue de formations ?</h3>
+    <br>
+    Vous pouvez accéder au catalogue une fois que vous êtes identifié sur la plateforme : soit lors de la validation des informations saisies (1ère connexion) soit en vous connectant à l’aide de vos identifiants ENT classiques.<br>
+    Vous pouvez cliquer dans « catalogue des formations » dans le bandeau supérieur gris clair pour y accéder directement.<br>
+    Les stages sont classés par domaines thématiques du plan de formation : vous pouvez accéder à la liste des formations ouvertes en cliquant sur le domaine qui vous intéresse. L’ensemble des stages programmés dans ce domaine apparaissent alors.<br>
+    En cliquant sur le titre du stage, vous accédez aux informations concernant le contenu, l’intervenant, les dates et horaires, ainsi que le lieu de la formation .
+    <br><br>
+    <h3>Qu’est-ce que le correspondant formation ?</h3>
+    <br>
+    Vous êtes affectés en laboratoire ou vous êtes agent du SCD : vous pouvez mentionner à cet endroit le nom du correspondant formation de votre service ou de votre unité. La personne identifiée dans ce champ sera copie de tous les messages qui vous seront envoyés par l’application.
+    <br><br>
+    <h3>Comment m’inscrire sur une formation ?</h3>
+    <br>
+    Dans le catalogue, vous cliquez sur le domaine de formation qui vous intéresse.
+    Vous voyez l’ensemble des formations ouvertes appartenant à ce domaine.<br>
+    Vous cliquez sur le titre du stage pour avoir accès aux informations complémentaires : dates de début et de fin, contenu, lieu de formation, intervenant.
+    Vous cliquez sur « s’inscrire à cette formation ».
+    Sur l’écran suivant, vous êtes invité à renseigner votre motivation pour participer à cette formation et à sélectionner la typologie de formation (T1, T2, T3, préparation concours).
+    Une fois ces champs complétés, vous cliquez sur « envoyer mon inscription ».<br>
+    La validation se fait de manière dématérialisée, vous n’avez pas de formulaire à imprimer ni à retourner. Votre manager reçoit un mail l’informant de votre demande d’inscription et effectue la validation en se connectant sur le lien que lui envoie l’application.
+    <br><br>
+    <h3>Comment me désister d’une formation à laquelle je suis inscrit ?</h3>
+    <br>
+    Connectez-vous à votre espace personnel.<br>
+    Allez sur l’onglet « mes demandes d’inscriptions » et cliquez sur « annuler ma demande ».
+    <br><br>
+    <h3>Comment éditer mon attestation de formation ?</h3>
+    <br>
+    Connectez-vous à votre espace personnel.
+    Allez sur l’onglet « mes formations suivies ».
+    Cliquez sur « imprimer mon attestation ».
+    <br><br>
+    <h3>Contact</h3>
+    <br>
+    Pour toute question sur le Plan de Formation ou les modalités d'inscription, vous pouvez contacter :
+    <br>
+    <div style="text-align: center"><a href="mailto:{{ contact_mail}}">{{ contact_mail}}</a></div>
+    <br><br>
+    Vous pouvez télécharger sur le site de la DRH :
+    <ul class="secondary-menu">
+        <li><a href="http://www.univ-amu.fr" target="_blank">Le flyer utilisateur de Geforp</a></li>
+        <li><a href="http://www.univ-amu.fr" target="_blank">Le plan de formation de l’année 2018</a></li>
+        <li><a href="http://www.univ-amu.fr" target="_blank">La programmation trimestrielle</a></li>
+    </ul>
+</div>
+{% endblock body %}

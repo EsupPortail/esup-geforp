@@ -1,0 +1,46 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <h1>Bienvenue sur la plateforme de gestion de l'offre de formation</h1>
+                    <br>
+                    <h1>!!! PLATE-FORME DE TEST !!!</h1>
+                </div>
+            </div><!-- /row -->
+        </div> <!-- /container -->
+    </header>
+{% endblock %}
+
+{% block body %}
+    <section class="main">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2">
+                    <br>
+                    <div class="mb-15">
+                        <p style="font-size: 18px">Pour pouvoir visualiser l'offre de formation et vous inscrire aux formations proposées, vous devez être authentifié. Vous pouvez utiliser votre compte universitaire et créer rapidement un compte GEFORP.</p>
+                        <br>
+                        <br>
+                    </div>
+                    <hr>
+                    <div class="login-section">
+                        <h3 class="mb-15">J'ai un compte universitaire</h3>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Vous avez un compte universitaire : utilisez-le pour créer ou retrouver votre compte GEFORP. <a href="{{ path('front.public.faq') }}">Consultez le guide d'utilisation</a></p>
+                            </div>
+                            <div class="col-sm-6">
+                                <a href="{{ path('front.account') }}" class="btn btn-primary btn-block">Se connecter avec son compte universitaire</a>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock body %}

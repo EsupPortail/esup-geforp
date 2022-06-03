@@ -1,0 +1,26 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Catalogue des formations</h1>
+                </div>
+            </div><!-- /row -->
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="{{ path('front.public.myprogram') }}" title="Accès aux formations de mon établissement" class="button secondary">L'offre de formation de mon établissement</a></li>
+                <li><a href="{{ path('front.public.search') }}" title="Rechercher une formation" >Rechercher une formation</a></li>
+                {% if multiEtab == true %}
+                    <li><a href="{{ path('front.public.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
+                {% endif %}
+            </ul>
+
+        </div> <!-- /container -->
+    </header>
+{% endblock %}
+
+{% block body %}
+    {% include '@SygeforFront/Public/program/program.html.twig' %}
+{% endblock body %}

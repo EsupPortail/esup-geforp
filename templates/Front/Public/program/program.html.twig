@@ -1,0 +1,111 @@
+
+{% form_theme form 'SygeforFrontBundle:Public/program:checkbox.html.twig' %}
+
+<div class="container">
+    <section>
+        <div class="outer-wrap">
+            <div class="inner-wrap">
+                <!-- RESULTS -->
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="row">
+                            <div class="col-xs-12 col-md-9">
+                                {% if search.items is not defined or search.items | length == 0 %}
+                                    <div class="row">
+                                        <div class="col-xs-12">
+                                            <h3 class="no-session">
+                                                Aucune session n'est disponible pour le moment.
+                                            </h3>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="session session--list">
+                                        {% if img == '' %}
+                                            <h1>Liste des domaines de formation </h1>
+                                        {% else %}
+                                            <h1>Liste des domaines de formation <img src="{{ asset(img) }}" height="30" alt=""> </h1>
+                                        {% endif %}
+                                        {% set theme = "" %}
+                                        {{ form_start(form) }}
+                                        {% set counter = 0 %}
+                                        {% for session in search.items %}
+                                            {% if session.displayOnline == true %}
+                                                {% if session.training.theme['name'] != theme and theme =="" %}
+                                                    {% set theme = session.training.theme['name'] %}
+                                                    <div  id="accordion" role="tablist" aria-multiselectable="true">
+                                                        <div >
+                                                            <div  role="tab" id="headingOne">
+                                                                <h3 >
+                                                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
+                                                                        {{ session.training.theme['name'] }}
+                                                                    </a>
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                        <div id="session{{ session.id }}" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                                                            <div class="panel-body">
+
+                                                {%  elseif session.training.theme['name'] != theme and theme !="" %}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    {% set theme = session.training.theme['name'] %}
+                                                    <div  id="accordion" role="tablist" aria-multiselectable="true">
+                                                        <div>
+                                                            <div  role="tab" id="headingOne">
+                                                                <h3 >
+                                                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
+                                                                        {{ session.training.theme['name'] }}
+                                                                    </a>
+                                                                </h3>
+                                                            </div>
+                                                        </div>
+                                                        <div id="session{{ session.id }}" class="collapse" role="tabpanel" aria-labelledby="headingOne">
+                                                            <div class="panel-body">
+                                                {%  endif %}
+
+                                                {% include '@SygeforFront/Public/program/session-list-item.html.twig' %}
+
+
+                                            {#    {% set theme = "" %}
+                                                {% for session in search.items %}
+                                                    {% if session.displayOnline == true %}
+                                                        {% if session.training.theme != theme %}
+                                                            {% set theme = session.training.theme %}
+                                                            <h3>{{ session.training.theme }}</h3>
+                                                        {% endif %}
+
+                                                        {% include '@SygeforFront/Public/program/session-list-item.html.twig' %}
+                                                    {% endif %}
+                                                {% endfor %} #}
+
+                                            {% endif %}
+
+                                            {% if session.sessionType == 'A venir' %}
+                                                {% set counter = counter + 1 %}
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-primary"> Valider les inscriptions aux alertes </button>
+                                        </div>
+                                    </div>
+                                    <div style="display: none">
+                                        {{ form_rest(form) }}
+                                    </div>
+                                    {{ form_end(form) }}
+                                {% endif %}
+                            {#    {% include('@SygeforFront/pagination.html.twig') %} #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

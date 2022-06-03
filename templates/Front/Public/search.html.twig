@@ -1,0 +1,97 @@
+{% extends "@SygeforFront/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8 col-xs-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Programme des formations</h1>
+                </div>
+            </div><!-- /row -->
+            <ul class="nav nav-tabs">
+                <li><a href="{{ path('front.public.myprogram') }}" title="Accès aux formations de mon établissement" >L'offre de formation de mon établissement</a></li>
+                <li class="active"><a href="{{ path('front.public.search') }}" title="Rechercher une formation" class="button secondary" >Rechercher une formation</a></li>
+                {% if multiEtab == true %}
+                    <li><a href="{{ path('front.public.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
+                {% endif %}
+            </ul>
+
+        </div> <!-- /container -->
+    </header>
+{% endblock %}
+
+{% block body %}
+    <script type="text/javascript" charset="utf8" src="{{ asset('js/jquery-1.11.3.min.js') }}"></script>
+    <script type="text/javascript" charset="utf8" src="{{ asset('js/jquery-ui.min.js') }}"></script>
+    <link rel="Stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" /> <!-- jquery_ui_theme -->
+
+    <div class="container">
+        <section>
+            <div class="outer-wrap">
+                <div class="inner-wrap">
+                    <!-- RESULTS -->
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-xs-12 col-md-9">
+                                    <div class="session session--list">
+                                        <h1>Rechercher une formation</h1>
+                                        <br>
+
+                                        {{ form_start(form) }}
+                                        {{ form_row(form.theme) }}
+                                        {{ form_row(form.centre) }}
+                                        {{ form_row(form.texte) }}
+                                        <br>
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button type="submit" class="btn btn-primary btn-block">Rechercher</button>
+                                            </div>
+                                        </div>
+
+                                        {{ form_errors(form) }}
+                                        {{ form_end(form) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </section>
+    </div>
+
+    <script type="text/javascript">
+        $('#search_texte').autocomplete({
+            source: function (requete, reponse) {
+                var motcle = $('#search_texte').val();
+                var domaine = $('#search_theme').val();
+                var centre = $('#search_centre').val();
+                var DATA = 'motcle=' + motcle + '&domaine=' + domaine + '&centre=' + centre;
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('ajax_completlist') }}",
+                    dataType: 'json',
+                    data: DATA,
+
+                    success: function (donnee) {
+                        reponse($.map(donnee, function (object) {
+                            return object;
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                {# $('#groupsearch_cn').val(ui.item.value); #}
+                $(event.target).val(ui.item.value);
+                $('#search').closest("form").submit();
+                {# $('#groupsearch').submit(); #}
+                return false;
+            }
+        });
+
+    </script>
+
+{% endblock body %}
