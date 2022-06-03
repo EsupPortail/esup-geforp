@@ -59,6 +59,7 @@ abstract class AbstractTrainerController extends AbstractController
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
+        $query = $request->request->get('query', 'NO QUERY');
 
         // Recherche avec les filtres
         $trainers = $trainerRepository->getTrainersList($keywords, $filters);
@@ -67,6 +68,16 @@ abstract class AbstractTrainerController extends AbstractController
         // Recherche pour aggs et query_filters
         $tabAggs = array();
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $trainerRepository);
+
+        // Recherche avec query (pour autocompletion)
+        if (isset($query)) {
+            // on transforme le champ 'query' en 'keywords'
+            if (isset($query['filtered']['query']['match']['fullName.autocomplete']['query'])) {
+                $keywords = $query['filtered']['query']['match']['fullName.autocomplete']['query'];
+                $trainers = $trainerRepository->getTrainersList($keywords, $filters);
+                $nbTrainers = count($trainers);
+            }
+        }
 
         $ret = array(
             'total' => $nbTrainers,
