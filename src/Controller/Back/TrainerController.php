@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Controller\Core\AbstractTrainerController;
 use App\Entity\Trainer;

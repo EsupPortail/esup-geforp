@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
-use App\Controller\Core\AbstractParticipationController;
-use App\Entity\Participation;
+use App\Entity\Institution;
+use App\Controller\Core\AbstractInstitutionController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -15,9 +15,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 
 /**
- * @Route("/participation")
+ * @Route("/institution")
  */
-class ParticipationController extends AbstractParticipationController
+class InstitutionController extends AbstractInstitutionController
 {
-    protected $participationClass = Participation::class;
+    protected $institutionClass = Institution::class;
 }
