@@ -24,9 +24,6 @@ Configuration requise
 
 ### MySQL
 
-
-### ElasticSearch
-
 ### Unoconv
 
 ### Shibboleth
@@ -37,7 +34,7 @@ Prérequis
 
 ### Prérequis
 
-- Composer installé
+- Composer installé (>2)
 - git installé
 - Installer node v0.12.17
 - Installer npm v2.15.1
