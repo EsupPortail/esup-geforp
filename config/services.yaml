@@ -6,8 +6,19 @@
 
 parameters:
     front_url: 'https://127.0.0.1:8000'
+    front_host: '%env(front_host)%'
+    back_host: '%env(back_host)%'
     wkhtmltopdf_bin: ../bin/wkhtmltopdf-amd64
     unoconv_bin: ../bin/unoconv
+    shibboleth:
+        login_path: 'Shibboleth.sso/Login'  # The path used to call Shibboleth login authentication (default = 'Shibboleth.sso/Login')
+        logout_path: 'Shibboleth.sso/Login'  # The path used to call Shibboleth logout (default = 'Shibboleth.sso/Logout')
+        username: 'eppn'  # The Shibboleth attribute that is used as username for the logged in user. The attribute must appear in the'attributes' parameter list (default = 'username')
+        attributes: [ 'eppn', 'mail', 'givenName', 'sn', 'cn', 'supannCivilite', 'supannOIDCDateDeNaissance', 'mobile', 'postalAddress', 'telephoneNumber', 'supannActivite', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale', 'supannEmpCorps', 'supannEtablissement', 'amuAffectationLib', 'supannCodePopulation' ]  # The list of attributes returned by Shibboleth Service Provider
+        login_target: ''  # The route to which the user will be redirected after login. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
+        logout_target: ''  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
+        session_id: ''  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
+        remote_user: '%env(REMOTE_USER)%'
     batch:
         convert_type:
             semestered_training:
@@ -394,7 +405,8 @@ services:
     App\Listener\SessionListener:
         tags:
             - { name: doctrine.event_subscriber }
-
+    shibbundle.sup_service:
+        class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider
 
 #    app.menu_builder:
 #        class: App\Menu\MenuBuilder
