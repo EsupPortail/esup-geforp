@@ -238,9 +238,9 @@ class User implements UserInterface
      *
      * @return $this|\FOS\CoreBundle\Model\UserInterface
      */
-    public function setEmailCanonical($emailCanonical)
+/*    public function setEmailCanonical($emailCanonical)
     {
         return parent::setEmailCanonical(strval(uniqid()).$emailCanonical);
-    }
+    }*/
 
 }
