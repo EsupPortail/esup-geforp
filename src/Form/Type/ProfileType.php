@@ -1,6 +1,6 @@
 <?php
 
-namespace Sygefor\Bundle\FrontBundle\Form;
+namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
 use App\Form\Type\TraineeType;
