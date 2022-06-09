@@ -188,7 +188,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             $trainee->setBap($bap);
             $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
             // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if (count($corps > 0)) {
+            if (isset($corps)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
                 $n_corps = $doctrine->getRepository('pp\Entity\Corps')->findOneBy(
@@ -226,7 +226,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
             $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
             // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if (count($corps > 0)) {
+            if ((isset($corps))) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
                 $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(

@@ -8,7 +8,7 @@ parameters:
     front_url: '%env(front_host)%'
     front_host: '%env(front_host)%'
     back_host: '%env(back_host)%'
-    adresse_from_ldap: true
+    adresse_from_ldap: false
     corresp_form_actif: true
     lib_affectation : false
     domaines:
