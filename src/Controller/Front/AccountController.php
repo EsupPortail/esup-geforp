@@ -9,6 +9,7 @@
 namespace App\Controller\Front;
 
 
+use App\Entity\Core\AbstractTrainee;
 use Doctrine\Persistence\ManagerRegistry;
 use Sygefor\Bundle\FrontBundle\Form\ProfileType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -69,8 +70,11 @@ class AccountController extends AbstractController
         $shibbolethAttributes = $this->getUser()->getCredentials();
 
         //$trainee = $this->getUser();
-        $trainee = new Trainee();
-        if ($this->getUser()) {
+        $userEmail = $this->getUser()->getCredentials()['mail'];
+        if (isset($userEmail)) {
+            $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
+        } 
+        if ($trainee) {
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             if ($shibbolethAttributes['supannCivilite']=='')
