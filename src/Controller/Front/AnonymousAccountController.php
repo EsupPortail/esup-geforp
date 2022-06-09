@@ -9,6 +9,7 @@
 namespace App\Controller\Front;
 
 
+use App\AccessRight\AccessRightRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Logger;
 use App\Controller\Front\AbstractAnonymousAccountController;
@@ -64,7 +65,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
      * @Route("/register", name="front.account.register")
      * @Template("Front/Account/profile/account-registration.html.twig")
      */
-    public function registerAction(Request $request, ManagerRegistry $doctrine)
+    public function registerAction(Request $request, ManagerRegistry $doctrine, AccessRightRegistry $accessRightRegistry)
     {
         $trainee = new Trainee();
 
@@ -191,7 +192,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             if (isset($corps)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $doctrine->getRepository('pp\Entity\Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {
@@ -239,7 +240,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             }
         }
 
-        $form = $this->createForm(new ProfileType($this->get('sygefor_core.access_right_registry')), $trainee);
+        $form = $this->createForm(new ProfileType($accessRightRegistry, $trainee));
 
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
