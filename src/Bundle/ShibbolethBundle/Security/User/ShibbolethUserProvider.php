@@ -20,7 +20,7 @@ class ShibbolethUserProvider implements ShibbolethUserProviderInterface
     public function loadUserByUsername($login)
     {
         $roles = array();
-        return new ShibbolethUser($login, '', '',$roles);
+        return new ShibbolethUser($login, '', '', array(), $roles);
     }
 
     public function loadUser($credentials)
