@@ -18,15 +18,13 @@ class ShibbolethUser implements UserInterface, EquatableInterface
     private $password;
     private $salt;
     private $roles;
-    private $credentials;
 
-    public function __construct($username, $password, $salt, array, $credentials, array $roles)
+    public function __construct($username, $password, $salt, array $roles)
     {
         $this->username = $username;
         $this->password = $password;
         $this->salt = $salt;
         $this->roles = $roles;
-        $this->credentials = $credentials;
     }
 
     public function getRoles()
@@ -53,11 +51,6 @@ class ShibbolethUser implements UserInterface, EquatableInterface
     public function getUsername()
     {
         return $this->username;
-    }
-
-    public function getCredentials()
-    {
-        return $this->credentials;
     }
 
     public function eraseCredentials()
