@@ -2,11 +2,12 @@
 
 namespace App\Controller\Front;
 
+use App\AccessRight\AccessRightRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\View\View;
 use Monolog\Logger;
-use Sygefor\Bundle\ApiBundle\Form\Type\RegistrationType;
+use App\Form\Type\RegistrationType;
 use App\Entity\Core\AbstractTrainee;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -36,7 +37,7 @@ abstract class AbstractAnonymousAccountController extends AbstractController
      * @Rest\View(serializerGroups={"api"})
      * @Method("POST")
      */
-    public function registerAction(Request $request, ManagerRegistry $doctrine)
+    public function registerAction(Request $request, ManagerRegistry $doctrine, AccessRightRegistry $accessRightRegistry)
     {
         /** @var Logger $logger */
         $logger = $this->get('monolog.logger.api');
