@@ -8,6 +8,9 @@ parameters:
     front_url: '%env(front_host)%'
     front_host: '%env(front_host)%'
     back_host: '%env(back_host)%'
+    adresse_from_ldap: true
+    corresp_form_actif: true
+    lib_affectation : false
     domaines:
         univ-amu.fr: AMU
         univ-avignon.fr: AVIGNON
