@@ -17,7 +17,7 @@ parameters:
         attributes: [ 'eppn', 'mail', 'givenName', 'sn', 'cn', 'supannCivilite', 'supannOIDCDateDeNaissance', 'mobile', 'postalAddress', 'telephoneNumber', 'supannActivite', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale', 'supannEmpCorps', 'supannEtablissement', 'amuAffectationLib', 'supannCodePopulation' ]  # The list of attributes returned by Shibboleth Service Provider
         login_target: ''  # The route to which the user will be redirected after login. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
         logout_target: ''  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
-        session_id:  'Shib-Session-ID'  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
+        session_id: ''  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
         remote_user: '%env(REMOTE_USER)%'
     batch:
         convert_type:
