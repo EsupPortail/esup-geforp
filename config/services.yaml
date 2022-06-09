@@ -5,9 +5,14 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
-    front_url: 'https://127.0.0.1:8000'
+    front_url: '%env(front_host)%'
     front_host: '%env(front_host)%'
     back_host: '%env(back_host)%'
+    domaines:
+        univ-amu.fr: AMU
+        univ-avignon.fr: AVIGNON
+        univ-tln.fr: TOULON
+        centrale-marseille.fr: "CENTRALE MARSEILLE"
     wkhtmltopdf_bin: ../bin/wkhtmltopdf-amd64
     unoconv_bin: ../bin/unoconv
     shibboleth:

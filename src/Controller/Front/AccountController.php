@@ -66,10 +66,11 @@ class AccountController extends AbstractController
         $adresseFromLdap = false;
 
         // Récupération des attributs Shibboleth pour mise à jour du profil
-        $shibbolethAttributes = $this->get('security.token_storage')->getToken()->getAttributes();
+        $shibbolethAttributes = $this->getUser()->getCredentials();
 
-        $trainee = $this->getUser();
-        if ($trainee) {
+        //$trainee = $this->getUser();
+        $trainee = new Trainee();
+        if ($this->getUser()) {
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             if ($shibbolethAttributes['supannCivilite']=='')
@@ -112,35 +113,35 @@ class AccountController extends AbstractController
                 }
             }
             $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
-            if ($shibbolethAttributes['primary_affiliation'] == "staff") {
+            if ($shibbolethAttributes['primary-affiliation'] == "staff") {
                 // Transformation de l'attribut 'staff' en 'employee'
-                $shibbolethAttributes['primary_affiliation'] = "employee";
+                $shibbolethAttributes['primary-affiliation'] = "employee";
             }
-            $primary_affiliation = $doctrine->getRepository('Sygefor\Bundle\TraineeBundle\Entity\Term\PublicType')->findOneBy(
-                array('name' => $shibbolethAttributes['primary_affiliation'])
+            $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+                array('name' => $shibbolethAttributes['primary-affiliation'])
             );
             if ($primary_affiliation != null) {
                 $trainee->setPublicType($primary_affiliation);
             }
             else {
-                $trainee->setPublicType($this->getDoctrine()->getRepository('Sygefor\Bundle\TraineeBundle\Entity\Term\PublicType')->findOneBy(
+                $trainee->setPublicType($this->getDoctrine()->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
                     array('name' => 'other')
                 ));
             }
-            $trainee->setStatus($shibbolethAttributes['postalCode']);
+//            $trainee->setStatus($shibbolethAttributes['postalCode']);
 
             // Etablissement
             $eppn = $shibbolethAttributes['eppn'];
             if (stripos($eppn , "@")>0) {
                 $domaine = substr($eppn, stripos($eppn, "@") + 1);
-                $listeDomaines = $this->container->getParameter('domaines');
+                $listeDomaines = $this->getParameter('domaines');
                 // Association nom de domaine et établissement
                 if (array_key_exists($domaine, $listeDomaines)){
                     $etab = $listeDomaines[$domaine];
                 }else {
                     $etab = "AMU";
                 }
-                $trainee->setInstitution($doctrine->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
+                $trainee->setInstitution($doctrine->getRepository('App\Entity\Institution')->findOneBy(
                     array('name' => $etab)
                 ));
 
@@ -156,7 +157,7 @@ class AccountController extends AbstractController
                     $servicelib = "";
                     if (count($services) > 0) {
                         foreach ($services as $service) {
-                            $supannCodeEntite = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:SupannCodeEntite')->findOneBy(
+                            $supannCodeEntite = $this->getDoctrine()->getRepository('App\Entity\SupannCodeEntite')->findOneBy(
                                 array('supannCodeEntite' => $service)
                             );
                             if ($supannCodeEntite != null) {
@@ -168,7 +169,7 @@ class AccountController extends AbstractController
                 $trainee->setService($servicelib);
                 $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
                 //$trainee->setBap($shibbolethAttributes['amuBap']);
-                $trainee->setCampus($shibbolethAttributes['amuCampus']);
+//                $trainee->setCampus($shibbolethAttributes['amuCampus']);
                 $bap = "";
                 $activites = explode(";", $shibbolethAttributes['supannActivite']);
                 foreach($activites as $activite) {
@@ -182,10 +183,10 @@ class AccountController extends AbstractController
                 $trainee->setBap($bap);
                 $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
                 // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-                if (count($corps > 0)) {
+                if (isset($corps)) {
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
@@ -220,10 +221,10 @@ class AccountController extends AbstractController
                 $trainee->setBap($bap);
                 $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
                 // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-                if (count($corps > 0)) {
+                if (isset($corps)) {
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
