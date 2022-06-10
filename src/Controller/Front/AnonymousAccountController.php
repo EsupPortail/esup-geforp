@@ -83,12 +83,12 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
         ));
         $trainee->setOrganization($doctrine->getRepository('App\Entity\Organization')->find(1));
 
-        $trainee->setLastName($shibbolethAttributes['sn']);
-        $trainee->setFirstName($shibbolethAttributes['givenName']);
+        $trainee->setLastname($shibbolethAttributes['sn']);
+        $trainee->setFirstname($shibbolethAttributes['givenName']);
         $trainee->setEmail($shibbolethAttributes['mail']);
         //$trainee->setBirthDate($shibbolethAttributes['schacDateOfBirth']);
         $datenaiss = str_replace("-", "", $shibbolethAttributes['supannOIDCDateDeNaissance']);
-        $trainee->setBirthDate($datenaiss);
+        $trainee->setBirthdate($datenaiss);
         // Mise en forme adresse au cas où il y en a une
         if (($adresseFromLdap == true) && ($shibbolethAttributes['postalAddress']!="")) {
             $address = $shibbolethAttributes['postalAddress'];
@@ -112,7 +112,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             $trainee->setCity($city);
             $trainee->setZip($codepostal);
         }
-        $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
+        $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -122,14 +122,14 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
         if ($shibbolethAttributes['primary-affiliation'] == "employee") {
             $flagSupRequired = true;
         }
-        $primary_affiliation = $this->getDoctrine()->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+        $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
             array('name' => $shibbolethAttributes['primary-affiliation'])
         );
         if ($primary_affiliation != null) {
-            $trainee->setPublicType($primary_affiliation);
+            $trainee->setPublictype($primary_affiliation);
         }
         else {
-            $trainee->setPublicType($this->getDoctrine()->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+            $trainee->setPublictype($doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
                 array('name' => 'other')
             ));
         }
@@ -173,7 +173,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             }*/
 
             $trainee->setService($shibbolethAttributes['amuAffectationLib']);
-            $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
+            $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
             //$trainee->setBap($shibbolethAttributes['amuBap']);
 //            $trainee->setCampus($shibbolethAttributes['amuCampus']);
             $bap = "";
@@ -224,13 +224,13 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                 }
             }
             $trainee->setBap($bap);
-            $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
+            $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
             $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
             // Si on a une valeur, on cherche le libellé et la catégorie dans la table
             if ((isset($corps))) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {
@@ -246,21 +246,21 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 // TEST sur le responsable
-                if (count($trainee->getEmailSup())>0) {
+                if (count($trainee->getEmailsup())>0) {
                     // Vérification du mail qui doit être institutionnel
-                    if (stripos($trainee->getEmailSup() , "@")>0) {
-                        $domaine = substr($trainee->getEmailSup(), stripos($trainee->getEmailSup(), "@") + 1);
+                    if (stripos($trainee->getEmailsup() , "@")>0) {
+                        $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
                         $listeDomaines = $this->getParameter('domaines');
                         // Association nom de domaine et établissement
                         if (array_key_exists($domaine, $listeDomaines)){
                             // ok : c'est bien une adresse institutionnelle qui a été renseignée
                             // Mail institutionel ok
                             // on vérifie que le mail du responsable est différent de clui du stagiaire
-                            if (strtolower($trainee->getEmailSup()) == strtolower($trainee->getEmail())) {
+                            if (strtolower($trainee->getEmailsup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
-                                parent::registerShibbolethTrainee($request, $trainee, true);
-                                $em = $this->getDoctrine()->getManager();
+//                                parent::registerShibbolethTrainee($request, $trainee, true);
+                                $em = $doctrine->getManager();
                                 $em->persist($trainee);
                                 $em->flush();
                                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
@@ -273,31 +273,11 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                         }else {
                             $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
-                        /*
-                        if (($domaine != "univ-amu.fr")&&($domaine != "univ-avignon.fr")&&($domaine != "univ-tln.fr")&&($domaine != "umontpellier.fr")&&($domaine != "univ-cotedazur.fr")&&($domaine != "unice.fr")&&($domaine != "centrale-marseille.fr")&&($domaine != "univ-lr.fr")&&($domaine != "univ-gustave-eiffel.fr")&&($domaine != "univ-reims.fr")&&($domaine != "univ-nantes.fr")&&($domaine != "insa-lyon.fr")) {
-                            $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
-                        }
-                        else {
-                            // Mail institutionel ok
-                            // on vérifie que le mail du responsable est différent de clui du stagiaire
-                            if ($trainee->getEmailSup() == $trainee->getEmail()) {
-                                $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
-                            } else {
-                                parent::registerShibbolethTrainee($request, $trainee, true);
-                                $em = $this->getDoctrine()->getManager();
-                                $em->persist($trainee);
-                                $em->flush();
-                                $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
-                                $this->get('security.token_storage')->getToken()->setUser($trainee);
 
-                                //return $this->redirectToRoute('front.account');
-                                return $this->redirectToRoute('front.public.myprogram');
-                            }
-                        }*/
                     }
                 } else {
-                    parent::registerShibbolethTrainee($request, $trainee, true);
-                    $em = $this->getDoctrine()->getManager();
+//                    parent::registerShibbolethTrainee($request, $trainee, true);
+                    $em = $doctrine->getManager();
                     $em->persist($trainee);
                     $em->flush();
                     $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');

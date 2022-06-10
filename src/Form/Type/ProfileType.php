@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
+use App\Entity\Core\Term\Publictype;
 
 /**
  * Class ProfileType.
@@ -38,7 +39,7 @@ class ProfileType extends TraineeType
         $builder->get('corps')->setDisabled(true);
         $builder->get('category')->setDisabled(true);
         $builder->get('bap')->setDisabled(true);
-        $builder->get('birthsate')->setDisabled(true);
+        $builder->get('birthdate')->setDisabled(true);
         $builder->get('campus')->setDisabled(true);
 	    $builder->get('publictype')->setDisabled(true);
         $builder->get('lastnamesup')->setDisabled(true);
