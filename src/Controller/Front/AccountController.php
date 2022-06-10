@@ -262,7 +262,7 @@ class AccountController extends AbstractController
      * @param Request $request
      *
      * @Route("/profile", name="front.account.profile")
-     * @Template("@SygeforFront/Account/profile/profile.html.twig")
+     * @Template("Front/Account/profile/profile.html.twig")
      *
      * @return array
      */
@@ -355,69 +355,6 @@ class AccountController extends AbstractController
                 array('name' => $etab)
             ));
 
-/*            switch($domaine) {
-                case "univ-amu.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "AMU")
-                    ));
-                    break;
-                case "univ-avignon.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "AVIGNON")
-                    ));
-                    break;
-                case "univ-tln.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "TOULON")
-                    ));
-                    break;
-                case "umontpellier.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "MONTPELLIER")
-                    ));
-                    break;
-                case "unice.fr":
-                case "univ-cotedazur.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "NICE")
-                    ));
-                    break;
-                case "centrale-marseille.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "CENTRALE MARSEILLE")
-                    ));
-                    break;
-                case "univ-lr.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "LA ROCHELLE")
-                    ));
-                    break;
-                case "univ-eiffel.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "UNIVERSITE GUSTAVE EIFFEL")
-                    ));
-                    break;
-                case "univ-reims.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "UNIVERSITE REIMS")
-                    ));
-                    break;
-                case "univ-nantes.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "UNIVERSITE NANTES")
-                    ));
-                    break;
-                case "insa-lyon.fr":
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "INSA LYON")
-                    ));
-                    break;
-                default:
-                    $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
-                        array('name' => "AMU")
-                    ));
-                    break;
-            }*/
         }
 
         $flagAMU = 0;
@@ -425,19 +362,6 @@ class AccountController extends AbstractController
         if ($trainee->getInstitution()->getName() == "AMU") {
             // tag de l'utilisateur comme étant AMU
             $flagAMU = 1;
-            //Suite à migration SIHAM, on utilise amuAffectationLib
-            /*$services = explode(";", $shibbolethAttributes['supannEntiteAffectation']);
-            $servicelib = "";
-            if (count($services) > 0) {
-                foreach ($services as $service) {
-                    $supannCodeEntite = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:SupannCodeEntite')->findOneBy(
-                        array('supannCodeEntite' => $service)
-                    );
-                    if ($supannCodeEntite != null) {
-                        $servicelib .= $supannCodeEntite->getDescription() . " ; ";
-                    }
-                }
-            }*/
             $servicelib = $shibbolethAttributes['amuAffectationLib'];
             $trainee->setService($servicelib);
             $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
