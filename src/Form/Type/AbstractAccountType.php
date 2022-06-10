@@ -21,22 +21,22 @@ abstract class AbstractAccountType extends AbstractType
             ->add('title', null, array(
                 'label' => 'Civilité',
             ))
-            ->add('lastName', null, array(
+            ->add('lastname', null, array(
                 'label' => 'Nom',
             ))
-            ->add('firstName', null, array(
+            ->add('firstname', null, array(
                 'label' => 'Prénom',
             ))
 
             ->add('email', EmailType::class, array(
                 'label' => 'Email',
             ))
-            ->add('phoneNumber', null, array(
+            ->add('phonenumber', null, array(
                 'label'    => 'Numéro de téléphone',
                 'required' => false,
             ))
 
-            ->add('addressType', ChoiceType::class, array(
+            ->add('addresstype', ChoiceType::class, array(
                 'required' => true,
                 'choices' => array(
                     '0' => 'Adresse personnelle',

@@ -72,9 +72,9 @@ class BaseTraineeType extends AbstractAccountType
                 'required' => false,
                 'label'    => 'Statut',
             ))
-            ->add('publicType', 'entity', array(
+            ->add('publictype', 'entity', array(
                 'label'    => 'Type de personnel',
-                'class'    => PublicType::class,
+                'class'    => Publictype::class,
                 'required' => false,
             ))
             ->add('isActive', CheckboxType::class, array(
