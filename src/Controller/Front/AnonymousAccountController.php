@@ -64,6 +64,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
      *
      * @Route("/register", name="front.account.register")
      * @Template("Front/Account/profile/account-registration.html.twig")
+     * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
     public function registerAction(Request $request, ManagerRegistry $doctrine, AccessRightRegistry $accessRightRegistry)
     {
@@ -246,7 +247,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                             if (strtolower($trainee->getEmailsup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
-                                parent::registerShibbolethTrainee($request, $trainee, true);
+                                parent::registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
                                 $trainee->setCreatedAt(new \DateTime('now'));
                                 $trainee->setUpdatedAt(new \DateTime('now'));
 
@@ -264,7 +265,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
 
                     }
                 } else {
-                    parent::registerShibbolethTrainee($request, $trainee, true);
+                    parent::registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
                     $trainee->setCreatedAt(new \DateTime('now'));
                     $trainee->setUpdatedAt(new \DateTime('now'));
 

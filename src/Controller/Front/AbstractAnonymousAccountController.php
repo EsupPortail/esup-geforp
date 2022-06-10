@@ -197,41 +197,24 @@ abstract class AbstractAnonymousAccountController extends AbstractController
     }
 
     /**
-     * @param Request $request
+     * @param $cred
      * @param $trainee
      * @param boolean
      */
-    protected function registerShibbolethTrainee(Request $request, $trainee, $shibboleth)
+    protected function registerShibbolethTrainee($cred, $trainee, $shibboleth)
     {
         $trainee->setIsActive(false);
 
         if ($shibboleth) {
             // if shibboleth, save persistent_id and force mail
             // and set active to true
-            $persistentId = $shibboleth['persistent_id'];
-            $email        = $shibboleth['mail'];
+            $persistentId = $cred['persistent_id'];
+            $email        = $cred['mail'];
             $trainee->setShibbolethPersistentId($persistentId ? $persistentId : $email);
             $trainee->setEmail($email);
             $trainee->setIsActive(true);
         }
-        else {
-            $trainee->setSendActivationMail(array(
-                'redirect' => $request->get('redirect'),
-            ));
-        }
 
-        // if a password has been
-        if ($trainee->getPlainPassword()) {
-            $password = $trainee->getPlainPassword();
-        } else {
-            $password = TraineeRepository::generatePassword();
-        }
-        $trainee->setPlainPassword($password);
-
-        // set isPaying from publicType
-        //$trainee->setIsPaying($trainee->getPublicType()->getIsPaying());
-
-        //$trainee->setSendCredentialsMail(true);
     }
 
     /**
