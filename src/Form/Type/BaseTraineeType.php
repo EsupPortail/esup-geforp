@@ -16,6 +16,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * Class TraineeType.
@@ -25,12 +26,18 @@ class BaseTraineeType extends AbstractAccountType
     /** @var  AccessRightRegistry $accessRightsRegistry */
     protected $accessRightsRegistry;
 
+    /**
+     * @var Security
+     */
+    private $security;
+
     /**InscriptionListener
      * @param AccessRightRegistry $accessRightsRegistry
      */
-    public function __construct(AccessRightRegistry $accessRightsRegistry)
+    public function __construct(AccessRightRegistry $accessRightsRegistry, Security $security)
     {
         $this->accessRightsRegistry = $accessRightsRegistry;
+        $this->security = $security;
     }
 
     /**
@@ -82,8 +89,7 @@ class BaseTraineeType extends AbstractAccountType
             // If the user does not have the rights, remove the organization field and force the value
             $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_trainee.rights.trainee.all.create');
             if (!$hasAccessRightForAll) {
-                $securityContext = $this->accessRightsRegistry->getSecurityContext();
-                $user            = $securityContext->getToken()->getUser();
+                $user            = $this->security->getUser();
                 if (is_object($user)) {
                     $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
                         $trainee = $event->getData();

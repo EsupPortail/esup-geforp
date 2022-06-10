@@ -28,18 +28,11 @@ class TraineeType extends BaseTraineeType
         parent::buildForm($builder, $options);
 
        $builder
-/*            ->add('disciplinaryDomain', EntityType::class, array(
-                'class' => Disciplinary::class,
-                'required' => false,
-                'label' => "Domaine disciplinaire",
-                'query_builder' => function(EntityRepository $er) {
-                    return $er->createQueryBuilder('d')->where('d.parent IS NULL');
-                }))*/
-           ->add('birthDate', null, array(
+           ->add('birthdate', null, array(
                'required' => false,
                'label'    => 'Date de naissance (format aaaammjj)',
            ))
-           ->add('amuStatut', null, array(
+           ->add('amustatut', null, array(
                'required' => false,
                'label'    => 'Statut',
            ))
@@ -59,40 +52,28 @@ class TraineeType extends BaseTraineeType
                'required' => false,
                'label'    => 'Campus',
            ))
-           ->add('lastNameSup', null, array(
+           ->add('lastnamesup', null, array(
                'required' => false,
                'label'    => 'Nom',
            ))
-           ->add('firstNameSup', null, array(
+           ->add('firstnamesup', null, array(
                'required' => false,
                'label'    => 'Prénom',
            ))
-           ->add('emailSup', null, array(
+           ->add('emailsup', null, array(
                'required' => false,
                'label'    => 'Email',
                'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
            ))
-/*           ->add('lastNameAut', null, array(
+           ->add('lastnamecorr', null, array(
                'required' => false,
                'label'    => 'Nom',
            ))
-           ->add('firstNameAut', null, array(
+           ->add('firstnamecorr', null, array(
                'required' => false,
                'label'    => 'Prénom',
            ))
-           ->add('emailAut', null, array(
-               'required' => false,
-               'label'    => 'Email',
-           ))
-*/           ->add('lastNameCorr', null, array(
-               'required' => false,
-               'label'    => 'Nom',
-           ))
-           ->add('firstNameCorr', null, array(
-               'required' => false,
-               'label'    => 'Prénom',
-           ))
-           ->add('emailCorr', null, array(
+           ->add('emailcorr', null, array(
                'required' => false,
                'label'    => 'Email',
            ))
@@ -100,15 +81,15 @@ class TraineeType extends BaseTraineeType
                'required' => true,
                'label'    => 'Fonction exercée',
            ))
-           ->remove('publicType')
-           ->add('publicType', 'entity', array(
+           ->remove('publictype')
+           ->add('publictype', 'entity', array(
                'label'    => 'Type de personnel',
-               'class'    => PublicType::class,
+               'class'    => Publictype::class,
                'required' => false,
            ))
-           ->add('publicType', 'entity', array(
+           ->add('publictype', 'entity', array(
                'label'    => 'Type de personnel',
-               'class'    => PublicType::class,
+               'class'    => Publictype::class,
                'choice_label' => 'machine_name',
                'query_builder' => function (EntityRepository $er) {
                    return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
@@ -125,64 +106,39 @@ class TraineeType extends BaseTraineeType
         // PRE_SET_DATA for the parent form
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $this->addInstitutionField($event->getForm(), $event->getData()->getOrganization());
-            $this->addDisciplinaryField($event->getForm(), $event->getData()->getDisciplinaryDomain());
             $user = $event->getData();//recuperation de l'objet sur lequel le formulaire se base
             // Si le stagaire est prÃ©-rempli
             if ($user->getLastName()!=null) {
-                if (($user->getPublicType() != null) && ($user->getPublicType()->getId() == 1)) { // Cas des biatss (employee) -> responsable hiÃ©rarchique obligatoire
+                if (($user->getPublictype() != null) && ($user->getPublictype()->getId() == 1)) { // Cas des biatss (employee) -> responsable hiÃ©rarchique obligatoire
                     $event->getForm()
-                        ->add('lastNameSup', null, array(
+                        ->add('lastnamesup', null, array(
                             'required' => true,
                             'label' => 'Nom',
                         ))
-                        ->add('firstNameSup', null, array(
+                        ->add('firstnamesup', null, array(
                             'required' => true,
                             'label' => 'Prénom',
                         ))
-                        ->add('emailSup', null, array(
+                        ->add('emailsup', null, array(
                             'required' => true,
                             'label' => 'Email',
                             'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
                         ));
-/*                        ->add('lastNameAut', null, array(
-                            'required' => true,
-                            'label' => 'Nom',
-                        ))
-                        ->add('firstNameAut', null, array(
-                            'required' => true,
-                            'label' => 'Prénom',
-                        ))
-                        ->add('emailAut', null, array(
-                            'required' => true,
-                            'label' => 'Email',
-                        ));*/
                 } else { // Autres cas : saisie du responsable non obligatoire
                     $event->getForm()
-                        ->add('lastNameSup', null, array(
+                        ->add('lastnamesup', null, array(
                             'required' => false,
                             'label' => 'Nom',
                         ))
-                        ->add('firstNameSup', null, array(
+                        ->add('firstnamesup', null, array(
                             'required' => false,
                             'label' => 'Prénom',
                         ))
-                        ->add('emailSup', null, array(
+                        ->add('emailsup', null, array(
                             'required' => false,
                             'label' => 'Email',
                             'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
                         ));
-/*                        ->add('lastNameAut', null, array(
-                            'required' => false,
-                            'label' => 'Nom',
-                        ))
-                        ->add('firstNameAut', null, array(
-                            'required' => false,
-                            'label' => 'Prénom',
-                        ))
-                        ->add('emailAut', null, array(
-                            'required' => false,
-                            'label' => 'Email',
-                        ));*/
                 }
             }
 
@@ -195,36 +151,8 @@ class TraineeType extends BaseTraineeType
             });
         }
 
-        if ($builder->has('disciplinaryDomain')) {
-            $builder->get('disciplinaryDomain')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $this->addDisciplinaryField($event->getForm()->getParent(), $event->getForm()->getData());
-            });
-        }
     }
 
-    /**
-     * Add disciplinary field
-     * @param FormInterface $form
-     * @param Disciplinary $disciplinaryDomain
-     */
-    protected function addDisciplinaryField(FormInterface $form, $disciplinaryDomain)
-    {
-        if ($disciplinaryDomain && $disciplinaryDomain->hasChildren()) {
-            $form->add('disciplinary', EntityType::class, array(
-                    'class' => Disciplinary::class,
-                    'required' => false,
-                    'label' => "Discipline",
-                    'query_builder' => function(EntityRepository $er) use($disciplinaryDomain) {
-                        return $er->createQueryBuilder('d')
-                            ->where('d.parent = :parent')
-                            ->setParameter('parent', $disciplinaryDomain);
-                    })
-            );
-        }
-        else {
-            $form->remove('disciplinary');
-        }
-    }
 
     /**
      * @param $resolver

@@ -240,7 +240,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             }
         }
 
-        $form = $this->createForm(new ProfileType($accessRightRegistry, $trainee));
+        $form = $this->createForm(ProfileType::class, $trainee);
 
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
