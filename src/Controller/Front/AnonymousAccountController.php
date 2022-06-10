@@ -249,6 +249,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                                 parent::registerShibbolethTrainee($request, $trainee, true);
                                 $trainee->setCreatedAt(new \DateTime('now'));
                                 $trainee->setUpdatedAt(new \DateTime('now'));
+
                                 $em = $doctrine->getManager();
                                 $em->persist($trainee);
                                 $em->flush();
@@ -266,6 +267,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                     parent::registerShibbolethTrainee($request, $trainee, true);
                     $trainee->setCreatedAt(new \DateTime('now'));
                     $trainee->setUpdatedAt(new \DateTime('now'));
+
                     $em = $doctrine->getManager();
                     $em->persist($trainee);
                     $em->flush();
