@@ -9,8 +9,13 @@
 namespace App\Controller\Front;
 
 use Doctrine\ORM\EntityManager;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Alert;
+use App\Entity\MultipleAlert;
+use App\Entity\SingleAlert;
+use App\Form\Type\ProgramAlertType;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -53,7 +58,7 @@ class PublicController extends AbstractController
      *
      * @return array
      */
-    public function trainingAction(Request $request, AbstractTraining $training, $sessionId = null, $token = null)
+    public function trainingAction(Request $request, ManagerRegistry $doctrine,AbstractTraining $training, $sessionId = null, $token = null)
     {
         $this->apiTrainingController->setContainer($this->container);
         $training = $this->apiTrainingController->trainingAction($training);
@@ -76,7 +81,7 @@ class PublicController extends AbstractController
             $inscription = null;
             if ($this->getUser() instanceof AbstractTrainee) {
                 /** @var EntityManager $em */
-                $em = $this->getDoctrine()->getManager();
+                $em = $doctrine->getManager();
                 $inscription = $em->getRepository('SygeforInscriptionBundle:AbstractInscription')->createQueryBuilder('inscription')
                     ->leftJoin('SygeforTrainingBundle:Session\AbstractSession', 'session', 'WITH', 'inscription.session = session.id')
                     ->leftJoin('SygeforTraineeBundle:AbstractTrainee', 'trainee', 'WITH', 'inscription.trainee = trainee.id')
@@ -146,7 +151,7 @@ class PublicController extends AbstractController
      *
      * @return array
      */
-    public function inscriptionAction(Request $request, AbstractTraining $training, Session $session, $token = null)
+    public function inscriptionAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
     {
         // in case shibboleth authentication done but user has not registered his account
         if (!is_object($this->getUser())) {
@@ -165,7 +170,7 @@ class PublicController extends AbstractController
             $session->moduleToken = md5($session->getTraining()->getType() . $session->getTraining()->getId()) === $token;
         }
 
-        $inscription = $this->getDoctrine()->getManager()->getRepository('SygeforInscriptionBundle:AbstractInscription')->findOneBy(array(
+        $inscription = $doctrine->getManager()->getRepository('SygeforInscriptionBundle:AbstractInscription')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -180,7 +185,7 @@ class PublicController extends AbstractController
             $inscription->setSession($session);
         }
         $inscription->setInscriptionStatus(
-            $this->getDoctrine()->getRepository('SygeforInscriptionBundle:Term\InscriptionStatus')->findOneBy(
+            $doctrine->getRepository('SygeforInscriptionBundle:Term\InscriptionStatus')->findOneBy(
                 array('machineName' => 'waiting')
             )
         );
@@ -210,7 +215,7 @@ class PublicController extends AbstractController
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
                 if ($form->isValid()) {
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
                     $this->get('session')->getFlashBag()->add('success', 'Votre inscription a bien été enregistrée.');
@@ -308,7 +313,7 @@ class PublicController extends AbstractController
      *
      * @return array
      */
-    public function alertAction(Request $request, AbstractTraining $training, Session $session, $token = null)
+    public function alertAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
     {
         // in case shibboleth authentication done but user has not registered his account
         if (!is_object($this->getUser())) {
@@ -324,7 +329,7 @@ class PublicController extends AbstractController
         $this->apiTrainingController->setContainer($this->container);
         $training = $this->apiTrainingController->trainingAction($training);
 
-        $alert = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+        $alert = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -340,7 +345,7 @@ class PublicController extends AbstractController
             $now = new \DateTime();
             $alert->setCreatedAt($now);
 
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->persist($alert);
             $em->flush();
             $this->get('session')->getFlashBag()->add('success', 'Votre alerte a bien été enregistrée.');
@@ -363,7 +368,7 @@ class PublicController extends AbstractController
      *
      * @return array
      */
-    public function alertRemoveAction(Request $request, AbstractTraining $training, Session $session, $token = null)
+    public function alertRemoveAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
     {
         // in case shibboleth authentication done but user has not registered his account
         if (!is_object($this->getUser())) {
@@ -379,7 +384,7 @@ class PublicController extends AbstractController
         $this->apiTrainingController->setContainer($this->container);
         $training = $this->apiTrainingController->trainingAction($training);
 
-        $alert = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+        $alert = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -390,7 +395,7 @@ class PublicController extends AbstractController
         }
         if ($alert) {
             // Suppression de l'alerte
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             $em->remove($alert);
             $em->flush();
         }
@@ -402,18 +407,18 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/myprogram", name="front.public.myprogram")
-     * @Template("@SygeforFront/Public/myprogram.html.twig")
+     * @Template("Front/Public/myprogram.html.twig")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function myProgramAction(Request $request)
+    public function myProgramAction(Request $request, ManagerRegistry $doctrine)
     {
-        $this->apiTrainingController->setContainer($this->container);
         $user = $this->getUser();
-        $etablissement = $user->getInstitution()->getName();
+        $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['email']);
+        $etablissement = $trainee->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->container->getParameter('multi_etab_actif');
-        $listeEtab = $this->container->getParameter('liste_etab');
+        $multiEtab = $this->getParameter('multi_etab_actif');
+        $listeEtab = $this->getParameter('liste_etab');
 
         if (array_key_exists($etablissement, $listeEtab)){
             $etab = $listeEtab[$etablissement];
@@ -427,23 +432,17 @@ class PublicController extends AbstractController
         $search = $this->createProgramQuery(1, 1000, $code);
         $sessions = $search["items"];
 
-        if ($request->get('shibboleth') == 1) {
-            if ($request->get('error') == "activation") {
-                $this->get('session')->getFlashBag()->add('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
-            }
-        }
-
         // creation entites pour recuperer les alertes
         $alerts = new MultipleAlert();
         foreach ($sessions as $session){
             if ($session["sessionType"] == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -466,14 +465,14 @@ class PublicController extends AbstractController
 
         if ($form->isValid()) {
             $arrAlerts = $alerts->getAlerts();
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -513,7 +512,7 @@ class PublicController extends AbstractController
      * @Template("@SygeforFront/Public/allprogram.html.twig")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function allProgramAction(Request $request)
+    public function allProgramAction(Request $request, ManagerRegistry $doctrine)
     {
         $this->apiTrainingController->setContainer($this->container);
         $search = $this->createProgramQuery(1, 1000);
@@ -531,11 +530,11 @@ class PublicController extends AbstractController
             if ($session["sessionType"] == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -558,14 +557,14 @@ class PublicController extends AbstractController
 
         if ($form->isValid()) {
             $arrAlerts = $alerts->getAlerts();
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -608,7 +607,7 @@ class PublicController extends AbstractController
      * @Template("@SygeforFront/Public/searchResult.html.twig")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function searchalertsAction(Request $request, $centreCode=null, $theme=null, $texte=null)
+    public function searchalertsAction(Request $request, ManagerRegistry $doctrine, $centreCode=null, $theme=null, $texte=null)
     {
         $this->apiTrainingController->setContainer($this->container);
         $user = $this->getUser();
@@ -634,11 +633,11 @@ class PublicController extends AbstractController
             if ($session["sessionType"] == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -661,14 +660,14 @@ class PublicController extends AbstractController
 
         if ($formAlert->isValid()) {
             $arrAlerts = $alerts->getAlerts();
-            $em = $this->getDoctrine()->getManager();
+            $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $this->getDoctrine()->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -707,7 +706,7 @@ class PublicController extends AbstractController
      * @Template("@SygeforFront/Public/search.html.twig")
      * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
      */
-    public function searchAction(Request $request)
+    public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
         $this->apiTrainingController->setContainer($this->container);
         $user = $this->getUser();
@@ -716,7 +715,7 @@ class PublicController extends AbstractController
         $multiEtab = $this->container->getParameter('multi_etab_actif');
 
         /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
+        $em = $doctrine->getManager();
         $theme = $em->getRepository('SygeforTrainingBundle:Training\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
         $organization = $em->getRepository('SygeforCoreBundle:Organization')->findOneBy(array('name' => 'Tous les établissements'));
 

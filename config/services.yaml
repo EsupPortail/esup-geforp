@@ -11,6 +11,23 @@ parameters:
     adresse_from_ldap: false
     corresp_form_actif: true
     lib_affectation : false
+    multi_etab_actif: true
+        liste_etab:
+            AMU:
+                codes:
+                    - amu-drh
+                    - AMU-CIPE
+                logo: logo.jpg
+                domaines:
+                    - univ-amu.fr
+            AVIGNON:
+                codes:
+                    - avignon-drh
+                logo: logo-avignon.jpg
+            TOULON:
+                codes:
+                    - toulon-drh
+                logo: logo-tln.jpg
     domaines:
         univ-amu.fr: AMU
         univ-avignon.fr: AVIGNON
@@ -22,7 +39,7 @@ parameters:
         login_path: 'Shibboleth.sso/Login'  # The path used to call Shibboleth login authentication (default = 'Shibboleth.sso/Login')
         logout_path: 'Shibboleth.sso/Login'  # The path used to call Shibboleth logout (default = 'Shibboleth.sso/Logout')
         username: 'eppn'  # The Shibboleth attribute that is used as username for the logged in user. The attribute must appear in the'attributes' parameter list (default = 'username')
-        attributes: [ 'eppn', 'mail', 'givenName', 'sn', 'cn', 'supannCivilite', 'supannOIDCDateDeNaissance', 'mobile', 'postalAddress', 'telephoneNumber', 'supannActivite', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale', 'supannEmpCorps', 'supannEtablissement', 'amuAffectationLib', 'supannCodePopulation', 'primary-affiliation' ]  # The list of attributes returned by Shibboleth Service Provider
+        attributes: [ 'eppn', 'mail', 'givenName', 'sn', 'cn', 'supannCivilite', 'supannOIDCDateDeNaissance', 'mobile', 'postalAddress', 'telephoneNumber', 'supannActivite', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale', 'supannEmpCorps', 'supannEtablissement', 'amuAffectationLib', 'supannCodePopulation', 'primary-affiliation', 'persistent-id']  # The list of attributes returned by Shibboleth Service Provider
         login_target: ''  # The route to which the user will be redirected after login. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
         logout_target: ''  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)
         session_id: 'Shib-Session-ID'  # The route to which the user will be redirected after logout. If this parameter is not filled, the user will be redirected to the page from which he comes. (default = null)

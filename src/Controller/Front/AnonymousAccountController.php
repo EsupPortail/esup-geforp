@@ -12,22 +12,24 @@ namespace App\Controller\Front;
 use App\AccessRight\AccessRightRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Logger;
-use App\Controller\Front\AbstractAnonymousAccountController;
 use App\Form\Type\ProfileType;
 use App\Entity\Trainee;
 use App\Entity\SupannCodeEntite;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * This controller regroup all public actions relative to account.
  *
  * @Route("/account")
  */
-class AnonymousAccountController extends AbstractAnonymousAccountController
+class AnonymousAccountController extends AbstractController
 {
     protected $traineeClass = Trainee::class;
 
@@ -248,7 +250,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                             if (strtolower($trainee->getEmailsup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
-                                parent::registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
+                                $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
                                 $trainee->setCreatedAt(new \DateTime('now'));
                                 $trainee->setUpdatedAt(new \DateTime('now'));
 
@@ -266,7 +268,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
 
                     }
                 } else {
-                    parent::registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
+                    $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee, true);
                     $trainee->setCreatedAt(new \DateTime('now'));
                     $trainee->setUpdatedAt(new \DateTime('now'));
 
@@ -281,6 +283,44 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
         }
 
         return array('user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName());
+    }
+
+    /**
+     * Return true if there is an account with the specified email.
+     */
+    protected function emailCheck($cred, ManagerRegistry $doctrine)
+    {
+        $em    = $doctrine->getManager();
+        $email = $cred['email'];
+        if( ! $email) {
+            return array('exists' => false);
+        }
+        $trainee = $em->getRepository(Trainee::class)->findByEmail($email);
+
+        return array('exists' => $trainee ? true : false);
+    }
+
+    /**
+     * @param $cred
+     * @param $trainee
+     * @param boolean
+     */
+    protected function registerShibbolethTrainee($cred, $trainee, $shibboleth)
+    {
+        $trainee->setIsActive(false);
+
+        if ($shibboleth) {
+            // if shibboleth, save persistent_id and force mail
+            // and set active to true
+            $persistentId = $cred['persistent-id'];
+            $email        = $cred['mail'];
+            $eppn = $cred['eppn'];
+            $trainee->setShibbolethPersistentId($persistentId ? $persistentId : $email);
+            $trainee->setEppn($eppn);
+            $trainee->setEmail($email);
+            $trainee->setIsActive(true);
+        }
+
     }
 
 }

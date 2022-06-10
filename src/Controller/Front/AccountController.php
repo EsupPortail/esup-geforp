@@ -1,17 +1,15 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: erwan
- * Date: 9/15/16
- * Time: 11:00 AM
  */
 
 namespace App\Controller\Front;
 
 
 use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\Term\Title;
 use Doctrine\Persistence\ManagerRegistry;
-use Sygefor\Bundle\FrontBundle\Form\ProfileType;
+use App\Form\Type\ProfileType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -73,13 +71,14 @@ class AccountController extends AbstractController
         $userEmail = $this->getUser()->getCredentials()['mail'];
         if (isset($userEmail)) {
             $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
-        } 
+        }
         if ($trainee) {
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
+            // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             if ($shibbolethAttributes['supannCivilite']=='')
                 $shibbolethAttributes['supannCivilite'] = 'M.';
-                $trainee->setTitle($doctrine->getRepository('App\Entity\Core\Term\Title')->findOneBy(
+            $trainee->setTitle($doctrine->getRepository('App\Entity\Core\Term\Title')->findOneBy(
                 array('name' => $shibbolethAttributes['supannCivilite'])
             ));
             $trainee->setOrganization($doctrine->getRepository('App\Entity\Organization')->find(1));
