@@ -2,50 +2,240 @@
 
 namespace App\Form\Type;
 
+use App\Entity\Core\Term\Publictype;
+use App\Entity\Trainee;
 use Doctrine\ORM\EntityRepository;
-use App\Form\Type\TraineeType;
+use App\Entity\Core\Term\Title;
 use App\Entity\Organization;
+use App\Form\Type\AbstractAccountType;
+use App\AccessRight\AccessRightRegistry;
+use App\Entity\Core\AbstractOrganization;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\AbstractInstitution;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormInterface;
-use App\Entity\Core\Term\Publictype;
 
 /**
  * Class ProfileType.
  */
-class ProfileType extends TraineeType
-{/**
- * @param FormBuilderInterface $builder
- * @param array                $options
- */
+class ProfileType extends AbstractType
+{
+    /** @var AccessRightRegistry $accessRightsRegistry */
+    protected $accessRightsRegistry;
+
+    /**
+     * @var Security
+     */
+    private $security;
+
+    /**InscriptionListener
+     * @param AccessRightRegistry $accessRightsRegistry
+     */
+    public function __construct(AccessRightRegistry $accessRightsRegistry, Security $security)
+    {
+        $this->accessRightsRegistry = $accessRightsRegistry;
+        $this->security = $security;
+    }
+
+    /**
+     * @param FormBuilderInterface $builder
+     * @param array                $options
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        parent::buildForm($builder, $options);
+        $builder
+            ->add('title', null, array(
+                'label' => 'Civilité',
+                'disabled' => true
+            ))
+            ->add('lastname', null, array(
+                'label' => 'Nom',
+                'disabled' => true
+            ))
+            ->add('firstname', null, array(
+                'label' => 'Prénom',
+                'disabled' => true
+            ))
 
-        $builder->remove('status');
-        $builder->remove('isPaying');
-        $builder->remove('addresstype');
-        $builder->get('email')->setDisabled(true);
-        $builder->get('firstname')->setDisabled(true);
-        $builder->get('lastname')->setDisabled(true);
-        $builder->get('title')->setDisabled(true);
-        $builder->get('title')->setRequired(false);
-        $builder->remove('organization');
-        $builder->get('institution')->setDisabled(true);
-        $builder->get('service')->setDisabled(true);
-        $builder->remove('isActive');
-        $builder->get('amustatut')->setDisabled(true);
-        $builder->get('corps')->setDisabled(true);
-        $builder->get('category')->setDisabled(true);
-        $builder->get('bap')->setDisabled(true);
-        $builder->get('birthdate')->setDisabled(true);
-        $builder->get('campus')->setDisabled(true);
-	    $builder->get('publictype')->setDisabled(true);
-        $builder->get('lastnamesup')->setDisabled(true);
-        $builder->get('firstnamesup')->setDisabled(true);
-        $builder->get('emailsup')->setDisabled(true);
+            ->add('email', EmailType::class, array(
+                'label' => 'Email',
+                'disabled' => true
+            ))
+            ->add('phonenumber', null, array(
+                'label'    => 'Numéro de téléphone',
+                'required' => false,
+                'disabled' => true
+            ))
+            ->add('address', null, array(
+                'label'    => 'Adresse professionnelle',
+                'required' => false,
+            ))
+            ->add('zip', null, array(
+                'label'    => 'Code postal',
+                'required' => false,
+            ))
+            ->add('city', null, array(
+                'label'    => 'Ville',
+                'required' => false,
+            ))
+            ->add('institution', EntityType::class, array(
+                'label'         => 'Etablissement',
+                'class'         => AbstractInstitution::class,
+                'disabled' => true
+            ))
+            ->add('service', null, array(
+                'required' => false,
+                'label'    => 'Service',
+                'disabled' => true
+            ))
+            ->add('publictype', EntityType::class, array(
+                'label'    => 'Type de personnel',
+                'class'    => Publictype::class,
+                'required' => false,
+                'disabled' => true
+            ))
+            ->add('birthdate', null, array(
+                'required' => false,
+                'label'    => 'Date de naissance (format aaaammjj)',
+                'disabled' => true
+            ))
+            ->add('amustatut', null, array(
+                'required' => false,
+                'label'    => 'Statut',
+                'disabled' => true
+            ))
+            ->add('bap', null, array(
+                'required' => false,
+                'label'    => 'BAP',
+                'disabled' => true
+            ))
+            ->add('corps', null, array(
+                'required' => false,
+                'label'    => 'Corps',
+                'disabled' => true
+            ))
+            ->add('category', null, array(
+                'required' => false,
+                'label'    => 'Catégorie',
+                'disabled' => true
+            ))
+            ->add('campus', null, array(
+                'required' => false,
+                'label'    => 'Campus',
+                'disabled' => true
+            ))
+            ->add('lastnamesup', null, array(
+                'required' => false,
+                'label'    => 'Nom',
+            ))
+            ->add('firstnamesup', null, array(
+                'required' => false,
+                'label'    => 'Prénom',
+            ))
+            ->add('emailsup', null, array(
+                'required' => false,
+                'label'    => 'Email',
+                'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
+            ))
+            ->add('lastnamecorr', null, array(
+                'required' => false,
+                'label'    => 'Nom',
+            ))
+            ->add('firstnamecorr', null, array(
+                'required' => false,
+                'label'    => 'Prénom',
+            ))
+            ->add('emailcorr', null, array(
+                'required' => false,
+                'label'    => 'Email',
+            ))
+            ->add('fonction', null, array(
+                'required' => true,
+                'label'    => 'Fonction exercée',
+            ));
 
+        // add listeners to handle conditionals fields
+        $this->addEventListeners($builder);
+
+        if($options['enable_security_check']) {
+            // If the user does not have the rights, remove the organization field and force the value
+/*            $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_trainee.rights.trainee.all.create');
+            if (!$hasAccessRightForAll) {
+                $securityContext = $this->accessRightsRegistry->getSecurityContext();
+                $user            = $securityContext->getToken()->getUser(); */
+                $user            = $this->security->getUser();
+                if (is_object($user)) {
+                    $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
+                        $trainee = $event->getData();
+//                        $trainee->setOrganization($user->getOrganization());
+                        $event->getForm()->remove('organization');
+                    });
+                }
+            //}
+        }
+    }
+
+    /**
+     * Add all listeners to manage conditional fields.
+     */
+    protected function addEventListeners(FormBuilderInterface $builder)
+    {
+        // PRE_SET_DATA for the parent form
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $this->addInstitutionField($event->getForm(), $event->getData()->getOrganization());
+            $user = $event->getData();//recuperation de l'objet sur lequel le formulaire se base
+            // Si le stagaire est prÃ©-rempli
+            if ($user->getLastname()!=null) {
+                if (($user->getPublictype() != null) && ($user->getPublictype()->getId() == 1)) { // Cas des biatss (employee) -> responsable hiÃ©rarchique obligatoire
+                    $event->getForm()
+                        ->add('lastnamesup', null, array(
+                            'required' => true,
+                            'label' => 'Nom',
+                        ))
+                        ->add('firstnamesup', null, array(
+                            'required' => true,
+                            'label' => 'Prénom',
+                        ))
+                        ->add('emailsup', null, array(
+                            'required' => true,
+                            'label' => 'Email',
+                            'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
+                        ));
+
+                } else { // Autres cas : saisie du responsable non obligatoire
+                    $event->getForm()
+                        ->add('lastnamesup', null, array(
+                            'required' => false,
+                            'label' => 'Nom',
+                        ))
+                        ->add('firstnamesup', null, array(
+                            'required' => false,
+                            'label' => 'Prénom',
+                        ))
+                        ->add('emailsup', null, array(
+                            'required' => false,
+                            'label' => 'Email',
+                            'attr' => array('placeholder' => 'Entrez le mail INSTITUTIONNEL de votre responsable hiérarchique')
+                        ));
+                }
+            }
+        });
+
+        // POST_SUBMIT for each field
+        if ($builder->has('organization')) {
+            $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+                $this->addInstitutionField($event->getForm()->getParent(), $event->getForm()->getData());
+            });
+        }
     }
 
     /**
@@ -56,6 +246,30 @@ class ProfileType extends TraineeType
      */
     protected function addInstitutionField(FormInterface $form, $organization)
     {
-
+        if ($organization) {
+            $form->add('institution', EntityType::class, array(
+                'class'         => AbstractInstitution::class,
+                'label'         => 'Etablissement',
+                'query_builder' => function (EntityRepository $er) use ($organization) {
+                    return $er->createQueryBuilder('i')
+                        ->where('i.organization = :organization')
+                        ->setParameter('organization', $organization)
+                        ->orWhere('i.organization is null')
+                        ->orderBy('i.name', 'ASC');
+                },
+            ));
+        }
     }
+
+	/**
+	 * @param OptionsResolver $resolver
+	 */
+	public function configureOptions(OptionsResolver $resolver)
+	{
+		$resolver->setDefaults(array(
+			'data_class' => Trainee::class,
+			'validation_groups' => ['Default', 'trainee', 'organization'],
+			'enable_security_check' => true,
+		));
+	}
 }

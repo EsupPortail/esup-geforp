@@ -13,7 +13,7 @@ use App\AccessRight\AccessRightRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Logger;
 use App\Controller\Front\AbstractAnonymousAccountController;
-use App\Form\Type\ProfileType;
+use App\Form\Type\OldProfileType;
 use App\Entity\Trainee;
 use App\Entity\SupannCodeEntite;
 use Symfony\Component\HttpFoundation\Request;
@@ -240,7 +240,7 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             }
         }
 
-        $form = $this->createForm(ProfileType::class, $trainee);
+        $form = $this->createForm(OldProfileType::class, $trainee);
 
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);

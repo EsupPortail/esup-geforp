@@ -2,25 +2,25 @@
 <section>
     <h2>Informations personnelles</h2>
     {{ form_row(form.title) }}
-    {{ form_row(form.lastName) }}
-    {{ form_row(form.firstName) }}
+    {{ form_row(form.lastname) }}
+    {{ form_row(form.firstname) }}
     {{ form_row(form.email) }}
-    {{ form_row(form.birthDate) }}
+    {{ form_row(form.birthdate) }}
     {% if disableAddress == 1  %}
-        {{ form_row(form.phoneNumber, { 'attr':{'disabled':'disabled'} } ) }}
+        {{ form_row(form.phonenumber, { 'attr':{'disabled':'disabled'} } ) }}
         {{ form_row(form.address, { 'attr':{'disabled':'disabled'} } ) }}
         {{ form_row(form.zip, { 'attr':{'disabled':'disabled'}}) }}
         {{ form_row(form.city, { 'attr':{'disabled':'disabled'}}) }}
     {% else %}
-        {{ form_row(form.phoneNumber) }}
+        {{ form_row(form.phonenumber) }}
         {{ form_row(form.address) }}
         {{ form_row(form.zip) }}
         {{ form_row(form.city) }}
     {% endif %}
     {{ form_row(form.institution) }}
     {{ form_row(form.service) }}
-    {{ form_row(form.publicType) }}
-    {{ form_row(form.amuStatut) }}
+    {{ form_row(form.publictype) }}
+    {{ form_row(form.amustatut) }}
     {{ form_row(form.bap) }}
     {{ form_row(form.corps) }}
     {{ form_row(form.category) }}
@@ -40,34 +40,28 @@ Si vous êtes enseignant, enseignant-chercheur, doctorant contractuel (démarche
 - vous pouvez saisir les coordonnées d'une personne à informer de votre inscription en formation : directeur de composante (ou de département d'enseignement), directeur de laboratoire, directeur de thèse.   " src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
     </h2>
     {% if flagAMU == 1  %}
-        {{ form_row(form.lastNameSup) }}
-        {{ form_row(form.firstNameSup) }}
-        {{ form_row(form.emailSup) }}
+        {{ form_row(form.lastnamesup) }}
+        {{ form_row(form.firstnamesup) }}
+        {{ form_row(form.emailsup) }}
     {% else %}
-        {{ form_row(form.lastNameSup) }}
-        {{ form_row(form.firstNameSup) }}
-        {{ form_row(form.emailSup) }}
+        {{ form_row(form.lastnamesup) }}
+        {{ form_row(form.firstnamesup) }}
+        {{ form_row(form.emailsup) }}
     {% endif %}
     <br>
-{#    <h2> Autorité hiérarchique <i class="glyphicon glyphicon-question-sign" title="Autorité de la structure : responsable administratif, directeur, directeur d’unité, etc."></i>
-    </h2>
-    {{ form_row(form.lastNameAut) }}
-    {{ form_row(form.firstNameAut) }}
-    {{ form_row(form.emailAut) }}
-    <br>
-#}
+
     {% if activeCorrForm == 0  %}
         <div style="display:none" >
-        {{ form_row(form.lastNameCorr) }}
-        {{ form_row(form.firstNameCorr) }}
-        {{ form_row(form.emailCorr) }}
+        {{ form_row(form.lastnamecorr) }}
+        {{ form_row(form.firstnamecorr) }}
+        {{ form_row(form.emailcorr) }}
         </div>
     {% else %}
         <h2> Correspondant formation <img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
         </h2>
-        {{ form_row(form.lastNameCorr) }}
-        {{ form_row(form.firstNameCorr) }}
-        {{ form_row(form.emailCorr) }}
+        {{ form_row(form.lastnamecorr) }}
+        {{ form_row(form.firstnamecorr) }}
+        {{ form_row(form.emailcorr) }}
     {% endif %}
 </section>
 <section>
