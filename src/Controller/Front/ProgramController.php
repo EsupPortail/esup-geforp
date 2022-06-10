@@ -8,6 +8,7 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\Trainee;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -393,8 +394,9 @@ class ProgramController extends AbstractController
     public function myProgramAction(Request $request, ManagerRegistry $doctrine)
     {
         $user = $this->getUser();
-        $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['email']);
-        $etablissement = $trainee->getInstitution()->getName();
+        /** @var Trainee $trainee */
+        $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $etablissement = $trainee[0]->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
@@ -423,7 +425,7 @@ class ProgramController extends AbstractController
                 ));
                 // on regarde s'il existe déjà une alerte
                 $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                    'trainee' => $trainee[0],
                     'session'=> $sessionExiste
                 ));
                 if ($alertExiste) {
@@ -434,7 +436,7 @@ class ProgramController extends AbstractController
                 }
 
                 $alert->setSessionId($session["id"]);
-                $alert->setTraineeId($this->getUser()->getId());
+                $alert->setTraineeId($trainee[0]->getId());
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -453,7 +455,7 @@ class ProgramController extends AbstractController
                 ));
 
                 $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                    'trainee' => $trainee[0],
                     'session'=> $sessionExiste
                 ));
 
@@ -462,7 +464,7 @@ class ProgramController extends AbstractController
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($this->getUser());
+                        $alertNew->setTrainee($trainee[0]);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);

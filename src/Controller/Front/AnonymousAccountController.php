@@ -259,7 +259,7 @@ class AnonymousAccountController extends AbstractController
                                 $em->flush();
                                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
 
-                                return $this->redirectToRoute('front.public.myprogram');
+                                return $this->redirectToRoute('front.account.myprogram');
 
                             }
                         }else {
