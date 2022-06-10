@@ -9,7 +9,7 @@
 namespace App\Controller\Front;
 
 use Doctrine\ORM\EntityManager;
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Alert;

@@ -12,22 +12,22 @@ parameters:
     corresp_form_actif: true
     lib_affectation : false
     multi_etab_actif: true
-        liste_etab:
-            AMU:
-                codes:
-                    - amu-drh
-                    - AMU-CIPE
-                logo: logo.jpg
-                domaines:
-                    - univ-amu.fr
-            AVIGNON:
-                codes:
-                    - avignon-drh
-                logo: logo-avignon.jpg
-            TOULON:
-                codes:
-                    - toulon-drh
-                logo: logo-tln.jpg
+    liste_etab:
+        AMU:
+            codes:
+                - amu-drh
+                - AMU-CIPE
+            logo: logo.jpg
+            domaines:
+                - univ-amu.fr
+        AVIGNON:
+            codes:
+                - avignon-drh
+            logo: logo-avignon.jpg
+        TOULON:
+            codes:
+                - toulon-drh
+            logo: logo-tln.jpg
     domaines:
         univ-amu.fr: AMU
         univ-avignon.fr: AVIGNON
