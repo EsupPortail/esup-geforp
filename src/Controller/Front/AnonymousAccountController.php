@@ -13,7 +13,7 @@ use App\AccessRight\AccessRightRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Logger;
 use App\Controller\Front\AbstractAnonymousAccountController;
-use App\Form\Type\OldProfileType;
+use App\Form\Type\ProfileType;
 use App\Entity\Trainee;
 use App\Entity\SupannCodeEntite;
 use Symfony\Component\HttpFoundation\Request;
@@ -158,19 +158,6 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
         if ($trainee->getInstitution()->getName() == "AMU") {
             // tag de l'utilisateur comme étant AMU
             $flagAMU = 1;
-            /* Suite à migration SIHAM, on utilise directement l'attribut amuaffectationlib
-            $services = explode(";", $shibbolethAttributes['supannEntiteAffectation']);
-            $servicelib = "";
-            if (count($services) > 0) {
-                foreach ($services as $service) {
-                    $supannCodeEntite = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:SupannCodeEntite')->findOneBy(
-                        array('supannCodeEntite' => $service)
-                    );
-                    if ($supannCodeEntite != null) {
-                        $servicelib .= $supannCodeEntite->getDescription() . " ; ";
-                    }
-                }
-            }*/
 
             $trainee->setService($shibbolethAttributes['amuAffectationLib']);
             $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
@@ -240,13 +227,13 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
             }
         }
 
-        $form = $this->createForm(OldProfileType::class, $trainee);
+        $form = $this->createForm(ProfileType::class, $trainee);
 
         if ($request->getMethod() == 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 // TEST sur le responsable
-                if (count($trainee->getEmailsup())>0) {
+                if ($trainee->getEmailsup()) {
                     // Vérification du mail qui doit être institutionnel
                     if (stripos($trainee->getEmailsup() , "@")>0) {
                         $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
@@ -259,14 +246,14 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
                             if (strtolower($trainee->getEmailsup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
-//                                parent::registerShibbolethTrainee($request, $trainee, true);
+                                parent::registerShibbolethTrainee($request, $trainee, true);
+                                $trainee->setCreatedAt(new \DateTime('now'));
+                                $trainee->setUpdatedAt(new \DateTime('now'));
                                 $em = $doctrine->getManager();
                                 $em->persist($trainee);
                                 $em->flush();
                                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
-//                                $this->get('security.token_storage')->getToken()->setUser($trainee);
 
-                                //return $this->redirectToRoute('front.account');
                                 return $this->redirectToRoute('front.public.myprogram');
 
                             }
@@ -276,14 +263,14 @@ class AnonymousAccountController extends AbstractAnonymousAccountController
 
                     }
                 } else {
-//                    parent::registerShibbolethTrainee($request, $trainee, true);
+                    parent::registerShibbolethTrainee($request, $trainee, true);
+                    $trainee->setCreatedAt(new \DateTime('now'));
+                    $trainee->setUpdatedAt(new \DateTime('now'));
                     $em = $doctrine->getManager();
                     $em->persist($trainee);
                     $em->flush();
                     $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
-//                    $this->get('security.token_storage')->getToken()->setUser($trainee);
 
-                    //return $this->redirectToRoute('front.account');
                     return $this->redirectToRoute('front.public.myprogram');
                 }
             }

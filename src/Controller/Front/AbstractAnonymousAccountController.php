@@ -56,20 +56,12 @@ abstract class AbstractAnonymousAccountController extends AbstractController
             // submit
             $form->submit($data, true);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
-                $token      = $this->get('security.context')->getToken();
-                $shibboleth = ($request->get('shibboleth') && $token->hasAttribute('mail') && $token->getAttribute('mail'));
+                $em = $doctrine->getManager();
+                $user      = $this->getUser();
+                $shibboleth = $user->eraseCredentials();
                 $this->registerShibbolethTrainee($request, $trainee, $shibboleth);
                 $em->persist($trainee);
                 $em->flush();
-
-                $clientId = $request->get('client_id');
-                if ($shibboleth && $clientId) {
-                    // if shibboleth, create a oauth token and return it
-                    $generator = $this->get('sygefor_api.oauth.token_generator');
-
-                    return $generator->generateTokenResponse($trainee, $clientId);
-                }
 
                 return array('registered' => true);
             }
@@ -123,14 +115,14 @@ abstract class AbstractAnonymousAccountController extends AbstractController
      * @Route("/email_check", name="api.account.email_check", defaults={"_format" = "json"})
      * @Rest\View()
      */
-    public function emailCheckAction(Request $request)
+    public function emailCheckAction(Request $request, ManagerRegistry $doctrine)
     {
-        $em    = $this->getDoctrine()->getManager();
+        $em    = $doctrine->getManager();
         $email = $request->get('email');
         if( ! $email) {
             throw new BadRequestHttpException('You must provide an email.');
         }
-        $trainee = $em->getRepository('SygeforTraineeBundle:Trainee')->findByEmail($email);
+        $trainee = $em->getRepository(Trainee::class)->findByEmail($email);
 
         return array('exists' => $trainee ? true : false);
     }
@@ -141,16 +133,16 @@ abstract class AbstractAnonymousAccountController extends AbstractController
      * @Route("/reset_password", name="api.account.reset_password", defaults={"_format" = "json"})
      * @Rest\View()
      */
-    public function resetPasswordAction(Request $request)
+    public function resetPasswordAction(Request $request, ManagerRegistry $doctrine)
     {
-        $em    = $this->getDoctrine()->getManager();
+        $em    = $doctrine->getManager();
         $email = $request->get('email');
         if ( ! $email) {
             throw new BadRequestHttpException('You must provide an email.');
         }
 
         /** @var AbstractTrainee $trainee */
-        $trainee = $em->getRepository('SygeforTraineeBundle:AbstractTrainee')->findOneByEmail($email);
+        $trainee = $em->getRepository(Trainee::class)->findOneByEmail($email);
         if ( ! $trainee) {
             throw new NotFoundHttpException('Unknown account : ' . $email);
         }
@@ -213,14 +205,11 @@ abstract class AbstractAnonymousAccountController extends AbstractController
     {
         $trainee->setIsActive(false);
 
-        // shibboleth
-        $token      = $this->get('security.context')->getToken();
-
         if ($shibboleth) {
             // if shibboleth, save persistent_id and force mail
             // and set active to true
-            $persistentId = $token->getAttribute('persistent_id');
-            $email        = $token->getAttribute('mail');
+            $persistentId = $shibboleth['persistent_id'];
+            $email        = $shibboleth['mail'];
             $trainee->setShibbolethPersistentId($persistentId ? $persistentId : $email);
             $trainee->setEmail($email);
             $trainee->setIsActive(true);
