@@ -70,7 +70,8 @@ class AccountController extends AbstractController
         //$trainee = $this->getUser();
         $userEmail = $this->getUser()->getCredentials()['mail'];
         if (isset($userEmail)) {
-            $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
+            $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
+            $trainee = $arTrainee[0];
         }
         if ($trainee) {
 
@@ -244,7 +245,7 @@ class AccountController extends AbstractController
                 $em->flush();
                 // redirect user to registrations pages
                 //$url = $this->generateUrl('front.account.registrations');
-                $url = $this->generateUrl('front.public.myprogram');
+                $url = $this->generateUrl('front.account.myprogram');
             }
             else {
                 return $this->redirectToRoute('front.account.logout', array('return' => $this->generateUrl('front.public.index', array('shibboleth' => 1, 'error' => 'activation'))));
