@@ -44,7 +44,7 @@
 
         <!-- flashes -->
         {% block flashes %}
-            {% from 'MopaBootstrapBundle::flash.html.twig' import session_flash %}
+{#             {% from 'MopaBootstrapBundle::flash.html.twig' import session_flash %}
             {% if app.session.flashbag.peekAll|length > 0 %}
                 <div class="container flashes">
                     <div class="row">
@@ -53,7 +53,7 @@
                         </div>
                     </div>
                 </div>
-            {% endif %}
+            {% endif %} #}
         {% endblock flashes %}
 
         {% block body %}{% endblock %}
