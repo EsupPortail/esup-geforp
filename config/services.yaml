@@ -15,7 +15,7 @@ parameters:
     liste_etab:
         AMU:
             codes:
-                - amu-drh
+                - AMU-DRH
                 - AMU-CIPE
             logo: logo.jpg
             domaines:

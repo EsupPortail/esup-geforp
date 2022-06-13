@@ -9,6 +9,7 @@
 namespace App\Controller\Front;
 
 use App\Entity\Trainee;
+use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -391,12 +392,11 @@ class ProgramController extends AbstractController
      * @Route("/myprogram", name="front.account.myprogram")
      * @Template("Front/Public/myprogram.html.twig")
      */
-    public function myProgramAction(Request $request, ManagerRegistry $doctrine)
+    public function myProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
         $user = $this->getUser();
-        /** @var Trainee $trainee */
-        $trainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $etablissement = $trainee[0]->getInstitution()->getName();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $etablissement = $arTrainee[0]->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
@@ -411,21 +411,21 @@ class ProgramController extends AbstractController
             $img = 'img/logo.png';
         }
 
-        $search = $this->createProgramQuery(1, 1000, $code);
+        $search = $this->createProgramQuery($code, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
         $alerts = new MultipleAlert();
         foreach ($sessions as $session){
-            if ($session["sessionType"] == "A venir") {
+            if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
-                    'trainee' => $trainee[0],
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
                 if ($alertExiste) {
@@ -436,7 +436,7 @@ class ProgramController extends AbstractController
                 }
 
                 $alert->setSessionId($session["id"]);
-                $alert->setTraineeId($trainee[0]->getId());
+                $alert->setTraineeId($arTrainee[0]->getId());
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -445,7 +445,7 @@ class ProgramController extends AbstractController
         $form = $this->createForm(ProgramAlertType::class, $alerts);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if (($form->isSubmitted()) && ($form->isValid())) {
             $arrAlerts = $alerts->getAlerts();
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
@@ -455,7 +455,7 @@ class ProgramController extends AbstractController
                 ));
 
                 $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
-                    'trainee' => $trainee[0],
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
 
@@ -464,7 +464,7 @@ class ProgramController extends AbstractController
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($trainee[0]);
+                        $alertNew->setTrainee($arTrainee[0]);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);
@@ -493,10 +493,9 @@ class ProgramController extends AbstractController
      * @Route("/allprogram", name="front.account.allprogram")
      * @Template("@SygeforFront/Public/allprogram.html.twig")
      */
-    public function allProgramAction(Request $request, ManagerRegistry $doctrine)
+    public function allProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
-        $this->apiTrainingController->setContainer($this->container);
-        $search = $this->createProgramQuery(1, 1000);
+        $search = $this->createProgramQuery(1, 1000, $sessionRepository);
         $sessions = $search["items"];
 
         if ($request->get('shibboleth') == 1) {
@@ -511,11 +510,11 @@ class ProgramController extends AbstractController
             if ($session["sessionType"] == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -541,11 +540,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -587,9 +586,8 @@ class ProgramController extends AbstractController
      * @Route("/searchalerts/{centreCode}/{theme}/{texte}", name="front.account.searchalerts")
      * @Template("@SygeforFront/Public/searchResult.html.twig")
      */
-    public function searchalertsAction(Request $request, ManagerRegistry $doctrine, $centreCode=null, $theme=null, $texte=null)
+    public function searchalertsAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null)
     {
-        $this->apiTrainingController->setContainer($this->container);
         $user = $this->getUser();
 
         // Recup param pour l'activation du multi établissement
@@ -604,7 +602,7 @@ class ProgramController extends AbstractController
         else
             $thematique = $theme;
 
-        $search = $this->createProgramQuerySearch(1, 1000, $centre, $thematique, $texte);
+        $search = $this->createProgramQuerySearch(1, 1000, $centre, $thematique, $texte, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -613,11 +611,11 @@ class ProgramController extends AbstractController
             if ($session["sessionType"] == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $session["id"]
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -643,11 +641,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
                     'trainee' => $this->getUser(),
                     'session'=> $sessionExiste
                 ));
@@ -687,7 +685,6 @@ class ProgramController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
-        $this->apiTrainingController->setContainer($this->container);
         $user = $this->getUser();
 
         // Recup param pour l'activation du multi établissement
@@ -695,8 +692,8 @@ class ProgramController extends AbstractController
 
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
-        $theme = $em->getRepository('SygeforTrainingBundle:Training\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
-        $organization = $em->getRepository('SygeforCoreBundle:Organization')->findOneBy(array('name' => 'Tous les établissements'));
+        $theme = $em->getRepository('App\Entity\Core\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
+        $organization = $em->getRepository('App\Entity\Organization')->findOneBy(array('name' => 'Tous les établissements'));
 
         $defaultData = array('centre' => $organization, 'theme' => $theme, 'texte' => "");
         $form = $this->createForm(new SearchType(), $defaultData);
@@ -740,44 +737,28 @@ class ProgramController extends AbstractController
      * @param $code
      * @return array
      */
-    protected function createProgramQuery($page, $itemPerPage = 10, $code = null)
+    protected function createProgramQuery($code = null, $sessionRepository)
     {
-        $search = $this->get('sygefor_training.session.search');
-        if ($page) {
-            $search->setPage($page);
-            $search->setSize($itemPerPage);
-        }
+        // Construction filtres : code et date
+        $filters["training.organization.name.source"] = $code;
 
-        // add filters
-        $filtDate = new BoolAnd();
-        $filtCode = new BoolOr();
-        $filtres = [];
-        // Filtre sur l'établissement
-        if (!empty($code)) {
-            foreach ($code as $item) {
-                $organization = new Term(array('training.organization.code' => $item));
-                $filtCode->addFilter($organization);
-            }
-            $filtres[] = $filtCode;
-        }
-        // filtre sur la date
-        $dateBegin = new Range('dateBegin', array("gte" => (new \DateTime("now", timezone_open('Europe/Paris')))->format('Y-m-d')));
-        $filtDate->addFilter($dateBegin);
-        $filtres[] = $filtDate;
+        // Construction date : prochaines sessions (aujourd'hui +5ans)
+        $dateB = new \DateTime('now');
+        $dateBegin = $dateB->format('d/m/Y');
+        $dateB->modify('+ 5 years');
+        $dateFin = $dateB->format('d/m/Y');
+        $filters["datebegin"] = $dateBegin . " - " . $dateFin;
 
-//        $types = new Terms('training.type', array('internship'));
-//        $filters->addFilter($types);
+        // Recherche avec les filtres
+        $sessions = $sessionRepository->getSessionsProgram($filters);
+        $nbSessions  = count($sessions);
 
-        $filters = new BoolAnd();
-        $filters->setFilters($filtres);
-
-        $search->addFilter('filters', $filters);
-
-        $search->addSort('training.theme.name');
-        $search->addSort('dateBegin');
-        $search->addSort('training.name.source');
-
-        return $search->search();
+        $ret = array(
+            'total' => $nbSessions,
+            'pageSize' => 0,
+            'items' => $sessions,
+        );
+        return $ret;
     }
 
     /**
@@ -787,49 +768,34 @@ class ProgramController extends AbstractController
      * @param $theme
      * @return array
      */
-    protected function createProgramQuerySearch($page, $itemPerPage = 10, $code = null, $theme = null, $texte = null)
+    protected function createProgramQuerySearch($code = null, $theme = null, $texte = null, $sessionRepository)
     {
-        $search = $this->get('sygefor_training.session.search');
-        if ($page) {
-            $search->setPage($page);
-            $search->setSize($itemPerPage);
-        }
+        $keywords = $texte;
 
-        // add filters
-        $filters = new BoolAnd();
+        // Construction filtres : code et date
+        $filters["training.organization.name.source"] = $code;
 
-        //centre
-        if (!empty($code)) {
-            $organization = new Term(array('training.organization.code' => $code));
-            $filters->addFilter($organization);
-        }
+        // Construction date : prochaines sessions (aujourd'hui +5ans)
+        $dateB = new \DateTime('now');
+        $dateBegin = $dateB->format('d/m/Y');
+        $dateB->modify('+ 5 years');
+        $dateFin = $dateB->format('d/m/Y');
+        $filters["datebegin"] = $dateBegin . " - " . $dateFin;
 
-        // thème
-        if (!empty($theme)) {
-            $organization = new Term(array('training.theme.name' => $theme));
-            $filters->addFilter($organization);
-        }
+        // Filtre theme
+        $filters["theme.name"] = $theme;
 
-        //texte
-        if (!empty($texte)) {
-            $name = new Term(array('session.name.source' => $texte));
-            $filters->addFilter($name);
-        }
+        // Recherche avec les filtres
+        $sessions = $sessionRepository->getSessionsProgram($keywords, $filters);
+        $nbSessions  = count($sessions);
 
-        // date à venir
-        $dateBegin = new Range('dateBegin', array("gte" => (new \DateTime("now", timezone_open('Europe/Paris')))->format('Y-m-d')));
-        $filters->addFilter($dateBegin);
+        $ret = array(
+            'total' => $nbSessions,
+            'pageSize' => 0,
+            'items' => $sessions,
+        );
+        return $ret;
 
-//        $types = new Terms('training.type', array('internship'));
-//        $filters->addFilter($types);
-
-        $search->addFilter('filters', $filters);
-
-        $search->addSort('training.theme.name');
-        $search->addSort('dateBegin');
-        $search->addSort('training.name.source');
-
-        return $search->search();
     }
 
 }

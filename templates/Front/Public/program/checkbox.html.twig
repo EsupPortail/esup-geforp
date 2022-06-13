@@ -1,6 +1,6 @@
 {% block checkbox_widget %}
-    {% spaceless %}
-        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} /><label  for="{{ id }}" style="margin-left: 5px">{{ label}}
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+    <label  for="{{ id }}" style="margin-left: 5px">
+        {{ label}}
     </label>
-    {% endspaceless %}
 {% endblock checkbox_widget %}

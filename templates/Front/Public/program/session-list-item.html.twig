@@ -4,13 +4,13 @@
             <small class="session_small">
                 <!-- time  -->
                 <time class="session__date">
-                    {% if session.sessionType == "A venir" %}
-                        {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
+                    {% if session.sessiontype == "A venir" %}
+                        {{ session.datebegin | date('F') | trans }} {{ session.datebegin | date('Y') }}
                     {% else %}
-                    {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
-                    <br><span class="session__moment">
-                        {{ session.dateBegin | time_diff }}
-                    </span>
+                    {{ session.datebegin | date('l') | trans }} {{ session.datebegin | date('d') }} {{ session.datebegin | date('F') | trans }} {{ session.datebegin | date('Y') }}
+{#                     <br><span class="session__moment">
+                        {{ session.datebegin | time_diff }}
+                    </span> #}
                     {% endif %}
                 </time>
                 <!-- organization  -->
@@ -20,7 +20,7 @@
                 <!-- label  -->
                 <div>
                 <div style="float: left" class="session__type"><span class="label radius">{{ session.training.typeLabel }}</span></div>
-                {% if session.sessionType == "A venir" %}
+                {% if session.sessionttimeype == "A venir" %}
                     <div style="float: right" class="session__avenir"><span class="label radius">Programmation à venir</span></div>
                 {% endif %}
                 </div>

@@ -1,5 +1,5 @@
 
-{% form_theme form 'SygeforFrontBundle:Public/program:checkbox.html.twig' %}
+{% form_theme form 'Front/Public/program:checkbox.html.twig' %}
 
 <div class="container">
     <section>
@@ -29,15 +29,15 @@
                                         {{ form_start(form) }}
                                         {% set counter = 0 %}
                                         {% for session in search.items %}
-                                            {% if session.displayOnline == true %}
-                                                {% if session.training.theme['name'] != theme and theme =="" %}
-                                                    {% set theme = session.training.theme['name'] %}
+                                            {% if session.displayonline == true %}
+                                                {% if session.training.theme.name != theme and theme =="" %}
+                                                    {% set theme = session.training.theme.name %}
                                                     <div  id="accordion" role="tablist" aria-multiselectable="true">
                                                         <div >
                                                             <div  role="tab" id="headingOne">
                                                                 <h3 >
                                                                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
-                                                                        {{ session.training.theme['name'] }}
+                                                                        {{ session.training.theme.name }}
                                                                     </a>
                                                                 </h3>
                                                             </div>
@@ -45,17 +45,17 @@
                                                         <div id="session{{ session.id }}" class="collapse" role="tabpanel" aria-labelledby="headingOne">
                                                             <div class="panel-body">
 
-                                                {%  elseif session.training.theme['name'] != theme and theme !="" %}
+                                                {%  elseif session.training.theme.name != theme and theme !="" %}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {% set theme = session.training.theme['name'] %}
+                                                    {% set theme = session.training.theme.name %}
                                                     <div  id="accordion" role="tablist" aria-multiselectable="true">
                                                         <div>
                                                             <div  role="tab" id="headingOne">
                                                                 <h3 >
                                                                     <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
-                                                                        {{ session.training.theme['name'] }}
+                                                                        {{ session.training.theme.name }}
                                                                     </a>
                                                                 </h3>
                                                             </div>
@@ -64,20 +64,7 @@
                                                             <div class="panel-body">
                                                 {%  endif %}
 
-                                                {% include '@SygeforFront/Public/program/session-list-item.html.twig' %}
-
-
-                                            {#    {% set theme = "" %}
-                                                {% for session in search.items %}
-                                                    {% if session.displayOnline == true %}
-                                                        {% if session.training.theme != theme %}
-                                                            {% set theme = session.training.theme %}
-                                                            <h3>{{ session.training.theme }}</h3>
-                                                        {% endif %}
-
-                                                        {% include '@SygeforFront/Public/program/session-list-item.html.twig' %}
-                                                    {% endif %}
-                                                {% endfor %} #}
+                                                {% include 'Front/Public/program/session-list-item.html.twig' %}
 
                                             {% endif %}
 
@@ -100,7 +87,6 @@
                                     </div>
                                     {{ form_end(form) }}
                                 {% endif %}
-                            {#    {% include('@SygeforFront/pagination.html.twig') %} #}
                             </div>
                         </div>
                     </div>

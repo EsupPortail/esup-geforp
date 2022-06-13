@@ -2,13 +2,16 @@
 
 namespace App\Repository;
 
+use App\Entity\Core\AbstractSession;
 use App\Entity\Session;
 use App\Entity\Core\Term\Theme;
 use App\Entity\Internship;
 use App\Entity\Organization;
+use App\Entity\SessionSearch;
 use App\Entity\Trainer;
 use App\Entity\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 
 class SessionRepository extends ServiceEntityRepository
@@ -18,27 +21,58 @@ class SessionRepository extends ServiceEntityRepository
         parent::__construct($registry, Session::class);
     }
 
-    public function getUpcomingSessions()
+    public function getSessionsProgram($filters)
     {
         $qb = $this->createQueryBuilder('s');
         $qb
-            /* On distingue les doublons */
             ->select(' s')
-            /* On ajoute les sessions */
-            ->innerJoin(Internship::class, 't')
+            ->innerJoin(Organization::class, 'o')
             ->innerJoin(Theme::class, 'th')
-            /* Si une session a une correspondance avec l'id d'un training */
-            ->where('t.id = s.training')
-            /* Si la session est affichée au public */
-            ->andWhere(' s.displayonline = 1');
-        /* Date de début supérieure ou égale à ajd */
-        /* TODO */
-        //   ->andWhere('s.datebegin >= CURRENT_DATE()');
+            ->innerJoin(Internship::class, 'tr')
+            ->orderBy('th.name')
+            ->orderBy('s.datebegin')
+            ->orderBy('tr.name');
 
+        // FILTRE DISPLAYONLINE pour affichage stagiaire
+        $qb->andWhere('s.displayonline = 1');
+
+        // FILTRE CENTRE
+        if (isset($filters['training.organization.name.source'])) {
+            $qb
+                ->andWhere('s.training = tr.id')
+                ->andWhere('tr.organization = o.id')
+                ->andWhere('o.name in (:centers)')
+                ->setParameter('centers', $filters['training.organization.name.source']);
+        }
+
+        //FILTRE DATE
+        if( isset($filters['datebegin']) ) {
+            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
+            $dates = explode('-', $filters["datebegin"]);
+            /* on retire les caractères non utiles */
+            $from = str_replace('/','-', $dates[0]);
+            $to = str_replace('/', '-', $dates[1]);
+            /* on convertit au même format qu'en base de données */
+            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
+            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
+
+            $qb
+                /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
+                ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo);
+        }
+
+        //FILTRE THEME
+        if( isset($filters['theme.name'])) {
+            $qb
+                ->andWhere('s.training = tr.id')
+                ->andWhere('tr.theme = th.id')
+                ->andWhere('th.name in (:themes)')
+                ->setParameter('themes', $filters['theme.name']);
+        }
 
         $query = $qb->getQuery();
-
-        /* Si on souhaite visualiser la requête SQL effectuée : var_dump($query->getSQL()); */
 
         return $result = $query->getResult();
     }
@@ -54,6 +88,7 @@ class SessionRepository extends ServiceEntityRepository
             ->innerJoin(Internship::class, 'tr')
             ->innerJoin(Trainer::class, 'trainer')
             ->innerJoin(Participation::class, 'p')
+            ->orderBy('s.datebegin')
 
             // FILTRE KEYWORD
             ->where('s.name LIKE :keyword')
