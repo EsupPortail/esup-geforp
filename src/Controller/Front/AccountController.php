@@ -71,9 +71,9 @@ class AccountController extends AbstractController
         $userEmail = $this->getUser()->getCredentials()['mail'];
         if (isset($userEmail)) {
             $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
-            $trainee = $arTrainee[0];
         }
-        if ($trainee) {
+        if (isset($arTrainee[0])) {
+            $trainee = $arTrainee[0];
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
