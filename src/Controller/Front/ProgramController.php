@@ -85,8 +85,8 @@ class ProgramController extends AbstractController
                 ->getQuery()->execute();
 
             $alert = $em->getRepository('App\Entity\Alert')->createQueryBuilder('alert')
-                ->leftJoin('App\Entity\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
-                ->leftJoin('App\Entity\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
+                ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
+                ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
                 ->where('session.id = :sessionId')
                 ->andWhere('trainee.id = :traineeId')
                 ->setParameter('sessionId', $sesId)
