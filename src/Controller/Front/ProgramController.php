@@ -602,7 +602,7 @@ class ProgramController extends AbstractController
         $multiEtab = $this->getParameter('multi_etab_actif');
 
         if ($centreCode=="tous") {
-            $centres = $doctrine->getRepository(Organisation::class)->findAll();
+            $centres = $doctrine->getRepository(Organization::class)->findAll();
             $centreName = array();
             foreach ($centres as $centre) {
                 $centreName[] = $centre->getName();
@@ -618,7 +618,7 @@ class ProgramController extends AbstractController
             }
         }else
             $themeName = $theme;
-        
+
         $search = $this->createProgramQuerySearch($centreName, $themeName, $texte, $sessionRepository);
         $sessions = $search["items"];
 
