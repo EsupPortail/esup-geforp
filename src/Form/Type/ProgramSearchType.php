@@ -11,15 +11,14 @@ use App\Entity\Core\Term\Theme;
 use App\Entity\Organization;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
 
+
 /**
  * Created by PhpStorm.
- * User: erwan
- * Date: 9/16/16
- * Time: 5:28 PM
  */
 class ProgramSearchType extends AbstractType
 {
@@ -30,12 +29,12 @@ class ProgramSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('centre', 'entity', array(
+            ->add('centre', EntityType::class, array(
                 'label' => 'Etablissement organisateur',
                 'choice_label' => 'name',
                 'class' => Organization::class
             ))
-            ->add('theme', 'entity', array(
+            ->add('theme', EntityType::class, array(
                 'label' => 'Domaine de formation',
                 'choice_label' => 'name',
                 'class' => Theme::class

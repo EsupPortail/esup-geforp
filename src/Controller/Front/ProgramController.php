@@ -601,7 +601,25 @@ class ProgramController extends AbstractController
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
 
-        $search = $this->createProgramQuerySearch($centreCode, $theme, $texte, $sessionRepository);
+        if ($centreCode=="tous") {
+            $centres = $doctrine->getRepository(Organisation::class)->findAll();
+            $centreName = array();
+            foreach ($centres as $centre) {
+                $centreName[] = $centre->getName();
+            }
+        } else
+            $centreName = $centreCode;
+
+        if ($theme=="tous") {
+            $themes = $doctrine->getRepository(Theme::class)->findAll();
+            $themeName = array();
+            foreach ($themes as $theme) {
+                $themeName[] = $theme->getName();
+            }
+        }else
+            $themeName = $theme;
+        
+        $search = $this->createProgramQuerySearch($centreName, $themeName, $texte, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -635,7 +653,7 @@ class ProgramController extends AbstractController
         $formAlert = $this->createForm(ProgramAlertType::class, $alerts);
         $formAlert->handleRequest($request);
 
-        if ($formAlert->isValid()) {
+        if(($formAlert->isSubmitted()) && ($formAlert->isValid())) {
             $arrAlerts = $alerts->getAlerts();
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
@@ -699,27 +717,19 @@ class ProgramController extends AbstractController
         $form = $this->createForm(ProgramSearchType::class, $defaultData);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if (($form->isSubmitted()) && ($form->isValid())) {
                 $theme = $form['theme']->getData();
                 if (!empty($theme)) {
                     $themeName = $theme->getName();
                     if ($themeName == "Tous les domaines") {
-                        $themes = $doctrine->getRepository(Theme::class)->findAll();
-                        $themeName = array();
-                        foreach ($themes as $theme) {
-                            $themeName[] = $theme->getName();
-                        }
+                        $themeName = "tous";
                     }
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
-                    $centreCode = $organization->getCode();
+                    $centreCode = $organization->getName();
                     if ($centreCode == "tous") {
-                        $centres = $doctrine->getRepository(Organization::class)->findAll();
-                        $centreCode = array();
-                        foreach ($centres as $centre) {
-                            $centreCode[] = $centre->getName();
-                        }
+                        $centreCode = "tous";
                     }
                 }
                 $texte = $form['texte']->getData();
