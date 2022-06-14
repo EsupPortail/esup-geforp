@@ -47,7 +47,7 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/login", name="front.public.login")
-     * @Template("Front/Public/login.html.twig)
+     * @Template("Front/Public/login.html.twig")
      */
     public function loginAction(Request $request)
     {
@@ -56,7 +56,7 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/contact", name="front.public.contact")
-     * @Template("Front/Public/contact.html.twig)
+     * @Template("Front/Public/contact.html.twig")
      */
     public function contactAction(Request $request)
     {
@@ -65,7 +65,7 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/faq", name="front.public.faq")
-     * @Template("Front/Public/faq.html.twig)
+     * @Template("Front/Public/faq.html.twig")
      */
     public function faqAction(Request $request)
     {
@@ -74,7 +74,7 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/about", name="front.public.about")
-     * @Template("Front/Public/about.html.twig)
+     * @Template("Front/Public/about.html.twig")
      */
     public function aboutAction(Request $request)
     {
@@ -83,7 +83,7 @@ class PublicController extends AbstractController
 
     /**
      * @Route("/legalNotice", name="front.public.legalNotice")
-     * @Template("Front/Public/legalNotice.html.twig)
+     * @Template("Front/Public/legalNotice.html.twig")
      */
     public function legalNoticeAction(Request $request)
     {
