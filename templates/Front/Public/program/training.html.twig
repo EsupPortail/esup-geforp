@@ -57,7 +57,7 @@
                         <h4>Sessions à venir <span class="label secondary radius no-mb pull-right">{{ upcomingSessions | length }}</span></h4>
 
                         {% set cpt = 0 %}
-                        {% for upcomingSession in (upcomingSessions | orderBy('dateBegin')) %}
+                        {% for upcomingSession in (upcomingSessions ) %}
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
                                     {% if upcomingSession.displayOnline == true %}
@@ -170,7 +170,7 @@
                                                 {% if upcomingSession.limitRegistrationDate is defined and upcomingSession.isPublic and upcomingSession.availablePlaces > 0 and upcomingSession.limitRegistrationDate %}
                                                     <li title="Le {{ upcomingSession.limitRegistrationDate | date('l') | trans }} {{ upcomingSession.limitRegistrationDate | date('d') }} {{ upcomingSession.limitRegistrationDate | date('F') | trans }} {{ upcomingSession.limitRegistrationDate | date('Y') }}" class="text-center">
                                                         <div class="alert-danger">
-                                                            <span class="label radius text-center">Clôture des inscriptions {{ upcomingSession.limitRegistrationDate | time_diff }}</span>
+                                                            <span class="label radius text-center">Clôture des inscriptions {{ upcomingSession.limitRegistrationDate | date('d/m/Y') }}</span>
                                                         </div>
                                                     </li>
                                                 {% endif %}
@@ -212,7 +212,7 @@
                     {% if pastSessions is defined and pastSessions | length > 0 %}
                         <h4>Sessions passées <span class="label secondary radius no-mb pull-right">{{ pastSessions | length }}</span></h4>
                         <ul>
-                            {% for pastSession in (pastSessions | orderBy('dateBegin')) %}
+                            {% for pastSession in (pastSessions ) %}
                                <li>{{ pastSession.dateBegin | date('l') | trans }} {{ pastSession.dateBegin | date('d') }} {{ pastSession.dateBegin | date('F') | trans }} {{ pastSession.dateBegin | date('Y') }}</li>
                             {% endfor %}
                         </ul>
@@ -225,7 +225,7 @@
                             <h4>Session(s) sans module<span class="label secondary radius no-mb pull-right">{{ sessionsWithoutModule | length }}</span></h4>
                             <uib-accordion close-others="true">
                                  {#ng-init="isOpened = session.id == $parent.$parent.state.params.session"#}
-                                {% for session in sessionsWithoutModule | orderBy('dateBegin') %}
+                                {% for session in sessionsWithoutModule  %}
                                 <div uib-accordion-group class="uib-accordion-group panel-default" is-open="true">
 
                                     <!--heading-->
@@ -254,7 +254,7 @@
                                             <!--prices-->
                                         {% endif %}
                                         {% if session.limitRegistrationDate is defined and session.isPublic and session.availablePlaces > 0 and session.limitRegistrationDate %}
-                                            <li title="Le {{ session.limitRegistrationDate | date('l') | trans }} {{ session.limitRegistrationDate | date('d') }} {{ session.limitRegistrationDate | date('F') | trans }} {{ session.limitRegistrationDate | date('Y') }}" class="text-center"><span class="label alert radius text-center">Clôture des inscriptions {{ session.limitRegistrationDate | time_diff }}</span></li>
+                                            <li title="Le {{ session.limitRegistrationDate | date('l') | trans }} {{ session.limitRegistrationDate | date('d') }} {{ session.limitRegistrationDate | date('F') | trans }} {{ session.limitRegistrationDate | date('Y') }}" class="text-center"><span class="label alert radius text-center">Clôture des inscriptions {{ session.limitRegistrationDate | date('d/m/Y') }}</span></li>
                                         {% endif %}
                                         {% if session.isPublic and session.availablePlaces <= 0 %}
                                             <li class="text-center"><span class="label alert radius text-center">Il n'y plus de place disponible</span></li>
