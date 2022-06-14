@@ -9,7 +9,9 @@
 namespace App\Controller\Front;
 
 use App\Entity\Core\Term\Theme;
-use App\Entity\Trainee;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\AbstractTraining;
+use App\Entity\Session;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,20 +39,22 @@ class ProgramController extends AbstractController
 {
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Sygefor\Bundle\TrainingBundle\Entity\Training\AbstractTraining $training
+     * @param App\Entity\Core\AbstractTraining $training
      * @param null $sessionId
      * @param null $token
      *
-     * @Route("/training/{id}/{sessionId}/{token}", name="front.public.training", requirements={"id": "\d+", "sessionId": "\d+"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
-     * @Template("@SygeforFront/Public/program/training.html.twig")
+     * @Route("/training/{id}/{sessionId}/{token}", name="front.account.training", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
+     * @Template("Front/Public/program/training.html.twig")
      *
      * @return array
      */
-    public function trainingAction(Request $request, ManagerRegistry $doctrine,AbstractTraining $training, $sessionId = null, $token = null)
+    public function trainingAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, $sessionId = null, $token = null)
     {
-        $this->apiTrainingController->setContainer($this->container);
-        $training = $this->apiTrainingController->trainingAction($training);
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
+
         $focusSession = null;
         foreach ($training->getSessions() as $session) {
             if ($session->getId() == $sessionId) {
@@ -68,56 +72,50 @@ class ProgramController extends AbstractController
 
             $sesId = $session->getId();
             $inscription = null;
-            if ($this->getUser() instanceof AbstractTrainee) {
-                /** @var EntityManager $em */
-                $em = $doctrine->getManager();
-                $inscription = $em->getRepository('SygeforInscriptionBundle:AbstractInscription')->createQueryBuilder('inscription')
-                    ->leftJoin('SygeforTrainingBundle:Session\AbstractSession', 'session', 'WITH', 'inscription.session = session.id')
-                    ->leftJoin('SygeforTraineeBundle:AbstractTrainee', 'trainee', 'WITH', 'inscription.trainee = trainee.id')
-                    ->where('session.id = :sessionId')
-                    ->andWhere('trainee.id = :traineeId')
-                    ->setParameter('sessionId', $sesId)
-                    ->setParameter('traineeId', $this->getUser()->getId())->getQuery()->execute();
 
-                $alert = $em->getRepository('SygeforMyCompanyBundle:Alert')->createQueryBuilder('alert')
-                    ->leftJoin('SygeforTrainingBundle:Session\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
-                    ->leftJoin('SygeforTraineeBundle:AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
-                    ->where('session.id = :sessionId')
-                    ->andWhere('trainee.id = :traineeId')
-                    ->setParameter('sessionId', $sesId)
-                    ->setParameter('traineeId', $this->getUser()->getId())->getQuery()->execute();
-            }
+            /** @var EntityManager $em */
+            $em = $doctrine->getManager();
+            $inscription = $em->getRepository('App\Entity\Core\AbstractInscription')->createQueryBuilder('inscription')
+                ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'inscription.session = session.id')
+                ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'inscription.trainee = trainee.id')
+                ->where('session.id = :sessionId')
+                ->andWhere('trainee.id = :traineeId')
+                ->setParameter('sessionId', $sesId)
+                ->setParameter('traineeId', $trainee->getId())
+                ->getQuery()->execute();
+
+            $alert = $em->getRepository('App\Entity\Alert')->createQueryBuilder('alert')
+                ->leftJoin('App\Entity\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
+                ->leftJoin('App\Entity\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
+                ->where('session.id = :sessionId')
+                ->andWhere('trainee.id = :traineeId')
+                ->setParameter('sessionId', $sesId)
+                ->setParameter('traineeId', $trainee->getId())
+                ->getQuery()->execute();
+
 
             $session->isRegistered = !empty($inscription);
 
-            $session->getDateBegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
+            $session->getDatebegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
             // Gestion des alertes existantes pour les sessions à venir
-            if ($session->getDateBegin() > $now) {
+            if ($session->getDatebegin() > $now) {
                 $session->isAlerted = !empty($alert);
             }
-            if ($session->getRegistration() === $session::REGISTRATION_PRIVATE && (!method_exists($session, 'getModule') || !$session->getModule())) {
+            if ($session->getRegistration() === $session::REGISTRATION_PRIVATE ) {
                 $session->availablePrivateSession = true;
             }
             else {
                 $session->availablePrivateSession = false;
             }
-            if (method_exists($session, 'getModule') && $session->getModule()) {
-                $session->moduleToken = md5($session->getTraining()->getType() . $session->getTraining()->getId()) === $token;
-            }
 
-        }
-
-        if ($this->getUser() && !$this->getUser()->getIsActive()) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous inscrire à une session tant que votre compte n'a pas
-             été validé par un administrateur.");
         }
 
         // Affichage d'un flag si le stage en public désigné
-        if ($training->getDesignatedPublic())
+        if ($training->getDesignatedpublic())
             $this->get('session')->getFlashBag()->add('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
 
         return array(
-            'user' => $this->getUser(),
+            'user' => $trainee,
             'training' => $training,
             'session' => $focusSession,
             'upcomingSessions' => $upcomingSessions,
@@ -128,14 +126,14 @@ class ProgramController extends AbstractController
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Sygefor\Bundle\TrainingBundle\Entity\Training\AbstractTraining $training
-     * @param \Sygefor\Bundle\MyCompanyBundle\Entity\Session $session
+     * @param \App\Entity\Core\AbstractTraining $training
+     * @param \App\Entity\Session $session
      * @param null $token
      *
-     * @Route("/training/inscription/{id}/{sessionId}/{token}", name="front.public.inscription", requirements={"id": "\d+", "sessionId": "\d+"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
-     * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "sessionId"})
-     * @Template("@SygeforFront/Public/program/inscription.html.twig")
+     * @Route("/training/inscription/{id}/{sessionId}/{token}", name="front.account.inscription", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
+     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "sessionId"})
+     * @Template("Front/Public/program/inscription.html.twig")
      *
      * @return array
      */
@@ -144,12 +142,6 @@ class ProgramController extends AbstractController
         // in case shibboleth authentication done but user has not registered his account
         if (!is_object($this->getUser())) {
             return $this->redirectToRoute('front.account.register');
-        }
-
-        if (!$this->getUser()->getIsActive()) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous inscrire à une session tant que votre compte n'a pas
-             été validé par un administrateur.");
-            return $this->redirectToRoute('front.public.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
         }
 
         $this->apiTrainingController->setContainer($this->container);

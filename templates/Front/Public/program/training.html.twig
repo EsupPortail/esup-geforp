@@ -263,7 +263,7 @@
 
                                     <!--infos-->
                                     {% if session.registrable and session.isRegistered and (session.availablePrivateSession or session.isPublic) %}
-                                        <a href="{{ path('front.public.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
+                                        <a href="{{ path('front.account.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
                                            ui-sref="program.inscription({'id': training.id, 'session': session.id, token: token})">S'inscrire à cette session</a>
                                     {% elseif session.isRegistered %}
                                         <a href="" class="btn btn-primary btn-lg btn-group-justified radius"
