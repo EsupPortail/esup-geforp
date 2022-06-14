@@ -21,7 +21,7 @@ class SessionRepository extends ServiceEntityRepository
         parent::__construct($registry, Session::class);
     }
 
-    public function getSessionsProgram($filters)
+    public function getSessionsProgram($keyword, $filters)
     {
         $qb = $this->createQueryBuilder('s');
         $qb
@@ -32,6 +32,14 @@ class SessionRepository extends ServiceEntityRepository
             ->orderBy('th.name')
             ->orderBy('s.datebegin')
             ->orderBy('tr.name');
+
+        // FILTRE KEYWORD
+        if ($keyword != 'NO KEYWORDS') {
+            $qb
+                ->where('s.name LIKE :keyword')
+                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        }
 
         // FILTRE DISPLAYONLINE pour affichage stagiaire
         $qb->andWhere('s.displayonline = 1');

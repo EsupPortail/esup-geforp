@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Organization;
 use App\Entity\Alert;
 use App\Entity\MultipleAlert;
 use App\Entity\SingleAlert;
@@ -491,23 +492,27 @@ class ProgramController extends AbstractController
 
     /**
      * @Route("/allprogram", name="front.account.allprogram")
-     * @Template("@SygeforFront/Public/allprogram.html.twig")
+     * @Template("Front/Public/allprogram.html.twig")
      */
     public function allProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
-        $search = $this->createProgramQuery(1, 1000, $sessionRepository);
-        $sessions = $search["items"];
+        // Recuperation info du user authentifié
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
 
-        if ($request->get('shibboleth') == 1) {
-            if ($request->get('error') == "activation") {
-                $this->get('session')->getFlashBag()->add('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
-            }
+        // Recuperation de tous les centres
+        $centres = $doctrine->getRepository(Organization::class)->findAll();
+        $codes = array();
+        foreach ($centres as $centre) {
+            $codes[] = $centre->getName();
         }
+        $search = $this->createProgramQuery($codes, $sessionRepository);
+        $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
         $alerts = new MultipleAlert();
         foreach ($sessions as $session){
-            if ($session["sessionType"] == "A venir") {
+            if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
                 $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
@@ -515,7 +520,7 @@ class ProgramController extends AbstractController
                 ));
                 // on regarde s'il existe déjà une alerte
                 $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
                 if ($alertExiste) {
@@ -525,8 +530,8 @@ class ProgramController extends AbstractController
                     $alert->setAlert(false);
                 }
 
-                $alert->setSessionId($session["id"]);
-                $alert->setTraineeId($this->getUser()->getId());
+                $alert->setSessionId($session->getId());
+                $alert->setTraineeId($arTrainee[0]);
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -535,17 +540,17 @@ class ProgramController extends AbstractController
         $form = $this->createForm(ProgramAlertType::class, $alerts);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if (($form->isSubmitted()) && ($form->isValid())) {
             $arrAlerts = $alerts->getAlerts();
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
 
@@ -554,7 +559,7 @@ class ProgramController extends AbstractController
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($this->getUser());
+                        $alertNew->setTrainee($arTrainee[0]);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);
@@ -575,7 +580,7 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return array('user' => $this->getUser(), 'search' => $search, 'img' => '', 'form' => $form->createView());
+        return array('user' => $arTrainee, 'search' => $search, 'img' => '', 'form' => $form->createView());
     }
 
     /**
@@ -589,9 +594,10 @@ class ProgramController extends AbstractController
     public function searchalertsAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null)
     {
         $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->container->getParameter('multi_etab_actif');
+        $multiEtab = $this->getParameter('multi_etab_actif');
 
         if ($centreCode == 'tous')
             $centre = null;
@@ -608,15 +614,15 @@ class ProgramController extends AbstractController
         // creation entites pour recuperer les alertes
         $alerts = new MultipleAlert();
         foreach ($sessions as $session){
-            if ($session["sessionType"] == "A venir") {
+            if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
                 $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
-                    'id' => $session["id"]
+                    'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
                 $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
                 if ($alertExiste) {
@@ -626,8 +632,8 @@ class ProgramController extends AbstractController
                     $alert->setAlert(false);
                 }
 
-                $alert->setSessionId($session["id"]);
-                $alert->setTraineeId($this->getUser()->getId());
+                $alert->setSessionId($session->getId());
+                $alert->setTraineeId($arTrainee[0]->getId());
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -646,7 +652,7 @@ class ProgramController extends AbstractController
                 ));
 
                 $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
-                    'trainee' => $this->getUser(),
+                    'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
 
@@ -688,7 +694,7 @@ class ProgramController extends AbstractController
         $user = $this->getUser();
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->container->getParameter('multi_etab_actif');
+        $multiEtab = $this->getParameter('multi_etab_actif');
 
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
@@ -750,7 +756,7 @@ class ProgramController extends AbstractController
         $filters["datebegin"] = $dateBegin . " - " . $dateFin;
 
         // Recherche avec les filtres
-        $sessions = $sessionRepository->getSessionsProgram($filters);
+        $sessions = $sessionRepository->getSessionsProgram('NO KEYWORDS', $filters);
         $nbSessions  = count($sessions);
 
         $ret = array(
