@@ -613,8 +613,8 @@ class ProgramController extends AbstractController
         if ($theme=="tous") {
             $themes = $doctrine->getRepository(Theme::class)->findAll();
             $themeName = array();
-            foreach ($themes as $theme) {
-                $themeName[] = $theme->getName();
+            foreach ($themes as $the) {
+                $themeName[] = $the->getName();
             }
         }else
             $themeName = $theme;
@@ -728,7 +728,7 @@ class ProgramController extends AbstractController
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
                     $centreCode = $organization->getName();
-                    if ($centreCode == "tous") {
+                    if ($centreCode == "Tous les établissements") {
                         $centreCode = "tous";
                     }
                 }
