@@ -8,6 +8,7 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\Core\Term\Theme;
 use App\Entity\Trainee;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
@@ -19,6 +20,7 @@ use App\Entity\Alert;
 use App\Entity\MultipleAlert;
 use App\Entity\SingleAlert;
 use App\Form\Type\ProgramAlertType;
+use App\Form\Type\ProgramSearchType;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -589,7 +591,7 @@ class ProgramController extends AbstractController
      * @param null theme
      * @param null texte
      * @Route("/searchalerts/{centreCode}/{theme}/{texte}", name="front.account.searchalerts")
-     * @Template("@SygeforFront/Public/searchResult.html.twig")
+     * @Template("Front/Public/searchResult.html.twig")
      */
     public function searchalertsAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null)
     {
@@ -599,16 +601,7 @@ class ProgramController extends AbstractController
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
 
-        if ($centreCode == 'tous')
-            $centre = null;
-        else
-            $centre = $centreCode;
-        if ($theme == 'tous')
-            $thematique = null;
-        else
-            $thematique = $theme;
-
-        $search = $this->createProgramQuerySearch(1, 1000, $centre, $thematique, $texte, $sessionRepository);
+        $search = $this->createProgramQuerySearch($centreCode, $theme, $texte, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -687,11 +680,12 @@ class ProgramController extends AbstractController
 
     /**
      * @Route("/search", name="front.account.search")
-     * @Template("@SygeforFront/Public/search.html.twig")
+     * @Template("Front/Public/search.html.twig")
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
         $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
@@ -702,7 +696,7 @@ class ProgramController extends AbstractController
         $organization = $em->getRepository('App\Entity\Organization')->findOneBy(array('name' => 'Tous les établissements'));
 
         $defaultData = array('centre' => $organization, 'theme' => $theme, 'texte' => "");
-        $form = $this->createForm(new SearchType(), $defaultData);
+        $form = $this->createForm(ProgramSearchType::class, $defaultData);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -710,25 +704,27 @@ class ProgramController extends AbstractController
                 if (!empty($theme)) {
                     $themeName = $theme->getName();
                     if ($themeName == "Tous les domaines") {
-                        $themeName = "tous";
+                        $themes = $doctrine->getRepository(Theme::class)->findAll();
+                        $themeName = array();
+                        foreach ($themes as $theme) {
+                            $themeName[] = $theme->getName();
+                        }
                     }
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
                     $centreCode = $organization->getCode();
                     if ($centreCode == "tous") {
-                        $centreCode = "tous";
+                        $centres = $doctrine->getRepository(Organization::class)->findAll();
+                        $centreCode = array();
+                        foreach ($centres as $centre) {
+                            $centreCode[] = $centre->getName();
+                        }
                     }
                 }
                 $texte = $form['texte']->getData();
 
-                if ($request->get('shibboleth') == 1) {
-                    if ($request->get('error') == "activation") {
-                        $this->get('session')->getFlashBag()->add('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
-                    }
-                }
-
-                return $this->redirectToRoute('front.public.searchalerts', array('centreCode' => $centreCode, 'theme' => $themeName, 'texte' => $texte));
+                return $this->redirectToRoute('front.account.searchalerts', array('centreCode' => $centreCode, 'theme' => $themeName, 'texte' => $texte));
 
             }
         }

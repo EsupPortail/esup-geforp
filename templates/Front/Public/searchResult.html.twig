@@ -1,4 +1,4 @@
-{% extends "@SygeforFront/base.html.twig" %}
+{% extends "Front/base.html.twig" %}
 
 {% block header %}
     <header>
@@ -25,7 +25,7 @@
     <div class="container">
         <section>
             <h1>Résultat(s) de recherche
-                        <a class="col-md-offset-1 btn btn-primary btn-lg" href="{{ path('front.public.search') }}" title="Nouvelle recherche" >
+                        <a class="col-md-offset-1 btn btn-primary btn-lg" href="{{ path('front.account.search') }}" title="Nouvelle recherche" >
                             <i class="glyphicon glyphicon-search"></i>
                             &nbsp;Nouvelle recherche
                         </a>
@@ -54,7 +54,7 @@
                                                     {% set theme = session.training.theme %}
 
                                                     <div class="panel-body">
-                                                        {% include '@SygeforFront/Public/program/session-list-item.html.twig' %}
+                                                        {% include 'Front/Public/program/session-list-item.html.twig' %}
                                                     </div>
                                                 {%  endif %}
                                                 {% if session.sessionType == 'A venir' %}
@@ -63,8 +63,6 @@
                                             {% endfor %}
                                         </div>
                                     {% endif %}
-
-                                        {#    {% include('@SygeforFront/pagination.html.twig') %} #}
                                 </div>
                             </div>
                         </div>

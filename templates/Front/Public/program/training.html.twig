@@ -1,4 +1,4 @@
-{% extends "@SygeforFront/base.html.twig" %}
+{% extends "Front/base.html.twig" %}
 
 {% block header %}
     <header>
@@ -17,7 +17,7 @@
         <section class="session training-detail-view {{ training.type }}">
             <div class="row">
                 <div class="col-md-7">
-                    {% include '@SygeforFront/Public/program/training-tags.html.twig' %}
+                    {% include 'Front/Public/program/training-tags.html.twig' %}
 
                     {% if training.publicTypesRestrict is defined and training.publicTypesRestrict | length > 0 %}
                         <h4>Public(s) cible(s)</h4>
