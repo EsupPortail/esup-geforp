@@ -73,7 +73,7 @@
                                     <div title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ attendance.session.schedule }}</div>
                                 {% endif %}
 
-                                <a href="{{ path('front.public.training', {id: attendance.session.training.id, sessionId: attendance.session.id }) }}" class="btn btn-default">Voir la fiche descriptive</a>
+                                <a href="{{ path('front.account.training', {id: attendance.session.training.id, sessionId: attendance.session.id }) }}" class="btn btn-default">Voir la fiche descriptive</a>
                             </div>
                             <div class="col-md-7">
                                 <!-- Téléchargement de l'attestation -->
