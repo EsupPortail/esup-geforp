@@ -336,7 +336,7 @@
                         <div>{{ training.organization.name }}</div>
                         <div>{{ training.organization.fullAddress | nl2br }}</div>
                         {% if training.organization.phoneNumber | length > 0 %}
-                            <div><span class="glyphicon glyphicon-phone-alt"></span> <a href="tel:{{ training.organization.phoneNumber | replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a></div>
+{#                             <div><span class="glyphicon glyphicon-phone-alt"></span> <a href="tel:{{ training.organization.phoneNumber | replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a></div> #}
                         {% endif %}
                         <div><span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{ training.organization.email }}">&nbsp;{{ training.organization.email }}</a></div>
                         {% if training.organization.website is defined and  training.organization.website | length > 0 %}
