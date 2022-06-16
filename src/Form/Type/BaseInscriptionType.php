@@ -20,6 +20,12 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class BaseInscriptionType extends AbstractType
 {
+    protected $organization;
+
+    function __construct($organization)
+    {
+        $this->organization = $organization;
+    }
 
     /**
      * @param FormBuilderInterface $builder
@@ -27,11 +33,9 @@ class BaseInscriptionType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $organization = $this->organization;
         /** @var AbstractSession $session */
         $session = $options['data']->getSession();
-
-        /** @var AbstractOrganization $organization */
-        $organization = $options['attr']['organization'];
 
         $builder
             ->add('trainee', EntityHiddenType::class, array(

@@ -167,7 +167,7 @@ class ProgramController extends AbstractController
         }
         $inscription->setInscriptionStatus(
             $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
-                array('machineName' => 'waiting')
+                array('machinename' => 'waiting')
             )
         );
 
