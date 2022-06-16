@@ -185,7 +185,7 @@
 
                                             <!--infos-->
                                             {% if upcomingSession.registrable and not upcomingSession.isRegistered and (upcomingSession.availablePrivateSession or upcomingSession.isPublic) %}
-                                                <a href="{{ path('front.public.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
+                                                <a href="{{ path('front.account.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
                                             {% elseif upcomingSession.isRegistered %}
                                                 <a href="{{ path('front.account.registrations') }}" class="btn btn-primary btn-lg btn-group-justified radius" >Voir l'état de mon inscription</a>
                                             {% elseif not upcomingSession.registrable and not upcomingSession.isRegistered %}
@@ -193,9 +193,9 @@
                                                     <a href="" class="btn btn-primary btn-lg disabled btn-group-justified radius">Inscriptions closes</a>
                                                 {% else %}
                                                     {% if upcomingSession.isAlerted %}
-                                                        <a href="{{ path('front.public.alertremove', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">Se désincrire de l'alerte</a>
+                                                        <a href="{{ path('front.account.alertremove', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">Se désincrire de l'alerte</a>
                                                     {% else %}
-                                                        <a href="{{ path('front.public.alert', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">M'alerter de l'ouverture de la session</a>
+                                                        <a href="{{ path('front.account.alert', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">M'alerter de l'ouverture de la session</a>
                                                     {% endif %}
                                                 {% endif %}
                                             {% endif %}
@@ -218,103 +218,6 @@
                         </ul>
                     {% endif %}
 
-                    <!--long training-->
-                    {% if training.modules is defined and training.modules | length > 0 %}
-                    <div>
-                        {% if sessionsWithoutModule is defined and sessionsWithoutModule | length > 0 %}
-                            <h4>Session(s) sans module<span class="label secondary radius no-mb pull-right">{{ sessionsWithoutModule | length }}</span></h4>
-                            <uib-accordion close-others="true">
-                                 {#ng-init="isOpened = session.id == $parent.$parent.state.params.session"#}
-                                {% for session in sessionsWithoutModule  %}
-                                <div uib-accordion-group class="uib-accordion-group panel-default" is-open="true">
-
-                                    <!--heading-->
-                                    <uib-accordion-heading>
-                                        {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
-                                    </uib-accordion-heading>
-
-                                    <ul class="list-unstyled">
-                                        {% if session.name is defined and session.name != "" %}
-                                            <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
-                                        {% endif %}
-                                        {% if session.place.name is defined %}
-                                            <li title="Lieu de la session"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;{{ session.place.name }}</li>
-                                        {% endif %}
-                                        {% if session.hourNumber is defined and session.dayNumber is defined %}
-                                            <li title="Durée de la session"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;{{ session.hourNumber }} heure(s) sur {{ session.dayNumber }} jour(s)</li>
-                                        {% endif %}
-                                        {% if session.schedule is defined %}
-                                            <li title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ session.schedule }}</li>
-                                        {% endif %}
-                                        {% if session.maximumNumberOfRegistrations is defined and session.maximumNumberOfRegistrations > 0 and session.availablePlaces is defined %}
-                                            <li title="Nombre maximum d'inscrits ({{ session.availablePlaces }} places disponibles)"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;{{ session.maximumNumberOfRegistrations }} inscriptions max.</li>
-                                        {% endif %}
-                                        {% if user.isPaying and session.price is defined %}
-                                            <li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;</li>
-                                            <!--prices-->
-                                        {% endif %}
-                                        {% if session.limitRegistrationDate is defined and session.isPublic and session.availablePlaces > 0 and session.limitRegistrationDate %}
-                                            <li title="Le {{ session.limitRegistrationDate | date('l') | trans }} {{ session.limitRegistrationDate | date('d') }} {{ session.limitRegistrationDate | date('F') | trans }} {{ session.limitRegistrationDate | date('Y') }}" class="text-center"><span class="label alert radius text-center">Clôture des inscriptions {{ session.limitRegistrationDate | date('d/m/Y') }}</span></li>
-                                        {% endif %}
-                                        {% if session.isPublic and session.availablePlaces <= 0 %}
-                                            <li class="text-center"><span class="label alert radius text-center">Il n'y plus de place disponible</span></li>
-                                        {% endif %}
-                                    </ul>
-
-                                    <!--infos-->
-                                    {% if session.registrable and session.isRegistered and (session.availablePrivateSession or session.isPublic) %}
-                                        <a href="{{ path('front.account.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
-                                           ui-sref="program.inscription({'id': training.id, 'session': session.id, token: token})">S'inscrire à cette session</a>
-                                    {% elseif session.isRegistered %}
-                                        <a href="" class="btn btn-primary btn-lg btn-group-justified radius"
-                                           ui-sref="account.registrations">Voir l'état de mon inscription</a>
-                                    {% elseif not session.registrable and not session.isRegistered%}
-                                        <a href="{{ path('front.account.registrations') }}" class="btn btn-primary btn-lg disabled btn-group-justified radius">Inscriptions closes</a>
-                                    {% endif %}
-
-                                </div>
-                            {% endfor %}
-                            </uib-accordion>
-                        {% endif %}
-
-                        {% if training.modules is defined and training.modules | length > 0 %}
-                            <h4>Modules<span class="label secondary radius no-mb pull-right">{{ training.modules | length }}</span></h4>
-                            <uib-accordion close-others="false">
-                                {#{% for key, module in (training.modules | orderBy('name')) %}#}
-                                    {#<div uib-accordion-group class="uib-accordion-group panel-default"  is-open="false">#}
-                                        {#<!--heading-->#}
-                                        {#<uib-accordion-heading>{{ module.name }}</uib-accordion-heading>#}
-
-                                        {#<!--infos-->#}
-                                        {#<ul class="list-unstyled">#}
-                                            {#<li title="Période de formation"><span class="glyphicon glyphicon-oil"></span>&nbsp;&nbsp;{{ module.dateRange }}</li>#}
-                                            {#{% if module.sessions[0].place.name %}#}
-                                                {#<li title="Lieu de la session">{{ module.sessions[0].place.name }}</li>#}
-                                            {#{% endif %}#}
-                                            {#{% if module.sessions[0].hourNumber is defined and module.sessions[0].dayNumber is defined %}#}
-                                                {#<li title="Durée de la session"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;{{ module.sessions[0].hourNumber }} heure(s) sur {{ module.sessions[0].dayNumber }} jour(s)</li>#}
-                                            {#{% endif %}#}
-                                            {#{% if module.sessions[0].schedule is defined %}#}
-                                                {#<li title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ module.sessions[0].schedule }}</li>#}
-                                            {#{% endif %}#}
-                                            {#{% if module.sessions[0].maximumNumberOfRegistrations is defined %}#}
-                                                {#<li title="Nombre maximum d'inscrits"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;{{ module.sessions[0].maximumNumberOfRegistrations }} inscriptions max.</li>#}
-                                            {#{% endif %}#}
-                                            {#{% if user.isPaying and training.sessions[0].price %}#}
-                                                {#<li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ training.sessions[0].prices }}</li>#}
-                                            {#{% endif %}#}
-                                        {#</ul>#}
-                                    {#</div>#}
-                                {#{% endfor %}#}
-                            </uib-accordion>
-                        {% endif %}
-
-                        <!--modules inscriptions-->
-                        {% if session.moduleToken %}
-                            <a href="" class="btn btn-primary btn-lg btn-group-justified radius" ui-sref="program.inscription({'id': training.id, token: token})">Voir l'état de mes inscriptions aux modules</a>
-                        {% endif %}
-                    </div>
-                    {% endif %}
 
                     {% if training.website is defined %}
                         <h4 class="mb-base">Site web</h4>
