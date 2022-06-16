@@ -152,7 +152,7 @@ class ProgramController extends AbstractController
         $trainee = $arTrainee[0];
 
         $inscription = $doctrine->getManager()->getRepository('App\Entity\Core\AbstractInscription')->findOneBy(array(
-            'trainee' => $this->getUser(),
+            'trainee' => $trainee,
             'session'=> $session
         ));
         if ($inscription) {
