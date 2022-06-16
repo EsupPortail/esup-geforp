@@ -185,7 +185,7 @@
 
                                             <!--infos-->
                                             {% if upcomingSession.registrable and not upcomingSession.isRegistered and (upcomingSession.availablePrivateSession or upcomingSession.isPublic) %}
-                                                <a href="{{ path('front.account.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
+                                                <a href="{{ path('front.program.inscription', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
                                             {% elseif upcomingSession.isRegistered %}
                                                 <a href="{{ path('front.account.registrations') }}" class="btn btn-primary btn-lg btn-group-justified radius" >Voir l'état de mon inscription</a>
                                             {% elseif not upcomingSession.registrable and not upcomingSession.isRegistered %}

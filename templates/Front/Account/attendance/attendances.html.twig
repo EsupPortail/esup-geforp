@@ -42,7 +42,7 @@
                                     <tr>
                                         <td>{{ attendance.session.dateBegin | date('d/m/Y') }}</td>
                                         <td>
-                                            <a href="{{ path('front.account.training', {id: attendance.session.training.id}) }}">{{ attendance.session.training.name }}</a>
+                                            <a href="{{ path('front.program.training', {id: attendance.session.training.id}) }}">{{ attendance.session.training.name }}</a>
                                             <br>
                                                 {% for key, part in attendance.session.participations %}
                                                     {% if key > 0 %}<span>, </span>{% endif %}

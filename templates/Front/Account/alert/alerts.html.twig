@@ -46,7 +46,7 @@
                                         <tr>
                                             <td>{{ alert.session.dateBegin | date('m/Y') }}</td>
                                             <td>
-                                                <a href="{{ path('front.account.training', {id: alert.session.training.id}) }}">{{ alert.session.training.name }}</a>
+                                                <a href="{{ path('front.program.training', {id: alert.session.training.id}) }}">{{ alert.session.training.name }}</a>
                                             </td>
                                             <td>{{ form_widget(form.alerts[counter].alert) }}</td>
                                         </tr>

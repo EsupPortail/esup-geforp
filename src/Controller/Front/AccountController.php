@@ -245,7 +245,7 @@ class AccountController extends AbstractController
                 $em->flush();
                 // redirect user to registrations pages
                 //$url = $this->generateUrl('front.account.registrations');
-                $url = $this->generateUrl('front.account.myprogram');
+                $url = $this->generateUrl('front.program.myprogram');
             }
             else {
                 return $this->redirectToRoute('front.account.logout', array('return' => $this->generateUrl('front.public.index', array('shibboleth' => 1, 'error' => 'activation'))));

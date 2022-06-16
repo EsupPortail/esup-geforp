@@ -12,17 +12,22 @@ use App\Entity\Core\Term\Theme;
 use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractTraining;
 use App\Entity\Session;
-use App\Repository\SessionRepository;
-use Doctrine\ORM\EntityManager;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
+use App\Entity\Inscription;
 use App\Entity\Organization;
 use App\Entity\Alert;
 use App\Entity\MultipleAlert;
 use App\Entity\SingleAlert;
+use App\Entity\Core\Term\Emailtemplate;
+use App\Repository\SessionRepository;
+use App\Vocabulary\VocabularyRegistry;
 use App\Form\Type\ProgramAlertType;
 use App\Form\Type\ProgramSearchType;
+use App\Form\Type\InscriptionType;
+
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
@@ -30,9 +35,11 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 /**
- * @Route("/account")
+ * @Route("/program")
  * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
  */
 class ProgramController extends AbstractController
@@ -43,7 +50,7 @@ class ProgramController extends AbstractController
      * @param null $sessionId
      * @param null $token
      *
-     * @Route("/training/{id}/{sessionId}/{token}", name="front.account.training", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @Route("/training/{id}/{sessionId}/{token}", name="front.program.training", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @Template("Front/Public/program/training.html.twig")
      *
@@ -130,27 +137,21 @@ class ProgramController extends AbstractController
      * @param \App\Entity\Session $session
      * @param null $token
      *
-     * @Route("/training/inscription/{id}/{sessionId}/{token}", name="front.account.inscription", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @Route("/training/inscription/{id}/{sessionId}/{token}", name="front.program.inscription", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @ParamConverter("session", class="App\Entity\Session", options={"id" = "sessionId"})
      * @Template("Front/Public/program/inscription.html.twig")
      *
      * @return array
      */
-    public function inscriptionAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
+    public function inscriptionAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, Session $session, $token = null)
     {
         // in case shibboleth authentication done but user has not registered his account
-        if (!is_object($this->getUser())) {
-            return $this->redirectToRoute('front.account.register');
-        }
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
 
-        $this->apiTrainingController->setContainer($this->container);
-        $training = $this->apiTrainingController->trainingAction($training);
-        if (method_exists($session, 'getModule') && $session->getModule()) {
-            $session->moduleToken = md5($session->getTraining()->getType() . $session->getTraining()->getId()) === $token;
-        }
-
-        $inscription = $doctrine->getManager()->getRepository('SygeforInscriptionBundle:AbstractInscription')->findOneBy(array(
+        $inscription = $doctrine->getManager()->getRepository('App\Entity\Core\AbstractInscription')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -161,17 +162,17 @@ class ProgramController extends AbstractController
         }
         if (!$inscription) {
             $inscription = new Inscription();
-            $inscription->setTrainee($this->getUser());
+            $inscription->setTrainee($trainee);
             $inscription->setSession($session);
         }
         $inscription->setInscriptionStatus(
-            $doctrine->getRepository('SygeforInscriptionBundle:Term\InscriptionStatus')->findOneBy(
+            $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
                 array('machineName' => 'waiting')
             )
         );
 
-        $publicType = $this->getUser()->getPublicType();
-        $publicRestrict = $training->getPublicTypesRestrict();
+        $publicType = $trainee->getPublictype();
+        $publicRestrict = $training->getPublictypesrestrict();
         $flagInsc = 0;
         if (sizeof($publicRestrict)) {
             foreach ($publicRestrict as $public) {
@@ -184,17 +185,17 @@ class ProgramController extends AbstractController
         }
 
         // Test responsable hiérarchique si biatss
-        $EmailSup = $this->getUser()->getEmailSup();
+        $EmailSup = $trainee->getEmailSup();
         if (($EmailSup == null) && ($publicType == null) || (($EmailSup == null) && ($publicType->getId() == 1))) {
             // Message pour indiquer qu'il faut renseigner le supéieur hiérarchique
             $flagInsc = 2;
         }
 
         if ($flagInsc==1) {
-            $form = $this->createForm(new InscriptionType(), $inscription);
+            $form = $this->createForm(InscriptionType::class, $inscription);
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
-                if ($form->isValid()) {
+                if (($form->isSubmitted())&&($form->isValid())) {
                     $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
@@ -208,9 +209,10 @@ class ProgramController extends AbstractController
 //                    if ($form['authorization']->getData() == TRUE) {
                     // si on a bien un responsable renseigné
                     if (count($inscription->getTrainee()->getEmailSup())) {
-                        $templateTerm = $this->container->get('sygefor_core.vocabulary_registry')->getVocabularyById('sygefor_trainee.vocabulary_email_template');
+                        // Recuperation des templates emails dans le registre des vocabulaires
+                        $templateTerm = $vocRegistry->getVocabularyById(5);
                         $repo = $em->getRepository(get_class($templateTerm));
-                        /** @var EmailTemplate $template */
+                        /** @var Emailtemplate $template */
                         $templates = $repo->findBy(array('name' => "Demande de validation d'inscription", 'organization' => $inscription->getSession()->getTraining()->getOrganization()));
                         $subject = $templates[0]->getSubject();
                         $body = $templates[0]->getBody();
@@ -218,15 +220,15 @@ class ProgramController extends AbstractController
 
                         $Texte = "";
                         foreach ($inscription->getSession()->getDates() as $date) {
-                            if ($date->getDateBegin() == $date->getDateEnd()) {
-                                $Texte .= $date->getDateBegin()->format('d/m/Y') . "        " . $date->getScheduleMorn() . "        " . $date->getScheduleAfter() . "        " . $date->getPlace() . "\n";
+                            if ($date->getDatebegin() == $date->getDateend()) {
+                                $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
                             } else {
-                                $Texte .= $date->getDateBegin()->format('d/m/Y') . " au " . $date->getDateEnd()->format('d/m/Y') . "        " . $date->getScheduleMorn() . "        " . $date->getScheduleAfter() . "        " . $date->getPlace() . "\n";
+                                $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
                             }
                         }
                         $newbody = str_replace("[dates]", $Texte, $newbody);
-                        $newbody = str_replace("[stagiaire.prenom]", $inscription->getTrainee()->getFirstName(), $newbody);
-                        $newbody = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastName(), $newbody);
+                        $newbody = str_replace("[stagiaire.prenom]", $inscription->getTrainee()->getFirstname(), $newbody);
+                        $newbody = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastname(), $newbody);
                         $newbody = str_replace("[lien]", $lien, $newbody);
 
                         // Envoyer un mail au supérieur hiérarchique
@@ -236,14 +238,14 @@ class ProgramController extends AbstractController
                             . "Pour autoriser ". $inscription->getTrainee()->getFullName()  . " à participer à cette formation, merci de valider l'inscription en cliquant sur le lien suivant :". "\n"
                             . "http://www.univ-amu.fr";
                         */
-                        $message = \Swift_Message::newInstance();
-                        $message->setFrom($this->container->getParameter('mailer_from'), "Sygefor");
-                        $message->setReplyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail());
-                        $message->setTo($inscription->getTrainee()->getEmailSup());
-                        $message->setSubject($subject);
-                        $message->setBody($newbody);
+                        $message = (new Email())
+                            ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
+                            ->replyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail())
+                            ->to($inscription->getTrainee()->getEmailSup())
+                            ->subject($subject)
+                            ->text($newbody);
 
-                        $this->container->get('mailer')->send($message);
+                        $mailer->send($message);
 
                     }
 
@@ -254,13 +256,13 @@ class ProgramController extends AbstractController
                     );
                 }
 
-                $sup = $inscription->getTrainee()->getFirstNameSup() . " " . $inscription->getTrainee()->getLastNameSup();
+                $sup = $inscription->getTrainee()->getFirstnamesup() . " " . $inscription->getTrainee()->getLastnamesup();
                 $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
 
             return array(
-                'user' => $this->getUser(),
+                'user' => $trainee,
                 'form' => $form->createView(),
                 'training' => $training,
                 'session' => $session,
@@ -271,7 +273,7 @@ class ProgramController extends AbstractController
         else {
             //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
             return array(
-                'user' => $this->getUser(),
+                'user' => $trainee,
                 'training' => $training,
                 'session' => $session,
                 'flag' => $flagInsc
@@ -285,7 +287,7 @@ class ProgramController extends AbstractController
      * @param \Sygefor\Bundle\MyCompanyBundle\Entity\Session $session
      * @param null $token
      *
-     * @Route("/training/alert/{id}/{sessionId}", name="front.public.alert", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @Route("/training/alert/{id}/{sessionId}", name="front.program.alert", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
      * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "sessionId"})
      * @Template("@SygeforFront/Public/program/inscription.html.twig")
@@ -339,7 +341,7 @@ class ProgramController extends AbstractController
      * @param \Sygefor\Bundle\MyCompanyBundle\Entity\Session $session
      * @param null $token
      *
-     * @Route("/training/alertremove/{id}/{sessionId}", name="front.public.alertremove", requirements={"id": "\d+", "sessionId": "\d+"})
+     * @Route("/training/alertremove/{id}/{sessionId}", name="front.program.alertremove", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
      * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "sessionId"})
      * @Template("@SygeforFront/Public/program/inscription.html.twig")
@@ -384,7 +386,7 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @Route("/myprogram", name="front.account.myprogram")
+     * @Route("/myprogram", name="front.program.myprogram")
      * @Template("Front/Public/myprogram.html.twig")
      */
     public function myProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
@@ -485,7 +487,7 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @Route("/allprogram", name="front.account.allprogram")
+     * @Route("/allprogram", name="front.program.allprogram")
      * @Template("Front/Public/allprogram.html.twig")
      */
     public function allProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
@@ -582,7 +584,7 @@ class ProgramController extends AbstractController
      * @param null centreCode
      * @param null theme
      * @param null texte
-     * @Route("/searchalerts/{centreCode}/{theme}/{texte}", name="front.account.searchalerts")
+     * @Route("/searchalerts/{centreCode}/{theme}/{texte}", name="front.program.searchalerts")
      * @Template("Front/Public/searchResult.html.twig")
      */
     public function searchalertsAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null)
@@ -689,7 +691,7 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @Route("/search", name="front.account.search")
+     * @Route("/search", name="front.program.search")
      * @Template("Front/Public/search.html.twig")
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine)
@@ -726,7 +728,7 @@ class ProgramController extends AbstractController
                 }
                 $texte = $form['texte']->getData();
 
-                return $this->redirectToRoute('front.account.searchalerts', array('centreCode' => $centreCode, 'theme' => $themeName, 'texte' => $texte));
+                return $this->redirectToRoute('front.program.searchalerts', array('centreCode' => $centreCode, 'theme' => $themeName, 'texte' => $texte));
 
             }
         }

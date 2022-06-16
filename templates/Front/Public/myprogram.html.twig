@@ -10,10 +10,10 @@
                 </div>
             </div><!-- /row -->
             <ul class="nav nav-tabs">
-                <li class="active"><a href="{{ path('front.account.myprogram') }}" title="Accès aux formations de mon établissement" class="button secondary">L'offre de formation de mon établissement</a></li>
-                <li><a href="{{ path('front.account.search') }}" title="Rechercher une formation" >Rechercher une formation</a></li>
+                <li class="active"><a href="{{ path('front.program.myprogram') }}" title="Accès aux formations de mon établissement" class="button secondary">L'offre de formation de mon établissement</a></li>
+                <li><a href="{{ path('front.program.search') }}" title="Rechercher une formation" >Rechercher une formation</a></li>
                 {% if multiEtab == true %}
-                    <li><a href="{{ path('front.account.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
+                    <li><a href="{{ path('front.program.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
                 {% endif %}
             </ul>
 
