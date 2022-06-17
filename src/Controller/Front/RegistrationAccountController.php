@@ -141,6 +141,9 @@ class RegistrationAccountController extends AbstractController
             if ($inscription->getInscriptionstatus()->getStatus() === Inscriptionstatus::STATUS_PENDING) {
                 // if the inscription is pending, just delete it
                 $em->remove($inscription);
+                $em->flush();
+                $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
+                return $this->redirectToRoute('front.account.registrations');
             }
             else {
                 // else set the status to "Desist"
@@ -152,7 +155,7 @@ class RegistrationAccountController extends AbstractController
 
         }
 
-        return array('user' => $this->getUser(), 'registration' => $registration);
+        return array('user' => $trainee, 'registration' => $registration);
     }
 
     /**

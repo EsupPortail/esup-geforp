@@ -16,7 +16,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for registration in list | orderBy('date') %}
+            {% for registration in list |sort((a, b) => a.createdat <=> b.createdat) %}
                 <tr>
                     <td>{{ registration.createdAt | date('d/m/Y') }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>

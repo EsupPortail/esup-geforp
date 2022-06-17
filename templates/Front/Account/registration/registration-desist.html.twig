@@ -44,7 +44,7 @@
 
           <blockquote class="small">
             {{ registration.session.training.name }}<br>
-            {{ registration.session.dateRange | replace('le' , '') }}
+            {{ registration.session.dateRange | u.replace('le' , '') }}
           </blockquote>
 
           <div class="row">
