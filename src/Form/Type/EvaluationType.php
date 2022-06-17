@@ -29,7 +29,8 @@ class EvaluationType extends AbstractType
         $builder
             ->add('criteria', CollectionType::class, array(
                 'label' => 'Critères d\'évaluation',
-                'type' => new EvaluationNotedCriterionType($tabEval)
+                'entry_type' => EvaluationNotedCriterionType::class,
+                'entry_options' =>  array('tab_eval'  => $tabEval)
             ))
             ->add('message', null, array(
                 'label' => $options['message'],

@@ -24,18 +24,13 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class EvaluationNotedCriterionType extends AbstractType
 {
-    private $tabEval;
-    public function __construct($variable)
-    {
-        $this->tabEval= $variable;
-    }
-
     /**
      * @param FormBuilderInterface $builder
      * @param array                $options
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $tabEval = $options['tab_eval'];
         $builder
             ->add('inscription', EntityHiddenType::class, array(
                 'label' => 'Inscription',
@@ -47,7 +42,7 @@ class EvaluationNotedCriterionType extends AbstractType
             ))
             ->add('note', ChoiceType::class, array(
                 'label' => 'Note',
-                'choices' => $this->tabEval
+                'choices' => $tabEval
             ));
 
         $builder->addEventListener(FormEvents::POST_SET_DATA, array($this, 'replaceNoteLabel'));
