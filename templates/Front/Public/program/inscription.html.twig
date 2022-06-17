@@ -41,33 +41,29 @@
                 <div class="col-md-7">
                     {% if flag==1 %}
                         {% include 'Front/Public/program/training-tags.html.twig' %}
-
-                        {% if session.moduleToken is not defined or not session.moduleToken %}
-                            {{ form_start(form) }}
-                            {{ form_row(form.children.motivation) }}
-                            {{ form_errors(form.children.motivation) }}
-               {#      <label>Type de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>{{ form_widget(form.children.actiontype) }} #}
-                            <label class="col-sm-3 control-label" data-toggle="popover" data-placement="top"  title="" data-content="Ce numéro n'est visible que par vous. " data-original-title="Alerte Sureté et Sécurité">Type de formation <img src=" {{ asset("bundles/app/images/icon_help.gif") }}"/></label>{{ form_widget(form.children.actiontype) }}
+                        {{ form_start(form) }}
+                        {{ form_row(form.children.motivation) }}
+                        {{ form_errors(form.children.motivation) }}
+           {#      <label>Type de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>{{ form_widget(form.children.actiontype) }} #}
+                        <label class="col-sm-3 control-label" data-toggle="popover" data-placement="top"  title="" data-content="Ce numéro n'est visible que par vous. " data-original-title="Alerte Sureté et Sécurité">Type de formation <img src=" {{ asset("bundles/app/images/icon_help.gif") }}"/></label>{{ form_widget(form.children.actiontype) }}
 {#                             {{ form_row(form.children.actiontype) }}  #}
 {#                             {{ form_widget(form.children.dif) }}  #}
-                            {{ form_widget(form.children.dif) }}<label>Compte personnel de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>
-                            {{ form_widget(form.children.authorization) }}
-                            {{ form_errors(form) }}
-                            <br>
-                            <div class="form-group">
-                                <div class="col-sm-offset-2 col-sm-10">
-                                    <button type="submit" class="btn btn-primary btn-block">Envoyer mon inscription</button>
-                                </div>
+                        {{ form_widget(form.children.dif) }}<label>Compte personnel de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>
+                        {{ form_widget(form.children.authorization) }}
+                        {{ form_errors(form) }}
+                        <br>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="submit" class="btn btn-primary btn-block">Envoyer mon inscription</button>
                             </div>
+                        </div>
 
-                            {{ form_end(form) }}
-                        {% endif %}
-
+                        {{ form_end(form) }}
                     {% else %}
                         {% if flag==0 %}
                             <h2> Inscription refusée </h2>
                             <p>Vous ne pouvez pas vous inscrire à cette session car vous ne faites par partie des publics cibles autorisés à s'inscrire.</p>
-                        {%  else %}
+                        {% else %}
                             {% if flag==2 %}
                                 <h2> Inscription impossible </h2>
                                 <h4>Vous ne pouvez pas vous inscrire à cette session car vous n'avez pas renseigné de supérieur hiérarchique. </h4>
@@ -76,7 +72,7 @@
                             {%  else %}
                                 <h2> Inscription refusée </h2>
                             {% endif%}
-                        {%  endif %}
+                        {% endif %}
                     {% endif %}
 
                 </div>
@@ -101,68 +97,69 @@
                                 <div class="panel-body">
                                     <ul class="list-unstyled text-center">
                                         {% if session.displayOnline == true %}
-                                        {% if session.name is defined and session.name != "" %}
-                                            <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
-                                        {% endif %}
-                                    {#    {% if session.place.name is defined %}
-                                            <li title="Lieu de la session"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;{{ session.place.name }}</li>
-                                        {% endif %}
-                                        {% if session.hourNumber is defined and session.dayNumber is defined %}
-                                            <li title="Durée de la session"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;{{ session.hourNumber }} heure(s) sur {{ session.dayNumber }} jour(s)</li>
-                                        {% endif %}
-                                        {% if session.schedule is defined and session.schedule | length > 0 %}
-                                            <li title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ session.schedule }}</li>
-                                        {% endif %} #}
-                                        {% if session.sessionType != "A venir" %}
-                                            {% if session.dates | length >0 %}
-                                                <li title="Dates">
-                                                    <table style="margin: auto">
-                                                        <thead>
-                                                        <tr>
-                                                            <th class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;</th>
-                                                            <th class="text-center"><i class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;</th>
-                                                            <th class="text-center"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;</th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {% for date in session.dates %}
-                                                            <tr >
-                                                                {% if date.dateEnd is defined and date.dateEnd is not null %}
-                                                                    {%  if date.dateEnd != date.dateBegin %}
-                                                                        <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                            {% if session.name is defined and session.name != "" %}
+                                                <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
+                                            {% endif %}
+                                        {#    {% if session.place.name is defined %}
+                                                <li title="Lieu de la session"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;{{ session.place.name }}</li>
+                                            {% endif %}
+                                            {% if session.hourNumber is defined and session.dayNumber is defined %}
+                                                <li title="Durée de la session"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;{{ session.hourNumber }} heure(s) sur {{ session.dayNumber }} jour(s)</li>
+                                            {% endif %}
+                                            {% if session.schedule is defined and session.schedule | length > 0 %}
+                                                <li title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ session.schedule }}</li>
+                                            {% endif %} #}
+                                            {% if session.sessionType != "A venir" %}
+                                                {% if session.dates | length >0 %}
+                                                    <li title="Dates">
+                                                        <table style="margin: auto">
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;</th>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;</th>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for date in session.dates %}
+                                                                <tr >
+                                                                    {% if date.dateEnd is defined and date.dateEnd is not null %}
+                                                                        {%  if date.dateEnd != date.dateBegin %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                                                        {% else %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                        {% endif %}
                                                                     {% else %}
                                                                         <td>{{ date.dateBegin | date('d/m/y') }} </td>
                                                                     {% endif %}
-                                                                {% else %}
-                                                                    <td>{{ date.dateBegin | date('d/m/y') }} </td>
-                                                                {% endif %}
-                                                                {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
-                                                                    {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
-                                                                        <td>{{ date.scheduleMorn }}, {{ date.scheduleAfter }}</td>
+                                                                    {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
+                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                            <td>{{ date.scheduleMorn }}, {{ date.scheduleAfter }}</td>
+                                                                        {% else %}
+                                                                            <td>{{ date.scheduleMorn }}</td>
+                                                                        {% endif %}
                                                                     {% else %}
-                                                                        <td>{{ date.scheduleMorn }}</td>
+                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                            <td>{{ date.scheduleAfter }}</td>
+                                                                        {% else %}
+                                                                            <td></td>
+                                                                        {% endif %}
                                                                     {% endif %}
-                                                                {% else %}
-                                                                    {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
-                                                                        <td>{{ date.scheduleAfter }}</td>
-                                                                    {% else %}
-                                                                        <td></td>
-                                                                    {% endif %}
-                                                                {% endif %}
-                                                                <td>{{ date.place }}</td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                        </tbody>
-                                                    </table>
+                                                                    <td>{{ date.place }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </li>
+                                                {% endif %}
+                                            {% else %}
+                                                <li title="Dates">
+                                                    <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
                                                 </li>
                                             {% endif %}
-                                        {% else %}
-                                            <li title="Dates">
-                                                <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
-                                            </li>
-                                        {% endif %}
-                                        {% if user.isPaying is defined and user.isPaying and session.price is defined %}
-                                            <li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;</li>
+                                            {% if user.isPaying is defined and user.isPaying and session.price is defined %}
+                                                <li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;</li>
+                                            {% endif %}
                                         {% endif %}
                                     </ul>
                                 </div>
