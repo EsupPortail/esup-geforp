@@ -70,7 +70,7 @@ class RegistrationAccountController extends AbstractController
     public function registrationsAction(Request $request, ManagerRegistry $doctrine)
     {
         // Recup param pour l'activation du bouton de relance au N+1
-        $relanceActif = $this->container->getParameter('relance_actif');
+        $relanceActif = $this->getParameter('relance_actif');
 
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);

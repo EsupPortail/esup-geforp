@@ -11,6 +11,7 @@ parameters:
     adresse_from_ldap: false
     corresp_form_actif: true
     lib_affectation : false
+    relance_actif: true
     multi_etab_actif: true
     liste_etab:
         AMU:

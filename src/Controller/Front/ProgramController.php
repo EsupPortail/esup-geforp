@@ -196,6 +196,8 @@ class ProgramController extends AbstractController
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
                 if (($form->isSubmitted())&&($form->isValid())) {
+                    $inscription->setCreatedAt(new \DateTime('now'));
+                    $inscription->setUpdatedAt(new \DateTime('now'));
                     $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
@@ -203,7 +205,7 @@ class ProgramController extends AbstractController
 
                     $id = $inscription->getId();
                     // Lien vers la page d'autorisation
-                    $lien = $this->container->getParameter('front_url') . "/account/registration/" . $id . "/valid";
+                    $lien = $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
 
 
 //                    if ($form['authorization']->getData() == TRUE) {
