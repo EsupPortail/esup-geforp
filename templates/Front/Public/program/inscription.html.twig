@@ -44,11 +44,8 @@
                         {{ form_start(form) }}
                         {{ form_row(form.children.motivation) }}
                         {{ form_errors(form.children.motivation) }}
-           {#      <label>Type de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>{{ form_widget(form.children.actiontype) }} #}
-                        <label class="col-sm-3 control-label" data-toggle="popover" data-placement="top"  title="" data-content="Ce numéro n'est visible que par vous. " data-original-title="Alerte Sureté et Sécurité">Type de formation <img src=" {{ asset("bundles/app/images/icon_help.gif") }}"/></label>{{ form_widget(form.children.actiontype) }}
-{#                             {{ form_row(form.children.actiontype) }}  #}
-{#                             {{ form_widget(form.children.dif) }}  #}
-                        {{ form_widget(form.children.dif) }}<label>Compte personnel de formation<img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/> </label>
+                        {{ form_row(form.children.actiontype) }}
+                        {{ form_widget(form.children.dif) }}
                         {{ form_widget(form.children.authorization) }}
                         {{ form_errors(form) }}
                         <br>
@@ -177,7 +174,7 @@
                     <address>
                         <div>{{ training.organization.name }}</div>
                         <div>{{ training.organization.fullAddress | nl2br }}</div>
-                        <div><span class="glyphicon glyphicon-phone-alt"></span> <a href="tel:{{ training.organization.phoneNumber | replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a></div>
+                        <div><span class="glyphicon glyphicon-phone-alt"></span> <a href="tel:{{ training.organization.phoneNumber | u.replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a></div>
                         <div><span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{ training.organization.email }}">&nbsp;{{ training.organization.email }}</a></div>
                         {% if training.organization.website is defined and training.organization.website | length > 0 %}
                             <div><span class="glyphicon glyphicon-globe"></span> <a href="{{ training.organization.website }}" target="_blank">&nbsp;{{ training.organization.website }}</a></div>
