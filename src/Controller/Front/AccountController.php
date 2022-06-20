@@ -152,27 +152,10 @@ class AccountController extends AbstractController
 
             // Attributs AMU
             if ($trainee->getInstitution()->getName() == "AMU") {
-                // Suite à migration SIHAM, on utilise amuAffectationLib
-                if (isset($shibbolethAttributes['amuAffectationLib'])) {
-                    $servicelib = $shibbolethAttributes['amuAffectationLib'];
-                } else {
-                    $services = explode(";", $shibbolethAttributes['supannEntiteAffectation']);
-                    $servicelib = "";
-                    if (count($services) > 0) {
-                        foreach ($services as $service) {
-                            $supannCodeEntite = $doctrine->getRepository('App\Entity\SupannCodeEntite')->findOneBy(
-                                array('supannCodeEntite' => $service)
-                            );
-                            if ($supannCodeEntite != null) {
-                                $servicelib .= $supannCodeEntite->getDescription() . " ; ";
-                            }
-                        }
-                    }
-                }
-                $trainee->setService($servicelib);
+                $trainee->setService($shibbolethAttributes['amuAffectationLib']);
                 $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
                 //$trainee->setBap($shibbolethAttributes['amuBap']);
-//                $trainee->setCampus($shibbolethAttributes['amuCampus']);
+                $trainee->setCampus($shibbolethAttributes['amuCampus']);
                 $bap = "";
                 $activites = explode(";", $shibbolethAttributes['supannActivite']);
                 foreach($activites as $activite) {
@@ -337,13 +320,13 @@ class AccountController extends AbstractController
                 array('name' => 'other')
             ));
         }
-        $trainee->setStatus($shibbolethAttributes['postalCode']);
+//        $trainee->setStatus($shibbolethAttributes['postalCode']);
 
         // Etablissement
         $eppn = $shibbolethAttributes['eppn'];
         if (stripos($eppn, "@") > 0) {
             $domaine = substr($eppn, stripos($eppn, "@") + 1);
-            $listeDomaines = $this->container->getParameter('domaines');
+            $listeDomaines = $this->getParameter('domaines');
             // Association nom de domaine et établissement
             if (array_key_exists($domaine, $listeDomaines)) {
                 $etab = $listeDomaines[$domaine];
@@ -379,7 +362,7 @@ class AccountController extends AbstractController
             $trainee->setBap($bap);
             $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
             // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if (count($corps > 0)) {
+            if (isset($corps)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
                 $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
@@ -416,7 +399,7 @@ class AccountController extends AbstractController
             $trainee->setBap($bap);
             $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
             // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if (count($corps > 0)) {
+            if (isset($corps)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
                 $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
@@ -434,7 +417,7 @@ class AccountController extends AbstractController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 // TEST sur le responsable
-                if (count($trainee->getEmailSup()) > 0) {
+                if ($trainee->getEmailSup()) {
                     // Vérification du mail qui doit être institutionnel
                     if (stripos($trainee->getEmailSup(), "@") > 0) {
                         $domaine = substr($trainee->getEmailSup(), stripos($trainee->getEmailSup(), "@") + 1);
