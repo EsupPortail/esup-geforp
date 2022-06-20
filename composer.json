@@ -18,6 +18,7 @@
         "gedmo/doctrine-extensions": "^3.5",
         "jms/serializer-bundle": "^4.0",
         "knplabs/knp-menu-bundle": "^3.2",
+        "knplabs/knp-snappy-bundle": "^1.9",
         "mbence/opentbs-bundle": "dev-master",
         "mopa/bootstrap-bundle": "^3.4",
         "nelmio/cors-bundle": "^2.2",
