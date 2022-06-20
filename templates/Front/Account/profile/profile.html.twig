@@ -1,4 +1,4 @@
-{% extends "@SygeforFront/base.html.twig" %}
+{% extends "Front/base.html.twig" %}
 
 
 {% block header %}
@@ -23,6 +23,6 @@
 
 {% block body %}
     <div class="container">
-        {% include('@SygeforFront/Account/profile/profile-form.html.twig') %}
+        {% include('Front/Account/profile/profile-form.html.twig') %}
     </div>
 {% endblock body %}

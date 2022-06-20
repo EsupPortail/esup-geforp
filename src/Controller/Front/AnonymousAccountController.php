@@ -141,9 +141,9 @@ class AnonymousAccountController extends AbstractController
 
 
         // Etablissement
-        $eppn = $shibbolethAttributes['eppn'];
-        if (stripos($eppn , "@")>0) {
-            $domaine = substr($eppn, stripos($eppn, "@") + 1);
+        $email = $shibbolethAttributes['mail'];
+        if (stripos($email , "@")>0) {
+            $domaine = substr($email, stripos($email, "@") + 1);
             $listeDomaines = $this->getParameter('domaines');
             // Association nom de domaine et établissement
             if (array_key_exists($domaine, $listeDomaines)){
