@@ -318,17 +318,17 @@ class AccountController extends AbstractController
             }
         }
         $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
-        if ($shibbolethAttributes['primary_affiliation'] == "staff") {
+        if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
-            $shibbolethAttributes['primary_affiliation'] = "employee";
+            $shibbolethAttributes['primary-affiliation'] = "employee";
         }
         // on teste si biatss : si oui, supérieur hiérarchique obligatoire dans le formulaire
         $flagSupRequired = false;
-        if ($shibbolethAttributes['primary_affiliation'] == "employee") {
+        if ($shibbolethAttributes['primary-affiliation'] == "employee") {
             $flagSupRequired = true;
         }
         $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\Publictype')->findOneBy(
-            array('name' => $shibbolethAttributes['primary_affiliation'])
+            array('name' => $shibbolethAttributes['primary-affiliation'])
         );
         if ($primary_affiliation != null) {
             $trainee->setPublictype($primary_affiliation);
