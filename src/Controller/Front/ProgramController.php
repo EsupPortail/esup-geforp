@@ -210,7 +210,7 @@ class ProgramController extends AbstractController
 
 //                    if ($form['authorization']->getData() == TRUE) {
                     // si on a bien un responsable renseigné
-                    if (count($inscription->getTrainee()->getEmailSup())) {
+                    if (null !== $inscription->getTrainee()->getEmailSup()) {
                         // Recuperation des templates emails dans le registre des vocabulaires
                         $templateTerm = $vocRegistry->getVocabularyById(5);
                         $repo = $em->getRepository(get_class($templateTerm));
@@ -485,7 +485,7 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return array('user' => $this->getUser(), 'search' => $search, 'img' => $img, 'form' => $form->createView(),'multiEtab' => $multiEtab);
+        return array('user' => $arTrainee[0], 'search' => $search, 'img' => $img, 'form' => $form->createView(),'multiEtab' => $multiEtab);
     }
 
     /**

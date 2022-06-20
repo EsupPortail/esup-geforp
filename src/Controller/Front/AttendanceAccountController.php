@@ -49,7 +49,7 @@ class AttendanceAccountController extends AbstractController
         $evalActif = $this->getParameter('eval_actif');
 
         // recup inscriptions
-        $qb          = $this->createQueryBuilder();
+        $qb          = $this->createQueryBuilder($doctrine, $trainee);
         $attendances = $qb->getQuery()->getResult();
 
         return array('user' => $trainee, 'attendances' => $attendances, 'evalActif' => $evalActif);
@@ -73,7 +73,7 @@ class AttendanceAccountController extends AbstractController
         $evalActif = $this->getParameter('eval_actif');
 
         /** @var Inscription $attendance */
-        $attendance = $this->getAttendance($session);
+        $attendance = $this->getAttendance($doctrine, $session, $trainee);
         $session = $attendance->getSession();
         $allMaterials = new ArrayCollection();
         foreach ($session->getMaterials() as $material) {
@@ -264,9 +264,9 @@ class AttendanceAccountController extends AbstractController
      *
      * @return AbstractInscription
      */
-    private function getAttendance($session)
+    private function getAttendance($doctrine, $session, $trainee)
     {
-        $qb = $this->createQueryBuilder();
+        $qb = $this->createQueryBuilder($doctrine, $trainee);
         $qb->andWhere('i.session = :session')
             ->setParameter('session', $session);
         $attendance = $qb->getQuery()->getOneOrNullResult();
