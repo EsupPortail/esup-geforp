@@ -250,7 +250,7 @@ class AttendanceAccountController extends AbstractController
 
         //checking signature file existence
         $fs = new Filesystem();
-        if($fs->exists($this->get('kernel')->getRootDir() . '../../../public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
+        if($fs->exists($this->getParameter('kernel.project_dir') . '../../../public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
             $signature = '/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
         }
 
