@@ -154,9 +154,14 @@ class AttendanceAccountController extends AbstractController
      * @Route("/attendance/{session}/download/{material}", name="front.account.attendance.download")
      * @Method("GET")
      */
-    public function downloadAction(Request $request, $session, $material)
+    public function downloadAction(Request $request, ManagerRegistry $doctrine, $session, $material)
     {
-        $attendance   = $this->getAttendance($session);
+        // recup trainee
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
+
+        $attendance   = $this->getAttendance($doctrine, $session, $trainee);
         $allMaterials = array();
         $material     = intval($material);
 
@@ -188,9 +193,14 @@ class AttendanceAccountController extends AbstractController
      * @Route("/attendance/{session}/attestation", name="front.account.attendance.attestation")
      * @Method("GET")
      */
-    public function attestationAction($session, Request $request)
+    public function attestationAction($session, ManagerRegistry $doctrine, Request $request)
     {
-        $attendance = $this->getAttendance($session);
+        // recup trainee
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
+
+        $attendance = $this->getAttendance($doctrine, $session, $trainee);
         $session = $attendance->getSession();
 
         // Gestion nombre d'heures de formation
@@ -240,7 +250,7 @@ class AttendanceAccountController extends AbstractController
 
         //checking signature file existence
         $fs = new Filesystem();
-        if($fs->exists($this->get('kernel')->getRootDir() . '/../web/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
+        if($fs->exists($this->get('kernel')->getRootDir() . '../../../public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
             $signature = '/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
         }
 
