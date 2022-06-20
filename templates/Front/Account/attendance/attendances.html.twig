@@ -1,4 +1,4 @@
-{% extends "@SygeforFront/base.html.twig" %}
+{% extends "Front/base.html.twig" %}
 
 {% block header %}
     <header>
@@ -38,7 +38,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for attendance in attendances | orderBy('session.dateBegin') %}
+                                {% for attendance in attendances | sort((a, b) => a.session.datebegin <=> b.session.datebegin) %}
                                     <tr>
                                         <td>{{ attendance.session.dateBegin | date('d/m/Y') }}</td>
                                         <td>
