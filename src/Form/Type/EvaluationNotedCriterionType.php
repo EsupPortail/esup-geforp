@@ -32,35 +32,24 @@ class EvaluationNotedCriterionType extends AbstractType
     {
         $tabEval = $options['tab_eval'];
         $builder
-            ->add('inscription', EntityHiddenType::class, array(
+            ->add('inscription', EntityType::class, array(
                 'label' => 'Inscription',
                 'class' => Inscription::class
             ))
-            ->add('criterion', EntityHiddenType::class, array(
+            ->add('criterion', EntityType::class, array(
                 'label' => 'Critère',
                 'class' => EvaluationCriterion::class
-            ))
-            ->add('note', ChoiceType::class, array(
-                'label' => 'Note',
-                'choices' => $tabEval
             ));
 
-        $builder->addEventListener(FormEvents::POST_SET_DATA, array($this, 'replaceNoteLabel'));
-    }
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $notes = $event->getData();
+            $form = $event->getForm();
+            $config = $form->getConfig()->getOptions();
+            $form->add('note', ChoiceType::class, array('label' => $notes->getCriterion()->getName(),
+                'choices' => $config['tab_eval']
+            ));
+        });
 
-    /**
-     * @param FormEvent $event
-     */
-    public function replaceNoteLabel(FormEvent $event)
-    {
-        $form             = $event->getForm();
-        $criterion        = $form->get('criterion')->getData();
-        $note             = $form->get('note');
-        $config           = $note->getConfig();
-        $options          = $config->getOptions();
-
-        $options['label'] = $criterion->getName();
-        $form->add($note->getName(), $config->getType() ? $config->getType()->getName() : null, $options);
     }
 
     /**
@@ -70,7 +59,7 @@ class EvaluationNotedCriterionType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class'        => EvaluationNotedCriterion::class,
-            'tab_evals'         => array(
+            'tab_eval'         => array(
                 4 => "Tout à fait d'accord",
                 3 => "Plutôt d'accord",
                 2 => "Pas vraiment d'accord",

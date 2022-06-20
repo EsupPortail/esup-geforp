@@ -164,10 +164,10 @@ class AttendanceAccountController extends AbstractController
         foreach ($attendance->getSession()->getMaterials() as $sessionMaterial) {
             $allMaterials[$sessionMaterial->getId()] = $sessionMaterial;
         }
-        foreach ($attendance->getSession()->getTraining()->getMaterials() as $trainingMaterial) {
+/*        foreach ($attendance->getSession()->getTraining()->getMaterials() as $trainingMaterial) {
             $allMaterials[$trainingMaterial->getId()] = $trainingMaterial;
         }
-
+*/
         foreach ($allMaterials as $_material) {
             if ($_material->getId() === $material) {
                 $material = $_material;
