@@ -46,11 +46,12 @@ class EvaluationType extends AbstractType
      */
     public function configureOptions(OptionsResolver $resolver)
     {
-        $resolver->setDefaults(array('tab_eval' => array(
-            4 => "Tout à fait d'accord",
-            3 => "Plutôt d'accord",
-            2 => "Pas vraiment d'accord",
-            1 => "Pas du tout d'accord"),
+        $resolver->setDefaults(array(
+            'tab_eval' => array(
+                4 => "Tout à fait d'accord",
+                3 => "Plutôt d'accord",
+                2 => "Pas vraiment d'accord",
+                1 => "Pas du tout d'accord"),
             'message' => 'Message'));
     }
 }

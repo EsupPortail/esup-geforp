@@ -128,7 +128,7 @@ class AttendanceAccountController extends AbstractController
         }
 
         $evaluationCriterions = $doctrine
-            ->getRepository('App\Entity\Term\EvaluationCriterion')
+            ->getRepository('App\Entity\Core\Term\EvaluationCriterion')
             ->findAll();
         foreach ($evaluationCriterions as $evaluationCriterion) {
             $evaluationNotedCriterion = new EvaluationNotedCriterion();

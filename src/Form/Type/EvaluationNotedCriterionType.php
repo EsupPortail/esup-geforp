@@ -70,6 +70,11 @@ class EvaluationNotedCriterionType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class'        => EvaluationNotedCriterion::class,
+            'tab_evals'         => array(
+                4 => "Tout à fait d'accord",
+                3 => "Plutôt d'accord",
+                2 => "Pas vraiment d'accord",
+                1 => "Pas du tout d'accord"),
             'validation_groups' => array('Correspondent'),
         ));
     }
