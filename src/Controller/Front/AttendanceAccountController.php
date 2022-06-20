@@ -79,9 +79,9 @@ class AttendanceAccountController extends AbstractController
         foreach ($session->getMaterials() as $material) {
             $allMaterials->add($material);
         }
-        foreach ($session->getTraining()->getMaterials() as $material) {
+/*        foreach ($session->getTraining()->getMaterials() as $material) {
             $allMaterials->add($material);
-        }
+        }*/
         $attendance->getSession()->setAllMaterials($allMaterials);
 
         return array('user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif);

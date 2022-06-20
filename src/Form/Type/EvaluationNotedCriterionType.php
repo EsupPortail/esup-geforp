@@ -32,11 +32,11 @@ class EvaluationNotedCriterionType extends AbstractType
     {
         $tabEval = $options['tab_eval'];
         $builder
-            ->add('inscription', EntityType::class, array(
+            ->add('inscription', EntityHiddenType::class, array(
                 'label' => 'Inscription',
                 'class' => Inscription::class
             ))
-            ->add('criterion', EntityType::class, array(
+            ->add('criterion', EntityHiddenType::class, array(
                 'label' => 'Critère',
                 'class' => EvaluationCriterion::class
             ));
