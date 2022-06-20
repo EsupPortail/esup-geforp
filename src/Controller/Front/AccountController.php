@@ -61,8 +61,7 @@ class AccountController extends AbstractController
     public function accountAction(Request $request, ManagerRegistry $doctrine)
     {
         // Recuperation paramétrage des champs du formulaire
-//        $adresseFromLdap = $this->container->getParameter('adresse_from_ldap');
-        $adresseFromLdap = false;
+        $adresseFromLdap = $this->getParameter('adresse_from_ldap');
 
         // Récupération des attributs Shibboleth pour mise à jour du profil
         $shibbolethAttributes = $this->getUser()->getCredentials();
@@ -121,14 +120,14 @@ class AccountController extends AbstractController
                 // Transformation de l'attribut 'staff' en 'employee'
                 $shibbolethAttributes['primary-affiliation'] = "employee";
             }
-            $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+            $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\Publictype')->findOneBy(
                 array('name' => $shibbolethAttributes['primary-affiliation'])
             );
             if ($primary_affiliation != null) {
-                $trainee->setPublicType($primary_affiliation);
+                $trainee->setPublictype($primary_affiliation);
             }
             else {
-                $trainee->setPublicType($this->getDoctrine()->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+                $trainee->setPublictype($doctrine->getRepository('App\Entity\Core\Term\Publictype')->findOneBy(
                     array('name' => 'other')
                 ));
             }
@@ -161,7 +160,7 @@ class AccountController extends AbstractController
                     $servicelib = "";
                     if (count($services) > 0) {
                         foreach ($services as $service) {
-                            $supannCodeEntite = $this->getDoctrine()->getRepository('App\Entity\SupannCodeEntite')->findOneBy(
+                            $supannCodeEntite = $doctrine->getRepository('App\Entity\SupannCodeEntite')->findOneBy(
                                 array('supannCodeEntite' => $service)
                             );
                             if ($supannCodeEntite != null) {
@@ -190,7 +189,7 @@ class AccountController extends AbstractController
                 if (isset($corps)) {
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(
+                    $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
@@ -200,7 +199,7 @@ class AccountController extends AbstractController
                 }
             }
             else {
-                $libAff = $this->container->getParameter('lib_affectation');
+                $libAff = $this->getParameter('lib_affectation');
                 // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
                 if ($libAff === false)
                     $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);
@@ -228,7 +227,7 @@ class AccountController extends AbstractController
                 if (isset($corps)) {
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Corps')->findOneBy(
+                    $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
@@ -238,18 +237,13 @@ class AccountController extends AbstractController
                 }
             }
 
+            // Mise à jour du profil en base de données
+            $em = $doctrine->getManager();
+            $em->flush();
+            // redirect user to registrations pages
+            //$url = $this->generateUrl('front.account.registrations');
+            $url = $this->generateUrl('front.program.myprogram');
 
-            if ($trainee->getIsActive()) {
-                // Mise à jour du profil en base de données
-                $em = $this->getDoctrine()->getManager();
-                $em->flush();
-                // redirect user to registrations pages
-                //$url = $this->generateUrl('front.account.registrations');
-                $url = $this->generateUrl('front.program.myprogram');
-            }
-            else {
-                return $this->redirectToRoute('front.account.logout', array('return' => $this->generateUrl('front.public.index', array('shibboleth' => 1, 'error' => 'activation'))));
-            }
         }
         else {
             // redirect user to registration form
@@ -267,24 +261,29 @@ class AccountController extends AbstractController
      *
      * @return array
      */
-    public function profileAction(Request $request)
+    public function profileAction(Request $request, ManagerRegistry $doctrine)
     {
         $options = array();
 
         // Recuperation paramétrage des champs du formulaire
-        $adresseFromLdap = $this->container->getParameter('adresse_from_ldap');
-        $corrFormActif = $this->container->getParameter('corresp_form_actif');
+        $adresseFromLdap = $this->getParameter('adresse_from_ldap');
+        $corrFormActif = $this->getParameter('corresp_form_actif');
 
         // Mise à jour du profil avec les attributs récupérés par Shibboleth
-        $shibbolethAttributes = $this->get('security.token_storage')->getToken()->getAttributes();
-        $trainee = $this->getUser();
+//        $shibbolethAttributes = $this->get('security.token_storage')->getToken()->getAttributes();
+//        $trainee = $this->getUser();
+        $shibbolethAttributes = $this->getUser()->getCredentials();
+        $userEmail = $this->getUser()->getCredentials()['mail'];
+        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($userEmail);
+        $trainee = $arTrainee[0];
+
         // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
-        if ($shibbolethAttributes['supannCivilite']=='')
+        if ($shibbolethAttributes['supannCivilite'] == '')
             $shibbolethAttributes['supannCivilite'] = 'M.';
-        $trainee->setTitle($this->getDoctrine()->getRepository('SygeforCoreBundle:PersonTrait\Term\Title')->findOneBy(
+        $trainee->setTitle($this->getRepository('App\Entity\Core\Term\Title')->findOneBy(
             array('name' => $shibbolethAttributes['supannCivilite'])
         ));
-        $trainee->setOrganization($this->getDoctrine()->getRepository('SygeforCoreBundle:Organization')->find(1));
+        $trainee->setOrganization($this->getRepository('App\Entity\Organization')->find(1));
         $trainee->setLastName($shibbolethAttributes['sn']);
         $trainee->setFirstName($shibbolethAttributes['givenName']);
         $trainee->setEmail($shibbolethAttributes['mail']);
@@ -292,7 +291,7 @@ class AccountController extends AbstractController
         $datenaiss = str_replace("-", "", $shibbolethAttributes['supannOIDCDateDeNaissance']);
         $trainee->setBirthDate($datenaiss);
         // Mise en forme adresse au cas où il y en a une
-        if (($adresseFromLdap == true) && ($shibbolethAttributes['postalAddress']!="")) {
+        if (($adresseFromLdap == true) && ($shibbolethAttributes['postalAddress'] != "")) {
             $address = $shibbolethAttributes['postalAddress'];
             // Recupération du code postal
             preg_match('/\$[0-9]{5}/', $address, $result, PREG_OFFSET_CAPTURE, 3);
@@ -328,14 +327,13 @@ class AccountController extends AbstractController
         if ($shibbolethAttributes['primary_affiliation'] == "employee") {
             $flagSupRequired = true;
         }
-        $primary_affiliation = $this->getDoctrine()->getRepository('Sygefor\Bundle\TraineeBundle\Entity\Term\PublicType')->findOneBy(
+        $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\Publictype')->findOneBy(
             array('name' => $shibbolethAttributes['primary_affiliation'])
         );
         if ($primary_affiliation != null) {
-            $trainee->setPublicType($primary_affiliation);
-        }
-        else {
-            $trainee->setPublicType($this->getDoctrine()->getRepository('Sygefor\Bundle\TraineeBundle\Entity\Term\PublicType')->findOneBy(
+            $trainee->setPublictype($primary_affiliation);
+        } else {
+            $trainee->setPublictype($doctrine->getRepository('App\Entity\Core\Term\Publictype')->findOneBy(
                 array('name' => 'other')
             ));
         }
@@ -343,16 +341,16 @@ class AccountController extends AbstractController
 
         // Etablissement
         $eppn = $shibbolethAttributes['eppn'];
-        if (stripos($eppn , "@")>0) {
+        if (stripos($eppn, "@") > 0) {
             $domaine = substr($eppn, stripos($eppn, "@") + 1);
             $listeDomaines = $this->container->getParameter('domaines');
             // Association nom de domaine et établissement
-            if (array_key_exists($domaine, $listeDomaines)){
+            if (array_key_exists($domaine, $listeDomaines)) {
                 $etab = $listeDomaines[$domaine];
-            }else {
+            } else {
                 $etab = "AMU";
             }
-            $trainee->setInstitution($this->getDoctrine()->getRepository('Sygefor\Bundle\InstitutionBundle\Entity\AbstractInstitution')->findOneBy(
+            $trainee->setInstitution($doctrine->getRepository('App\Entity\Core\AbstractInstitution')->findOneBy(
                 array('name' => $etab)
             ));
 
@@ -370,7 +368,7 @@ class AccountController extends AbstractController
             $trainee->setCampus($shibbolethAttributes['amuCampus']);
             $bap = "";
             $activites = explode(";", $shibbolethAttributes['supannActivite']);
-            foreach($activites as $activite) {
+            foreach ($activites as $activite) {
                 $pos = stripos($activite, "{BAP}");
                 if ($pos !== false) {
                     $bap = ltrim($activite, "{BAP}");
@@ -384,7 +382,7 @@ class AccountController extends AbstractController
             if (count($corps > 0)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {
@@ -392,8 +390,7 @@ class AccountController extends AbstractController
                     $trainee->setCategory($n_corps->getCategory());
                 }
             }
-        }
-        else {
+        } else {
             $libAff = $this->container->getParameter('lib_affectation');
             // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
             if ($libAff === false)
@@ -408,7 +405,7 @@ class AccountController extends AbstractController
             $trainee->setAmuStatut($shibbolethAttributes['supannCodePopulation']);
             $bap = "";
             $activites = explode(";", $shibbolethAttributes['supannActivite']);
-            foreach($activites as $activite) {
+            foreach ($activites as $activite) {
                 $pos = stripos($activite, "{BAP}");
                 if ($pos !== false) {
                     $bap = ltrim($activite, "{BAP}");
@@ -422,7 +419,7 @@ class AccountController extends AbstractController
             if (count($corps > 0)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {
@@ -432,41 +429,41 @@ class AccountController extends AbstractController
             }
         }
 
-        $form = $this->createForm(new ProfileType($this->get('sygefor_core.access_right_registry')), $trainee);
+        $form = $this->createForm(ProfileType::class, $trainee);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 // TEST sur le responsable
-                if (count($trainee->getEmailSup())>0) {
+                if (count($trainee->getEmailSup()) > 0) {
                     // Vérification du mail qui doit être institutionnel
-                    if (stripos($trainee->getEmailSup() , "@")>0) {
+                    if (stripos($trainee->getEmailSup(), "@") > 0) {
                         $domaine = substr($trainee->getEmailSup(), stripos($trainee->getEmailSup(), "@") + 1);
-                        $listeDomaines = $this->container->getParameter('domaines');
+                        $listeDomaines = $this->getParameter('domaines');
                         // Association nom de domaine et établissement
-                        if (array_key_exists($domaine, $listeDomaines)){
+                        if (array_key_exists($domaine, $listeDomaines)) {
                             // ok : c'est bien une adresse institutionnelle qui a été renseignée
                             // Mail institutionel ok
                             // on vérifie que le mail du responsable est différent de clui du stagiaire
                             if (strtolower($trainee->getEmailSup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
-                                $em = $this->getDoctrine()->getManager();
+                                $em = $doctrine->getManager();
                                 $em->flush();
                                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
                             }
-                        }else {
+                        } else {
                             $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
                     }
                 } else {
-                    $em = $this->getDoctrine()->getManager();
+                    $em = $doctrine->getManager();
                     $em->flush();
                     $this->get('session')->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
                 }
             }
         }
 
-        return array('user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName());
+        return array('user' => $trainee, 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName());
     }
 
     /**
