@@ -280,10 +280,10 @@ class AccountController extends AbstractController
         // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
         if ($shibbolethAttributes['supannCivilite'] == '')
             $shibbolethAttributes['supannCivilite'] = 'M.';
-        $trainee->setTitle($this->getRepository('App\Entity\Core\Term\Title')->findOneBy(
+        $trainee->setTitle($doctrine->getRepository('App\Entity\Core\Term\Title')->findOneBy(
             array('name' => $shibbolethAttributes['supannCivilite'])
         ));
-        $trainee->setOrganization($this->getRepository('App\Entity\Organization')->find(1));
+        $trainee->setOrganization($doctrine->getRepository('App\Entity\Organization')->find(1));
         $trainee->setLastName($shibbolethAttributes['sn']);
         $trainee->setFirstName($shibbolethAttributes['givenName']);
         $trainee->setEmail($shibbolethAttributes['mail']);
