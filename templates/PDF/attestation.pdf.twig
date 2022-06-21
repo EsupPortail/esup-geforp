@@ -35,7 +35,7 @@
 
     <h4>Aux dates suivantes :</h4>
     {% if inscription.session.dates | length >0 %}
-        {% for date in (inscription.session.dates) | orderBy('dateBegin') %}
+        {% for date in (inscription.session.dates) | sort((a, b) => a.datebegin <=> b.datebegin) %}
 
             {% if date.dateEnd is defined and date.dateEnd is not null %}
                 {%  if date.dateEnd != date.dateBegin %}
