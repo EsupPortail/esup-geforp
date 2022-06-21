@@ -65,48 +65,36 @@ class PublicController extends AbstractController
      * @Route("/contact", name="front.public.contact")
      * @Template("Front/Public/contact.html.twig")
      */
-    public function contactAction(Request $request, ManagerRegistry $doctrine)
+    public function contactAction(Request $request)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('user' => $trainee, 'contact_mail' => $this->getParameter('contact_mail'));
+        return array('contact_mail' => $this->getParameter('contact_mail'));
     }
 
     /**
      * @Route("/faq", name="front.public.faq")
      * @Template("Front/Public/faq.html.twig")
      */
-    public function faqAction(Request $request, ManagerRegistry $doctrine)
+    public function faqAction(Request $request)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('user' => $trainee, 'contact_mail' => $this->getParameter('contact_mail'));
+        return array('contact_mail' => $this->getParameter('contact_mail'));
     }
 
     /**
      * @Route("/about", name="front.public.about")
      * @Template("Front/Public/about.html.twig")
      */
-    public function aboutAction(Request $request, ManagerRegistry $doctrine)
+    public function aboutAction(Request $request)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('user' => $trainee);
+        return array('user' => $this->getUser());
     }
 
     /**
      * @Route("/legalNotice", name="front.public.legalNotice")
      * @Template("Front/Public/legalNotice.html.twig")
      */
-    public function legalNoticeAction(Request $request, ManagerRegistry $doctrine)
+    public function legalNoticeAction(Request $request)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('user' => $trainee);
+        return array('user' => $this->getUser());
     }
 
 }
