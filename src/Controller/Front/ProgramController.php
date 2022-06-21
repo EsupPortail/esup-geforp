@@ -420,7 +420,7 @@ class ProgramController extends AbstractController
                 $alert = new SingleAlert();
 
                 $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
-                    'id' => $session["id"]
+                    'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
                 $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
@@ -434,7 +434,7 @@ class ProgramController extends AbstractController
                     $alert->setAlert(false);
                 }
 
-                $alert->setSessionId($session["id"]);
+                $alert->setSessionId($session->getId());
                 $alert->setTraineeId($arTrainee[0]->getId());
                 $alerts->getAlerts()->add($alert);
             }
@@ -514,7 +514,7 @@ class ProgramController extends AbstractController
                 $alert = new SingleAlert();
 
                 $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
-                    'id' => $session["id"]
+                    'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
                 $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
@@ -668,7 +668,7 @@ class ProgramController extends AbstractController
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($this->getUser());
+                        $alertNew->setTrainee($arTrainee[0]);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);

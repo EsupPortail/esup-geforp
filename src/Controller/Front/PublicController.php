@@ -53,12 +53,9 @@ class PublicController extends AbstractController
      * @Route("/login", name="front.public.login")
      * @Template("Front/Public/login.html.twig")
      */
-    public function loginAction(Request $request, ManagerRegistry $doctrine)
+    public function loginAction(Request $request)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('user' => $trainee);
+        return array('user' => $this->getUser());
     }
 
     /**
