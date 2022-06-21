@@ -76,7 +76,7 @@ class PublicController extends AbstractController
      */
     public function faqAction(Request $request)
     {
-        return array('contact_mail' => $this->getParameter('contact_mail'));
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'));
     }
 
     /**
