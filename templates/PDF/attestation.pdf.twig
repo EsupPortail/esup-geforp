@@ -3,11 +3,14 @@
 
 {% block head %}
 <style>
-    h1, h2, h3, h4, h5 {
+    h1, h2, h3, h4 {
         text-align: center;
     }
+    h5 {
+        text-align: right;
+    }
     .signature {
-        text-align: center;
+        text-align: right;
     }
     .signature img {
         width:180px;
@@ -18,7 +21,7 @@
 {% block body %}
     <p>&nbsp;</p>
 
-    <h2>Attestation de présence</h2>
+    <h2>Attestation de pr&eacutesence</h2>
     <p>&nbsp;</p>
     <p>&nbsp;</p>
 
@@ -30,11 +33,24 @@
     <p>&nbsp;</p>
     <h3>{{ inscription.session.training.name }}</h3>
 
-    {% if inscription.session.dateEnd and (inscription.session.dateBegin | date("d/m/Y")) != (inscription.session.dateEnd | date("d/m/Y")) %}
-        <h4>du {{ inscription.session.dateBegin | date("d/m/Y") }} au {{ inscription.session.dateEnd | date("d/m/Y")  }}</h4>
-    {% else %}
-        <h4>le {{ inscription.session.dateBegin | date("d/m/Y") }}</h4>
+    <h4>Aux dates suivantes :</h4>
+    {% if inscription.session.dates | length >0 %}
+        {% for date in (inscription.session.dates) | orderBy('dateBegin') %}
+
+            {% if date.dateEnd is defined and date.dateEnd is not null %}
+                {%  if date.dateEnd != date.dateBegin %}
+                    <h4>du {{ date.dateBegin | date('d/m/Y') }} au {{ date.dateEnd | date('d/m/Y') }}</h4>
+                {% else %}
+                    <h4>le {{ date.dateBegin | date('d/m/Y') }} </h4>
+                {% endif %}
+            {% else %}
+                <h4>le {{ date.dateBegin | date('d/m/Y') }} </h4>
+            {% endif %}
+
+        {% endfor %}
     {% endif %}
+
+    <h4> Nombre d'heures suivies : {{ nbHeuresPresence }}</h4>
 
     {% if inscription.session.getSchedule %}
         <p><center>[Horaires : {{ inscription.session.getSchedule }} ]</center></p>
@@ -42,7 +58,7 @@
     <p>&nbsp;</p>
 
     {% if inscription.session.participations|length %}
-        <p>animé par :</p>
+        <p>anim&eacute par :</p>
         {% for participation in inscription.session.participations %}
             <h4>{{ participation.trainer.fullName }}</h4>
         {% endfor %}
@@ -50,9 +66,9 @@
     <p>&nbsp;</p>
     <p>&nbsp;</p>
 
-    <h5>Certifié Sincère et Véritable,</h5>
+    <h5>Certifi&eacute Sinc&egravere et V&eacuteritable,</h5>
     {% if signature is defined %}
-        <p class="signature"><img src="{{ app.request.getSchemeAndHttpHost() ~ asset(signature) }}" /></p>
+        <p class="signature"><img src="{{app.request.getSchemeAndHttpHost()}}{{signature}}" /></p>
         <p>&nbsp;</p>
     {% else %}
     <p>&nbsp;</p>

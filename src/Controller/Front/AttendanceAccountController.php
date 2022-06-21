@@ -10,6 +10,7 @@ use App\Entity\EvaluationNotedCriterion;
 use App\Entity\Inscription;
 use App\Form\Type\EvaluationType;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Snappy\Pdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -193,7 +194,7 @@ class AttendanceAccountController extends AbstractController
      * @Route("/attendance/{session}/attestation", name="front.account.attendance.attestation")
      * @Method("GET")
      */
-    public function attestationAction($session, ManagerRegistry $doctrine, Request $request)
+    public function attestationAction($session, ManagerRegistry $doctrine, Request $request, Pdf $knpPdf)
     {
         // recup trainee
         $user = $this->getUser();
@@ -250,7 +251,7 @@ class AttendanceAccountController extends AbstractController
 
         //checking signature file existence
         $fs = new Filesystem();
-        if($fs->exists($this->getParameter('kernel.project_dir') . '../../../public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
+        if($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
             $signature = '/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
         }
 
@@ -261,12 +262,11 @@ class AttendanceAccountController extends AbstractController
         ));
 
         return new Response(
-            $this->get('knp_snappy.pdf')->getOutputFromHtml($pdf, array('print-media-type' => null)), 200,
+            $knpPdf->getOutputFromHtml($pdf, array('print-media-type' => null)), 200,
             array(
                 'Content-Type'        => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="attestation.pdf"', )
         );
-//        return parent::attestationAction($session, $request);
     }
 
     /**
