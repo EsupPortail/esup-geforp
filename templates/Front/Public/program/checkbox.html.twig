@@ -1,6 +1,3 @@
 {% block checkbox_widget %}
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
-    <label  for="{{ id }}" style="margin-left: 5px">
-        {{ label}}
-    </label>
+    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />&nbsp;&nbsp;S'inscrire à l'alerte d'ouverture de la session
 {% endblock checkbox_widget %}

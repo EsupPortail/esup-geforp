@@ -53,7 +53,7 @@ class AlertAccountController extends AbstractController
         $form = $this->createForm(ProgramAlertType::class, $alerts);
         $form->handleRequest($request);
 
-        if ($form->isValid()) {
+        if (($form->isSubmitted()) && ($form->isValid())) {
             $arrAlerts = $alerts->getAlerts();
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
