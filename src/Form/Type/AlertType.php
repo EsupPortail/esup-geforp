@@ -30,7 +30,7 @@ class AlertType extends AbstractType
     {
         $builder
             ->add('alert', CheckboxType::class, array(
-                'label' => "S'incrire à l'alerte d'ouverture de la session",
+                'label' => false,
                 'required' => false
             ))
             ->add('session_id', HiddenType::class)

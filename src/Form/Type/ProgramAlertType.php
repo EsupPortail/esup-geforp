@@ -10,6 +10,7 @@ namespace App\Form\Type;
 
 
 use App\Entity\MultipleAlert;
+use App\Form\Type\AlertType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\FormBuilderInterface;

@@ -13,9 +13,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\Alert;
 
 class SingleAlert
 {
+    /* @var \App\Entity\Alert */
     public $alert;
 
     public $session_id;
@@ -27,7 +29,7 @@ class SingleAlert
         return $this->alert;
     }
 
-    public function setAlert($alert)
+    public function setAlert(Alert $alert)
     {
         $this->alert = $alert;
     }

@@ -449,11 +449,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App/Entity/Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App/Entity/Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));

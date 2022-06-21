@@ -29,9 +29,9 @@ class SessionRepository extends ServiceEntityRepository
             ->innerJoin(Organization::class, 'o')
             ->innerJoin(Theme::class, 'th')
             ->innerJoin(Internship::class, 'tr')
-            ->orderBy('th.name')
-            ->orderBy('s.datebegin')
-            ->orderBy('tr.name');
+            ->orderBy('th.name');
+//            ->orderBy('s.datebegin')
+//            ->orderBy('tr.name');
 
         // FILTRE KEYWORD
         if ($keyword != 'NO KEYWORDS') {
