@@ -1,6 +1,6 @@
-{% extends "@SygeforFront/base.html.twig" %}
+{% extends "Front/base.html.twig" %}
 
-{% form_theme form 'SygeforFrontBundle:Account/alert:checkbox.html.twig' %}
+{% form_theme form 'Front/Account/alert/checkbox.html.twig' %}
 
 {% block header %}
     <header>
@@ -48,7 +48,7 @@
                                             <td>
                                                 <a href="{{ path('front.program.training', {id: alert.session.training.id}) }}">{{ alert.session.training.name }}</a>
                                             </td>
-                                            <td>{{ form_widget(form.alerts[counter].alert) }}</td>
+                                            <td>{{ form_widget(form.alerts[counter]) }}</td>
                                         </tr>
                                     {% endif %}
                                     {% set counter = counter + 1 %}
