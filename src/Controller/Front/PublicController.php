@@ -41,12 +41,8 @@ class PublicController extends AbstractController
                 $this->get('session')->getFlashBag()->add('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
             }
         }
-
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-
-        return array('user' => $trainee);
+        
+        return array('user' => $this->getUser());
     }
 
     /**
