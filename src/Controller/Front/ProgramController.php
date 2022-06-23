@@ -165,7 +165,7 @@ class ProgramController extends AbstractController
             $inscription->setTrainee($trainee);
             $inscription->setSession($session);
         }
-        $inscription->setInscriptionStatus(
+        $inscription->setInscriptionstatus(
             $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
                 array('machinename' => 'waiting')
             )
@@ -185,7 +185,7 @@ class ProgramController extends AbstractController
         }
 
         // Test responsable hiérarchique si biatss
-        $EmailSup = $trainee->getEmailSup();
+        $EmailSup = $trainee->getEmailsup();
         if (($EmailSup == null) && ($publicType == null) || (($EmailSup == null) && ($publicType->getId() == 1))) {
             // Message pour indiquer qu'il faut renseigner le supéieur hiérarchique
             $flagInsc = 2;
@@ -196,8 +196,8 @@ class ProgramController extends AbstractController
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
                 if (($form->isSubmitted())&&($form->isValid())) {
-                    $inscription->setCreatedAt(new \DateTime('now'));
-                    $inscription->setUpdatedAt(new \DateTime('now'));
+                    $inscription->setCreatedat(new \DateTime('now'));
+                    $inscription->setUpdatedat(new \DateTime('now'));
                     $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
@@ -210,7 +210,7 @@ class ProgramController extends AbstractController
 
 //                    if ($form['authorization']->getData() == TRUE) {
                     // si on a bien un responsable renseigné
-                    if (null !== $inscription->getTrainee()->getEmailSup()) {
+                    if (null !== $inscription->getTrainee()->getEmailsup()) {
                         // Recuperation des templates emails dans le registre des vocabulaires
                         $templateTerm = $vocRegistry->getVocabularyById(5);
                         $repo = $em->getRepository(get_class($templateTerm));
@@ -243,7 +243,7 @@ class ProgramController extends AbstractController
                         $message = (new Email())
                             ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
                             ->replyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail())
-                            ->to($inscription->getTrainee()->getEmailSup())
+                            ->to($inscription->getTrainee()->getEmailsup())
                             ->subject($subject)
                             ->text($newbody);
 
