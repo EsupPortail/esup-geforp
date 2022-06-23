@@ -32,7 +32,7 @@
 
   .session__date, .session__type, .session__organization, .session__avenir {
     @media (max-width: $screen-md-min) {
-      display: inline-block;
+/*      display: inline-block; */
       line-height: 1;
       margin-right: 1em;
       margin-top: 0.25em;
@@ -41,7 +41,7 @@
 
   .list-item__bottom {
     .session__date, .session__type, .session__organization, .session__place, .session__duration, .session__trainer, .session__avenir, .session__alert {
-      display: inline-block;
+/*      display: inline-block; */
       margin-right: $padding-base-horizontal;
     }
   }

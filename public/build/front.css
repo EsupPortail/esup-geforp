@@ -5910,12 +5910,12 @@ header {
     margin-bottom: 0.5em; }
   @media (max-width: 992px) {
     .list-item .session__date, .list-item .session__type, .list-item .session__organization, .list-item .session__avenir {
-      display: inline-block;
+      /*      display: inline-block; */
       line-height: 1;
       margin-right: 1em;
       margin-top: 0.25em; } }
   .list-item .list-item__bottom .session__date, .list-item .list-item__bottom .session__type, .list-item .list-item__bottom .session__organization, .list-item .list-item__bottom .session__place, .list-item .list-item__bottom .session__duration, .list-item .list-item__bottom .session__trainer, .list-item .list-item__bottom .session__avenir, .list-item .list-item__bottom .session__alert {
-    display: inline-block;
+    /*      display: inline-block; */
     margin-right: 12px; }
 
 .no-session.well {
