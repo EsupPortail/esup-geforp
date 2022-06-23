@@ -26,7 +26,7 @@ class AuthorizationType extends AbstractType
     {
         $builder
             ->add('validation', ChoiceType::class, array(
-                'choices' => array('ok' => 'Favorable', 'nok' => 'Défavorable'),
+                'choices' => array('Favorable' =>'ok', 'Défavorable' => 'nok'),
                 'expanded' => true,
                 'multiple' => false,
                 'data' => 'ok',

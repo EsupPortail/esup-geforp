@@ -27,7 +27,7 @@
 
               <blockquote class="small">
                 {{ registration.session.training.name }}<br>
-                {{ registration.session.dateRange | replace('le' , '') }}
+                {{ registration.session.dateRange | u.replace('le' , '') }}
               </blockquote>
 
               <p><b>Motivation pour participer à la formation :</b> {{ registration.motivation }} </p>

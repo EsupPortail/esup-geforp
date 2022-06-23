@@ -55,7 +55,7 @@ class RegistrationAccountController extends AbstractController
     public function checkoutAction(Request $request, ManagerRegistry $doctrine, $sessions = array())
     {
         $inscription = $doctrine->getManager()->getRepository('App\Entity\Inscription')->find($request->get('inscriptionId'));
-        $this->sendCheckoutNotification(array($inscription), $inscription->getTrainee());
+//        $this->sendCheckoutNotification($doctrine, array($inscription), $inscription->getTrainee());
 
         return $this->redirectToRoute('front.account.registrations');
     }
@@ -257,9 +257,9 @@ class RegistrationAccountController extends AbstractController
                         if (isset($dataForm)) {
                             if ($dataForm['validation'] == "ok") {
                                 // Si avis favorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
-                                $registration->setInscriptionStatus(
-                                    $doctrine->getRepository('App\Entity\Core\Term\InscriptionStatus')->findOneBy(
-                                        array('machineName' => 'favorable')
+                                $registration->setInscriptionstatus(
+                                    $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
+                                        array('machinename' => 'favorable')
                                     )
                                 );
                                 $em = $doctrine->getManager();
@@ -276,8 +276,8 @@ class RegistrationAccountController extends AbstractController
                                     ->to($registration->getTrainee()->getEmail())
                                     ->subject("Avis favorable pour inscription à une formation")
                                     ->text($body);
-                                if ($registration->getTrainee()->getEmailCorr() != null)
-                                    $message->setCc($registration->getTrainee()->getEmailCorr());
+                                if ($registration->getTrainee()->getEmailcorr() != null)
+                                    $message->setCc($registration->getTrainee()->getEmailcorr());
 
                                 $mailer->send($message);
 
@@ -287,8 +287,8 @@ class RegistrationAccountController extends AbstractController
                                 // Sinon, on modifie le statut de l'inscription à "avis défavorable" et on envoie un mail au stagiaire
                                 // Si avis défavorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
                                 $registration->setInscriptionstatus(
-                                    $doctrine->getRepository('App\Entity\Core\Term\InscriptionStatus')->findOneBy(
-                                        array('machineName' => 'defavorable')
+                                    $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
+                                        array('machinename' => 'defavorable')
                                     )
                                 );
                                 $registration->setRefuse($dataForm['refuse']);
@@ -306,8 +306,8 @@ class RegistrationAccountController extends AbstractController
                                     ->to($registration->getTrainee()->getEmail())
                                     ->subject("Avis défavorable pour inscription à une formation")
                                     ->text($body);
-                                if ($registration->getTrainee()->getEmailCorr() != null)
-                                    $message->setCc($registration->getTrainee()->getEmailCorr());
+                                if ($registration->getTrainee()->getEmailcorr() != null)
+                                    $message->setCc($registration->getTrainee()->getEmailcorr());
 
                                 $mailer->send($message);
 
