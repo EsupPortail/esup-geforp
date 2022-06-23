@@ -26,12 +26,9 @@ class SessionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('s');
         $qb
             ->select(' s')
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Theme::class, 'th')
-            ->innerJoin(Internship::class, 'tr')
-            ->orderBy('th.name');
-//            ->orderBy('s.datebegin')
-//            ->orderBy('tr.name');
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
+            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+            ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme');
 
         // FILTRE KEYWORD
         if ($keyword != 'NO KEYWORDS') {
@@ -79,6 +76,11 @@ class SessionRepository extends ServiceEntityRepository
                 ->andWhere('th.name in (:themes)')
                 ->setParameter('themes', $filters['theme.name']);
         }
+
+        // TRI DES RESULTATS
+        $qb->addOrderBy('th.name')
+            ->addOrderBy('s.datebegin')
+            ->addOrderBy('s.name');
 
         $query = $qb->getQuery();
 
