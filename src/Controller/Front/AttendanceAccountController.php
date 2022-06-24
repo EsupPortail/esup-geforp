@@ -5,7 +5,7 @@ namespace App\Controller\Front;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
-use App\Entity\Core\Term\PresenceStatus;
+use App\Entity\Core\Term\Presencestatus;
 use App\Entity\EvaluationNotedCriterion;
 use App\Entity\Inscription;
 use App\Form\Type\EvaluationType;
