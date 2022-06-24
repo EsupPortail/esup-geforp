@@ -410,6 +410,11 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                     }
                                 }
                             }
+                            if ($insc->getActiontype() == null)
+                                $typAc = "";
+                            else
+                                $typAc = $insc->getActiontype()->getName();
+
 
                             $lines[0]['inscriptions'][] = array('dateDebut' => $insc->getSession()->getDatebegin()->format('d/m/Y'),
                                 'nombreHeures' => $insc->getSession()->getHournumber(),
@@ -418,7 +423,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                 'domaine' => $insc->getSession()->getTraining()->getTheme(),
                                 "formateurs" => $formateurs,
                                 "type" => $insc->getSession()->getTraining()->getCategory(),
-                                "typeAction" => $insc->getActiontype()->getName());
+                                "typeAction" => $typAc;
                         }
                     }
                     $entityName = 'stagiaire';
@@ -445,9 +450,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     }
                 }
 
-                usort($lines[0]['inscriptions'], function($a, $b) {
-                    return strcasecmp($a['nom'], $b['nom']);
-                });
+                if (isset($lines[0]['inscriptions'])) {
+                    usort($lines[0]['inscriptions'], function ($a, $b) {
+                        return strcasecmp($a['nom'], $b['nom']);
+                    });
+                }
+
                 $entityName = 's';
 //                }
             }
