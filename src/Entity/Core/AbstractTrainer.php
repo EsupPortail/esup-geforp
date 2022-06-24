@@ -60,7 +60,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
 
     /**
      * @var Trainertype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\TrainerType")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Trainertype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainer"})
      */
