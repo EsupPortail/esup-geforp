@@ -14,7 +14,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\ExecutionContextInterface;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Class UploadableTrait.
@@ -247,7 +247,11 @@ trait UploadableTrait
     public function validateFileSize(ExecutionContextInterface $context)
     {
         if ($this->file->getSize() > self::$maxFileSize) {
-            $context->addViolationAt('file', 'La taille du fichier dépasse la limite autorisée', array(), null);
+//            $context->addViolationAt('file', 'La taille du fichier dépasse la limite autorisée', array(), null);
+            $context->buildViolation('La taille du fichier dépasse la limite autorisée')
+                ->atPath('file')
+                ->addViolation();
+
         }
     }
 }

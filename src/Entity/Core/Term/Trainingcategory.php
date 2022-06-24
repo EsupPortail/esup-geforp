@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\Term\AbstractTerm;
 use App\Entity\Core\Term\VocabularyInterface;
-use App\Form\TrainingCategoryType;
+use App\Form\Type\TrainingcategoryType;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -51,7 +51,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
 
     public static function getFormType()
     {
-        return TrainingCategoryType::class;
+        return TrainingcategoryType::class;
     }
 
     public static function getVocabularyStatus()
