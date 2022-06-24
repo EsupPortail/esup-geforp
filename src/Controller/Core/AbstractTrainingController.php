@@ -254,7 +254,7 @@ abstract class AbstractTrainingController extends AbstractController
 
         // verify if training category matches with new type
         /** @var RepositoryFactory $repository */
-        $repository = $this->getDoctrine()->getRepository('SygeforTrainingBundle:Training\Term\TrainingCategory');
+        $repository = $this->getDoctrine()->getRepository('SygeforTrainingBundle:Training\Term\Trainingcategory');
         /** @var QueryBuilder $qb */
         $qb = $repository->createQueryBuilder('t')
             ->where('t.trainingType = :trainingType')

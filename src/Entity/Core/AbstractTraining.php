@@ -118,7 +118,7 @@ abstract class AbstractTraining implements SerializedAccessRights
 
     /**
      * @var Trainingcategory
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\TrainingCategory")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Trainingcategory")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"training", "api"})
      */
