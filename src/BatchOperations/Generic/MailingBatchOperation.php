@@ -423,7 +423,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                 'domaine' => $insc->getSession()->getTraining()->getTheme(),
                                 "formateurs" => $formateurs,
                                 "type" => $insc->getSession()->getTraining()->getCategory(),
-                                "typeAction" => $typAc;
+                                "typeAction" => $typAc);
                         }
                     }
                     $entityName = 'stagiaire';
