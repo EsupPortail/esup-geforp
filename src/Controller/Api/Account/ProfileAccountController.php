@@ -5,7 +5,7 @@ namespace App\Controller\Api\Account;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Core\Entity\AbstractTrainee;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

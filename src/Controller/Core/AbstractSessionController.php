@@ -8,6 +8,7 @@ use App\Entity\Organization;
 use App\Entity\Session;
 use App\Entity\Trainer;
 use App\Repository\SessionRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -501,5 +502,56 @@ abstract class AbstractSessionController extends AbstractController
 
 
         return $tabAggs;
+    }
+
+    public function computeInscriptionsStats(ManagerRegistry $doctrine, $session)
+    {
+        /** @var EntityManager $em */
+        $em = $doctrine->getManager();
+        $stats = array();
+        if ($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
+            $query = $em
+                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Inscriptionstatus s
+                        JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
+                        WHERE i.session = :session
+                        GROUP BY s.id')
+                ->setParameter('session', $this);
+
+            $result = $query->getResult();
+            foreach ($result as $status) {
+                $stats[] = array(
+                    'id' => $status[0]->getId(),
+                    'name' => $status[0]->getName(),
+                    'status' => $status[0]->getStatus(),
+                    'count' => (int)$status[1],
+                );
+            }
+        }
+        return $stats;
+    }
+
+    public function computePresencesStats(ManagerRegistry $doctrine, $session)
+    {
+        /** @var EntityManager $em */
+        $em = $doctrine->getManager();
+        $statsPres = array();
+        $queryPres = $em
+            ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+                            JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
+                            WHERE i.session = :session
+                            GROUP BY s.id')
+            ->setParameter('session', $this);
+
+        $resultPres = $queryPres->getResult();
+        foreach ($resultPres as $status) {
+            $statsPres[] = array(
+                'id' => $status[0]->getId(),
+                'name' => $status[0]->getName(),
+                'status' => $status[0]->getStatus(),
+                'count' => (int)$status[1],
+            );
+        }
+
+        return $statsPres;
     }
 }

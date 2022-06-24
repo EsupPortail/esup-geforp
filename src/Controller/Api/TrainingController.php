@@ -7,7 +7,7 @@ use Elastica\Filter\Term;
 use Elastica\Search;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use App\Utils\Search\SearchService;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;

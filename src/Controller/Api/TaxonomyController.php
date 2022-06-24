@@ -7,7 +7,7 @@ use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\Term\VocabularyInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\Routing\Annotation\Route;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
