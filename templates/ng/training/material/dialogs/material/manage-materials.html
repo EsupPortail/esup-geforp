@@ -54,7 +54,7 @@
             </div>
 
             <!--file material on server -->
-            <button ng-if="file.filePath" type="button" class="btn btn-success" ng-click="getFile(file)">
+            <button ng-if="file.filepath" type="button" class="btn btn-success" ng-click="getFile(file)">
                 <i class="fa fa-download"></i>
                 <span>Voir</span>
             </button>
@@ -62,7 +62,7 @@
 
         <div class="col-md-3">
             <!--link material or server file-->
-            <div ng-if="file.url || file.filePath" class="col-md-3">
+            <div ng-if="file.url || file.filepath" class="col-md-3">
                 <button type="button" class="btn btn-warning cancel" ng-click="removeMaterial(file)">
                     <i class="glyphicon glyphicon-ban-circle"></i>
                     <span>Retirer</span>

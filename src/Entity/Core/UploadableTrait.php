@@ -28,14 +28,14 @@ trait UploadableTrait
      *
      * @var string
      */
-    protected $filePath;
+    protected $filepath;
 
     /**
      * @ORM\Column(name="file_name", type="string", nullable=false)
      *
      * @var string
      */
-    protected $fileName;
+    protected $filename;
 
     /**
      * @var File
@@ -62,17 +62,17 @@ trait UploadableTrait
             $this->id = null;
             $fs = new Filesystem();
             $tmpFileName = sha1(uniqid(mt_rand(), true)) . '.' . $file->getFileInfo()->getExtension();
-            $fs->copy($this->getTemplatesRootDir() . '/' . $this->filePath, $this->getTemplatesRootDir() . '/' . $tmpFileName);
-            $this->setFile(new File($this->getTemplatesRootDir() . '/' . $tmpFileName), $this->getFileName());
+            $fs->copy($this->getTemplatesRootDir() . '/' . $this->filepath, $this->getTemplatesRootDir() . '/' . $tmpFileName);
+            $this->setFile(new File($this->getTemplatesRootDir() . '/' . $tmpFileName), $this->getFilename());
         }
     }
 
     /**
      * @param string $filePath
      */
-    public function setFilePath($filePath)
+    public function setFilepath($filePath)
     {
-        $this->filePath = $filePath;
+        $this->filepath = $filePath;
     }
 
     /**
@@ -80,8 +80,8 @@ trait UploadableTrait
      */
     public function getFile()
     {
-        if ($this->filePath !== null) {
-            $this->file = new File($this->getTemplatesRootDir() . '/' . $this->filePath);
+        if ($this->filepath !== null) {
+            $this->file = new File($this->getTemplatesRootDir() . '/' . $this->filepath);
         }
 
         return $this->file;
@@ -90,25 +90,25 @@ trait UploadableTrait
     /**
      * @return string
      */
-    public function getFilePath()
+    public function getFilepath()
     {
-        return $this->filePath;
+        return $this->filepath;
     }
 
     /**
      * @param string $fileName
      */
-    public function setFileName($fileName)
+    public function setFilename($fileName)
     {
-        $this->fileName = $fileName;
+        $this->filename = $fileName;
     }
 
     /**
      * @return string
      */
-    public function getFileName()
+    public function getFilename()
     {
-        return $this->fileName;
+        return $this->filename;
     }
 
     /**
@@ -121,12 +121,12 @@ trait UploadableTrait
             $this->uploaded = new \DateTime();
             $this->file = $file;
             if ($this->file instanceof UploadedFile) {
-                $this->filePath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
-                $this->fileName = $this->file->getClientOriginalName();
+                $this->filepath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
+                $this->filename = $this->file->getClientOriginalName();
             }
             else {
-                $this->filePath = $file->getFileInfo()->getFilename();
-                $this->fileName = ($name) ? $name : $file->getFileInfo()->getFilename();
+                $this->filepath = $file->getFileInfo()->getFilename();
+                $this->filename = ($name) ? $name : $file->getFileInfo()->getFilename();
             }
         }
     }
@@ -138,8 +138,8 @@ trait UploadableTrait
     {
         if (null !== $this->file && ($this->file instanceof UploadedFile)) {
             // nom unique du fichier.
-            $this->filePath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
-            $this->fileName = $this->file->getClientOriginalName();
+            $this->filepath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
+            $this->filename = $this->file->getClientOriginalName();
         }
     }
 
@@ -180,7 +180,7 @@ trait UploadableTrait
         if (null === $this->file) {
             return;
         }
-        $this->file->move($this->getTemplatesRootDir(), $this->filePath);
+        $this->file->move($this->getTemplatesRootDir(), $this->filepath);
 
         unset($this->file);
     }
@@ -200,7 +200,7 @@ trait UploadableTrait
      */
     public function getAbsolutePath()
     {
-        return (null === $this->filePath) ? null : $this->getTemplatesRootDir() . '/' . $this->filePath;
+        return (null === $this->filepath) ? null : $this->getTemplatesRootDir() . '/' . $this->filepath;
     }
 
     /**
@@ -233,7 +233,7 @@ trait UploadableTrait
 
         // Set headers
         $response->headers->set('Cache-Control', 'private');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $this->getFileName() . '";');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $this->getFilename() . '";');
         $response->headers->set('Content-length', filesize($fp));
         $response->sendHeaders();
         $response->setContent(readfile($fp));

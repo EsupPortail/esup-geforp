@@ -14,7 +14,7 @@
         </div>
         <ul class="list-unstyled">
             <li ng-repeat="material in entity.materials">
-                <a href="" ng-click="getMaterial(material)" ng-if="!material.url">{{ material.fileName }}</a>
+                <a href="" ng-click="getMaterial(material)" ng-if="!material.url">{{ material.filename }}</a>
                 <a href="{{material.url}}" target="_blank" ng-if="material.url">{{ material.name }}</a>
             </li>
         </ul>

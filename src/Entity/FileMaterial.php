@@ -30,7 +30,7 @@ class FileMaterial extends Material
      */
     public function getName()
     {
-        return $this->fileName;
+        return $this->filename;
     }
 
     /**
