@@ -50,17 +50,6 @@ abstract class Material
     protected $session;
 
     /**
-     * @ORM\Column(name="is_public", type="boolean")
-     * @Serializer\Groups({"Default", "api.training", "api.attendance"})
-     */
-    protected $isPublic;
-
-    public function __construct($isPublic = false)
-    {
-        $this->isPublic = $isPublic;
-    }
-
-    /**
      * Get id.
      *
      * @return int
@@ -125,20 +114,5 @@ abstract class Material
     {
         $this->session = $session;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getIsPublic()
-    {
-        return $this->isPublic;
-    }
-
-    /**
-     * @param mixed $isPublic
-     */
-    public function setIsPublic($isPublic)
-    {
-        $this->isPublic = $isPublic;
-    }
+    
 }
