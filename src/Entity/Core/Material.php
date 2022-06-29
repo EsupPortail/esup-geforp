@@ -29,7 +29,7 @@ abstract class Material
     /**
      * @var string
      * @ORM\Column(name="name", type="string", length=255, nullable=true)
-     * @Serializer\Groups({"Default", "api.training", "api.attendance"})
+     * @Serializer\Groups({"Default", "api.attendance"})
      */
     protected $name;
 

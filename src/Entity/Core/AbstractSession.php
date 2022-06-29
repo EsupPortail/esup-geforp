@@ -62,7 +62,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     /**
      * @ORM\OneToMany(targetEntity="AbstractParticipation", mappedBy="session", cascade={"remove"})
-     * @Serializer\Groups({"session", "api.training"})
+     * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      */
     protected $participations;
 

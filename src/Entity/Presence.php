@@ -53,7 +53,7 @@ class Presence
      * @var Session
      * @ORM\ManyToOne(targetEntity="Inscription", inversedBy="presences")
      * @ORM\JoinColumn(onDelete="CASCADE")
-     * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
+     * @Serializer\Groups({"session", "trainee", "trainer", "api"})
      */
     protected $inscription;
 

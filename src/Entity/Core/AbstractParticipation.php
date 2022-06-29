@@ -24,7 +24,7 @@ abstract class AbstractParticipation
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Groups({"Default", "api"})
+     * @Serializer\Groups({"Default", "api", "session", "participation"})
      */
     protected $id;
 
@@ -33,7 +33,7 @@ abstract class AbstractParticipation
      * @ORM\ManyToOne(targetEntity="AbstractTrainer", inversedBy="participations")
      * @ORM\JoinColumn(name="trainer_id", referencedColumnName="id")
      * @Assert\NotNull(message="Vous devez sélectionner un intervenant")
-     * @Serializer\Groups({"participation", "session", "api.training"})
+     * @Serializer\Groups({"participation", "session", "api.training", "api"})
      */
     protected $trainer;
 
@@ -42,7 +42,7 @@ abstract class AbstractParticipation
      * @ORM\ManyToOne(targetEntity="AbstractSession", inversedBy="participations")
      * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
      * @Assert\NotNull()
-     * @Serializer\Groups({"participation", "trainer"})
+     * @Serializer\Groups({"participation", "session", "trainer", "api"})
      */
     protected $session;
 
