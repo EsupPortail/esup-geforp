@@ -92,15 +92,14 @@ class SessionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('s');
         $qb
             ->select(' s')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Theme::class, 'th')
-            ->innerJoin(Internship::class, 'tr')
-            ->innerJoin(Trainer::class, 'trainer')
-            ->innerJoin(Participation::class, 'p')
-            ->orderBy('s.datebegin')
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
+            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+            ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+            ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
+            ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer');
 
             // FILTRE KEYWORD
+        $qb
             ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
@@ -221,15 +220,15 @@ class SessionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s');
         $qb
-            ->select('s')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Theme::class, 'th')
-            ->innerJoin(Internship::class, 'tr')
-            ->innerJoin(Trainer::class, 'trainer')
-            ->innerJoin(Participation::class, 'p')
+            ->select(' s')
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
+            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+            ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+            ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
+            ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer');
 
             // FILTRE KEYWORD
+        $qb
             ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
