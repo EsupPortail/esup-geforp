@@ -131,6 +131,9 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('dateTo', $dateTo);
         }
 
+        // TRI DES RESULTATS
+        $qb->addOrderBy('i.createdat', 'DESC');
+
         // PAGINATION
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)

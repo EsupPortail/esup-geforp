@@ -74,10 +74,11 @@ abstract class AbstractTraineeController extends AbstractController
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $query = $request->request->get('query', 'NO QUERY');
+        $page = $request->request->get('page', 'NO PAGE');
+        $size = $request->request->get('size', 'NO SIZE');
 
         // Recherche avec les filtres
-        $trainees = $traineeRepository->getTraineesList($keywords, $filters);
-        $nbTrainees  = count($trainees);
+        $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
@@ -88,17 +89,13 @@ abstract class AbstractTraineeController extends AbstractController
             // on transforme le champ 'query' en 'keywords'
             if (isset($query['match']['fullname.autocomplete']['query'])) {
                 $keywords = $query['match']['fullname.autocomplete']['query'];
-                $trainees = $traineeRepository->getTraineesList($keywords, $filters);
-                $nbTrainees = count($trainees);
+                $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size);
             }
         }
 
-        $ret = array(
-            'total' => $nbTrainees,
-            'pageSize' => 0,
-            'items' => $trainees,
-            'aggs' => $tabAggs
-        );
+        // Concatenation des resultats
+        $ret['aggs'] = $tabAggs;
+
         return $ret;
     }
 

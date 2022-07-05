@@ -13,6 +13,7 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * Class TraineeRepository.
@@ -26,16 +27,15 @@ class TraineeSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainee::class);
     }
 
-    public function getTraineesList($keyword, $filters)
+    public function getTraineesList($keyword, $filters, $page, $pageSize)
     {
         $qb = $this->createQueryBuilder('trainee');
         $qb
             ->select(' trainee')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Publictype::class, 'pt')
-            ->innerJoin(Title::class, 'ti')
-            ->innerJoin(Institution::class, 'institution')
+            ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
+            ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
+            ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
+            ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -95,7 +95,28 @@ class TraineeSearchRepository extends ServiceEntityRepository
         }
                 $query = $qb->getQuery();
 
-        return $result = $query->getResult();
+        // TRI DES RESULTATS
+        $qb->addOrderBy('trainee.lastname');
+
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
+            ->setMaxResults($pageSize);
+
+        $query = $qb->getQuery();
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabTrainees = array();
+        foreach($paginator as $test)
+            $tabTrainees[] = $test;
+
+        $res = array('total' => $c,
+            'pageSize' => $pageSize,
+            'items' => $tabTrainees);
+
+        return $res;
     }
 
     public function getNbTrainees($query_filters, $keyword, $aggs, $name)
@@ -103,11 +124,10 @@ class TraineeSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainee');
         $qb
             ->select('trainee')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Publictype::class, 'pt')
-            ->innerJoin(Title::class, 'ti')
-            ->innerJoin(Institution::class, 'institution')
+            ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
+            ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
+            ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
+            ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -170,7 +190,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         }
 
         // On compte le nb de stagiaires en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
+        $paginator = new Paginator($qb->getQuery());
         $totalRows = count($paginator);
 
         return $totalRows;
