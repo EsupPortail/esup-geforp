@@ -109,8 +109,8 @@ class TraineeSearchRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainees = array();
-        foreach($paginator as $test)
-            $tabTrainees[] = $test;
+        foreach($paginator as $tr)
+            $tabTrainees[] = $tr;
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

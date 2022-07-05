@@ -227,8 +227,8 @@ class SessionRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabSession = array();
-        foreach($paginator as $test)
-            $tabSession[] = $test;
+        foreach($paginator as $session)
+            $tabSession[] = $session;
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

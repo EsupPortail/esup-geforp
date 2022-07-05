@@ -145,8 +145,8 @@ class InscriptionSearchRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabIns = array();
-        foreach($paginator as $test)
-            $tabIns[] = $test;
+        foreach($paginator as $insc)
+            $tabIns[] = $insc;
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

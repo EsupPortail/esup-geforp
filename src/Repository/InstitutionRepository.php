@@ -63,8 +63,8 @@ class InstitutionRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabInst = array();
-        foreach($paginator as $test)
-            $tabInst[] = $test;
+        foreach($paginator as $inst)
+            $tabInst[] = $inst;
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

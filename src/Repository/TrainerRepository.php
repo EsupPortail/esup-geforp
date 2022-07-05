@@ -10,6 +10,7 @@ use App\Entity\Session;
 use App\Entity\Trainer;
 use App\Entity\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 class TrainerRepository extends ServiceEntityRepository
@@ -19,14 +20,13 @@ class TrainerRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainer::class);
     }
 
-    public function getTrainersList($keyword, $filters)
+    public function getTrainersList($keyword, $filters, $page, $pageSize)
     {
         $qb = $this->createQueryBuilder('trainer');
         $qb
             ->select('trainer')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Institution::class, 'i')
+            ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
+            ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
 
             // FILTRE KEYWORD
             ->where('trainer.firstname LIKE :keyword')
@@ -72,10 +72,28 @@ class TrainerRepository extends ServiceEntityRepository
                 ->setParameter('isArch', $filters['isArchived']);
         }
 
-        $query = $qb->getQuery();
-        $result = $query->getResult();
+        // TRI DES RESULTATS
+        $qb->addOrderBy('trainer.lastname');
 
-        return $result;
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
+            ->setMaxResults($pageSize);
+
+        $query = $qb->getQuery();
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabTrainers = array();
+        foreach($paginator as $tr)
+            $tabTrainers[] = $tr;
+
+        $res = array('total' => $c,
+            'pageSize' => $pageSize,
+            'items' => $tabTrainers);
+
+        return $res;
     }
 
     public function getNbTrainers($query_filters, $keyword, $aggs, $name)
@@ -83,9 +101,8 @@ class TrainerRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainer');
         $qb
             ->select('trainer')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Institution::class, 'i')
+            ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
+            ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
 
             // FILTRE KEYWORD
             ->where('trainer.firstname LIKE :keyword')
@@ -154,7 +171,7 @@ class TrainerRepository extends ServiceEntityRepository
         }
 
         // On compte le nb de sessions en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
+        $paginator = new Paginator($qb->getQuery());
         $totalRows = count($paginator);
 
         return $totalRows;
