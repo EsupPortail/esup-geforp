@@ -528,7 +528,7 @@ SQL;
                         $tabDatesSes = $query->getResult();
 
                         // on récupère le lieu de la première ligne du tableau de dates
-                        if (null !== $tabDatesSes[0]) {
+                        if ((isset($tabDatesSes[0])) &&(null !== $tabDatesSes[0])) {
                             if (null !== $tabDatesSes[0]->getPlace()) {
                                 $data[$key] = $tabDatesSes[0]->getPlace();
                             } else {

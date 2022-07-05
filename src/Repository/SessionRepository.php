@@ -13,6 +13,7 @@ use App\Entity\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class SessionRepository extends ServiceEntityRepository
 {
@@ -87,7 +88,7 @@ class SessionRepository extends ServiceEntityRepository
         return $result = $query->getResult();
     }
 
-    public function getSessionsList($keyword, $filters)
+    public function getSessionsList($keyword, $filters, $page, $pageSize)
     {
         $qb = $this->createQueryBuilder('s');
         $qb
@@ -211,9 +212,30 @@ class SessionRepository extends ServiceEntityRepository
                 ->setParameter('trainerFirstName', $firstName);
         }
 
+        // TRI DES RESULTATS
+        $qb->addOrderBy('s.datebegin')
+            ->addOrderBy('s.name');
+
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
+            ->setMaxResults($pageSize);
+
         $query = $qb->getQuery();
 
-        return $result = $query->getResult();
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabSession = array();
+        foreach($paginator as $test)
+            $tabSession[] = $test;
+
+        $res = array('total' => $c,
+            'pageSize' => $pageSize,
+            'items' => $tabSession);
+
+        return $res;
+
     }
 
     public function getNbSessions($query_filters, $keyword, $aggs, $name)
@@ -393,7 +415,7 @@ class SessionRepository extends ServiceEntityRepository
         }
 
         // On compte le nb de sessions en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
+        $paginator = new Paginator($qb->getQuery());
         $totalRows = count($paginator);
 
         return $totalRows;
