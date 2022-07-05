@@ -10,6 +10,7 @@ use App\Entity\Organization;
 use App\Entity\Trainer;
 use App\Entity\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 class InstitutionRepository extends ServiceEntityRepository
@@ -19,13 +20,12 @@ class InstitutionRepository extends ServiceEntityRepository
         parent::__construct($registry, Institution::class);
     }
 
-    public function getInstitutionsList($keyword, $filters)
+    public function getInstitutionsList($keyword, $filters, $page, $pageSize)
     {
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select(' i')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
+            ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
 
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
@@ -49,9 +49,28 @@ class InstitutionRepository extends ServiceEntityRepository
                 ->setParameter('cities', $filters['city.source']);
         }
 
+        // TRI DES RESULTATS
+        $qb->addOrderBy('i.name');
+
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
+            ->setMaxResults($pageSize);
+
         $query = $qb->getQuery();
 
-        return $result = $query->getResult();
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabInst = array();
+        foreach($paginator as $test)
+            $tabInst[] = $test;
+
+        $res = array('total' => $c,
+            'pageSize' => $pageSize,
+            'items' => $tabInst);
+
+        return $res;
     }
 
     public function getNbInstitutions($query_filters, $keyword, $aggs, $name)
@@ -59,8 +78,7 @@ class InstitutionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select('i')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
+            ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
 
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')

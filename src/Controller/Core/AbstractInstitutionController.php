@@ -36,21 +36,19 @@ abstract class AbstractInstitutionController extends AbstractController
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
+        $page = $request->request->get('page', 'NO PAGE');
+        $size = $request->request->get('size', 'NO SIZE');
 
         // Recherche avec les filtres
-        $institutions = $institutionRepository->getInstitutionsList($keywords, $filters);
-        $nbInstitutions  = count($institutions);
+        $ret = $institutionRepository->getInstitutionsList($keywords, $filters, $page, $size);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $institutionRepository);
 
-        $ret = array(
-            'total' => $nbInstitutions,
-            'pageSize' => 0,
-            'items' => $institutions,
-            'aggs' => $tabAggs
-        );
+        // Concatenation des resultats
+        $ret['aggs'] = $tabAggs;
+
         return $ret;
     }
 
