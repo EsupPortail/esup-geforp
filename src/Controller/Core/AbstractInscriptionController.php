@@ -62,21 +62,19 @@ abstract class AbstractInscriptionController extends AbstractController
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
+        $page = $request->request->get('page', 'NO PAGE');
+        $size = $request->request->get('size', 'NO SIZE');
 
         // Recherche avec les filtres
-        $inscriptions = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters);
-        $nbInscriptions  = count($inscriptions);
+        $ret = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters, $page, $size);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $inscriptionSearchRepository);
 
-        $ret = array(
-            'total' => $nbInscriptions,
-            'pageSize' => 0,
-            'items' => $inscriptions,
-            'aggs' => $tabAggs
-        );
+        // Concatenation des resultats
+        $ret['aggs'] = $tabAggs;
+
         return $ret;
     }
 

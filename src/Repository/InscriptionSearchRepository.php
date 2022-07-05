@@ -13,6 +13,7 @@ use App\Entity\Organization;
 use App\Entity\Trainee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class InscriptionSearchRepository extends ServiceEntityRepository
 {
@@ -21,20 +22,20 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Inscription::class);
     }
 
-    public function getInscriptionsList($keyword, $filters)
+    public function getInscriptionsList($keyword, $filters,$page, $pageSize)
     {
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select(' i')
             /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Session::class, 's')
-            ->innerJoin(Internship::class, 'tr')
-            ->innerJoin(Inscriptionstatus::class, 'istatus')
-            ->innerJoin(Presencestatus::class, 'pstatus')
-            ->innerJoin(Institution::class, 'institution')
-            ->innerJoin(Trainee::class, 'trainee')
-            ->innerJoin(Publictype::class, 'publictype')
+            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
+            ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
+            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+            ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+            ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+            ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
+            ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+            ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -130,9 +131,25 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('dateTo', $dateTo);
         }
 
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
+            ->setMaxResults($pageSize);
+
         $query = $qb->getQuery();
 
-        return $result = $query->getResult();
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabIns = array();
+        foreach($paginator as $test)
+            $tabIns[] = $test;
+
+        $res = array('total' => $c,
+            'pageSize' => $pageSize,
+            'items' => $tabIns);
+
+        return $res;
     }
 
     public function getNbInscriptions($query_filters, $keyword, $aggs, $name)
@@ -140,15 +157,14 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select('i')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Session::class, 's')
-            ->innerJoin(Internship::class, 'tr')
-            ->innerJoin(Inscriptionstatus::class, 'istatus')
-            ->innerJoin(Presencestatus::class, 'pstatus')
-            ->innerJoin(Institution::class, 'institution')
-            ->innerJoin(Trainee::class, 'trainee')
-            ->innerJoin(Publictype::class, 'publictype')
+            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
+            ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
+            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+            ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+            ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+            ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
+            ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+            ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -270,9 +286,8 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         }
 
         // On compte le nb de sessions en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
+        $paginator = new Paginator($qb->getQuery());
         $totalRows = count($paginator);
-        dump($totalRows);
 
         return $totalRows;
     }
