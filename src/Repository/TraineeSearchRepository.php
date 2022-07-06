@@ -96,7 +96,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 $query = $qb->getQuery();
 
         // TRI DES RESULTATS
-        if (array_key_exists('lastname', $sort))
+        if (array_key_exists('lastName.source', $sort))
             $qb->addOrderBy('trainee.lastname');
         else
             $qb->addOrderBy('trainee.createdat', 'desc');
