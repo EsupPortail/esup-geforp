@@ -55,33 +55,20 @@ abstract class AbstractTrainingController extends AbstractController
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
+        $page = $request->request->get('page', 'NO PAGE');
+        $size = $request->request->get('size', 'NO SIZE');
 
         // Recherche avec les filtres
-        $trainings = $trainingRepository->getTrainingsList($keywords, $filters);
-        $nbTrainings  = count($trainings);
+        $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $trainingRepository);
 
-        $ret = array(
-            'total' => $nbTrainings,
-            'pageSize' => 0,
-            'items' => $trainings,
-            'aggs' => $tabAggs
-        );
+        // Concatenation des resultats
+        $ret['aggs'] = $tabAggs;
+
         return $ret;
-
-        /*
-        $trainings = $doctrine->getRepository(Internship::class)->findAll();
-        $nbTrainings  = count($trainings);
-
-        $ret = array(
-            'total' => $nbTrainings,
-            'pageSize' => 0,
-            'items' => $trainings,
-        );
-        return $ret;*/
     }
 
     /**
