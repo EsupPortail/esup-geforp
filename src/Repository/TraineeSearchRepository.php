@@ -27,7 +27,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainee::class);
     }
 
-    public function getTraineesList($keyword, $filters, $page, $pageSize)
+    public function getTraineesList($keyword, $filters, $page, $pageSize, $sort)
     {
         $qb = $this->createQueryBuilder('trainee');
         $qb
@@ -96,7 +96,10 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 $query = $qb->getQuery();
 
         // TRI DES RESULTATS
-        $qb->addOrderBy('trainee.lastname');
+        if (array_key_exists('lastname', $sort))
+            $qb->addOrderBy('trainee.lastname');
+        else
+            $qb->addOrderBy('trainee.createdat', 'desc');
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;
