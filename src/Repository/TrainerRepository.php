@@ -25,8 +25,6 @@ class TrainerRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainer');
         $qb
             ->select('trainer')
-            ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
-            ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
 
             // FILTRE KEYWORD
             ->where('trainer.firstname LIKE :keyword')
@@ -38,7 +36,7 @@ class TrainerRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if (isset($filters['organization.name.source'])) {
             $qb
-                ->andWhere('trainer.organization = o.id')
+                ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['organization.name.source']);
         }
@@ -46,7 +44,7 @@ class TrainerRepository extends ServiceEntityRepository
         //FILTRE ETABLISSEMENT
         if( isset($filters['institution.name.source'])) {
             $qb
-                ->andWhere('trainer.institution = i.id')
+                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
                 ->andWhere('i.name in (:inst)')
                 ->setParameter('inst', $filters['institution.name.source']);
         }
@@ -101,8 +99,6 @@ class TrainerRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainer');
         $qb
             ->select('trainer')
-            ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
-            ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
 
             // FILTRE KEYWORD
             ->where('trainer.firstname LIKE :keyword')
@@ -114,12 +110,12 @@ class TrainerRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if(isset( $aggs['organization.name.source'])) {
             $qb
-                ->andWhere('trainer.organization = o.id')
+                ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
                 ->andWhere('o.name = :center')
                 ->setParameter('center', $name);
         } elseif (isset($query_filters['organization.name.source'])) {
             $qb
-                ->andWhere('trainer.organization = o.id')
+                ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $query_filters['organization.name.source']);
         }
@@ -127,12 +123,12 @@ class TrainerRepository extends ServiceEntityRepository
         // FILTRE ETABLISSEMENT
         if (isset($aggs['institution.name.source'])) {
             $qb
-                ->andWhere('trainer.institution = i.id')
+                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
                 ->andWhere('i.name = :inst')
                 ->setParameter('inst', $name);
         } elseif (isset($query_filters['institution.name.source'])) {
             $qb
-                ->andWhere('trainer.institution = i.id')
+                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
                 ->andWhere('i.name in (:inst)')
                 ->setParameter('inst', $query_filters['institution.name.source']);
         }
