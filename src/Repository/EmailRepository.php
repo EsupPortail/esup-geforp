@@ -22,10 +22,6 @@ class EmailRepository extends ServiceEntityRepository
         $qb
             ->select('e')
             /* Keyword (recherche par mot clé) */
-            ->innerJoin(Trainer::class, 'trainer')
-            ->innerJoin(Trainee::class, 'trainee')
-            ->innerJoin(Session::class, 's')
-
             // FILTRE KEYWORD
             ->where('e.subject LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */

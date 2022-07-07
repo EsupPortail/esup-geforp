@@ -32,10 +32,6 @@ class TraineeSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainee');
         $qb
             ->select(' trainee')
-            ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
-            ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
-            ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
-            ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -47,7 +43,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if (isset($filters['organization.name.source'])) {
             $qb
-                ->andWhere('trainee.organization = o.id')
+                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['organization.name.source']);
         }
@@ -73,7 +69,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         //FILTRE CIVILITE
         if( isset($filters['title'])) {
             $qb
-                ->andWhere('trainee.title = ti.id')
+                ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
                 ->andWhere('ti.name = :title')
                 ->setParameter('title', $filters['title']);
         }
@@ -81,7 +77,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE ETABLISSEMENT
         if( isset($filters['institution.name.source']) ) {
             $qb
-                ->andWhere('trainee.institution = institution.id')
+                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
                 ->andWhere('institution.name = :institution')
                 ->setParameter('institution', $filters['institution.name.source']);
         }
@@ -89,7 +85,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE PUBLIC TYPE
         if( isset($filters['publicType.source']) ){
             $qb
-                ->andWhere('trainee.publictype = pt.id')
+                ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
                 ->andWhere('pt.name = :publictype')
                 ->setParameter('publictype', $filters['publicType.source']);
         }
@@ -127,10 +123,6 @@ class TraineeSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('trainee');
         $qb
             ->select('trainee')
-            ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
-            ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
-            ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
-            ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -142,12 +134,12 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if(isset( $aggs['organization.name.source'])) {
             $qb
-                ->andWhere('trainee.organization = o.id')
+                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
                 ->andWhere('o.name = :center')
                 ->setParameter('center', $name);
         } elseif (isset($query_filters['organization.name.source'])) {
             $qb
-                ->andWhere('trainee.organization = o.id')
+                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $query_filters['organization.name.source']);
         }
@@ -155,12 +147,12 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE CIVILITE
         if (isset($aggs['title'])) {
             $qb
-                ->andWhere('trainee.title = ti.id')
+                ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
                 ->andWhere('ti.name = :title')
                 ->setParameter('title', $name);
         } elseif (isset($query_filters['title'])) {
             $qb
-                ->andWhere('trainee.title = ti.id')
+                ->innerJoin('trainee.title', 'ti', 'WITH', 'trainee.title = ti')
                 ->andWhere('ti.name = :title')
                 ->setParameter('title', $query_filters['title']);
         }
@@ -168,12 +160,12 @@ class TraineeSearchRepository extends ServiceEntityRepository
         //FILTRE ETABLISSEMENT
         if(isset( $aggs['institution.name.source'])) {
             $qb
-                ->andWhere('trainee.institution = institution.id')
+                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
                 ->andWhere('institution.name = :institution')
                 ->setParameter('institution', $name);
         } elseif (isset($query_filters['institution.name.source'])) {
             $qb
-                ->andWhere('trainee.institution = institution.id')
+                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
                 ->andWhere('institution.name = :institution')
                 ->andWhere('th.name in (:institutions)')
                 ->setParameter('institutions', $query_filters['institution.name.source']);
@@ -182,12 +174,12 @@ class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE PUBLIC TYPE
         if(isset( $aggs['publicType.source'])) {
             $qb
-                ->andWhere('trainee.publictype = pt.id')
+                ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
                 ->andWhere('pt.name = :publictype')
                 ->setParameter('publictype', $name);
         } elseif( isset($query_filters['publicType.source']) ) {
             $qb
-                ->andWhere('trainee.publictype = pt.id')
+                ->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt')
                 ->andWhere('pt.name = :publictype')
                 ->setParameter('publictype', $query_filters['publicType.source']);
         }

@@ -25,7 +25,6 @@ class InstitutionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select(' i')
-            ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
 
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
@@ -36,7 +35,7 @@ class InstitutionRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if (isset($filters['organization.name.source'])) {
             $qb
-                ->andWhere('i.organization = o.id')
+                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['organization.name.source']);
         }
@@ -78,7 +77,6 @@ class InstitutionRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select('i')
-            ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
 
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
@@ -89,12 +87,12 @@ class InstitutionRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if(isset( $aggs['organization.name.source'])) {
             $qb
-                ->andWhere('i.organization = o.id')
+                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
                 ->andWhere('o.name = :center')
                 ->setParameter('center', $name);
         } elseif (isset($query_filters['organization.name.source'])) {
             $qb
-                ->andWhere('i.organization = o.id')
+                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $query_filters['organization.name.source']);
         }

@@ -27,15 +27,9 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select(' i')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
-            ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
-            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
-            ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
-            ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+            // join sur trainee et session car toujours vrai
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
-            ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
-            ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
+            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -44,56 +38,19 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
-
         // FILTRE CENTRE
         if (isset($filters['session.training.organization.name.source'])) {
             $qb
-                ->andWhere('i.session = s.id')
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
+                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
+                ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['session.training.organization.name.source']);
-        }
-
-        //FILTRE STATUT D'INSCRIPTION
-        if( isset($filters['inscriptionStatus.name.source'])) {
-            $qb
-                ->andWhere('i.inscriptionstatus = istatus.id')
-                ->andWhere('istatus.name = :status')
-                ->setParameter('status', $filters['inscriptionStatus.name.source']);
-        }
-
-        //FILTRE STATUT DE PRESENCE
-        if( isset($filters['presenceStatus.name.source'])) {
-            $qb
-                ->andWhere('i.presencestatus = pstatus.id')
-                ->andWhere('pstatus.name = :status')
-                ->setParameter('status', $filters['presenceStatus.name.source']);
-        }
-
-        //FILTRE ETABLISSEMENT
-        if( isset($filters['institution.name.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.institution = institution.id')
-                ->andWhere('institution.name in (:institutions)')
-                ->setParameter('institutions', $filters['institution.name.source']);
-        }
-
-        //FILTRE CATEGORIE DE PERSONNEL
-        if( isset($filters['publicType.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.publictype = publictype.id')
-                ->andWhere('publictype.name in (:publictypes)')
-                ->setParameter('publictypes', $filters['publicType.source']);
         }
 
         // FILTRE ANNEE
         if (isset($filters['session.year'])) {
             $qb
                 /* On récupère l'année du dateBegin (à l'aide d'une doctrine extension) */
-                ->andWhere('i.session = s.id')
                 ->andWhere('YEAR(s.datebegin) in (:years)')
                 ->setParameter('years', $filters['session.year']);
         }
@@ -106,7 +63,6 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 $monthFrom = 7; $monthTo = 12;
             }
             $qb
-                ->andWhere('i.session = s.id')
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
                 ->setParameter('monthTo', $monthTo);
@@ -125,10 +81,41 @@ class InscriptionSearchRepository extends ServiceEntityRepository
 
             $qb
                 /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
-                ->andWhere('i.session = s.id')
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
+        }
+
+        //FILTRE STATUT D'INSCRIPTION
+        if( isset($filters['inscriptionStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+                ->andWhere('istatus.name = :status')
+                ->setParameter('status', $filters['inscriptionStatus.name.source']);
+        }
+
+        //FILTRE STATUT DE PRESENCE
+        if( isset($filters['presenceStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+                ->andWhere('pstatus.name = :status')
+                ->setParameter('status', $filters['presenceStatus.name.source']);
+        }
+
+        //FILTRE ETABLISSEMENT
+        if( isset($filters['institution.name.source'])) {
+            $qb
+                ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+                ->andWhere('institution.name in (:institutions)')
+                ->setParameter('institutions', $filters['institution.name.source']);
+        }
+
+        //FILTRE CATEGORIE DE PERSONNEL
+        if( isset($filters['publicType.source'])) {
+            $qb
+                ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
+                ->andWhere('publictype.name in (:publictypes)')
+                ->setParameter('publictypes', $filters['publicType.source']);
         }
 
         // TRI DES RESULTATS
@@ -160,14 +147,8 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('i');
         $qb
             ->select('i')
-            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
-            ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
-            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
-            ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
-            ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
-            ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
-            ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
+            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -176,89 +157,28 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
-
         // FILTRE CENTRE
         if(isset( $aggs['session.training.organization.name.source'])) {
             $qb
-                ->andWhere('i.session = s.id')
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
+                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
+                ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name = :center')
                 ->setParameter('center', $name);
         } elseif (isset($query_filters['session.training.organization.name.source'])) {
             $qb
-                ->andWhere('i.session = s.id')
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
+                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
+                ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $query_filters['session.training.organization.name.source']);
-        }
-
-        //FILTRE STATUT D'INSCRIPTION
-        if(isset( $aggs['inscriptionStatus.name.source'])) {
-            $qb
-                ->andWhere('i.inscriptionstatus = istatus.id')
-                ->andWhere('istatus.name = :status')
-                ->setParameter('status', $name);
-        } elseif( isset($query_filters['inscriptionStatus.name.source'])) {
-            $qb
-                ->andWhere('i.inscriptionstatus = istatus.id')
-                ->andWhere('istatus.name = :status')
-                ->setParameter('status', $query_filters['inscriptionStatus.name.source']);
-        }
-
-        //FILTRE STATUT DE PRESENCE
-        if( isset($aggs['presenceStatus.name.source'])) {
-            $qb
-                ->andWhere('i.presencestatus = pstatus.id')
-                ->andWhere('pstatus.name = :status')
-                ->setParameter('status', $name);
-        } elseif( isset($query_filters['presenceStatus.name.source'])) {
-            $qb
-                ->andWhere('i.presencestatus = pstatus.id')
-                ->andWhere('pstatus.name = :status')
-                ->setParameter('status', $query_filters['presenceStatus.name.source']);
-        }
-
-        //FILTRE ETABLISSEMENT
-        if( isset($aggs['institution.name.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.institution = institution.id')
-                ->andWhere('institution.name = :institution')
-                ->setParameter('institution',$name);
-        }elseif( isset($query_filters['institution.name.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.institution = institution.id')
-                ->andWhere('institution.name = :institution')
-                ->setParameter('institution', $query_filters['institution.name.source']);
-        }
-
-        //FILTRE CATEGORIE DE PERSONNEL
-        if( isset($aggs['publicType.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.publictype = publictype.id')
-                ->andWhere('publictype.name = :publictype')
-                ->setParameter('publictype', $name);
-        }elseif( isset($query_filters['publicType.source'])) {
-            $qb
-                ->andWhere('i.trainee = trainee.id')
-                ->andWhere('trainee.publictype = publictype.id')
-                ->andWhere('publictype.name = :publictype')
-                ->setParameter('publictype', $query_filters['publicType.source']);
         }
 
         // FILTRE ANNEE
         if (isset($aggs['session.year'])) {
             $qb
-                ->andWhere('i.session = s.id')
                 ->andWhere('YEAR(s.datebegin) = :year')
                 ->setParameter('year', $name);
         } elseif (isset($query_filters['session.year'])) {
             $qb
-                ->andWhere('i.session = s.id')
                 ->andWhere('YEAR(s.datebegin) in (:years)')
                 ->setParameter('years', $query_filters['session.year']);
         }
@@ -271,7 +191,6 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 $monthFrom = 7; $monthTo = 12;
             }
             $qb
-                ->andWhere('i.session = s.id')
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
                 ->setParameter('monthTo', $monthTo);
@@ -282,10 +201,61 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 $monthFrom = 7; $monthTo = 12;
             }
             $qb
-                ->andWhere('i.session = s.id')
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
                 ->setParameter('monthTo', $monthTo);
+        }
+
+        //FILTRE STATUT D'INSCRIPTION
+        if(isset( $aggs['inscriptionStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+                ->andWhere('istatus.name = :status')
+                ->setParameter('status', $name);
+        } elseif( isset($query_filters['inscriptionStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+                ->andWhere('istatus.name = :status')
+                ->setParameter('status', $query_filters['inscriptionStatus.name.source']);
+        }
+
+        //FILTRE STATUT DE PRESENCE
+        if( isset($aggs['presenceStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+                ->andWhere('pstatus.name = :status')
+                ->setParameter('status', $name);
+        } elseif( isset($query_filters['presenceStatus.name.source'])) {
+            $qb
+                ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+                ->andWhere('pstatus.name = :status')
+                ->setParameter('status', $query_filters['presenceStatus.name.source']);
+        }
+
+        //FILTRE ETABLISSEMENT
+        if( isset($aggs['institution.name.source'])) {
+            $qb
+                ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+                ->andWhere('institution.name = :institution')
+                ->setParameter('institution',$name);
+        }elseif( isset($query_filters['institution.name.source'])) {
+            $qb
+                ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+                ->andWhere('institution.name = :institution')
+                ->setParameter('institution', $query_filters['institution.name.source']);
+        }
+
+        //FILTRE CATEGORIE DE PERSONNEL
+        if( isset($aggs['publicType.source'])) {
+            $qb
+                ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
+                ->andWhere('publictype.name = :publictype')
+                ->setParameter('publictype', $name);
+        }elseif( isset($query_filters['publicType.source'])) {
+            $qb
+                ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
+                ->andWhere('publictype.name = :publictype')
+                ->setParameter('publictype', $query_filters['publicType.source']);
         }
 
         // On compte le nb de sessions en résultat

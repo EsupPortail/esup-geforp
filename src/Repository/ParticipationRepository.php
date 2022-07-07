@@ -23,10 +23,9 @@ class ParticipationRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p');
         $qb
             ->select('p')
-            /* Keyword (recherche par mot clé) */
-            ->innerJoin(Organization::class, 'o')
-            ->innerJoin(Trainer::class, 'trainer')
-            ->innerJoin(Session::class, 's')
+            ->innerJoin('p.trainer', 'trainer', 'WITH', 'trainer = p.trainer')
+            ->innerJoin('p.session', 's', 'WITH', 's = p.session')
+            ->innerJoin('p.organization', 'o', 'WITH', 'o = p.organization')
 
             // FILTRE KEYWORD
             ->where('trainer.firstname LIKE :keyword')
@@ -38,7 +37,6 @@ class ParticipationRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if (isset($filters['training.organization.name.source'])) {
             $qb
-                ->andWhere('internship.organization = o.id')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['training.organization.name.source']);
         }
@@ -46,7 +44,7 @@ class ParticipationRepository extends ServiceEntityRepository
         // FILTRE FORMATEUR
         if( isset($filters['trainer.id']) ) {
             $qb
-                ->andWhere('p.trainer = :id')
+                ->andWhere('trainer = :id')
                 ->setParameter('id', $filters['trainer.id']);
         }
 

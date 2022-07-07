@@ -92,12 +92,7 @@ class SessionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s');
         $qb
-            ->select(' s')
-            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
-            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
-            ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
-            ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
-            ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer');
+            ->select(' s');
 
             // FILTRE KEYWORD
         $qb
@@ -106,14 +101,29 @@ class SessionRepository extends ServiceEntityRepository
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
 
-        // FILTRE CENTRE
-        if (isset($filters['training.organization.name.source'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $filters['training.organization.name.source']);
+        if ((isset($filters['training.organization.name.source'])) ||
+            ( isset($filters['theme.name']))
+            ){
+            // join sur training
+            $qb->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training');
+
+            // FILTRE CENTRE
+            if (isset($filters['training.organization.name.source'])) {
+                $qb
+                    ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+                    ->andWhere('o.name in (:centers)')
+                    ->setParameter('centers', $filters['training.organization.name.source']);
+            }
+
+            //FILTRE THEME
+            if( isset($filters['theme.name'])) {
+                $qb
+                    ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                    ->andWhere('th.name in (:themes)')
+                    ->setParameter('themes', $filters['theme.name']);
+            }
         }
+
 
         // FILTRE ANNEE
         if (isset($filters['year'])) {
@@ -152,15 +162,6 @@ class SessionRepository extends ServiceEntityRepository
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
-        }
-
-        //FILTRE THEME
-        if( isset($filters['theme.name'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.theme = th.id')
-                ->andWhere('th.name in (:themes)')
-                ->setParameter('themes', $filters['theme.name']);
         }
 
         // FILTRE INSCRIPTION (0,1,2,3)
@@ -205,8 +206,8 @@ class SessionRepository extends ServiceEntityRepository
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
-                ->andWhere('s.id = p.session')
-                ->andWhere('trainer.id = p.trainer')
+                ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
+                ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer')
                 ->andWhere('trainer.lastname = :trainerLastName AND trainer.firstname = :trainerFirstName')
                 ->setParameter('trainerLastName', $lastName)
                 ->setParameter('trainerFirstName', $firstName);
@@ -242,12 +243,7 @@ class SessionRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('s');
         $qb
-            ->select(' s')
-            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
-            ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
-            ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
-            ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
-            ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer');
+            ->select(' s');
 
             // FILTRE KEYWORD
         $qb
@@ -255,20 +251,37 @@ class SessionRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
+        if ((isset( $aggs['training.organization.name.source'])) || (isset($query_filters['training.organization.name.source'])) ||
+            (isset( $aggs['theme.name'])) || (isset($query_filters['theme.name']))
+        ) {
+            // join sur training
+            $qb->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training');
 
-        // FILTRE CENTRE
-        if(isset( $aggs['training.organization.name.source'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
-                ->andWhere('o.name = :center')
-                ->setParameter('center', $name);
-        } elseif (isset($query_filters['training.organization.name.source'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.organization = o.id')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $query_filters['training.organization.name.source']);
+            // FILTRE CENTRE
+            if(isset( $aggs['training.organization.name.source'])) {
+                $qb
+                    ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+                    ->andWhere('o.name = :center')
+                    ->setParameter('center', $name);
+            } elseif (isset($query_filters['training.organization.name.source'])) {
+                $qb
+                    ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+                    ->andWhere('o.name in (:centers)')
+                    ->setParameter('centers', $query_filters['training.organization.name.source']);
+            }
+
+            //FILTRE THEME
+            if(isset( $aggs['theme.name'])) {
+                $qb
+                    ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                    ->andWhere('th.name = :theme')
+                    ->setParameter('theme', $name);
+            } elseif (isset($query_filters['theme.name'])) {
+                $qb
+                    ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                    ->andWhere('th.name in (:themes)')
+                    ->setParameter('themes', $query_filters['theme.name']);
+            }
         }
 
         // FILTRE ANNEE
@@ -322,21 +335,6 @@ class SessionRepository extends ServiceEntityRepository
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
-        }
-
-        //FILTRE THEME
-        if(isset( $aggs['theme.name'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.theme = th.id')
-                ->andWhere('th.name = :theme')
-                ->setParameter('theme', $name);
-        } elseif (isset($query_filters['theme.name'])) {
-            $qb
-                ->andWhere('s.training = tr.id')
-                ->andWhere('tr.theme = th.id')
-                ->andWhere('th.name in (:themes)')
-                ->setParameter('themes', $query_filters['theme.name']);
         }
 
         // FILTRE INSCRIPTION (0,1,2,3)
@@ -397,8 +395,8 @@ class SessionRepository extends ServiceEntityRepository
         // FILTRE FORMATEUR
         if(isset( $aggs['participations.trainer.fullName'])) {
             $qb
-                ->andWhere('s.id = p.session')
-                ->andWhere('trainer.id = p.trainer')
+                ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
+                ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer')
                 ->andWhere('trainer.id = :id ')
                 ->setParameter('id', $name);
         } elseif( isset($query_filters['participations.trainer.fullName']) ) {
@@ -407,8 +405,8 @@ class SessionRepository extends ServiceEntityRepository
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
-                ->andWhere('s.id = p.session')
-                ->andWhere('trainer.id = p.trainer')
+                ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
+                ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer')
                 ->andWhere('trainer.lastname = :trainerLastName AND trainer.firstname = :trainerFirstName')
                 ->setParameter('trainerLastName', $lastName)
                 ->setParameter('trainerFirstName', $firstName);
