@@ -228,8 +228,58 @@ class SessionRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabSession = array();
-        foreach($paginator as $session)
-            $tabSession[] = $session;
+        $sessionES = array();
+        foreach($paginator as $session) {
+            // On ne garde que les infos de la session dont on a besoin
+            $sessionES['id'] = $session->getId();
+            $sessionES['name'] = $session->getName();
+            $sessionES['datebegin'] = $session->getDatebegin();
+            $sessionES['dateend'] = $session->getDateend();
+            $sessionES['hournumber'] = $session->getHournumber();
+            $sessionES['daynumber'] = $session->getDaynumber();
+            $sessionES['year'] = $session->getYear();
+            $sessionES['semester'] = $session->getSemester();
+            $sessionES['semesterLabel'] = $session->getSemesterLabel();
+            $sessionES['limitRegistrationDate'] = $session->getLimitregistrationdate();
+            $sessionES['numberOfRegistrations'] = $session->getNumberofregistrations();
+            $sessionES['maximumNumberOfRegistrations'] = $session->getMaximumnumberofregistrations();
+            $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
+            $sessionES['registrable'] = $session->isRegistrable();
+            $sessionES['registration'] = $session->getRegistration();
+            $sessionES['status'] = $session->getStatus();
+            $sessionES['displayonline'] = $session->getDisplayonline();
+            $sessionES['sessiontype'] = $session->getSessiontype();
+            $sessionES['availablePlaces'] = $session->getAvailablePlaces();
+            $sessionES['promote'] = $session->getPromote();
+
+            $sessionES['training']['id'] = $session->getTraining()->getId();
+            $sessionES['training']['type'] = $session->getTraining()->getType();
+            $sessionES['training']['typeLabel'] = $session->getTraining()->getTypeLabel();
+            $sessionES['training']['organization'] = $session->getTraining()->getOrganization();
+            $sessionES['training']['number'] = $session->getTraining()->getNumber();
+            $sessionES['training']['serial'] = $session->getTraining()->getSerial();
+            $sessionES['training']['theme'] = $session->getTraining()->getTheme();
+            $sessionES['training']['tags'] = $session->getTraining()->getTags();
+            $sessionES['training']['program'] = $session->getTraining()->getProgram();
+            $sessionES['training']['description'] = $session->getTraining()->getDescription();
+            $sessionES['training']['interventionType'] = $session->getTraining()->getInterventionType();
+            $sessionES['training']['externalInitiative'] = $session->getTraining()->isExternalInitiative();
+            $sessionES['training']['category'] = $session->getTraining()->getCategory();
+            $sessionES['training']['comments'] = $session->getTraining()->getComments();
+            $sessionES['training']['firstSessionPeriodSemester'] = $session->getTraining()->getFirstSessionPeriodSemester();
+            $sessionES['training']['firstSessionPeriodYear'] = $session->getTraining()->getFirstSessionPeriodSemester();
+            $sessionES['training']['publictypes'] = $session->getTraining()->getPubliTypes();
+
+            $sessionES['inscriptions'] = $session->getInscriptions();
+
+            $sessionES['participations'] = $session->getParticipations();
+
+            $sessionES['theme'] = $session->getTraining()->getTheme();
+
+            $sessionES['inscriptionsStats'] = array();
+
+            $tabSession[] = $sessionES;
+        }
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,
