@@ -110,8 +110,44 @@ class TrainingRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainings = array();
-        foreach($paginator as $tr)
-            $tabTrainings[] = $tr;
+        $trainingES = array();
+        foreach($paginator as $training) {
+            // On ne garde que les infos du stage dont on a besoin
+            $trainingES['sessionsCount'] = $training->getSessionscount();
+            $trainingES['id'] = $training->getId();
+
+            $trainingES['training']['id'] = $training->getId();
+            $trainingES['training']['type'] = $training->getType();
+            $trainingES['training']['typeLabel'] = $training->getTypeLabel();
+            $trainingES['training']['organization'] =$training->getOrganization();
+            $trainingES['training']['number'] = $training->getNumber();
+            $trainingES['training']['theme'] = $training->getTheme();
+            $trainingES['training']['tags'] = $training->getTags();
+            $trainingES['training']['name'] = $training->getName();
+            $trainingES['training']['program'] = $training->getProgram();
+            $trainingES['training']['description'] = $training->getDescription();
+            $trainingES['training']['interventionType'] = $training->getInterventionType();
+            $trainingES['training']['externalInitiative'] = $training->isExternalInitiative();
+            $trainingES['training']['category'] = $training->getCategory();
+            $trainingES['training']['comments'] = $training->getComments();
+            $trainingES['training']['firstSessionPeriodSemester'] = $training->getFirstSessionPeriodSemester();
+            $trainingES['training']['firstSessionPeriodYear'] = $training->getFirstSessionPeriodSemester();
+            $trainingES['training']['publictypes'] = $training->getPublicTypes();
+
+            foreach ($training->getTrainers() as $trainer) {
+                $trainingES['trainers'][]['id'] = $trainer->getId();
+                $trainingES['trainers'][]['fullname'] = $trainer->getFullname();
+            }
+
+            $trainingES['training']['nextSession'] = $training->getNextsession();
+            $trainingES['training']['lastSession'] = $training->getLastsession();
+
+            $sessionES['theme'] = $training->getTheme();
+
+            $sessionES['inscriptionsStats'] = array();
+
+            $tabTrainings[] = $trainingES;
+        }
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,
