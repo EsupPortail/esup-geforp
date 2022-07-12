@@ -241,7 +241,7 @@ class SessionRepository extends ServiceEntityRepository
             $sessionES['semester'] = $session->getSemester();
             $sessionES['semesterLabel'] = $session->getSemesterLabel();
             $sessionES['limitRegistrationDate'] = $session->getLimitregistrationdate();
-            $sessionES['numberOfRegistrations'] = $session->getNumberofregistrations();
+            $sessionES['numberofregistrations'] = $session->getNumberofregistrations();
             $sessionES['maximumNumberOfRegistrations'] = $session->getMaximumnumberofregistrations();
             $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
             $sessionES['registrable'] = $session->isRegistrable();
@@ -254,10 +254,10 @@ class SessionRepository extends ServiceEntityRepository
 
             $sessionES['training']['id'] = $session->getTraining()->getId();
             $sessionES['training']['type'] = $session->getTraining()->getType();
+            $sessionES['training']['name'] = $session->getTraining()->getName();
             $sessionES['training']['typeLabel'] = $session->getTraining()->getTypeLabel();
             $sessionES['training']['organization'] = $session->getTraining()->getOrganization();
             $sessionES['training']['number'] = $session->getTraining()->getNumber();
-            $sessionES['training']['serial'] = $session->getTraining()->getSerial();
             $sessionES['training']['theme'] = $session->getTraining()->getTheme();
             $sessionES['training']['tags'] = $session->getTraining()->getTags();
             $sessionES['training']['program'] = $session->getTraining()->getProgram();
@@ -268,11 +268,16 @@ class SessionRepository extends ServiceEntityRepository
             $sessionES['training']['comments'] = $session->getTraining()->getComments();
             $sessionES['training']['firstSessionPeriodSemester'] = $session->getTraining()->getFirstSessionPeriodSemester();
             $sessionES['training']['firstSessionPeriodYear'] = $session->getTraining()->getFirstSessionPeriodSemester();
-            $sessionES['training']['publictypes'] = $session->getTraining()->getPubliTypes();
+            $sessionES['training']['publictypes'] = $session->getTraining()->getPublicTypes();
 
-            $sessionES['inscriptions'] = $session->getInscriptions();
+            foreach($session->getInscriptions() as $insc) {
+                $sessionES['inscriptions'][]['id'] = $insc->getId();
+            }
 
-            $sessionES['participations'] = $session->getParticipations();
+            foreach($session->getParticipations() as $part) {
+                $sessionES['participations'][]['id'] = $part->getId();
+            }
+
 
             $sessionES['theme'] = $session->getTraining()->getTheme();
 
