@@ -99,6 +99,9 @@ class TrainingRepository extends ServiceEntityRepository
                 ->setParameter('number', $filters['training.number']);
         }
 
+        // TRI DES RESULTATS
+        $qb->addOrderBy('training.name');
+
         // PAGINATION
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
@@ -113,7 +116,7 @@ class TrainingRepository extends ServiceEntityRepository
         $trainingES = array();
         foreach($paginator as $training) {
             // On ne garde que les infos du stage dont on a besoin
-            $trainingES['sessionsCount'] = $training->getSessionscount();
+            $trainingES['sessionscount'] = $training->getSessionscount();
             $trainingES['id'] = $training->getId();
 
             $trainingES['training']['id'] = $training->getId();
@@ -139,8 +142,8 @@ class TrainingRepository extends ServiceEntityRepository
                 $trainingES['trainers'][]['fullname'] = $trainer->getFullname();
             }
 
-            $trainingES['training']['nextSession'] = $training->getNextsession();
-            $trainingES['training']['lastSession'] = $training->getLastsession();
+            $trainingES['nextsession'] = $training->getNextsession();
+            $trainingES['lastsession'] = $training->getLastsession();
 
             $sessionES['theme'] = $training->getTheme();
 
