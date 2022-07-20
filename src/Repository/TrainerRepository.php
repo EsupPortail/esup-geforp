@@ -74,6 +74,11 @@ class TrainerRepository extends ServiceEntityRepository
         $qb->addOrderBy('trainer.lastname');
 
         // PAGINATION
+        if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
+            // on met une valeur par défaut (pour l'autocompletion)
+            $page = 1;
+            $pageSize = 50;
+        }
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);

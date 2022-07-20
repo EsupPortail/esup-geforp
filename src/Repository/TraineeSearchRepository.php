@@ -92,12 +92,17 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 $query = $qb->getQuery();
 
         // TRI DES RESULTATS
-        if (array_key_exists('lastName.source', $sort))
+        if ((is_array($sort)) && (array_key_exists('lastName.source', $sort)))
             $qb->addOrderBy('trainee.lastname');
         else
             $qb->addOrderBy('trainee.createdat', 'desc');
 
         // PAGINATION
+        if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
+            // on met une valeur par défaut (pour l'autocompletion)
+            $page = 1;
+            $pageSize = 50;
+        }
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
