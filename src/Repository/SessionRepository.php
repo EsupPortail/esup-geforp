@@ -242,7 +242,8 @@ class SessionRepository extends ServiceEntityRepository
             $sessionES['semesterLabel'] = $session->getSemesterLabel();
             $sessionES['limitRegistrationDate'] = $session->getLimitregistrationdate();
             $sessionES['numberofregistrations'] = $session->getNumberofregistrations();
-            $sessionES['maximumNumberOfRegistrations'] = $session->getMaximumnumberofregistrations();
+            $sessionES['numberofacceptedregistrations'] = $session->getNumberofacceptedregistrations();
+            $sessionES['maximumnumberofregistrations'] = $session->getMaximumnumberofregistrations();
             $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
             $sessionES['registrable'] = $session->isRegistrable();
             $sessionES['registration'] = $session->getRegistration();

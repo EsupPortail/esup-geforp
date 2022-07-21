@@ -46,7 +46,7 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
             if(session.registration) {
                 // inscription gérée individuellement
                 scope.label = session.numberofacceptedregistrations + ' / ' + session.maximumnumberofregistrations;
-                scope.tooltip = session.numberofacceptedRegistrations + ' acceptés sur ' + session.maximumnumberofregistrations + ' places';
+                scope.tooltip = session.numberofacceptedregistrations + ' acceptés sur ' + session.maximumnumberofregistrations + ' places';
                 scope.classes.push(scope.$root.sessionInscriptionStatsClass(session.numberofacceptedregistrations, session.maximumnumberofregistrations));
             } else {
                 // inscription gérée globalement
