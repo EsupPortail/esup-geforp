@@ -194,7 +194,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         if ($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
 
                             // On commence par recuperer les inscriptions de la session avec le statut "Convoqué"
-                            $inscConv = array();
+/*                            $inscConv = array();
                             $query = $em
                                 ->createQuery('SELECT i, count(s) FROM App\Entity\Core\AbstractInscription i
                     JOIN App\Entity\Core\Term\Inscriptionstatus s WITH s = i.inscriptionstatus
@@ -202,6 +202,17 @@ class CSVBatchOperation extends AbstractBatchOperation
                     GROUP BY i.id')
                                 ->setParameter('session', $session)
                                 ->setParameter('status', "convoke");
+                            $tabInsc = $query->getResult();*/
+
+                            // On commence par recuperer les inscriptions de la session avec le statut "Présent" ou "Présence partielle"
+                            $query = $em
+                                ->createQuery('SELECT i, count(s) FROM App\Entity\Core\AbstractInscription i
+                    JOIN App\Entity\Core\Term\Presencestatus s WITH s = i.presencestatus
+                    WHERE i.session = :session and (s.machinename = :statuspres or s.machinename = :statusprespart)
+                    GROUP BY i.id')
+                                ->setParameter('session', $session)
+                                ->setParameter('statuspres', "present")
+                                ->setParameter('statusprespart', "partiel");
                             $tabInsc = $query->getResult();
 
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
@@ -466,6 +477,8 @@ class CSVBatchOperation extends AbstractBatchOperation
                             + $accessor->getValue($entity, 'materialcost');
 
                         $data[$key] = ($rvalue) ? $rvalue : '';
+                        // Transformation '.' en ',' pour faciliter Excel
+                        $data[$key] = str_replace('.', ',', $data[$key]);
                     }elseif ($key == "session.totalCost") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
@@ -483,6 +496,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                             + $accessor->getValue($session, 'materialcost');
 
                         $data[$key] = ($rvalue) ? $rvalue : '';
+                        // Transformation '.' en ',' pour faciliter Excel
+                        $data[$key] = str_replace('.', ',', $data[$key]);
+
                     }elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
@@ -611,7 +627,6 @@ SQL;
 
                     } else {
                         $rvalue = $accessor->getValue($entity, $key);
-
                         // reformat values
                         if (!empty($value['type'])) {
                             if ($value['type'] === 'date') {
@@ -649,6 +664,11 @@ SQL;
 
                                 }
                             }
+                        }
+                        // Petite mise en forme pour faciliter les manips avec Excel
+                        if (stripos($key,  'cost') !== false) {
+                            // Transformation '.' en ',' pour faciliter Excel
+                            $rvalue = str_replace('.', ',', $rvalue);
                         }
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);

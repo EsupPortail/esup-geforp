@@ -162,6 +162,7 @@ parameters:
                     trainee.institution: "Etablissement"
                     trainee.service: "Service"
                     trainee.amuStatut: "Statut"
+                    trainee.publictype.name: "Type de public"
                     trainee.fonction: "Fonction exercée"
                     trainee.category: "Catégorie"
                     trainee.corps: "Corps"
