@@ -298,8 +298,8 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $inscription = $entity;
                         $session = $inscription->getSession();
 
-                        // on regarde si l'inscription est bien dans un statut convoqué
-                        if($inscription->getInscriptionstatus()->getMachinename() == "convoke") {
+                        // on regarde si l'inscription est bien dans un statut convoqué // DEMANDE DRH : NE PLUS VERIFIER
+//                        if($inscription->getInscriptionstatus()->getMachinename() == "convoke") {
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                             $query = $em
                                 ->createQuery('SELECT d FROM App\Entity\DateSession d
@@ -334,9 +334,9 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             // On recupere seulement le compteur du nombre d'heures de présence
                             $data[$key] = $nbHeuresPresence;
-                        } else {
-                            $data[$key] = '';
-                        }
+//                        } else {
+//                            $data[$key] = '';
+//                        }
                     } elseif ($key == "presence.partiel") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
