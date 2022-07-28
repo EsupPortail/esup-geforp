@@ -1,6 +1,13 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
 
+    # variables globales pour la partie stagiaire
+    globals:
+        contact_mail: '%contact_mail%'
+        adresse_site: '%adresse_site%'
+        nom_etablissement: '%nom_etablissement%'
+        front_url: '%front_url%'
+
 when@test:
     twig:
         strict_variables: true
