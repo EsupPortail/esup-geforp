@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Bundle\ShibbolethBundle\Security\AdminUser;
+namespace App\Bundle\AdminShibbolethBundle\Security\User;
 
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-class ShibbolethAdminUserToken extends AbstractToken {
+class ShibbolethUserToken extends AbstractToken {
 
     /**
      * @param mixed $user

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Bundle\ShibbolethBundle\Security\AdminUser;
+namespace App\Bundle\AdminShibbolethBundle\Security\User;
 
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 /**
  * Interface ShibbolethUserProviderInterface
- * @package App\Bundle\ShibbolethBundle\Security\User
+ * @package App\Bundle\AdminShibbolethBundle\Security\User
  */
-Interface ShibbolethAdminUserProviderInterface extends UserProviderInterface{
+Interface ShibbolethUserProviderInterface extends UserProviderInterface{
 
     /**
      * @param array $credentials

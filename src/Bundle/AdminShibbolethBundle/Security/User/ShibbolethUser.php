@@ -6,13 +6,13 @@
  * Time: 13:39
  */
 
-namespace App\Bundle\ShibbolethBundle\Security\AdminUser;
+namespace App\Bundle\AdminShibbolethBundle\Security\User;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 
-class ShibbolethAdminUser implements UserInterface, EquatableInterface
+class ShibbolethUser implements UserInterface, EquatableInterface
 {
     private $username;
     private $password;
@@ -66,7 +66,7 @@ class ShibbolethAdminUser implements UserInterface, EquatableInterface
 
     public function isEqualTo(UserInterface $user)
     {
-        if (!$user instanceof ShibbolethAdminUser) {
+        if (!$user instanceof ShibbolethUser) {
             return false;
         }
 
