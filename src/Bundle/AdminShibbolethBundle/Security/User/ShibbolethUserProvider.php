@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denoix
- * Date: 29/03/18
- * Time: 13:43
- */
 
 namespace App\Bundle\AdminShibbolethBundle\Security\User;
 
@@ -12,34 +6,29 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Doctrine\Persistence\ManagerRegistry;
 use App\Bundle\AdminShibbolethBundle\Security\User\ShibbolethUserProviderInterface;
 use App\Entity\Core\User;
-use Doctrine\ORM\EntityRepository;
 
 class ShibbolethUserProvider implements ShibbolethUserProviderInterface
 {
+    private $registry;
+
+    public function __construct(ManagerRegistry $registry)
+    {
+        $this->registry = $registry;
+    }
 
     public function loadUserByUsername($login)
     {
-/*        $roles = array();
-        return new ShibbolethUser($login, '', '', array(), $roles);*/
-
-        return $this->createQueryBuilder('u')
-            ->where('u.username = :username')
-            ->setParameter('username', $login)
-            ->getQuery()
-            ->getOneOrNullResult();
+        $entityManager = $this->registry->getManagerForClass(User::class);
+        $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $login]);
+        return $user;
     }
 
     public function loadUser($credentials)
     {
-/*        $roles = array();
-        return new ShibbolethUser($credentials['username'], '', '', $credentials, $roles);*/
-        return $this->createQueryBuilder('u')
-            ->where('u.username = :username')
-            ->setParameter('username', $credentials['username'])
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->loadUserByUsername($credentials['username']);
     }
 
     public function refreshUser(UserInterface $user)
