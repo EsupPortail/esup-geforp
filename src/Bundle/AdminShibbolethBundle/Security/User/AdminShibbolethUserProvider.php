@@ -7,10 +7,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Doctrine\Persistence\ManagerRegistry;
-use App\Bundle\AdminShibbolethBundle\Security\User\ShibbolethUserProviderInterface;
+use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProviderInterface;
 use App\Entity\Core\User;
 
-class ShibbolethUserProvider implements ShibbolethUserProviderInterface
+class AdminShibbolethUserProvider implements AdminShibbolethUserProviderInterface
 {
     private $registry;
 

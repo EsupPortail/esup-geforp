@@ -21,5 +21,6 @@ return [
     Nelmio\CorsBundle\NelmioCorsBundle::class => ['all' => true],
     Mopa\Bundle\BootstrapBundle\MopaBootstrapBundle::class => ['all' => true],
     App\Bundle\ShibbolethBundle\ShibbolethBundle::class => ['all' => true],
+    App\Bundle\AdminShibbolethBundle\AdminShibbolethBundle::class => ['all' => true],
     Knp\Bundle\SnappyBundle\KnpSnappyBundle::class => ['all' => true],
 ];

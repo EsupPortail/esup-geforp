@@ -6,7 +6,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 use Symfony\Component\Security\Core\Authentication\Token\AbstractToken;
 
-class ShibbolethUserToken extends AbstractToken {
+class AdminShibbolethUserToken extends AbstractToken {
 
     /**
      * @param mixed $user

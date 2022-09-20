@@ -15,13 +15,13 @@ use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
-use App\Bundle\AdminShibbolethBundle\Security\User\ShibbolethUserProviderInterface;
+use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProviderInterface;
 
 /**
- * Class ShibbolethGuardAuthenticator
+ * Class AdminShibbolethGuardAuthenticator
  * @package App\Bundle\ShibbolethBundle\Security
  */
-class ShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
+class AdminShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
 {
 
     /**
@@ -159,7 +159,8 @@ class ShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
      */
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        return new JsonResponse(array('message' => $exception->getMessageKey()), Response::HTTP_FORBIDDEN);
+//        return new JsonResponse(array('message' => $exception->getMessageKey()), Response::HTTP_FORBIDDEN);
+        return new JsonResponse(array('message' => "Vous n'avez pas les droits pour accéder à cette application"), Response::HTTP_FORBIDDEN);
     }
 
     /**
