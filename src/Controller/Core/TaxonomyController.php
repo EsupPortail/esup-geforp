@@ -77,28 +77,18 @@ class TaxonomyController extends AbstractController
         /** @var AbstractTerm $abstractVocabulary */
         $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
-        $userAccessRights = $this->getUser()->getAccessRights();
-        $userVocabularyAccessRights = array(
-            'nationalEdit' => in_array('sygefor_core.access_right.vocabulary.national', $userAccessRights),
-            'localEdit' => in_array('sygefor_core.access_right.vocabulary.own', $userAccessRights),
-            'allView' => in_array('sygefor_core.access_right.vocabulary.view.all', $userAccessRights),
-            'allEdit' => in_array('sygefor_core.access_right.vocabulary.all', $userAccessRights),
-        );
+        // for mixed vocabularies
+        $canEditNationalTerms = $this->isGranted('VIEW', $abstractVocabulary);
 
-        if (!$organization) {
-            $org = $this->getUser()->getOrganization();
-            $redirectUrl = $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $org->getId())));
-            if ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_LOCAL) {
-                return $redirectUrl;
-            } elseif ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_MIXED && !$userVocabularyAccessRights['allView'] && !$userVocabularyAccessRights['nationalEdit']) {
-                return $redirectUrl;
-            }
+        if ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_LOCAL && !$organization) {
+            return $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $this->getUser()->getOrganization()->getId())));
         }
 
         // set organization to abstract vocabulary to check access rights
         $abstractVocabulary->setOrganization($organization);
-        if (!$this->isGranted('VIEW', $abstractVocabulary)) {
-            throw new AccessDeniedException();
+        if (!$this->isGranted('VIEW', $abstractVocabulary) && !$canEditNationalTerms) {
+            // organization required for local vocabularies
+            throw new AccessDeniedException('');
         }
 
         // needed for template organization tabs
@@ -108,12 +98,11 @@ class TaxonomyController extends AbstractController
             $alterAbstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
             foreach ($alterOrganizations as $alterOrganization) {
                 $alterAbstractVocabulary->setOrganization($alterOrganization);
-                if ($this->isGranted('EDIT', $alterAbstractVocabulary) || $this->isGranted('VIEW', $alterAbstractVocabulary)) {
+                if ($this->isGranted('VIEW', $alterAbstractVocabulary)) {
                     $organizations[$alterOrganization->getId()] = $alterOrganization;
                 }
             }
         }
-
         $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization);
         if ($organization) {
             foreach ($terms as $key => $term) {
@@ -123,16 +112,16 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return $this->render('Core/views/Taxonomy/view.html.twig', array(
+        return array(
             'organization' => $organization,
             'organizations' => $organizations,
-            'userVocabularyAccessRights' => true, //$userVocabularyAccessRights,
+            'canEditNationalTerms' => $canEditNationalTerms,
             'terms' => $terms,
             'vocabulary' => $abstractVocabulary,
-            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
+            'vocabularies' => $this->getVocabulariesList(),
             'sortable' => $abstractVocabulary::orderBy() === 'position',
             'depth' => method_exists($abstractVocabulary, 'getChildren') ? 2 : 1,
-        ));
+        );
     }
 
     /**
