@@ -52,9 +52,9 @@ class TaxonomyController extends AbstractController
      */
     public function indexAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry)
     {
-/*        if (!$this->get('security.context')->isGranted('VIEW', VocabularyInterface::class)) {
+        if (!$this->isGranted('VIEW', VocabularyInterface::class)) {
             throw new AccessDeniedException();
-        } */
+        }
 
         return $this->render('Core/views/Taxonomy/index.html.twig', array(
             'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
@@ -67,7 +67,7 @@ class TaxonomyController extends AbstractController
      *
      * @Route("/{vocabularyId}/view/{organizationId}", name="taxonomy.view", defaults={"organizationId" = null})
      * @ParamConverter("organization", class="App\Entity\Core\AbstractOrganization", options={"id" = "organizationId"}, isOptional="true")
-     *
+     * @Security("is_granted('VIEW', 'Vocabulary\\VocabularyInterface')")
      * @throws EntityNotFoundException
      *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -126,6 +126,7 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/edit/{id}/{organizationId}", name="taxonomy.edit", defaults={"id" = null, "organizationId" = null})
+     * @Security("is_granted('EDIT', 'Vocabulary\\VocabularyInterface')")
      */
     public function editVocabularyTermAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organizationId, $id = null)
     {
@@ -191,6 +192,7 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/remove/{id}", name="taxonomy.remove")
+     * @Security("is_granted('REMOVE', 'Vocabulary\\VocabularyInterface')")
      */
     public function removeAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $id)
     {
@@ -405,7 +407,7 @@ class TaxonomyController extends AbstractController
 	 *     requirements={"id"="\d+"}
 	 * )
 	 * @Method("GET")
-	 * @Security("is_granted('VIEW', 'Sygefor\\Bundle\\TaxonomyBundle\\Vocabulary\\VocabularyInterface')")
+	 * @Security("is_granted('VIEW', 'Vocabulary\\VocabularyInterface')")
 	 *
 	 * @param Publiposttemplate $template
 	 *
