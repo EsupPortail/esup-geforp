@@ -377,8 +377,7 @@ class TaxonomyController extends AbstractController
     private function getVocabulariesList(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry)
     {
         $vocsGroups = $vocRegistry->getGroups();
-        $userOrg = $this->get('security.context')->getToken()->getUser()->getOrganization();
-        $centre = $doctrine->getRepository(Organization::class)->find(1);
+        $userOrg = $this->getUser()->getOrganization();
 
         //getting vocabularies list, grouped by vocabularies groups
         $vocNames = array();
