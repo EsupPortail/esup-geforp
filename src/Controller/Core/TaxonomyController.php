@@ -77,21 +77,20 @@ class TaxonomyController extends AbstractController
         /** @var AbstractTerm $abstractVocabulary */
         $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
-/*        $userAccessRights = $this->getUser()->getAccessRights();
+        $userAccessRights = $this->getUser()->getAccessRights();
         $userVocabularyAccessRights = array(
             'nationalEdit' => in_array('sygefor_core.access_right.vocabulary.national', $userAccessRights),
             'localEdit' => in_array('sygefor_core.access_right.vocabulary.own', $userAccessRights),
             'allView' => in_array('sygefor_core.access_right.vocabulary.view.all', $userAccessRights),
             'allEdit' => in_array('sygefor_core.access_right.vocabulary.all', $userAccessRights),
         );
-*/
+
         if (!$organization) {
-            //$org = $this->getUser()->getOrganization();
-            $org = $doctrine->getRepository(Organization::class)->find(1);
+            $org = $this->getUser()->getOrganization();
             $redirectUrl = $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $org->getId())));
             if ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_LOCAL) {
                 return $redirectUrl;
-            } elseif ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_MIXED ) { //&& !$userVocabularyAccessRights['allView'] && !$userVocabularyAccessRights['nationalEdit']) {
+            } elseif ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_MIXED && !$userVocabularyAccessRights['allView'] && !$userVocabularyAccessRights['nationalEdit']) {
                 return $redirectUrl;
             }
         }
@@ -109,9 +108,9 @@ class TaxonomyController extends AbstractController
             $alterAbstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
             foreach ($alterOrganizations as $alterOrganization) {
                 $alterAbstractVocabulary->setOrganization($alterOrganization);
-//                if ($this->get('security.context')->isGranted('EDIT', $alterAbstractVocabulary) || $this->get('security.context')->isGranted('VIEW', $alterAbstractVocabulary)) {
+                if ($this->isGranted('EDIT', $alterAbstractVocabulary) || $this->isGranted('VIEW', $alterAbstractVocabulary)) {
                     $organizations[$alterOrganization->getId()] = $alterOrganization;
-//                }
+                }
             }
         }
 
