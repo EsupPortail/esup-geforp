@@ -118,7 +118,7 @@ class TaxonomyController extends AbstractController
             'canEditNationalTerms' => $canEditNationalTerms,
             'terms' => $terms,
             'vocabulary' => $abstractVocabulary,
-            'vocabularies' => $this->getVocabulariesList(),
+            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
             'sortable' => $abstractVocabulary::orderBy() === 'position',
             'depth' => method_exists($abstractVocabulary, 'getChildren') ? 2 : 1,
         );
