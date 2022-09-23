@@ -98,10 +98,10 @@ class TaxonomyController extends AbstractController
 
         // set organization to abstract vocabulary to check access rights
         $abstractVocabulary->setOrganization($organization);
-/*        if (!$this->get('security.context')->isGranted('VIEW', $abstractVocabulary)) {
+        if (!$this->isGranted('VIEW', $abstractVocabulary)) {
             throw new AccessDeniedException();
         }
-*/
+
         // needed for template organization tabs
         $organizations = array();
         if ($abstractVocabulary->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL) {
@@ -161,10 +161,10 @@ class TaxonomyController extends AbstractController
             $term = new $termClass();
             $term->setOrganization($organization);
         }
-/*
-        if (!$this->get('security.context')->isGranted('EDIT', $term)) {
+
+        if (!$this->isGranted('EDIT', $term)) {
             throw new AccessDeniedException();
-        } */
+        }
 
         // get term from
         $formType = VocabularyType::class;
@@ -221,11 +221,11 @@ class TaxonomyController extends AbstractController
         if ($term->isLocked()) {
             throw new AccessDeniedException("This term can't be removed");
         }
-/*
-        if (!$this->get('security.context')->isGranted('REMOVE', $term)) {
+
+        if (!$this->isGranted('REMOVE', $term)) {
             throw new AccessDeniedException();
         }
-*/
+
         // get term usage
         $count = $vocRegistry->getTermUsages($em, $term);
 
@@ -377,7 +377,7 @@ class TaxonomyController extends AbstractController
     private function getVocabulariesList(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry)
     {
         $vocsGroups = $vocRegistry->getGroups();
-//        $userOrg = $this->get('security.context')->getToken()->getUser()->getOrganization();
+        $userOrg = $this->get('security.context')->getToken()->getUser()->getOrganization();
         $centre = $doctrine->getRepository(Organization::class)->find(1);
 
         //getting vocabularies list, grouped by vocabularies groups
@@ -387,7 +387,8 @@ class TaxonomyController extends AbstractController
                 if ($voc->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && !empty($userOrg)) {
                     $voc->setOrganization($userOrg);
                 }
-//                if ($this->get('security.context')->isGranted('VIEW', $voc)) {
+
+                if ($this->isGranted('VIEW', $voc)) {
                     $label = $vocRegistry->getVocabularyLabel($vid);
                     $voc->setVocabularyLabel($label);
                     $vocNames[] = array(
@@ -395,9 +396,9 @@ class TaxonomyController extends AbstractController
                         'vocabulary' => $voc,
                         'name' => $voc->getVocabularyName(),
                         'scope' => $voc->getVocabularyStatus(),
-                        'canEdit' => true, //$this->get('security.context')->isGranted('EDIT', $voc),
+                        'canEdit' => $this->isGranted('EDIT', $voc)
                     );
-//                }
+                }
             }
         }
 
