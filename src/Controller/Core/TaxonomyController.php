@@ -112,7 +112,7 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return array(
+        return $this->render('Core/views/Taxonomy/view.html.twig', array(
             'organization' => $organization,
             'organizations' => $organizations,
             'canEditNationalTerms' => $canEditNationalTerms,
@@ -121,7 +121,7 @@ class TaxonomyController extends AbstractController
             'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
             'sortable' => $abstractVocabulary::orderBy() === 'position',
             'depth' => method_exists($abstractVocabulary, 'getChildren') ? 2 : 1,
-        );
+        ));
     }
 
     /**
