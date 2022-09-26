@@ -69,9 +69,9 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         }
 
         //FILTRE DATE
-        if( isset($filters['session.dateBegin']) ) {
+        if( isset($filters['session.datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["session.dateBegin"]);
+            $dates = explode('-', $filters["session.datebegin"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -117,6 +117,14 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->andWhere('publictype.name in (:publictypes)')
                 ->setParameter('publictypes', $filters['publicType.source']);
         }
+
+        // FILTRE SESSION
+        if (isset($filters['session.id'])) {
+            $qb
+                ->andWhere('s.id in (:id)')
+                ->setParameter('id', $filters['session.id']);
+        }
+
 
         // TRI DES RESULTATS
         $qb->addOrderBy('i.createdat', 'DESC');
