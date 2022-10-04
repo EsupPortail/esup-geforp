@@ -7,7 +7,7 @@ use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Session;
 use App\Entity\Back\Trainer;
-use App\Entity\Back\Participation;
+use App\Entity\Core\AbstractParticipation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -15,7 +15,7 @@ class ParticipationRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Participation::class);
+        parent::__construct($registry, AbstractParticipation::class);
     }
 
     public function getParticipationsList($keyword, $filters)

@@ -54,7 +54,7 @@ abstract class AbstractParticipation
     protected $isOrganization;
 
     /**
-     * @var Organization
+     * @var AbstractOrganization
      * @ORM\ManyToOne(targetEntity="AbstractOrganization")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
