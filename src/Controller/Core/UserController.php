@@ -68,7 +68,7 @@ class UserController extends AbstractController
      *
      * @Route("/{id}", requirements={"id" = "\d+"}, name="user.view", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerEnableMaxDepthChecks=true)
-     * @ParamConverter("user", class="App:Core:User", options={"id" = "id"})
+     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      *
      * @return User
      */

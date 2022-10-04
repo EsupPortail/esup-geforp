@@ -1,5 +1,6 @@
 <?php
-namespace App\Entity\Core\Term;
+
+namespace App\Entity\Term;
 
 use JMS\Serializer\Annotation as Serializer;
 

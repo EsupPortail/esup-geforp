@@ -24,22 +24,28 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+            App\Back:
+                is_bundle: false
+                type: annotation
+                dir: '%kernel.project_dir%/src/Entity/Back'
+                prefix: 'App\Entity\Back'
+                alias: AppBack
             App\Core:
                 is_bundle: false
                 type: annotation
                 dir: '%kernel.project_dir%/src/Entity/Core'
                 prefix: 'App\Entity\Core'
                 alias: AppCore
-            App\Core\Term:
+            App\Term:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Entity/Core/Term'
-                prefix: 'App\Entity\Core\Term'
-                alias: AppCoreTerm
-            App\Core\PersonTrait:
+                dir: '%kernel.project_dir%/src/Entity/Term'
+                prefix: 'App\Entity\Term'
+                alias: AppTerm
+            App\PersonTrait:
                 is_bundle: false
                 type: annotation
-                dir: '%kernel.project_dir%/src/Entity/Core/PersonTrait'
-                prefix: 'App\Entity\Core\PersonTrait'
-                alias: AppCorePersonTrait
+                dir: '%kernel.project_dir%/src/Entity/PersonTrait'
+                prefix: 'App\Entity\PersonTrait'
+                alias: AppPersonTrait
 

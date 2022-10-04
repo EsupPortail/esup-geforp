@@ -2,11 +2,11 @@
 
 namespace App\Repository;
 
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Core\Term\Title;
-use App\Entity\Institution;
-use App\Entity\Organization;
-use App\Entity\Trainee;
+use App\Entity\Term\Publictype;
+use App\Entity\Term\Title;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Trainee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;

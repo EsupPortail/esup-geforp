@@ -3,9 +3,9 @@
 namespace App\Controller\Front;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use App\Entity\Alert;
-use App\Entity\MultipleAlert;
-use App\Entity\SingleAlert;
+use App\Entity\Back\Alert;
+use App\Entity\Back\MultipleAlert;
+use App\Entity\Back\SingleAlert;
 use App\Form\Type\ProgramAlertType;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -34,7 +34,7 @@ class AlertAccountController extends AbstractController
     {
         // Récupération des alertes du stagiaire
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\BackTrainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
         $alertsTrainee = $trainee->getAlerts();
 
@@ -58,11 +58,11 @@ class AlertAccountController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $trainee,
                     'session'=> $sessionExiste
                 ));

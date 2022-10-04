@@ -7,7 +7,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Context\Context;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractTraining;
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

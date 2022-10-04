@@ -2,7 +2,7 @@
 
 namespace App\Controller\Back;
 
-use App\Entity\Institution;
+use App\Entity\Back\Institution;
 use App\Controller\Core\AbstractInstitutionController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;

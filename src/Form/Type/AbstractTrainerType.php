@@ -3,11 +3,11 @@
 namespace App\Form\Type;
 
 use App\Entity\Core\AbstractOrganization;
-use App\Entity\Institution;
+use App\Entity\Back\Institution;
 use Doctrine\ORM\EntityRepository;
 use App\AccessRight\AccessRightRegistry;
-use App\Entity\Organization;
-use App\Entity\Core\Term\Title;
+use App\Entity\Back\Organization;
+use App\Entity\Term\Title;
 use App\Entity\Core\AbstractTrainer;
 use App\Entity\Core\AbstractInstitution;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -102,7 +102,7 @@ class AbstractTrainerType extends AbstractType
             ))
             ->add('trainerType', EntityType::class, array(
                 'label'    => "Type d'intervenant",
-                'class'    => \App\Entity\Core\Term\Trainertype::class,
+                'class'    => \App\Entity\Term\Trainertype::class,
                 'required' => false,
             ))
             ->add('service', null, array(

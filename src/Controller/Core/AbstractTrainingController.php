@@ -2,10 +2,10 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Core\Term\Theme;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\Trainer;
+use App\Entity\Term\Theme;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Trainer;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
@@ -22,7 +22,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
 use App\Repository\TrainingRepository;
-use Sygefor\Bundle\TrainingBundle\SpreadSheet\TrainingBalanceSheet;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -41,16 +40,6 @@ abstract class AbstractTrainingController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, TrainingRepository $trainingRepository)
     {
-/*        $search = $this->get('sygefor_training.semestered.search');
-        $search->handleRequest($request);
-
-        // security check
-        if( ! $this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_training.rights.training.all.view')) {
-            $search->addTermFilter('training.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search(); */
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
@@ -77,10 +66,6 @@ abstract class AbstractTrainingController extends AbstractController
      */
     public function createAction(Request $request, ManagerRegistry $doctrine, $type)
     {
-/*        $registry = $this->get('sygefor_training.type.registry');
-        $type     = $registry->getType($type);
-
-        $class = $type['class'];*/
         $class = Internship::class;
         /** @var AbstractTraining $training */
         $training = new $class();

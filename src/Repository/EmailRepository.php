@@ -3,9 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Core\Email;
-use App\Entity\Session;
-use App\Entity\Trainer;
-use App\Entity\Trainee;
+use App\Entity\Back\Session;
+use App\Entity\Back\Trainer;
+use App\Entity\back\Trainee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Core\PersonTrait;
+namespace App\Entity\PersonTrait;
 
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;

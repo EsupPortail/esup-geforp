@@ -2,11 +2,11 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Institution;
-use App\Entity\Trainee;
-use App\Entity\Organization;
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Core\Term\Title;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Trainee;
+use App\Entity\Back\Organization;
+use App\Entity\Term\Publictype;
+use App\Entity\Term\Title;
 use App\Form\Type\AbstractTraineeType;
 use App\Repository\TraineeSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -50,25 +50,6 @@ abstract class AbstractTraineeController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, TraineeSearchRepository $traineeRepository)
     {
-/*        $search = $this->get('sygefor_trainee.search');
-        $search->handleRequest($request);
-
-        // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainee.all.view')) {
-            $search->addTermFilter('organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search(); */
-/*        $trainees = $doctrine->getRepository(Trainee::class)->findAll();
-        $nbTrainees  = count($trainees);
-
-        $ret = array(
-            'total' => $nbTrainees,
-            'pageSize' => 0,
-            'items' => $trainees,
-        );
-        return $ret;*/
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');

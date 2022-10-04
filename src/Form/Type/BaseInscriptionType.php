@@ -4,8 +4,8 @@ namespace App\Form\Type;
 
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\AbstractTrainee;
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Term\Presencestatus;
 use Doctrine\ORM\EntityRepository;
 use App\Form\Type\EntityHiddenType;
 use App\Entity\Core\AbstractInscription;

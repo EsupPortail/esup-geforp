@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity\Core\Term;
+namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\AbstractTerm;
-use App\Entity\Core\Term\VocabularyInterface;
+use App\Entity\Term\AbstractTerm;
+use App\Entity\Term\VocabularyInterface;
 use App\Form\Type\TrainingcategoryType;
 use Symfony\Component\Validator\Constraints as Assert;
 

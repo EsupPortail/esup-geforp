@@ -3,7 +3,7 @@
 namespace App\Controller\Back;
 
 use App\Controller\Core\AbstractTrainerController;
-use App\Entity\Trainer;
+use App\Entity\Back\Trainer;
 use App\Controller\Core\AbstractInstitutionController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;

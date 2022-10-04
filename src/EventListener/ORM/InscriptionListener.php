@@ -7,7 +7,7 @@ use Html2Text\Html2Text;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\DependencyInjection\Container;
-use App\Entity\Core\Term\Emailtemplate;
+use App\Entity\Term\Emailtemplate;
 use App\Entity\Core\AbstractInscription;
 
 /**
@@ -82,7 +82,7 @@ class InscriptionListener implements EventSubscriber
         $inscription = $eventArgs->getEntity();
 
         // find the first template for the given inscription status
-        $repository = $eventArgs->getEntityManager()->getRepository('App\Entity\Core\Term\Emailtemplate');
+        $repository = $eventArgs->getEntityManager()->getRepository('App\Entity\Term\Emailtemplate');
 
         /** @var Emailtemplate $template */
         $template = $repository->findOneBy(array(

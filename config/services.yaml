@@ -61,14 +61,14 @@ parameters:
                 class: 'App\Entity\Core\AbstractTraining'
         csv:
             user:
-                class: 'App\Entity\User'
+                class: 'App\Entity\Back\User'
                 filename: 'utilisateurs.csv'
                 fields:
                     username: Nom
                     email: Email
                     organization.name: Centre
             session:
-                class: 'App\Entity\Session'
+                class: 'App\Entity\Back\Session'
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
@@ -121,7 +121,7 @@ parameters:
                     lastSession.dateBegin: { label: 'Dernière', type: 'date' }
 #                    tags: { label: 'Tags' }
             trainee:
-                class: 'App\Entity\Trainee'
+                class: 'App\Entity\Back\Trainee'
                 filename: 'stagiaire.csv'
                 fields:
                     title: "Civilité"
@@ -197,19 +197,19 @@ parameters:
                     city: "Ville"
         mailing:
             organization:
-                class: 'App\Entity\Organization'
+                class: 'App\Entity\Back\Organization'
                 excludeFromFormType: true
                 alias: 'centre'
                 fields:
                     nom: { property: name }
                     code: { property: code }
             typeAction:
-                class: 'App\Entity\Core\Term\Actiontype'
+                class: 'App\Entity\Term\Actiontype'
                 alias: 'typeaction'
                 fields:
                     nom: { property: name }
             inscription:
-                class: 'App\Entity\Inscription'
+                class: 'App\Entity\Back\Inscription'
                 emailPath: 'trainee.email'
                 alias: 'inscription'
                 fields:
@@ -228,7 +228,7 @@ parameters:
                     listeFormateurs: { property: session.listeFormateurs }
                     refuse: { property: refuse }
             trainee:
-                class: 'App\Entity\Trainee'
+                class: 'App\Entity\Back\Trainee'
                 alias: 'stagiaire'
                 emailPath: 'email'
                 fields:
@@ -257,7 +257,7 @@ parameters:
                     # Trainee
                     inscriptions: { property: inscriptions }
             trainer:
-                class: 'App\Entity\Trainer'
+                class: 'App\Entity\Back\Trainer'
                 # excludeFromFormType: true
                 alias: 'formateur'
                 emailPath: 'email'
@@ -281,7 +281,7 @@ parameters:
                     # other fields
                     sessions: { property: sessions }
             session:
-                class: 'App\Entity\Session'
+                class: 'App\Entity\Back\Session'
                 alias: 'session'
                 emailPath: 'trainer.email'
                 fields:
@@ -339,7 +339,7 @@ parameters:
                     # Meeting
                     nationale: { property: national }
             participation:
-                class: 'App\Entity\Participation'
+                class: 'App\Entity\Back\Participation'
                 alias: 'participation'
                 emailPath: 'trainer.email'
                 fields:
@@ -348,10 +348,10 @@ parameters:
                     session: { property: session }
                     dates: { property: session.dates }
             internship:
-                class: 'App\Entity\Internship'
+                class: 'App\Entity\Back\Internship'
                 parent: training
             date:
-                class: 'App\Entity\DateSession'
+                class: 'App\Entity\Back\DateSession'
                 alias: 'date'
                 fields:
                     dateDebut: { property: datebegin }
@@ -362,13 +362,13 @@ parameters:
                     nbHeuresApr: { property: hournumberafter }
                     lieu: { property: place }
             institution:
-                class: 'App\Entity\Institution'
+                class: 'App\Entity\Back\Institution'
                 alias: 'institution'
                 excludeFromFormType: true
                 fields:
                     nom: { property: name }
             alert:
-                class: 'App\Entity\Alert'
+                class: 'App\Entity\Back\Alert'
                 alias: 'alert'
                 excludeFromFormType: true
                 emailPath: 'trainee.email'
@@ -379,7 +379,7 @@ parameters:
                     dates: { property: session.dates }
                     email: { property: trainee.email }
             presence:
-                class: 'App\Entity\Presence'
+                class: 'App\Entity\Back\Presence'
                 alias: 'presence'
                 excludeFromFormType: true
                 fields:
@@ -397,7 +397,7 @@ parameters:
                     meeting: 'SygeforMyCompanyBundle:Training:pdf/meeting.html.twig'
 
             inscription.attestation:
-                class: 'App\Entity\Inscription'
+                class: 'App\Entity\Back\Inscription'
                 template: 'SygeforMyCompanyBundle:Inscription:attestation.pdf.twig'
                 key: inscription
                 filename: "attestation.pdf"

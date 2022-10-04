@@ -3,7 +3,7 @@
 namespace App\Controller\Back;
 
 use App\Controller\Core\AbstractParticipationController;
-use App\Entity\Participation;
+use App\Entity\Back\Participation;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;

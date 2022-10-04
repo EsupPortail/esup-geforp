@@ -33,7 +33,7 @@ class SemesteredTrainingProvider extends Provider
           'indexName' => 'sygefor3',
           'typeName' => 'semestered_training',
         );
-        parent::__construct($objectPersister, $indexable, 'Sygefor\Bundle\CoreBundle\Entity\AbstractTraining', $options, $managerRegistry);
+        parent::__construct($objectPersister, $indexable, 'App\Entity\Core\AbstractTraining', $options, $managerRegistry);
     }
 
     /**

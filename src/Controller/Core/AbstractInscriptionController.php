@@ -2,11 +2,11 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Inscription;
-use App\Entity\Institution;
-use App\Entity\Organization;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Term\Publictype;
+use App\Entity\Back\Inscription;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Organization;
 use App\Form\Type\BaseInscriptionType;
 use App\Repository\InscriptionSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,7 +17,7 @@ use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractInscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Term\Inscriptionstatus;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
@@ -37,27 +37,6 @@ abstract class AbstractInscriptionController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, InscriptionSearchRepository $inscriptionSearchRepository)
     {
-        /*
-        $search = $this->get('sygefor_inscription.search');
-        $search->handleRequest($request);
-
-        // security check : training
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.inscription.all.view')) {
-            $search->addTermFilter('session.training.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search();
-        */
-/*        $inscriptions = $doctrine->getRepository(Inscription::class)->findAll();
-        $nbInscriptions  = count($inscriptions);
-
-        $ret = array(
-            'total' => $nbInscriptions,
-            'pageSize' => 0,
-            'items' => $inscriptions,
-        );
-        return $ret;*/
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
@@ -91,7 +70,6 @@ abstract class AbstractInscriptionController extends AbstractController
         /** @var AbstractInscription $inscription */
         $inscription = $this->createInscription($session, $doctrine);
         /** @var BaseInscriptionType $inscriptionClass */
-//        $inscriptionClass = $inscription::getFormType();
         $inscriptionClass = BaseInscriptionType::class;
 
         $form = $this->createForm($inscriptionClass, $inscription,
@@ -129,8 +107,6 @@ abstract class AbstractInscriptionController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        /** @var AbstractInscriptionType $inscriptionClass */
-//        $inscriptionClass = $inscription::getFormType();
         $inscriptionClass = BaseInscriptionType::class;
 
         $form = $this->createForm($inscriptionClass, $inscription,
@@ -160,7 +136,6 @@ abstract class AbstractInscriptionController extends AbstractController
         $em = $doctrine->getManager();
         $em->remove($inscription);
         $em->flush();
-//        $this->get('fos_elastica.index')->refresh();
 
         return array();
     }

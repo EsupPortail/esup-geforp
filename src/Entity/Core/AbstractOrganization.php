@@ -4,7 +4,8 @@ namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Core\PersonTrait\CoordinatesTrait;
+use App\Entity\PersonTrait\CoordinatesTrait;
+use App\Form\Type\AbstractOrganizationType;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as Serializer;

@@ -11,12 +11,12 @@ namespace App\Controller\Front;
 use App\BatchOperations\BatchOperationRegistry;
 use App\BatchOperations\Generic\EmailingBatchOperation;
 use App\Entity\Core\AbstractInscription;
-use App\Entity\Inscription;
+use App\Entity\Back\Inscription;
 use App\Entity\Core\AbstractTraining;
 use App\Entity\Core\AbstractTrainee;
-use App\Entity\Core\Term\Emailtemplate;
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Organization;
+use App\Entity\Term\Emailtemplate;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Back\Organization;
 use App\Form\Type\AuthorizationType;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
@@ -54,7 +54,7 @@ class RegistrationAccountController extends AbstractController
      */
     public function checkoutAction(Request $request, ManagerRegistry $doctrine, $sessions = array())
     {
-        $inscription = $doctrine->getManager()->getRepository('App\Entity\Inscription')->find($request->get('inscriptionId'));
+        $inscription = $doctrine->getManager()->getRepository('App\Entity\Back\Inscription')->find($request->get('inscriptionId'));
 //        $this->sendCheckoutNotification($doctrine, array($inscription), $inscription->getTrainee());
 
         return $this->redirectToRoute('front.account.registrations');
@@ -73,7 +73,7 @@ class RegistrationAccountController extends AbstractController
         $relanceActif = $this->getParameter('relance_actif');
 
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $inscriptions = $trainee->getInscriptions();
@@ -109,7 +109,7 @@ class RegistrationAccountController extends AbstractController
     public function desistAction($id, Request $request, ManagerRegistry $doctrine)
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $registration = $doctrine->getRepository('App\Entity\Core\AbstractInscription')->find($id);
@@ -258,7 +258,7 @@ class RegistrationAccountController extends AbstractController
                             if ($dataForm['validation'] == "ok") {
                                 // Si avis favorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
                                 $registration->setInscriptionstatus(
-                                    $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
+                                    $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
                                         array('machinename' => 'favorable')
                                     )
                                 );
@@ -287,7 +287,7 @@ class RegistrationAccountController extends AbstractController
                                 // Sinon, on modifie le statut de l'inscription à "avis défavorable" et on envoie un mail au stagiaire
                                 // Si avis défavorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
                                 $registration->setInscriptionstatus(
-                                    $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
+                                    $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
                                         array('machinename' => 'defavorable')
                                     )
                                 );
@@ -388,9 +388,9 @@ class RegistrationAccountController extends AbstractController
     protected function getDesistInscriptionStatus(ManagerRegistry $doctrine, AbstractTrainee $trainee)
     {
         $em     = $doctrine->getManager();
-        $status = $em->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => null));
+        $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => null));
         if (!$status) {
-            $status = $em->getRepository('pp\Entity\Core\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => $trainee->getOrganization()));
+            $status = $em->getRepository('pp\Entity\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => $trainee->getOrganization()));
         }
 
         return $status;

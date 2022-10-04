@@ -30,7 +30,7 @@ class AllTrainerUpdateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Trainer') {
+        if ($class === 'App\Entity\Back\Trainer') {
             return true;
         }
 

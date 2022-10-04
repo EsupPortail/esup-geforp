@@ -90,7 +90,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Inscriptionstatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
@@ -124,7 +124,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Inscriptionstatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
@@ -158,8 +158,8 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Inscriptionstatus s
-                    JOIN App\Entity\Inscription i WITH i.inscriptionstatus = s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
+                    JOIN App\Entity\Back\Inscription i WITH i.inscriptionstatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
                                 ->setParameter('session', $session)
@@ -207,7 +207,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                             // On commence par recuperer les inscriptions de la session avec le statut "Présent" ou "Présence partielle"
                             $query = $em
                                 ->createQuery('SELECT i, count(s) FROM App\Entity\Core\AbstractInscription i
-                    JOIN App\Entity\Core\Term\Presencestatus s WITH s = i.presencestatus
+                    JOIN App\Entity\Term\Presencestatus s WITH s = i.presencestatus
                     WHERE i.session = :session and (s.machinename = :statuspres or s.machinename = :statusprespart)
                     GROUP BY i.id')
                                 ->setParameter('session', $session)
@@ -217,7 +217,7 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                             $query = $em
-                                ->createQuery('SELECT d FROM App\Entity\DateSession d
+                                ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
                     WHERE d.session = :session')
                                 ->setParameter('session', $session);
                             $tabDatesSes = $query->getResult();
@@ -229,7 +229,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                             foreach ($tabInsc as $insc) {
                                 // On récupère le tableau des présences pour chaque inscription
                                 $query = $em
-                                    ->createQuery('SELECT p FROM App\Entity\Presence p
+                                    ->createQuery('SELECT p FROM App\Entity\Back\Presence p
                     WHERE p.inscription = :inscription')
                                     ->setParameter('inscription', $insc[0]);
                                 $tabPresences = $query->getResult();
@@ -264,7 +264,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                     WHERE i.session = :session and (s.machinename = :present or s.machinename = :partiel)
                     GROUP BY s.id')
@@ -302,7 +302,7 @@ class CSVBatchOperation extends AbstractBatchOperation
 //                        if($inscription->getInscriptionstatus()->getMachinename() == "convoke") {
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                             $query = $em
-                                ->createQuery('SELECT d FROM App\Entity\DateSession d
+                                ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
                     WHERE d.session = :session')
                                 ->setParameter('session', $session);
                             $tabDatesSes = $query->getResult();
@@ -312,7 +312,7 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             // On récupère le tableau des présences pour chaque inscription
                             $query = $em
-                                ->createQuery('SELECT p FROM App\Entity\Presence p
+                                ->createQuery('SELECT p FROM App\Entity\Back\Presence p
                     WHERE p.inscription = :inscription')
                                 ->setParameter('inscription', $inscription);
                             $tabPresences = $query->getResult();
@@ -347,7 +347,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
@@ -381,7 +381,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
@@ -415,7 +415,7 @@ class CSVBatchOperation extends AbstractBatchOperation
                         $session = $entity;
                         if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                             $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                     JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                     WHERE i.session = :session and s.machinename = :status
                     GROUP BY s.id')
@@ -538,7 +538,7 @@ SQL;
 
                         // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                         $query = $em
-                            ->createQuery('SELECT d FROM App\Entity\DateSession d
+                            ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
                 WHERE d.session = :session')
                             ->setParameter('session', $session);
                         $tabDatesSes = $query->getResult();
@@ -570,7 +570,7 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-                            ->createQuery('SELECT ec FROM App\Entity\Core\Term\Evaluationcriterion ec');
+                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec');
                         $tabCrit = $query->getResult();
 
                         // On initialise les variables pour la moyenne
@@ -586,7 +586,7 @@ SQL;
                         foreach ($tabInsc as $insc) {
                             // On recupere le tableau des critères d'évaluation et intitulés
                             $query = $em
-                                ->createQuery('SELECT s FROM App\Entity\EvaluationNotedCriterion s
+                                ->createQuery('SELECT s FROM App\Entity\Back\EvaluationNotedCriterion s
                     WHERE s.inscription = :inscription 
                     GROUP BY s.id')
                                 ->setParameter('inscription', $insc);

@@ -30,13 +30,13 @@ class OwnTrainingCreateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Internship' || $class === 'App\Entity\Session') {
+        if ($class === 'App\Entity\Back\Internship' || $class === 'App\Entity\Back\Session') {
             return true;
         }
         try {
             $refl = new \ReflectionClass($class);
 
-            return $refl ? $refl->isSubclassOf('App\Entity\Internship') : false;
+            return $refl ? $refl->isSubclassOf('App\Entity\Back\Internship') : false;
         } catch (\ReflectionException $re){
             return false;
         }

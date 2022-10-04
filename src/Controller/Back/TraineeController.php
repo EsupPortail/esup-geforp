@@ -3,7 +3,7 @@
 namespace App\Controller\Back;
 
 
-use App\Entity\Trainee;
+use App\Entity\Back\Trainee;
 use App\Controller\Core\AbstractTraineeController;
 use Symfony\Component\Routing\Annotation\Route;
 

@@ -5,15 +5,15 @@ namespace App\Entity\Core;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\PersonTrait\AccountTrait;
+use App\Entity\PersonTrait\AccountTrait;
 use App\Entity\Core\AbstractOrganization;
 use App\AccessRight\SerializedAccessRights;
-use App\Entity\Core\PersonTrait\ProfessionalSituationTrait;
+use App\Entity\PersonTrait\ProfessionalSituationTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use App\Form\BaseTraineeType;
+use App\Form\Type\AbstractTraineeType;
 
 /**
  * Trainee.
@@ -209,7 +209,7 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
      */
     static public function getFormType()
     {
-        return BaseTraineeType::class;
+        return AbstractTraineeType::class;
     }
 
     /**

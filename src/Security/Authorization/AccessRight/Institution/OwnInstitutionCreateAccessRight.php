@@ -30,7 +30,7 @@ class OwnInstitutionCreateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Institution') {
+        if ($class === 'App\Entity\Back\Institution') {
             return true;
         }
 

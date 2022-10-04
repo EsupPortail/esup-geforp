@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractSession;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\SessionType;
-use App\Entity\DateSession;
-use App\Entity\Alert;
+use App\Entity\Back\DateSession;
+use App\Entity\Back\Alert;
 
 /**
  *
@@ -74,7 +74,7 @@ class Session extends AbstractSession
 
     /**
      * @var ArrayCollection $dates
-     * @ORM\OneToMany(targetEntity="App\Entity\DateSession", mappedBy="session", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Back\DateSession", mappedBy="session", cascade={"persist", "remove"})
      * @ORM\OrderBy({"datebegin" = "ASC"})
      * @Serializer\Groups({"session", "api.session"})
      */
@@ -82,7 +82,7 @@ class Session extends AbstractSession
 
     /**
      * @var ArrayCollection $alerts
-     * @ORM\OneToMany(targetEntity="App\Entity\Alert", mappedBy="session", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Back\Alert", mappedBy="session", cascade={"persist", "remove"})
      * @Serializer\Groups({"session", "api.session"})
      */
     protected $alerts;

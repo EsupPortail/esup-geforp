@@ -6,14 +6,14 @@
  * Time: 12:55 PM
  */
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use App\Entity\Core\AbstractInstitution;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use App\Form\InstitutionType;
+use App\Form\Type\BaseInstitutionType;
 
 /**
  *
@@ -24,7 +24,7 @@ class Institution extends AbstractInstitution
 {
     public static function getFormType()
     {
-        return InstitutionType::class;
+        return BaseInstitutionType::class;
     }
 
     /**

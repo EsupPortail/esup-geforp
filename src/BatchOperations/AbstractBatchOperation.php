@@ -2,8 +2,6 @@
 
 namespace App\BatchOperations;
 
-use App\Entity\Core\AbstractInscription;
-use App\Entity\Inscription;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 

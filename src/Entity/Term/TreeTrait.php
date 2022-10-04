@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Core\Term;
+namespace App\Entity\Term;
 
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;

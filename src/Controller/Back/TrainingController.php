@@ -3,7 +3,7 @@
 namespace App\Controller\Back;
 
 
-use App\Entity\Session;
+use App\Entity\Back\Session;
 use App\Controller\Core\AbstractTrainingController;
 use App\Entity\Core\AbstractTraining;
 use FOS\RestBundle\Controller\Annotations as Rest;

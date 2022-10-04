@@ -5,9 +5,9 @@ namespace App\Controller\Front;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\QueryBuilder;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\EvaluationNotedCriterion;
-use App\Entity\Inscription;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Back\EvaluationNotedCriterion;
+use App\Entity\Back\Inscription;
 use App\Form\Type\EvaluationType;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
@@ -43,7 +43,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup param evaluations
@@ -67,7 +67,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup param pour l'activation des evaluations
@@ -90,14 +90,14 @@ class AttendanceAccountController extends AbstractController
 
     /**
      * @Route("/attendance/{id}/evaluation", name="front.account.attendance.evaluation")
-     * @ParamConverter("attendance", class="App\Entity\Inscription", options={"id" = "id"})
+     * @ParamConverter("attendance", class="App\Entity\Back\Inscription", options={"id" = "id"})
      * @Template("Front/Account/attendance/evaluation.html.twig")
      */
     public function evaluationAction(Request $request, ManagerRegistry $doctrine, Inscription $attendance)
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup params pour les critères d'évalutation
@@ -129,7 +129,7 @@ class AttendanceAccountController extends AbstractController
         }
 
         $evaluationCriterions = $doctrine
-            ->getRepository('App\Entity\Core\Term\EvaluationCriterion')
+            ->getRepository('App\Entity\Term\EvaluationCriterion')
             ->findAll();
         foreach ($evaluationCriterions as $evaluationCriterion) {
             $evaluationNotedCriterion = new EvaluationNotedCriterion();
@@ -159,7 +159,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $attendance   = $this->getAttendance($doctrine, $session, $trainee);
@@ -198,7 +198,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $attendance = $this->getAttendance($doctrine, $session, $trainee);

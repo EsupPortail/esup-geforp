@@ -24,7 +24,7 @@ use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Process\Exception\RuntimeException;
-use App\Entity\Core\Term\PublipostTemplate;
+use App\Entity\Term\PublipostTemplate;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use App\BatchOperations\AbstractBatchOperation;

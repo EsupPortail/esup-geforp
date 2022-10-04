@@ -2,7 +2,7 @@
 
 namespace App\Listener;
 
-use App\Entity\Internship;
+use App\Entity\Back\Internship;
 use Doctrine\Common\EventSubscriber;
 //use Doctrine\ORM\Event\LifecycleEventArgs;
 //use Doctrine\ORM\Event\LoadClassMetadataEventArgs;

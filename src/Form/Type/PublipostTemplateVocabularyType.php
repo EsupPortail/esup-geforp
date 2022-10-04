@@ -16,7 +16,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use App\Entity\Core\Term\Publiposttemplate;
+use App\Entity\Term\Publiposttemplate;
 
 class PublipostTemplateVocabularyType extends VocabularyType
 {

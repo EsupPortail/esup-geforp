@@ -9,10 +9,10 @@
 namespace App\Form\Type;
 
 
-use App\Entity\Inscription;
+use App\Entity\Back\Inscription;
 use App\Form\Type\EntityHiddenType;
-use App\Entity\Core\Term\EvaluationCriterion;
-use App\Entity\EvaluationNotedCriterion;
+use App\Entity\Term\EvaluationCriterion;
+use App\Entity\Back\EvaluationNotedCriterion;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;

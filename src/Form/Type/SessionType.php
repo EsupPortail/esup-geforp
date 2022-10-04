@@ -2,11 +2,11 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Session;
+use App\Entity\Back\Session;
 use Doctrine\ORM\EntityRepository;
 use App\Form\Type\AbstractSessionType;
 use App\Entity\Core\AbstractSession;
-use App\Security\AccessRight\AccessRightRegistry;
+use App\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

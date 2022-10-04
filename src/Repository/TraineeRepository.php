@@ -2,14 +2,14 @@
 
 namespace App\Repository;
 
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Core\Term\Theme;
-use App\Entity\Core\Term\Title;
-use App\Entity\Institution;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\Participation;
-use App\Entity\Trainer;
+use App\Entity\Term\Publictype;
+use App\Entity\Term\Theme;
+use App\Entity\Term\Title;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Participation;
+use App\Entity\Back\Trainer;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;

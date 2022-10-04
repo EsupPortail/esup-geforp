@@ -9,7 +9,7 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Participation;
+use App\Entity\Back\Participation;
 use App\Repository\ParticipationRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -40,26 +40,6 @@ abstract class AbstractParticipationController extends AbstractController
      */
     public function participationSearchAction(Request $request, ManagerRegistry $doctrine, ParticipationRepository $participationRepository)
     {
-        /** @var SearchService $search */
-/*        $search = $this->get('sygefor_participation.search');
-        $search->handleRequest($request);
-
-        // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainer.all.view')) {
-            $search->addTermFilter('organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search(); */
-/*        $participations = $doctrine->getRepository(Participation::class)->findAll();
-        $nbParticipations  = count($participations);
-
-        $ret = array(
-            'total' => $nbParticipations,
-            'pageSize' => 0,
-            'items' => $participations,
-        );
-        return $ret; */
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');

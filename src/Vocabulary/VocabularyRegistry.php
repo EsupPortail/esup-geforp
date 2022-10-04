@@ -2,21 +2,21 @@
 
 namespace App\Vocabulary;
 
-use App\Entity\Core\Term\Actiontype;
-use App\Entity\Core\Term\Emailtemplate;
-use App\Entity\Core\Term\Evaluationcriterion;
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Core\Term\MenuItem;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Core\Term\Publiposttemplate;
-use App\Entity\Core\Term\Sessiontype;
-use App\Entity\Core\Term\Supervisor;
-use App\Entity\Core\Term\Tag;
-use App\Entity\Core\Term\Theme;
-use App\Entity\Core\Term\Title;
-use App\Entity\Core\Term\Trainertype;
-use App\Entity\Core\Term\Trainingcategory;
+use App\Entity\Term\Actiontype;
+use App\Entity\Term\Emailtemplate;
+use App\Entity\Term\Evaluationcriterion;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Term\MenuItem;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Term\Publictype;
+use App\Entity\Term\Publiposttemplate;
+use App\Entity\Term\Sessiontype;
+use App\Entity\Term\Supervisor;
+use App\Entity\Term\Tag;
+use App\Entity\Term\Theme;
+use App\Entity\Term\Title;
+use App\Entity\Term\Trainertype;
+use App\Entity\Term\Trainingcategory;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Entity\Core\PersonTrait;
+namespace App\Entity\PersonTrait;
 
-use App\Entity\Core\Term\Publictype;
+use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractInstitution;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\ExecutionContextInterface;
@@ -10,7 +10,7 @@ use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class ProfessionalSituationTraitInstitution
- * @package App\Entity\Core
+ * @package App\Entity\PersonTrait
  */
 trait ProfessionalSituationTrait
 {
@@ -25,7 +25,7 @@ trait ProfessionalSituationTrait
 
     /**
      * @var Publictype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Publictype")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Publictype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainee", "trainer", "inscription", "api.profile","session"})
      */

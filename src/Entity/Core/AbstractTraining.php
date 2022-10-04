@@ -8,9 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Form\Type\AbstractTrainingType;
 use App\Entity\Core\AbstractInstitution;
 use App\Entity\Core\Material;
-use App\Entity\Core\Term\Supervisor;
-use App\Entity\Core\Term\Tag;
-use App\Entity\Core\Term\Trainingcategory;
+use App\Entity\Term\Supervisor;
+use App\Entity\Term\Tag;
+use App\Entity\Term\Trainingcategory;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\AccessRight\SerializedAccessRights;
 
@@ -69,7 +69,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     protected $name;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Theme")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Theme")
      * @ORM\JoinColumn(nullable=false)
      * @Assert\NotBlank(message="Vous devez renseigner une thématique.")
      * @Serializer\Groups({"training", "session", "inscription", "api"})
@@ -111,14 +111,14 @@ abstract class AbstractTraining implements SerializedAccessRights
 
     /**
      * @var Supervisor
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Supervisor")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Supervisor")
      * @Serializer\Groups({"training", "api.training", "session"})
      */
     protected $supervisor;
 
     /**
      * @var Trainingcategory
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Trainingcategory")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Trainingcategory")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"training", "api"})
      */
@@ -126,7 +126,7 @@ abstract class AbstractTraining implements SerializedAccessRights
 
     /**
      * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\Tag")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Tag")
      * @ORM\JoinTable(name="training__training_tag",
      *      joinColumns={@ORM\JoinColumn(name="training_id", referencedColumnName="id", onDelete="cascade")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="cascade")}

@@ -6,11 +6,11 @@
  * Date: 5/25/16
  * Time: 10:14 AM.
  */
-namespace App\Entity\Core\Term;
+namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Core\Term\AbstractTerm;
-use App\Entity\Core\Term\VocabularyInterface;
+use App\Entity\Term\AbstractTerm;
+use App\Entity\Term\VocabularyInterface;
 
 /**
  * Type de personnel.

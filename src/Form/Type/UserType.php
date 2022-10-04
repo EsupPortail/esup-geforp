@@ -9,7 +9,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 use Doctrine\ORM\EntityRepository;
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Core\User;

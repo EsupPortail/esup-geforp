@@ -6,12 +6,12 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\Sessiontype;
+use App\Entity\Term\Sessiontype;
 use App\Form\Type\AbstractSessionType;
 use App\AccessRight\SerializedAccessRights;
-use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Term\Inscriptionstatus;
 use App\Entity\Core\AbstractInscription;
-use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Term\Presencestatus;
 use App\Entity\Core\ParticipantsSummary;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -144,7 +144,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     /**
      * @var Sessiontype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Sessiontype")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Sessiontype")
      * @ORM\JoinColumn(name="sessionType_id", referencedColumnName="id", onDelete="SET NULL")
      * @Serializer\Groups({"session", "inscription", "api"})
      */

@@ -2,10 +2,10 @@
 
 namespace App\Controller\Back;
 
-use App\Entity\Participation;
-use App\Entity\Session;
-use App\Entity\DateSession;
-use App\Entity\Inscription;
+use App\Entity\Back\Participation;
+use App\Entity\Back\Session;
+use App\Entity\Back\DateSession;
+use App\Entity\Back\Inscription;
 use App\Form\Type\DateSessionType;
 use App\Controller\Core\AbstractSessionController;
 use Doctrine\Persistence\ManagerRegistry;
@@ -30,7 +30,7 @@ class SessionController extends AbstractSessionController
 
     /**
      * @Route("/adddates/{session}", name="dates.add", requirements={"id" = "\d+"}, options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "session"})
+     * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function adddatesAction(Session $session, Request $request, ManagerRegistry $doctrine)
@@ -120,8 +120,8 @@ class SessionController extends AbstractSessionController
         /**
      * @Route("/{session}/remove/{dates}", name="dates.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
-     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "session"})
-     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
+     * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "session"})
+     * @ParamConverter("dates", class="App\Entity\Back\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function removedatesAction(Session $session, DateSession $dates, ManagerRegistry $doctrine)
@@ -178,7 +178,7 @@ class SessionController extends AbstractSessionController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/editdates/{dates}", name="dates.edit", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
+     * @ParamConverter("dates", class="App\Entity\Back\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function editdatesAction(DateSession $dates, Request $request, ManagerRegistry $doctrine)
@@ -248,7 +248,7 @@ class SessionController extends AbstractSessionController
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
      * @Route("/viewdates/{dates}", name="dates.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="App\Entity\DateSession", options={"id" = "dates"})
+     * @ParamConverter("dates", class="App\Entity\Back\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     public function viewdatesAction(DateSession $dates, Request $request, ManagerRegistry $doctrine)

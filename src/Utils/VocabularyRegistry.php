@@ -5,7 +5,7 @@ namespace App\Utils;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
-use App\Entity\Core\Term\VocabularyInterface;
+use App\Entity\Term\VocabularyInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**

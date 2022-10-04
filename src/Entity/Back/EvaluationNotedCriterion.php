@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -24,13 +24,13 @@ class EvaluationNotedCriterion
 
     /**
      * @var Inscription
-     * @ORM\ManyToOne(targetEntity="App\Entity\Inscription", inversedBy="criteria")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Back\Inscription", inversedBy="criteria")
      * @Serializer\Exclude
      */
     protected $inscription;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Evaluationcriterion")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Evaluationcriterion")
      * @ORM\JoinColumn(name="criterion_id", referencedColumnName="id", onDelete="CASCADE")
      * @Serializer\Groups({"Default", "api.attendance"})
      */

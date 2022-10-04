@@ -6,7 +6,7 @@
  * Time: 5:33 PM
  */
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -50,7 +50,6 @@ class Presence
     protected $afternoon;
 
     /**
-     * @var Session
      * @ORM\ManyToOne(targetEntity="Inscription", inversedBy="presences")
      * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Groups({"session", "trainee", "trainer", "api"})

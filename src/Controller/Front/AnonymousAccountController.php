@@ -13,8 +13,8 @@ use App\AccessRight\AccessRightRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Monolog\Logger;
 use App\Form\Type\ProfileType;
-use App\Entity\Trainee;
-use App\Entity\SupannCodeEntite;
+use App\Entity\Back\Trainee;
+use App\Entity\Back\SupannCodeEntite;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -82,10 +82,10 @@ class AnonymousAccountController extends AbstractController
         // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
         if ($shibbolethAttributes['supannCivilite']=='')
             $shibbolethAttributes['supannCivilite'] = 'M.';
-        $trainee->setTitle($doctrine->getRepository('App\Entity\Core\Term\Title')->findOneBy(
+        $trainee->setTitle($doctrine->getRepository('App\Entity\Term\Title')->findOneBy(
             array('name' => $shibbolethAttributes['supannCivilite'])
         ));
-        $trainee->setOrganization($doctrine->getRepository('App\Entity\Organization')->find(1));
+        $trainee->setOrganization($doctrine->getRepository('App\Entity\Back\Organization')->find(1));
 
         $trainee->setLastname($shibbolethAttributes['sn']);
         $trainee->setFirstname($shibbolethAttributes['givenName']);
@@ -126,14 +126,14 @@ class AnonymousAccountController extends AbstractController
         if ($shibbolethAttributes['primary-affiliation'] == "employee") {
             $flagSupRequired = true;
         }
-        $primary_affiliation = $doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+        $primary_affiliation = $doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
             array('name' => $shibbolethAttributes['primary-affiliation'])
         );
         if ($primary_affiliation != null) {
             $trainee->setPublictype($primary_affiliation);
         }
         else {
-            $trainee->setPublictype($doctrine->getRepository('App\Entity\Core\Term\PublicType')->findOneBy(
+            $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
                 array('name' => 'other')
             ));
         }
@@ -151,7 +151,7 @@ class AnonymousAccountController extends AbstractController
             }else {
                 $etab = "AMU";
             }
-            $trainee->setInstitution($doctrine->getRepository('App\Entity\Institution')->findOneBy(
+            $trainee->setInstitution($doctrine->getRepository('App\Entity\Back\Institution')->findOneBy(
                 array('name' => $etab)
             ));
 
@@ -183,7 +183,7 @@ class AnonymousAccountController extends AbstractController
             if (isset($corps)) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Back\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {
@@ -221,7 +221,7 @@ class AnonymousAccountController extends AbstractController
             if ((isset($corps))) {
                 if (ctype_digit($corps))
                     $corps = (int)$corps;
-                $n_corps = $doctrine->getRepository('App\Entity\Corps')->findOneBy(
+                $n_corps = $doctrine->getRepository('App\Entity\Back\Corps')->findOneBy(
                     array('corps' => $corps)
                 );
                 if ($n_corps != null) {

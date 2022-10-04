@@ -32,34 +32,6 @@ class EmailController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, EmailRepository $emailRepository)
     {
-        /*
-        $search = $this->get('sygefor_email.search');
-        $search->handleRequest($request);
-        $requestFilters = $request->request->get('filters');
-
-        // security check
-        if (isset($requestFilters['trainee.id']) && !$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainee.all.view')) {
-            $search->addTermFilter('trainee.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-        if (isset($requestFilters['session.id']) && !$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.training.all.view')) {
-            $search->addTermFilter('session.training.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-        if (isset($requestFilters['trainer.id']) && !$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainer.all.view')) {
-            $search->addTermFilter('trainer.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search();*/
-
-/*        $emails = $doctrine->getRepository(Email::class)->findAll();
-        $nbEmails  = count($emails);
-
-        $ret = array(
-            'total' => $nbEmails,
-            'pageSize' => 0,
-            'items' => $emails
-        );
-        return $ret;*/
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');

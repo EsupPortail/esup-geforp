@@ -30,7 +30,7 @@ class AllTraineeDuplicateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Trainee') {
+        if ($class === 'App\Entity\Back\Trainee') {
             return true;
         }
     }

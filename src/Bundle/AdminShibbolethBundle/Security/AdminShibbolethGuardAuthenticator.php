@@ -19,7 +19,7 @@ use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProviderIn
 
 /**
  * Class AdminShibbolethGuardAuthenticator
- * @package App\Bundle\ShibbolethBundle\Security
+ * @package App\Bundle\AdminShibbolethBundle\Security
  */
 class AdminShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
 {

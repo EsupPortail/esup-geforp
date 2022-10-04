@@ -12,9 +12,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use App\Entity\Alert;
-use App\Entity\MultipleAlert;
-use App\Entity\SingleAlert;
+use App\Entity\Back\Alert;
+use App\Entity\Back\MultipleAlert;
+use App\Entity\Back\SingleAlert;
 use App\Form\Type\ProgramAlertType;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;

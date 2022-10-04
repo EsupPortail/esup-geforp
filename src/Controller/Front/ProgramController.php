@@ -8,16 +8,16 @@
 
 namespace App\Controller\Front;
 
-use App\Entity\Core\Term\Theme;
+use App\Entity\Term\Theme;
 use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractTraining;
-use App\Entity\Session;
-use App\Entity\Inscription;
-use App\Entity\Organization;
-use App\Entity\Alert;
-use App\Entity\MultipleAlert;
-use App\Entity\SingleAlert;
-use App\Entity\Core\Term\Emailtemplate;
+use App\Entity\Back\Session;
+use App\Entity\Back\Inscription;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Alert;
+use App\Entity\Back\MultipleAlert;
+use App\Entity\Back\SingleAlert;
+use App\Entity\Term\Emailtemplate;
 use App\Repository\SessionRepository;
 use App\Vocabulary\VocabularyRegistry;
 use App\Form\Type\ProgramAlertType;
@@ -59,7 +59,7 @@ class ProgramController extends AbstractController
     public function trainingAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, $sessionId = null, $token = null)
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $focusSession = null;
@@ -91,7 +91,7 @@ class ProgramController extends AbstractController
                 ->setParameter('traineeId', $trainee->getId())
                 ->getQuery()->execute();
 
-            $alert = $em->getRepository('App\Entity\Alert')->createQueryBuilder('alert')
+            $alert = $em->getRepository('App\Entity\Back\Alert')->createQueryBuilder('alert')
                 ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
                 ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
                 ->where('session.id = :sessionId')
@@ -134,12 +134,12 @@ class ProgramController extends AbstractController
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \App\Entity\Core\AbstractTraining $training
-     * @param \App\Entity\Session $session
+     * @param \App\Entity\Back\Session $session
      * @param null $token
      *
      * @Route("/training/inscription/{id}/{sessionId}/{token}", name="front.program.inscription", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
-     * @ParamConverter("session", class="App\Entity\Session", options={"id" = "sessionId"})
+     * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "sessionId"})
      * @Template("Front/Public/program/inscription.html.twig")
      *
      * @return array
@@ -148,7 +148,7 @@ class ProgramController extends AbstractController
     {
         // in case shibboleth authentication done but user has not registered his account
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $inscription = $doctrine->getManager()->getRepository('App\Entity\Core\AbstractInscription')->findOneBy(array(
@@ -166,7 +166,7 @@ class ProgramController extends AbstractController
             $inscription->setSession($session);
         }
         $inscription->setInscriptionstatus(
-            $doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus')->findOneBy(
+            $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
                 array('machinename' => 'waiting')
             )
         );
@@ -285,13 +285,13 @@ class ProgramController extends AbstractController
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Sygefor\Bundle\TrainingBundle\Entity\Training\AbstractTraining $training
-     * @param \Sygefor\Bundle\MyCompanyBundle\Entity\Session $session
+     * @param \App\Entity\Core\AbstractTraining $training
+     * @param \App\Entity\Back\Session $session
      * @param null $token
      *
      * @Route("/training/alert/{id}/{sessionId}", name="front.program.alert", requirements={"id": "\d+", "sessionId": "\d+"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
-     * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "sessionId"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
+     * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "sessionId"})
      * @Template("@SygeforFront/Public/program/inscription.html.twig")
      *
      * @return array
@@ -312,7 +312,7 @@ class ProgramController extends AbstractController
         $this->apiTrainingController->setContainer($this->container);
         $training = $this->apiTrainingController->trainingAction($training);
 
-        $alert = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+        $alert = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -344,8 +344,8 @@ class ProgramController extends AbstractController
      * @param null $token
      *
      * @Route("/training/alertremove/{id}/{sessionId}", name="front.program.alertremove", requirements={"id": "\d+", "sessionId": "\d+"})
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
-     * @ParamConverter("session", class="SygeforMyCompanyBundle:Session", options={"id" = "sessionId"})
+     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
+     * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "sessionId"})
      * @Template("@SygeforFront/Public/program/inscription.html.twig")
      *
      * @return array
@@ -366,7 +366,7 @@ class ProgramController extends AbstractController
         $this->apiTrainingController->setContainer($this->container);
         $training = $this->apiTrainingController->trainingAction($training);
 
-        $alert = $doctrine->getManager()->getRepository('SygeforMyCompanyBundle:Alert')->findOneBy(array(
+        $alert = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
             'trainee' => $this->getUser(),
             'session'=> $session
         ));
@@ -394,7 +394,7 @@ class ProgramController extends AbstractController
     public function myProgramAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $etablissement = $arTrainee[0]->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
@@ -419,11 +419,11 @@ class ProgramController extends AbstractController
             if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -449,11 +449,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -496,7 +496,7 @@ class ProgramController extends AbstractController
     {
         // Recuperation info du user authentifié
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recuperation de tous les centres
         $centres = $doctrine->getRepository(Organization::class)->findAll();
@@ -513,11 +513,11 @@ class ProgramController extends AbstractController
             if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -543,11 +543,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -592,7 +592,7 @@ class ProgramController extends AbstractController
     public function searchalertsAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null)
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
@@ -624,11 +624,11 @@ class ProgramController extends AbstractController
             if ($session->getSessiontype() == "A venir") {
                 $alert = new SingleAlert();
 
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $session->getId()
                 ));
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -654,11 +654,11 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             foreach ($arrAlerts as $alert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Session')->findOneBy(array(
+                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
                     'id' => $alert->getSessionId()
                 ));
 
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Alert')->findOneBy(array(
+                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
                     'trainee' => $arTrainee[0],
                     'session'=> $sessionExiste
                 ));
@@ -699,15 +699,15 @@ class ProgramController extends AbstractController
     public function searchAction(Request $request, ManagerRegistry $doctrine)
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
 
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
-        $theme = $em->getRepository('App\Entity\Core\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
-        $organization = $em->getRepository('App\Entity\Organization')->findOneBy(array('name' => 'Tous les établissements'));
+        $theme = $em->getRepository('App\Entity\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
+        $organization = $em->getRepository('App\Entity\Back\Organization')->findOneBy(array('name' => 'Tous les établissements'));
 
         $defaultData = array('centre' => $organization, 'theme' => $theme, 'texte' => "");
         $form = $this->createForm(ProgramSearchType::class, $defaultData);

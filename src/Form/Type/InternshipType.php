@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\Publictype;
+use App\Entity\Term\Publictype;
 use App\Form\Type\TrainingType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\FormBuilderInterface;

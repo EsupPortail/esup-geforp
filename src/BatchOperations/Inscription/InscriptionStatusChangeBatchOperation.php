@@ -15,10 +15,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\AbstractInscription;
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\DateSession;
-use App\Entity\Presence;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Back\DateSession;
+use App\Entity\Back\Presence;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -163,7 +163,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
             foreach ($arrayInscriptionsGranted as $inscription) {
                 $attachments = array();
                 if ($options['attachmentTemplates']) {
-                    $repo = $this->doctrine->getRepository('App\Entity\Core\Publiposttemplate');
+                    $repo = $this->doctrine->getRepository('App\Entity\Term\Publiposttemplate');
                     foreach ($options['attachmentTemplates'] as $tplId) {
                         $tpl           = $repo->find($tplId);
                         $attachments[] = $this->container->get('sygefor_core.batch.publipost.inscription')->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);

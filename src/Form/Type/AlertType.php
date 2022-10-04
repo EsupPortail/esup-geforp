@@ -9,7 +9,7 @@
 namespace App\Form\Type;
 
 
-use App\Entity\SingleAlert;
+use App\Entity\Back\SingleAlert;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;

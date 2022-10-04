@@ -2,7 +2,7 @@
 
 namespace App\Vocabulary;
 
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 
 /**
  * Interface VocabularyInterface.

@@ -2,11 +2,11 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\Publictype;
+use App\Entity\Term\Publictype;
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Core\Term\Title;
-use App\Entity\Organization;
-use App\Form\Type\AbstractAccountType;
+use App\Entity\Term\Title;
+use App\Entity\Back\Organization;
+use App\Form\Type\AccountType;
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Core\AbstractTrainee;

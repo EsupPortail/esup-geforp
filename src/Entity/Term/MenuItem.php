@@ -7,13 +7,13 @@
  * Time: 16:43.
  */
 
-namespace App\Entity\Core\Term;
+namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\AbstractTerm;
-use App\Entity\Core\Term\VocabularyInterface;
+use App\Entity\Term\AbstractTerm;
+use App\Entity\Term\VocabularyInterface;
 use App\Form\Type\MenuItemType;
 
 /**

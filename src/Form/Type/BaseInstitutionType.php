@@ -3,8 +3,7 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Organization;
-use Sygefor\Bundle\InstitutionBundle\Entity\Term\InstitutionType as InstitutionTypeTerm;
+use App\Entity\Back\Organization;
 use App\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;

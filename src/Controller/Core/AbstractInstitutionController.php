@@ -2,7 +2,7 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Institution;
+use App\Entity\Back\Institution;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use App\Form\Type\ChangeOrganizationType;
 use App\Entity\Core\AbstractInstitution;
 use App\Form\Type\BaseInstitutionType;
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 use App\Repository\InstitutionRepository;
 
 

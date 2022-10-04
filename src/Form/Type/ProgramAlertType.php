@@ -9,7 +9,7 @@
 namespace App\Form\Type;
 
 
-use App\Entity\MultipleAlert;
+use App\Entity\Back\MultipleAlert;
 use App\Form\Type\AlertType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;

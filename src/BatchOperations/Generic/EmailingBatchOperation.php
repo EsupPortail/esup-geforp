@@ -99,12 +99,12 @@ class EmailingBatchOperation extends AbstractBatchOperation
         $repo = $this->doctrine->getRepository(get_class($templateTerm));
 
         if (!empty($options['inscriptionstatus'])) {
-            $repoInscriptionStatus = $this->doctrine->getRepository('App\Entity\Core\Term\Inscriptionstatus');
+            $repoInscriptionStatus = $this->doctrine->getRepository('App\Entity\Term\Inscriptionstatus');
             $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionstatus']);
             $templates = $repo->findBy(array('inscriptionstatus' => $inscriptionStatus, 'organization' => $this->security->getUser()->getOrganization()));
         }
         else if (!empty($options['presencestatus'])) {
-            $repoPresenceStatus = $this->doctrine->getRepository('App\Entity\Core\Term\Presencestatus');
+            $repoPresenceStatus = $this->doctrine->getRepository('App\Entity\Term\Presencestatus');
             $presenceStatus = $repoPresenceStatus->findById($options['presencestatus']);
             $templates = $repo->findBy(array('presenceStatus' => $presenceStatus, 'organization' => $this->security->getUser()->getOrganization()));
         }
@@ -261,7 +261,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                     else if (get_parent_class($entity) === 'App\Entity\Core\AbstractInscription') {
                         $email->setTrainee($entity->getTrainee());
                         $email->setSession($entity->getSession());
-                    } else if (get_class($entity) === 'App\Entity\Alert') {
+                    } else if (get_class($entity) === 'App\Entity\Back\Alert') {
                         $email->setTrainee($entity->getTrainee());
                         $email->setSession($entity->getSession());
                     } else if (get_parent_class($entity) === 'App\Entity\Core\AbstractParticipation') {

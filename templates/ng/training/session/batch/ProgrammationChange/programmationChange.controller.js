@@ -87,7 +87,7 @@ sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$mo
         $dialog.open('batch.emailPreview', {
             ids: $scope.items[0],
             options: {
-                targetClass: 'SygeforInscriptionBundle:AbstractInscription',
+                targetClass: 'App\\Entity\\Core\\AbstractInscription',
                 subject: $scope.message.subject,
                 message: $scope.message.body
             }

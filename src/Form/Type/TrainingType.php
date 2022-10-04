@@ -3,12 +3,12 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 use App\Entity\Core\AbstractInstitution;
-use App\Entity\Core\Term\Supervisor;
-use App\Entity\Core\Term\Tag;
-use App\Entity\Core\Term\Theme;
-use App\Entity\Core\Term\Trainingcategory;
+use App\Entity\Term\Supervisor;
+use App\Entity\Term\Tag;
+use App\Entity\Term\Theme;
+use App\Entity\Term\Trainingcategory;
 use App\Entity\Core\AbstractTraining;
 use App\AccessRight\AccessRightRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;

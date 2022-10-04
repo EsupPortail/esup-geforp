@@ -3,8 +3,8 @@
 namespace App\Form\Type;
 
 
-use App\Entity\Inscription;
-use App\Entity\Core\Term\ActionType;
+use App\Entity\Back\Inscription;
+use App\Entity\Term\ActionType;
 use App\Form\Type\EntityHiddenType;
 use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractSession;

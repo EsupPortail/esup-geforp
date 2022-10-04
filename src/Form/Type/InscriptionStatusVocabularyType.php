@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Term\Inscriptionstatus;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;

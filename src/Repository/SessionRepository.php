@@ -3,13 +3,12 @@
 namespace App\Repository;
 
 use App\Entity\Core\AbstractSession;
-use App\Entity\Session;
-use App\Entity\Core\Term\Theme;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\SessionSearch;
-use App\Entity\Trainer;
-use App\Entity\Participation;
+use App\Entity\Back\Session;
+use App\Entity\Term\Theme;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Trainer;
+use App\Entity\Back\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;

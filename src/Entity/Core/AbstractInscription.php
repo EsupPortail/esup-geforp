@@ -8,10 +8,9 @@ use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\Core\Term\Inscriptionstatus;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Term\Inscriptionstatus;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use App\Form\Type\AbstractInscriptionType;
 use App\AccessRight\SerializedAccessRights;
 use App\Entity\Core\TimestampableTrait;
 
@@ -60,7 +59,7 @@ abstract class AbstractInscription implements SerializedAccessRights
 
     /**
      * @var Inscriptionstatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Inscriptionstatus")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Inscriptionstatus")
      * @ORM\JoinColumn(name="inscription_status_id", referencedColumnName="id")
      * @Assert\NotNull(message="Vous devez spécifier un status d'inscription.")
      * @Serializer\Groups({"Default", "api"})
@@ -69,7 +68,7 @@ abstract class AbstractInscription implements SerializedAccessRights
 
     /**
      * @var Presencestatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Presencestatus")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Presencestatus")
      * @ORM\JoinColumn(name="presence_status_id", referencedColumnName="id")
      * @Serializer\Groups({"Default", "api"})
      */

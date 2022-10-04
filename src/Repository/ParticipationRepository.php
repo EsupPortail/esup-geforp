@@ -2,12 +2,12 @@
 
 namespace App\Repository;
 
-use App\Entity\Core\Term\Theme;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\Session;
-use App\Entity\Trainer;
-use App\Entity\Participation;
+use App\Entity\Term\Theme;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Session;
+use App\Entity\Back\Trainer;
+use App\Entity\Back\Participation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

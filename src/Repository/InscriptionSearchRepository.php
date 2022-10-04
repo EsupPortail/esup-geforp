@@ -2,15 +2,15 @@
 
 namespace App\Repository;
 
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\Core\Term\Publictype;
-use App\Entity\Inscription;
-use App\Entity\Institution;
-use App\Entity\Session;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\Trainee;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Term\Publictype;
+use App\Entity\Back\Inscription;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Session;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Trainee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;

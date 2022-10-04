@@ -2,7 +2,7 @@
 
 namespace App\Form\Type;
 
-use App\Entity\Core\Term\Presencestatus;
+use App\Entity\Term\Presencestatus;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 

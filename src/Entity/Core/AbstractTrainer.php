@@ -7,10 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\AccessRight\SerializedAccessRights;
 use App\Form\Type\AbstractTrainerType;
-use App\Entity\Core\PersonTrait\CoordinatesTrait;
-use App\Entity\Core\PersonTrait\PersonTrait;
-use App\Entity\Core\PersonTrait\ProfessionalSituationTrait;
-use App\Entity\Core\Term\Trainertype;
+use App\Entity\PersonTrait\CoordinatesTrait;
+use App\Entity\PersonTrait\PersonTrait;
+use App\Entity\PersonTrait\ProfessionalSituationTrait;
+use App\Entity\Term\Trainertype;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
@@ -60,7 +60,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
 
     /**
      * @var Trainertype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Trainertype")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Trainertype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainer"})
      */

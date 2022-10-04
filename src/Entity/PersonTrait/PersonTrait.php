@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Core\PersonTrait;
+namespace App\Entity\PersonTrait;
 
 use JMS\Serializer\Annotation as Serializer;
 
@@ -10,7 +10,7 @@ use JMS\Serializer\Annotation as Serializer;
 trait PersonTrait
 {
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Title")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Title")
      * @Serializer\Groups({"Default", "api"})
      */
     protected $title;

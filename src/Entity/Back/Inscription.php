@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractInscription;
 use Doctrine\ORM\Mapping as ORM;
-use App\Form\InscriptionType;
+use App\Form\Type\InscriptionType;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
@@ -26,7 +26,7 @@ class Inscription extends AbstractInscription
 
     /**
      * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\EvaluationNotedCriterion", mappedBy="inscription", cascade={"persist", "merge", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Back\EvaluationNotedCriterion", mappedBy="inscription", cascade={"persist", "merge", "remove"})
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
     protected $criteria;
@@ -38,7 +38,7 @@ class Inscription extends AbstractInscription
     protected $message;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\Term\Actiontype")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Actiontype")
      * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
@@ -53,7 +53,7 @@ class Inscription extends AbstractInscription
 
     /**
      * @var ArrayCollection $presences
-     * @ORM\OneToMany(targetEntity="App\Entity\Presence", mappedBy="inscription", cascade={"persist", "remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Back\Presence", mappedBy="inscription", cascade={"persist", "remove"})
      * @ORM\OrderBy({"datebegin" = "ASC"})
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */

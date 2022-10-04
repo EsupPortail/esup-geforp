@@ -2,11 +2,11 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Core\Term\Theme;
-use App\Entity\Internship;
-use App\Entity\Organization;
-use App\Entity\Session;
-use App\Entity\Trainer;
+use App\Entity\Term\Theme;
+use App\Entity\Back\Internship;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Session;
+use App\Entity\Back\Trainer;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,16 +43,6 @@ abstract class AbstractSessionController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
     {
-/*        $search = $this->get('sygefor_training.session.search');
-        $search->handleRequest($request);
-
-        // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.training.all.view')) {
-            $search->addTermFilter('training.organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search(); */
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
@@ -509,7 +499,7 @@ abstract class AbstractSessionController extends AbstractController
         $stats = array();
         if ($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
             $query = $em
-                ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Inscriptionstatus s
+                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
                         JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
                         WHERE i.session = :session
                         GROUP BY s.id')
@@ -534,7 +524,7 @@ abstract class AbstractSessionController extends AbstractController
         $em = $doctrine->getManager();
         $statsPres = array();
         $queryPres = $em
-            ->createQuery('SELECT s, count(i) FROM App\Entity\Core\Term\Presencestatus s
+            ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                             JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                             WHERE i.session = :session
                             GROUP BY s.id')

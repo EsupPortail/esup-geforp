@@ -6,7 +6,7 @@
  * Date: 5/25/16
  * Time: 10:21 AM.
  */
-namespace App\Entity\Core\PersonTrait;
+namespace App\Entity\PersonTrait;
 
 /**
  * Class AccountTrait.

@@ -2,7 +2,7 @@
 
 namespace App\DependencyInjection\Core\Compiler;
 
-use App\Entity\Core\Term\VocabularyInterface;
+use App\Entity\Term\VocabularyInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;

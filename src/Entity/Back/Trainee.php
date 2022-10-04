@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 
 use App\Entity\Core\AbstractInscription;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Form\Type\TraineeType;
+use App\Form\Type\AbstractTraineeType;
 use App\Entity\Core\AbstractTrainee;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
@@ -100,7 +100,7 @@ class Trainee extends AbstractTrainee implements UserInterface
     protected $fonction;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Alert", mappedBy="trainee", cascade={"remove"})
+     * @ORM\OneToMany(targetEntity="App\Entity\Back\Alert", mappedBy="trainee", cascade={"remove"})
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
     protected $alerts;
@@ -110,7 +110,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      */
     static public function getFormType()
     {
-        return TraineeType::class;
+        return AbstractTraineeType::class;
     }
 
     /**

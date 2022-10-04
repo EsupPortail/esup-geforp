@@ -11,7 +11,7 @@ namespace App\Form\Type;
 
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
-use App\Entity\Core\Term\Sessiontype as Type;
+use App\Entity\Term\Sessiontype as Type;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

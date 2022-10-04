@@ -10,7 +10,7 @@ namespace App\Form\Type;
 
 use App\Entity\Core\AbstractSession;
 use Doctrine\ORM\EntityRepository;
-use App\Entity\DateSession;
+use App\Entity\Back\DateSession;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;

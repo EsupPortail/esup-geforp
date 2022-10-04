@@ -9,8 +9,8 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\AbstractSession;
-use App\Entity\AbstractTrainee;
+use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTrainee;
 
 /**
  * Class InscriptionRepository.

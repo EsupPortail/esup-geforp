@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
-use App\Entity\Core\Term\Publictype;
+use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractTraining;
 use App\Form\Type\InternshipType;
 
@@ -18,7 +18,7 @@ use App\Form\Type\InternshipType;
 class Internship extends AbstractTraining
 {
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\Publictype")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Publictype")
      * @ORM\JoinTable(name="internship__internship_publictype",
      *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="publictype_id", referencedColumnName="id")}
@@ -28,7 +28,7 @@ class Internship extends AbstractTraining
     protected $publictypes;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\Term\Publictype")
+     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Publictype")
      * @ORM\JoinTable(name="internship__internship_publictyperestrict",
      *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
      *      inverseJoinColumns={@ORM\JoinColumn(name="publictyperestrict_id", referencedColumnName="id")}

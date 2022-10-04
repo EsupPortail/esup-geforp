@@ -3,10 +3,10 @@
 namespace App\Form\Type;
 
 use Doctrine\ORM\EntityRepository;
-use App\Entity\Core\Term\Emailtemplate;
-use App\Entity\Core\Term\Inscriptionstatus;
-use App\Entity\Core\Term\Presencestatus;
-use App\Entity\Core\Term\Publiposttemplate;
+use App\Entity\Term\Emailtemplate;
+use App\Entity\Term\Inscriptionstatus;
+use App\Entity\Term\Presencestatus;
+use App\Entity\Term\Publiposttemplate;
 use App\Utils\Email\CCRegistry;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;

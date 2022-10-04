@@ -12,7 +12,7 @@ namespace App\Controller\Core;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use App\Entity\Organization;
+use App\Entity\Back\Organization;
 use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -77,7 +77,7 @@ class OrganizationController extends AbstractController
      * @param AbstractOrganization $organization
      *
      * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="organization.edit", options={"expose"=true})
-     * @ParamConverter("organization", class="App\Entity\Organization", options={"id" = "id"})
+     * @ParamConverter("organization", class="App\Entity\Back\Organization", options={"id" = "id"})
      *
      * @return array|RedirectResponse
      */

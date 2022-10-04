@@ -2,9 +2,9 @@
 
 namespace App\Controller\Core;
 
-use App\Entity\Institution;
-use App\Entity\Organization;
-use App\Entity\Trainer;
+use App\Entity\Back\Institution;
+use App\Entity\Back\Organization;
+use App\Entity\Back\Trainer;
 use App\Repository\TrainerRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -13,7 +13,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Form\Type\ChangeOrganizationType;
-use App\Utils\Search\SearchService;
 use App\Entity\Core\AbstractTrainer;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,26 +34,6 @@ abstract class AbstractTrainerController extends AbstractController
      */
     public function searchAction(Request $request, ManagerRegistry $doctrine, TrainerRepository $trainerRepository)
     {
-        /** @var SearchService $search */
-/*        $search = $this->get('sygefor_trainer.search');
-        $search->handleRequest($request);
-
-        // security check
-        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainer.all.view')) {
-            $search->addTermFilter('organization.id', $this->getUser()->getOrganization()->getId());
-        }
-
-        return $search->search(); */
-/*        $trainers = $doctrine->getRepository(Trainer::class)->findAll();
-        $nbTrainers  = count($trainers);
-
-        $ret = array(
-            'total' => $nbTrainers,
-            'pageSize' => 0,
-            'items' => $trainers,
-        );
-        return $ret;*/
-
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
@@ -180,9 +159,7 @@ abstract class AbstractTrainerController extends AbstractController
         $em = $doctrine->getManager();
         $em->remove($trainer);
         $em->flush();
-//        $this->get('fos_elastica.index')->refresh();
 
-        return;
     }
 
     private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $trainerRepository)

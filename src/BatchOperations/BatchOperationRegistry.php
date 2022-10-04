@@ -53,7 +53,7 @@ class BatchOperationRegistry
         $mailingBatch = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
         $mailingBatch->setContainer($container);
         $mailingBatch->setDoctrine($doctrine);
-        $mailingBatch->setTargetClass('App\Entity\Session');
+        $mailingBatch->setTargetClass('App\Entity\Back\Session');
         $mailingBatch->setOptions($confMail['session']);
         $this->addBatchOperation($mailingBatch, $i);
         $i++;
@@ -62,7 +62,7 @@ class BatchOperationRegistry
         $mailingBatchTrainee = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
         $mailingBatchTrainee->setContainer($container);
         $mailingBatchTrainee->setDoctrine($doctrine);
-        $mailingBatchTrainee->setTargetClass('App\Entity\Trainee');
+        $mailingBatchTrainee->setTargetClass('App\Entity\Back\Trainee');
         $mailingBatchTrainee->setOptions($confMail['trainee']);
         $this->addBatchOperation($mailingBatchTrainee, $i);
         $i++;
@@ -71,7 +71,7 @@ class BatchOperationRegistry
         $mailingBatchTrainer = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
         $mailingBatchTrainer->setContainer($container);
         $mailingBatchTrainer->setDoctrine($doctrine);
-        $mailingBatchTrainer->setTargetClass('App\Entity\Trainer');
+        $mailingBatchTrainer->setTargetClass('App\Entity\Back\Trainer');
         $mailingBatchTrainer->setOptions($confMail['trainer']);
         $this->addBatchOperation($mailingBatchTrainer, $i);
         $i++;
@@ -87,7 +87,7 @@ class BatchOperationRegistry
         // operation batch : export CSV pour les sessions
         $CSVBatchSession = new CSVBatchOperation($security);
         $CSVBatchSession->setDoctrine($doctrine);
-        $CSVBatchSession->setTargetClass('App\Entity\Session');
+        $CSVBatchSession->setTargetClass('App\Entity\Back\Session');
         $CSVBatchSession->setOptions($confCSV['session']);
         $this->addBatchOperation($CSVBatchSession, $i);
         $i++;
@@ -103,7 +103,7 @@ class BatchOperationRegistry
         // operation batch : export CSV pour les inscriptions
         $CSVBatchInscription = new CSVBatchOperation($security);
         $CSVBatchInscription->setDoctrine($doctrine);
-        $CSVBatchInscription->setTargetClass('App\Entity\Inscription');
+        $CSVBatchInscription->setTargetClass('App\Entity\Back\Inscription');
         $CSVBatchInscription->setOptions($confCSV['inscription']);
         $this->addBatchOperation($CSVBatchInscription, $i);
         $i++;
@@ -111,7 +111,7 @@ class BatchOperationRegistry
         // operation batch : export CSV pour les trainee
         $CSVBatchTrainee = new CSVBatchOperation($security);
         $CSVBatchTrainee->setDoctrine($doctrine);
-        $CSVBatchTrainee->setTargetClass('App\Entity\Trainee');
+        $CSVBatchTrainee->setTargetClass('App\Entity\Back\Trainee');
         $CSVBatchTrainee->setOptions($confCSV['trainee']);
         $this->addBatchOperation($CSVBatchTrainee, $i);
         $i++;
@@ -119,7 +119,7 @@ class BatchOperationRegistry
         // operation batch : export CSV pour les etablissements
         $CSVBatchInstitution = new CSVBatchOperation($security);
         $CSVBatchInstitution->setDoctrine($doctrine);
-        $CSVBatchInstitution->setTargetClass('App\Entity\Institution');
+        $CSVBatchInstitution->setTargetClass('App\Entity\Back\Institution');
         $CSVBatchInstitution->setOptions($confCSV['institution']);
         $this->addBatchOperation($CSVBatchInstitution, $i);
         $i++;
@@ -127,7 +127,7 @@ class BatchOperationRegistry
         // operation batch : export CSV pour les formateurs
         $CSVBatchTrainer = new CSVBatchOperation($security);
         $CSVBatchTrainer->setDoctrine($doctrine);
-        $CSVBatchTrainer->setTargetClass('App\Entity\Trainer');
+        $CSVBatchTrainer->setTargetClass('App\Entity\Back\Trainer');
         $CSVBatchTrainer->setOptions($confCSV['trainer']);
         $this->addBatchOperation($CSVBatchTrainer, $i);
         $i++;

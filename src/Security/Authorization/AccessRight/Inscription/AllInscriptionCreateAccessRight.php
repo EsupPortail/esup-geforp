@@ -30,7 +30,7 @@ class AllInscriptionCreateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class)
     {
-        if ($class === 'App\Entity\Inscription') {
+        if ($class === 'App\Entity\Back\Inscription') {
             return true;
         }
 

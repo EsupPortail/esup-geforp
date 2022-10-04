@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity\Core\Term;
+namespace App\Entity\Term;
 
 use App\Form\Type\EmailTemplateVocabularyType;
 use Doctrine\Common\Collections\ArrayCollection;

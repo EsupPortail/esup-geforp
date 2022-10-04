@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 use App\Entity\Core\AbstractParticipation;
 use Doctrine\ORM\Mapping as ORM;

@@ -6,7 +6,7 @@
  * Time: 5:33 PM
  */
 
-namespace App\Entity;
+namespace App\Entity\Back;
 
 
 use Doctrine\Common\Collections\ArrayCollection;
@@ -120,7 +120,7 @@ class Alert
     }
 
     /**
-     * @return \App\Entity\Core\Organization
+     * @return \App\Entity\Organization
      */
     public function getOrganization()
     {

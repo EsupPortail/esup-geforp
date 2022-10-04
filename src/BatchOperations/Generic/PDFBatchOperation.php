@@ -7,14 +7,14 @@
  * Time: 16:56.
  */
 
-namespace CoreBundle\BatchOperations\Generic;
+namespace App\BatchOperations\Generic;
 
 use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
 use Knp\Snappy\Pdf;
-use CoreBundle\BatchOperations\AbstractBatchOperation;
-use CoreBundle\Entity\AbstractInscription;
-use CoreBundle\Entity\AbstractSession;
-use CoreBundle\Entity\AbstractTraining;
+use App\BatchOperations\AbstractBatchOperation;
+use App\Entity\Core\AbstractInscription;
+use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTraining;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Kernel;
