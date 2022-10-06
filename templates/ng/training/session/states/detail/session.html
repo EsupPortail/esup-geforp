@@ -114,7 +114,7 @@
                                 <tbody>
                                 <tr ng-repeat="alert in session.alerts | filter:filter | orderBy:'createdat':true">
                                     <td> {{ alert.createdat | date: 'dd/MM/yyyy' }} </td>
-                                    <td> <a title="Voir le profil du stagiaire" href="" ui-sref="trainee.detail.view({ id: alert.trainee.id })">{{ alert.trainee.fullName }}</a> </td>
+                                    <td> <a title="Voir le profil du stagiaire" href="" ui-sref="trainee.detail.view({ id: alert.trainee.id })">{{ alert.trainee.fullname }}</a> </td>
                                 </tr>
                                 </tbody>
                             </table>
