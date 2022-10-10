@@ -34,7 +34,7 @@ class AlertAccountController extends AbstractController
     {
         // Récupération des alertes du stagiaire
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\BackTrainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
         $alertsTrainee = $trainee->getAlerts();
 
