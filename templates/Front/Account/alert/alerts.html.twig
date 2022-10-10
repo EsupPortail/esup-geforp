@@ -50,6 +50,8 @@
                                             </td>
                                             <td>{{ form_widget(form.alerts[counter]) }}</td>
                                         </tr>
+                                    {% else %}
+                                        <td style="display: none">{{ form_widget(form.alerts[counter]) }}</td>
                                     {% endif %}
                                     {% set counter = counter + 1 %}
                                 {% endfor %}
