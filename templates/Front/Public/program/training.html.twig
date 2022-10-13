@@ -193,9 +193,9 @@
                                                     <a href="" class="btn btn-primary btn-lg disabled btn-group-justified radius">Inscriptions closes</a>
                                                 {% else %}
                                                     {% if upcomingSession.isAlerted %}
-                                                        <a href="{{ path('front.account.alertremove', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">Se désincrire de l'alerte</a>
+                                                        <a href="{{ path('front.program.alertremove', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">Se désincrire de l'alerte</a>
                                                     {% else %}
-                                                        <a href="{{ path('front.account.alert', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">M'alerter de l'ouverture de la session</a>
+                                                        <a href="{{ path('front.program.alert', {'id': training.id, 'sessionId': upcomingSession.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">M'alerter de l'ouverture de la session</a>
                                                     {% endif %}
                                                 {% endif %}
                                             {% endif %}

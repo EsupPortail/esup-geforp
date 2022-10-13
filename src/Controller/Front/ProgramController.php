@@ -146,7 +146,7 @@ class ProgramController extends AbstractController
      */
     public function inscriptionAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, Session $session, $token = null)
     {
-        // in case shibboleth authentication done but user has not registered his account
+        // in case shibboleth authentication
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
@@ -292,30 +292,22 @@ class ProgramController extends AbstractController
      * @Route("/training/alert/{id}/{sessionId}", name="front.program.alert", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "sessionId"})
-     * @Template("@SygeforFront/Public/program/inscription.html.twig")
+     * @Template("Front/Public/program/inscription.html.twig")
      *
      * @return array
      */
     public function alertAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
     {
-        // in case shibboleth authentication done but user has not registered his account
-        if (!is_object($this->getUser())) {
-            return $this->redirectToRoute('front.account.register');
-        }
-
-        if (!$this->getUser()->getIsActive()) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous inscrire à une session tant que votre compte n'a pas
-             été validé par un administrateur.");
-            return $this->redirectToRoute('front.public.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
-        }
-
-        $this->apiTrainingController->setContainer($this->container);
-        $training = $this->apiTrainingController->trainingAction($training);
+        // in case shibboleth authentication
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
 
         $alert = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
-            'trainee' => $this->getUser(),
+            'trainee' => $trainee,
             'session'=> $session
         ));
+
         if ($alert) {
             $this->get('session')->getFlashBag()->add('warning', "Vous êtes déjà inscrit à l'alerte d'ouverture de la session.");
             return $this->redirectToRoute('front.account.registrations');
@@ -323,7 +315,7 @@ class ProgramController extends AbstractController
         }
         if (!$alert) {
             $alert = new Alert();
-            $alert->setTrainee($this->getUser());
+            $alert->setTrainee($trainee);
             $alert->setSession($session);
             $now = new \DateTime();
             $alert->setCreatedAt($now);
@@ -334,40 +326,30 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Votre alerte a bien été enregistrée.');
         }
 
-        return $this->redirectToRoute('front.public.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
+        return $this->redirectToRoute('front.program.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
     }
 
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param \Sygefor\Bundle\TrainingBundle\Entity\Training\AbstractTraining $training
-     * @param \Sygefor\Bundle\MyCompanyBundle\Entity\Session $session
+     * @param \App\Entity\Core\AbstractTraining $training
+     * @param \App\Entity\Back\Session  $session
      * @param null $token
      *
      * @Route("/training/alertremove/{id}/{sessionId}", name="front.program.alertremove", requirements={"id": "\d+", "sessionId": "\d+"})
      * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
      * @ParamConverter("session", class="App\Entity\Back\Session", options={"id" = "sessionId"})
-     * @Template("@SygeforFront/Public/program/inscription.html.twig")
+     * @Template("Front/Public/program/inscription.html.twig")
      *
      * @return array
      */
     public function alertRemoveAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training, Session $session, $token = null)
     {
-        // in case shibboleth authentication done but user has not registered his account
-        if (!is_object($this->getUser())) {
-            return $this->redirectToRoute('front.account.register');
-        }
-
-        if (!$this->getUser()->getIsActive()) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous inscrire à une session tant que votre compte n'a pas
-             été validé par un administrateur.");
-            return $this->redirectToRoute('front.public.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
-        }
-
-        $this->apiTrainingController->setContainer($this->container);
-        $training = $this->apiTrainingController->trainingAction($training);
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
 
         $alert = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
-            'trainee' => $this->getUser(),
+            'trainee' => $trainee,
             'session'=> $session
         ));
         if (!$alert) {
@@ -384,7 +366,7 @@ class ProgramController extends AbstractController
 
         $this->get('session')->getFlashBag()->add('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
 
-        return $this->redirectToRoute('front.public.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
+        return $this->redirectToRoute('front.program.training', array('id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token));
     }
 
     /**
