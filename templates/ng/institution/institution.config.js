@@ -16,7 +16,6 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
             search: function ($searchFactory, $stateParams, $user) {
                 var search = $searchFactory('institution.search');
                 search.query.sorts = {'name.source': 'asc'};
-                search.query.filters['organization.name.source'] = $user.organization.name;
                 search.extendQueryFromJson($stateParams.q);
                 return search.search().then(function() { return search; });
             }
@@ -82,31 +81,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
             }
         }
     });
-
-    /**
-     * institution change organization modal window
-     */
-    $dialogProvider.dialog('institution.changeOrg', /* @ngInject */ {
-        templateUrl: 'institution/dialogs/change-organization.html',
-        controller: function($scope, $modalInstance, $dialogParams, form, growl) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.form = form;
-
-            $scope.onSuccess = function(response) {
-                growl.addSuccessMessage("L'établissement a bien changé de centre de référence.");
-                $scope.dialog.close(response);
-            };
-        },
-        resolve: {
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('institution.changeorg', {id: $dialogParams.institution.id })).then(function(response) {
-                    return response.data.form;
-                });
-            }
-        }
-    });
-
+    
     /**
      * institution deletion modal window
      */

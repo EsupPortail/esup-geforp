@@ -40,14 +40,6 @@ abstract class AbstractInstitution implements SerializedAccessRights
     protected $id;
 
     /**
-     * @var AbstractOrganization Organization
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractOrganization")
-     * @Assert\NotNull(message="Vous devez renseigner un centre de rattachement.")
-     * @Serializer\Groups({"Default", "api", "api.institution"})})
-     */
-    protected $organization;
-
-    /**
      * @var string name
      * @ORM\Column(name="name", type="string", length=512)
      * @Assert\NotBlank(message="Vous devez renseigner un nom d'établissement.")
@@ -77,22 +69,6 @@ abstract class AbstractInstitution implements SerializedAccessRights
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param $organization
-     */
-    public function setOrganization($organization)
-    {
-        $this->organization = $organization;
-    }
-
-    /**
-     * @return Organization Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
     }
 
     /**

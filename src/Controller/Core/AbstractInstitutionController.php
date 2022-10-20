@@ -60,7 +60,6 @@ abstract class AbstractInstitutionController extends AbstractController
     {
         /** @var AbstractInstitution $institution */
         $institution = new $this->institutionClass();
-        $institution->setOrganization($this->getUser()->getOrganization());
 
         //institution can't be created if user has no rights for it
         if ( ! $this->isGranted('CREATE', $institution)) {
@@ -109,30 +108,6 @@ abstract class AbstractInstitutionController extends AbstractController
     }
 
     /**
-     * @Route("/{id}/changeorg", name="institution.changeorg", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("EDIT", subject="institution")
-     * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function changeOrganizationAction(Request $request, ManagerRegistry $doctrine, AbstractInstitution $institution)
-    {
-        // security check
-/*        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_inscription.rights.inscription.all.update')) {
-            throw new AccessDeniedException();
-        }*/
-
-        $form = $this->createForm(ChangeOrganizationType::class, $institution);
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $doctrine->getManager()->flush();
-            }
-        }
-
-        return array('form' => $form->createView(), 'institution' => $institution);
-    }
-
-    /**
      * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="institution.remove", options={"expose"=true}, defaults={"_format" = "json"})
      * @Method("POST")
      * @IsGranted("DELETE", subject="institution")
@@ -144,7 +119,6 @@ abstract class AbstractInstitutionController extends AbstractController
         $em = $doctrine->getManager();
         $em->remove($institution);
         $em->flush();
-//        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirect($this->generateUrl('institution.search'));
     }
@@ -152,22 +126,6 @@ abstract class AbstractInstitutionController extends AbstractController
     private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $institutionRepository)
     {
         $tabAggs = array();
-
-        // CONSTRUCTION CENTRES
-        if(isset( $aggs['organization.name.source'])){
-            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
-
-            $i = 0; $tabOrg = array();
-            //Pour chaque centre on teste la requête
-            foreach($allOrganizations as $organization){
-                $nbInstOrg = $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $organization->getName());
-                if ($nbInstOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbInstOrg];
-                    $i++;
-                }
-            }
-            $tabAggs['organization.name.source']['buckets'] = $tabOrg;
-        }
 
         // CONSTRUCTION VILLE
         if(isset( $aggs['city.source'])){

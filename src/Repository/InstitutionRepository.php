@@ -31,15 +31,6 @@ class InstitutionRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
-
-        // FILTRE CENTRE
-        if (isset($filters['organization.name.source'])) {
-            $qb
-                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $filters['organization.name.source']);
-        }
-
         // FILTRE VILLE
         if (isset($filters['city.source'])) {
             $qb
@@ -82,20 +73,6 @@ class InstitutionRepository extends ServiceEntityRepository
             ->where('i.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
-
-
-        // FILTRE CENTRE
-        if(isset( $aggs['organization.name.source'])) {
-            $qb
-                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
-                ->andWhere('o.name = :center')
-                ->setParameter('center', $name);
-        } elseif (isset($query_filters['organization.name.source'])) {
-            $qb
-                ->innerJoin('i.organization', 'o', 'WITH', 'i.organization = o')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $query_filters['organization.name.source']);
-        }
 
         // FILTRE ANNEE
         if (isset($aggs['city.source'])) {

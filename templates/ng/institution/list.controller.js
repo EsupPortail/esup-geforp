@@ -37,9 +37,6 @@ sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injecto
 
     // facets
     $scope.facets = {
-        'organization.name.source': {
-            label: 'Centre'
-        },
         'city.source' : {
             label: 'Ville'
         }
