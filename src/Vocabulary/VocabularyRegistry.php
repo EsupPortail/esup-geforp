@@ -3,6 +3,7 @@
 namespace App\Vocabulary;
 
 use App\Entity\Term\Actiontype;
+use App\Entity\Term\Domain;
 use App\Entity\Term\Emailtemplate;
 use App\Entity\Term\Evaluationcriterion;
 use App\Entity\Term\Inscriptionstatus;
@@ -96,6 +97,9 @@ class VocabularyRegistry
         $this->addVocabulary($voc, $i);
         $i++;
         $voc = new Publictype();
+        $this->addVocabulary($voc, $i);
+        $i++;
+        $voc = new Domain();
         $this->addVocabulary($voc, $i);
     }
 
