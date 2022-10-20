@@ -48,6 +48,13 @@ abstract class AbstractInstitution implements SerializedAccessRights
     protected $name;
 
     /**
+     * @var string idp
+     * @ORM\Column(name="idp", type="string", length=512, nullable=true)
+     * @Serializer\Groups({"Default", "api"})
+     */
+    protected $idp;
+
+    /**
      * @var ArrayCollection
      * @ORM\ManyToMany(targetEntity="App\Entity\Term\Domain")
      * @ORM\JoinTable(name="institution__institution_domain",
@@ -85,6 +92,22 @@ abstract class AbstractInstitution implements SerializedAccessRights
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdp()
+    {
+        return $this->idp;
+    }
+
+    /**
+     * @param string $idp
+     */
+    public function setIdp($idp)
+    {
+        $this->idp = $idp;
     }
 
     /**

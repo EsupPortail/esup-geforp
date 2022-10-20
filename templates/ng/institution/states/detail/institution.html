@@ -23,6 +23,7 @@
                     <h3>Paramètres informatiques</h3>
                     <hr>
                     <ul class="summary">
+                        <li><label>URL IDP</label> <span sf-xeditable="form.children.idp" data-type="textarea">{{ institution.idp }}</span></li>
                         <li><label>Noms de domaines</label> <span sf-xeditable="form.children.domains" data-type="select2">{{ institution.domains | joinObjects:'name' }}</span></li>
                     </ul>
                 </div>

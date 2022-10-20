@@ -81,7 +81,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
             }
         }
     });
-    
+
     /**
      * institution deletion modal window
      */
