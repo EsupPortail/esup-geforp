@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Term\Domain;
 use App\Form\Type\BaseInstitutionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -55,6 +56,22 @@ abstract class AbstractInstitution implements SerializedAccessRights
     protected $name;
 
     /**
+     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Domain")
+     * @ORM\JoinTable(name="institution__institution_domain",
+     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="cascade")}
+     * )
+     * @Serializer\Groups({"Default", "api"})
+     */
+    protected $domains;
+
+    public function __construct()
+    {
+        $this->domains = new ArrayCollection();
+    }
+
+    /**
      * @return int
      */
     public function getId()
@@ -92,6 +109,54 @@ abstract class AbstractInstitution implements SerializedAccessRights
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDomains()
+    {
+        return $this->domains;
+    }
+
+    /**
+     * @param mixed $domains
+     */
+    public function setDomains($domains)
+    {
+        $this->domains = $domains;
+    }
+
+    /**
+     * @param Domain $domain
+     *
+     * @return bool
+     */
+    public function addDomain($domain)
+    {
+        if (!$this->domains->contains($domain)) {
+            $this->domains->add($domain);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Domain $domain
+     *
+     * @return bool
+     */
+    public function removeDomain($domain)
+    {
+        if ($this->domains->contains($domain)) {
+            $this->domains->removeElement($domain);
+
+            return true;
+        }
+
+        return false;
     }
 
     function __toString()

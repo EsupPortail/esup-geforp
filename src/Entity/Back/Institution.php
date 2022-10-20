@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use App\Form\Type\BaseInstitutionType;
+use App\Form\Type\InstitutionType;
 
 /**
  *
@@ -24,7 +24,7 @@ class Institution extends AbstractInstitution
 {
     public static function getFormType()
     {
-        return BaseInstitutionType::class;
+        return InstitutionType::class;
     }
 
     /**

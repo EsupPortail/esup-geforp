@@ -14,7 +14,7 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\Type\ChangeOrganizationType;
 use App\Entity\Core\AbstractInstitution;
-use App\Form\Type\BaseInstitutionType;
+use App\Form\Type\InstitutionType;
 use App\Entity\Back\Organization;
 use App\Repository\InstitutionRepository;
 
@@ -67,7 +67,7 @@ abstract class AbstractInstitutionController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $form = $this->createForm(BaseInstitutionType::class, $institution);
+        $form = $this->createForm(InstitutionType::class, $institution);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -96,7 +96,7 @@ abstract class AbstractInstitutionController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $form = $this->createForm(BaseInstitutionType::class, $institution);
+        $form = $this->createForm(InstitutionType::class, $institution);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
