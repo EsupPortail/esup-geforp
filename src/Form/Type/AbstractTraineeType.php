@@ -90,13 +90,6 @@ class AbstractTraineeType extends AbstractType
                 'label'    => 'Ville',
                 'required' => false,
             ))
-            ->add('organization', EntityType::class, array(
-                'label'         => 'Centre',
-                'class'         => Organization::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
-                },
-            ))
             ->add('institution', EntityType::class, array(
                 'label'         => 'Etablissement',
                 'class'         => AbstractInstitution::class,
@@ -179,22 +172,6 @@ class AbstractTraineeType extends AbstractType
         // add listeners to handle conditionals fields
         $this->addEventListeners($builder);
 
-        if($options['enable_security_check']) {
-            // If the user does not have the rights, remove the organization field and force the value
-/*            $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_trainee.rights.trainee.all.create');
-            if (!$hasAccessRightForAll) {
-                $securityContext = $this->accessRightsRegistry->getSecurityContext();
-                $user            = $securityContext->getToken()->getUser(); */
-                $user            = $this->security->getUser();
-                if (is_object($user)) {
-                    $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
-                        $trainee = $event->getData();
-                        $trainee->setOrganization($user->getOrganization());
-                        $event->getForm()->remove('organization');
-                    });
-                }
-            //}
-        }
     }
 
     /**
@@ -204,7 +181,6 @@ class AbstractTraineeType extends AbstractType
     {
         // PRE_SET_DATA for the parent form
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $this->addInstitutionField($event->getForm(), $event->getData()->getOrganization());
             $user = $event->getData();//recuperation de l'objet sur lequel le formulaire se base
             // Si le stagaire est prÃ©-rempli
             if ($user->getLastname()!=null) {
@@ -266,12 +242,6 @@ class AbstractTraineeType extends AbstractType
             }
         });
 
-        // POST_SUBMIT for each field
-        if ($builder->has('organization')) {
-            $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $this->addInstitutionField($event->getForm()->getParent(), $event->getForm()->getData());
-            });
-        }
     }
 
     /**

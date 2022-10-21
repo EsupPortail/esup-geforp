@@ -49,19 +49,4 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
         });
     };
 
-    /**
-     * Change the password
-     */
-    $scope.changePassword = function () {
-        $dialog.open('trainee.changePwd', {trainee: $scope.trainee});
-    };
-
-    /**
-     * Change Organization
-     */
-    $scope.changeOrganization = function () {
-        $dialog.open('trainee.changeOrg', {trainee: $scope.trainee}).then(function(data) {
-            $scope.trainee = data.form.value;
-        });
-    };
 }]);

@@ -39,15 +39,6 @@ class TraineeSearchRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
-
-        // FILTRE CENTRE
-        if (isset($filters['organization.name.source'])) {
-            $qb
-                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $filters['organization.name.source']);
-        }
-
         //FILTRE DATE DE CREATION
         if( isset($filters['createdAt']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
@@ -134,20 +125,6 @@ class TraineeSearchRepository extends ServiceEntityRepository
             ->orWhere('trainee.lastname LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
-
-
-        // FILTRE CENTRE
-        if(isset( $aggs['organization.name.source'])) {
-            $qb
-                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
-                ->andWhere('o.name = :center')
-                ->setParameter('center', $name);
-        } elseif (isset($query_filters['organization.name.source'])) {
-            $qb
-                ->innerJoin('trainee.organization', 'o', 'WITH', 'o = trainee.organization')
-                ->andWhere('o.name in (:centers)')
-                ->setParameter('centers', $query_filters['organization.name.source']);
-        }
 
         // FILTRE CIVILITE
         if (isset($aggs['title'])) {

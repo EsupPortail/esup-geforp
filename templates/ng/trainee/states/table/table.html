@@ -7,7 +7,6 @@
                 <thead>
                 <tr>
                     <th></th>
-                    <th search-table-th field="organization.name.source">Centre</th>
                     <th search-table-th field="title">Civilite</th>
                     <th search-table-th field="lastName.source">Nom</th>
                     <th search-table-th field="createdAt">Inscription</th>
@@ -18,7 +17,6 @@
                 <tbody>
                 <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
                     <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
-                    <td>{{ item.organization.name }}</td>
                     <td>{{ item.title.name ? item.title.name : item.title }}</td>
                     <td><a href="" ui-sref="trainee.detail.view({ id: item.id })">{{ item.fullname }}</a></td>
                     <td>{{ item.createdat | date: 'dd/MM/yyyy' }}</td>

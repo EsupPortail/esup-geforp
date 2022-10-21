@@ -50,14 +50,11 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
 
     // facets
     $scope.facets = {
-        'organization.name.source' : {
-            label: 'Centre'
-        },
         'title' : {
             label: 'Civilité'
         },
         'institution.name.source' : {
-            label: 'Unité',
+            label: 'Etablissement',
             size: 10
         },
         'createdAt' : {

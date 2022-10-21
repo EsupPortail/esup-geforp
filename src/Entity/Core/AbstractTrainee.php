@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Back\Institution;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
@@ -43,12 +44,12 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
     protected $id;
 
     /**
-     * @var AbstractOrganization Organization
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractOrganization")
-     * @Assert\NotNull(message="Vous devez renseigner un centre de rattachement.")
+     * @var AbstractInstitution Institution
+     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractInstitution")
+     * @Assert\NotNull(message="Vous devez renseigner un établissement.")
      * @Serializer\Groups({"trainee", "session", "api.profile", "api.token"})})
      */
-    protected $organization;
+    protected $institution;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Core\AbstractInscription", mappedBy="trainee", cascade={"remove"})
@@ -101,19 +102,19 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
     }
 
     /**
-     * @param Organization $organization
+     * @param Institution $institution
      */
-    public function setOrganization($organization)
+    public function setInstitution($institution)
     {
-        $this->organization = $organization;
+        $this->institution = $institution;
     }
 
     /**
-     * @return Organization
+     * @return Institution
      */
-    public function getOrganization()
+    public function getInstitution()
     {
-        return $this->organization;
+        return $this->institution;
     }
 
     /**

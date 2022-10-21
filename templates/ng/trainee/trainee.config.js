@@ -16,7 +16,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             search: function ($searchFactory, $stateParams, $user) {
                 var search = $searchFactory('trainee.search');
                 search.query.sorts = {'lastName.source': 'asc'};
-                search.query.filters['organization.name.source'] = $user.organization.name;
+//                search.query.filters['institution.name.source'] = $user.organization.institution.name;
                 search.extendQueryFromJson($stateParams.q);
                 return search.search().then(function() { return search; });
             }
@@ -103,54 +103,6 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
     });
 
     /**
-     * trainee change password modal window
-     */
-    $dialogProvider.dialog('trainee.changePwd', /* @ngInject */ {
-        templateUrl: 'trainee/dialogs/change-password.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.form = form;
-            $scope.onSuccess = function(response) {
-                growl.addSuccessMessage("Le mot de passe a bien été changé.");
-                $scope.dialog.close(response);
-            };
-        },
-        resolve: {
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('trainee.changepwd', {id: $dialogParams.trainee.id })).then(function(response) {
-                    return response.data.form;
-                });
-            }
-        }
-
-    });
-
-    /**
-     * trainee change organization modal window
-     */
-    $dialogProvider.dialog('trainee.changeOrg', /* @ngInject */ {
-        templateUrl: 'trainee/dialogs/change-organization.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.form = form;
-            $scope.onSuccess = function(response) {
-                growl.addSuccessMessage("Le stagiaire a bien changé de centre de référence.");
-                $scope.dialog.close(response);
-            };
-        },
-        resolve: {
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('trainee.changeorg', {id: $dialogParams.trainee.id })).then(function(response) {
-                    return response.data.form;
-                });
-            }
-        }
-
-    });
-
-    /**
      * change trainee activation modal window
      */
     $dialogProvider.dialog('trainee.toggleActivation', /* @ngInject */ {
@@ -184,7 +136,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 title: 'Derniers stagiaires inscrits',
                 size: 10,
                 filters:{
-                    'organization.name.source': $user.organization.name,
+//                    'institution.name.source': $user.organization.institution.name,
                     "createdat": {
                         "type": "range",
                         "gte": $filter('date')(date, 'yyyy-MM-dd', 'Europe/Paris')

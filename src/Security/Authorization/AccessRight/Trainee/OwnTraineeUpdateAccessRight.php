@@ -42,7 +42,7 @@ class OwnTraineeUpdateAccessRight extends AbstractAccessRight
     {
         if ($attribute !== 'EDIT') return false;
         if ($object) {
-            return $object->getOrganization() === $token->getUser()->getOrganization();
+            return $object->getInstitution() === $token->getUser()->getOrganization();
         } else {
             return true;
         }
