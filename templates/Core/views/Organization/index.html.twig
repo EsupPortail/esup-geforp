@@ -26,7 +26,7 @@
                         <tr>
                             <td><a href="{{ path('organization.edit', { 'id': organization.id }) }}">{{ organization.name }}</a></td>
                             <td>{{ organization.code }}</td>
-                            <td>{{ organization.institution }}</td>
+                            <td>{{ organization.institution.name }}</td>
                             <td><a href="mailto:{{ organization.email }}">{{ organization.email }}</a></td>
                             <td>{{ organization.phoneNumber }}</td>
                             <td><a href="{{ organization.website }}" target="_blank">{{ organization.website }}</a></td>

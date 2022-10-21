@@ -18,7 +18,7 @@ class AllTraineeDeleteAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Supprimer les stagiaires de tous les centres';
+        return 'Supprimer les stagiaires de tous les établissements';
     }
 
     /**

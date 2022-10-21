@@ -18,7 +18,7 @@ class AllTraineeCreateAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Créer les stagiaires de tous les centres';
+        return 'Créer les stagiaires de tous les établissements';
     }
 
     /**

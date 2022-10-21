@@ -18,7 +18,7 @@ class AllTraineeViewAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Voir les stagiaires de tous les centres';
+        return 'Voir les stagiaires de tous les établissements';
     }
 
     /**

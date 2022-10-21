@@ -18,7 +18,7 @@ class OwnTraineeCreateAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Création des stagiaires de son propre centre';
+        return 'Création des stagiaires de son propre établissement';
     }
 
     /**
@@ -42,7 +42,7 @@ class OwnTraineeCreateAccessRight extends AbstractAccessRight
     {
         if ($attribute !== 'CREATE') return false;
         if ($object) {
-            return $object->getInstitution() === $token->getUser()->getOrganization();
+            return $object->getInstitution() === $token->getUser()->getOrganization()->getInstitution();
         } else {
             return true;
         }

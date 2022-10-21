@@ -298,10 +298,11 @@ abstract class AbstractOrganization
     /**
      * @var AbstractInstitution
      * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
-     * @Serializer\Groups({"api"})
+     * @ORM\JoinColumn(nullable=false, onDelete="SET NULL")
+     * @Serializer\Groups({"Default", "api"})
      */
     private $institution;
+
 
     /**
      * Constructor.

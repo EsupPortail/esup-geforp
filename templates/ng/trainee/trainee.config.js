@@ -16,7 +16,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             search: function ($searchFactory, $stateParams, $user) {
                 var search = $searchFactory('trainee.search');
                 search.query.sorts = {'lastName.source': 'asc'};
-//                search.query.filters['institution.name.source'] = $user.organization.institution.name;
+                search.query.filters['institution.name.source'] = $user.institution;
                 search.extendQueryFromJson($stateParams.q);
                 return search.search().then(function() { return search; });
             }
@@ -136,7 +136,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 title: 'Derniers stagiaires inscrits',
                 size: 10,
                 filters:{
-//                    'institution.name.source': $user.organization.institution.name,
+                    'institution.name.source': $user.institution,
                     "createdat": {
                         "type": "range",
                         "gte": $filter('date')(date, 'yyyy-MM-dd', 'Europe/Paris')

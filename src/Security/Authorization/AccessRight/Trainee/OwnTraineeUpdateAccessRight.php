@@ -18,7 +18,7 @@ class OwnTraineeUpdateAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Modifier les stagiaires de son propre centre';
+        return 'Modifier les stagiaires de son propre établissement';
     }
 
     /**
@@ -42,9 +42,9 @@ class OwnTraineeUpdateAccessRight extends AbstractAccessRight
     {
         if ($attribute !== 'EDIT') return false;
         if ($object) {
-            return $object->getInstitution() === $token->getUser()->getOrganization();
+            return $object->getInstitution() === $token->getUser()->getOrganization()->getInstitution();
         } else {
             return true;
-        }
+       }
     }
 }

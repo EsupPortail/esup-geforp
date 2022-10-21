@@ -18,7 +18,7 @@ class OwnTraineeDeleteAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Suppression des stagiaires de son propre centre';
+        return 'Suppression des stagiaires de son propre établissement';
     }
 
     /**
@@ -42,7 +42,7 @@ class OwnTraineeDeleteAccessRight extends AbstractAccessRight
     {
         if ($attribute !== 'DELETE') return false;
         if ($object) {
-            return $object->getInstitution() === $token->getUser()->getOrganization();
+            return $object->getInstitution() === $token->getUser()->getOrganization()->getInstitution();
         } else {
             return true;
         }

@@ -61,25 +61,11 @@ class OrganizationType extends AbstractType
             ->add('traineeRegistrable', CheckboxType::class, array(
                 'label'    => 'Les stagiaires peuvent choisir cette organisation',
                 'required' => false,
-            ));
+            ))
+            ->add('institution', EntityType::class, array(
+                'label'         => 'Etablissement de rattachement',
+                'class'         => AbstractInstitution::class,
+                'required'      => true));
 
-        // PRE_SET_DATA for the parent form
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-              $builder = $event->getForm();
-              $organization = $event->getData();
-
-              $builder->add('institution', EntityType::class, array(
-                  'label'         => 'Etablissement de rattachement',
-                  'class'         => AbstractInstitution::class,
-                  'required'      => false,
-                  'query_builder' => $organization->getId() ? function (EntityRepository $er) use ($organization) {
-                      return $er->createQueryBuilder('i')
-                        ->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null')
-                        ->orderBy('i.name');
-                  } : null,
-                ));
-          });
     }
 }

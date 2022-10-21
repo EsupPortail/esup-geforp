@@ -19,6 +19,7 @@ use App\Security\Authorization\AccessRight\Training\OwnTrainingDeleteAccessRight
 use App\Security\Authorization\AccessRight\Training\OwnTrainingUpdateAccessRight;
 use App\Security\Authorization\AccessRight\Training\OwnTrainingViewAccessRight;
 use App\Security\Authorization\AccessRight\Trainee\AllTraineeCreateAccessRight;
+use App\Security\Authorization\AccessRight\Trainee\AllTraineeUpdateAccessRight;
 use App\Security\Authorization\AccessRight\Trainee\AllTraineeDeleteAccessRight;
 use App\Security\Authorization\AccessRight\Trainee\AllTraineeViewAccessRight;
 use App\Security\Authorization\AccessRight\Trainee\OwnTraineeCreateAccessRight;
@@ -166,7 +167,7 @@ class AccessRightRegistry
         $accessRight = new AllTraineeCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
         $i++;
-        $accessRight = new AllTrainingUpdateAccessRight();
+        $accessRight = new AllTraineeUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
         $i++;
         $accessRight = new AllTraineeDeleteAccessRight();

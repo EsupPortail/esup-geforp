@@ -18,7 +18,7 @@ class AllTraineeDuplicateAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Gestion des doublons de stagiaires de tous les centres';
+        return 'Gestion des doublons de stagiaires de tous les établissements';
     }
 
     /**

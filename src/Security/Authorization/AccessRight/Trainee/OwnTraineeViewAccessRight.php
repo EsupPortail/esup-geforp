@@ -18,7 +18,7 @@ class OwnTraineeViewAccessRight extends AbstractAccessRight
      */
     public function getLabel()
     {
-        return 'Voir les stagiaires de son propre centre';
+        return 'Voir les stagiaires de son propre établissement';
     }
 
     /**
@@ -43,7 +43,7 @@ class OwnTraineeViewAccessRight extends AbstractAccessRight
         if ($attribute !== 'VIEW') return false;
 
         if ($object) {
-            return $object->getInstitution() === $token->getUser()->getOrganization();
+            return $object->getInstitution() === $token->getUser()->getOrganization()->getInstitution();
         } else {
             return true;
         }
