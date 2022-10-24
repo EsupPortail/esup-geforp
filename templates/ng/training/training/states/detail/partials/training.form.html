@@ -1,7 +1,7 @@
 <div class="btn-group pull-right">
     <a class="btn btn-fa" href="" tooltip="Bilan" ng-if="training.sessions.length && training._accessRights.view" ng-click="getBalanceSheet()"><span class="fa fa-file-excel-o"></span></a>
     <a class="btn btn-fa" href="" tooltip="Publipostage" ng-click="$dialog.open('batch.publipost', { items: [training.id], service: 'training' })"><span class="fa fa-file-word-o"></span></a>
-    <a class="btn btn-fa" href="" tooltip="Dupliquer" ng-if="training._accessRights.edit" ng-click="duplicate()"><span class="fa fa-copy"></span></a>
+<!--    <a class="btn btn-fa" href="" tooltip="Dupliquer" ng-if="training._accessRights.edit" ng-click="duplicate()"><span class="fa fa-copy"></span></a> -->
     <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="training._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
 </div>
 
