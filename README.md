@@ -54,12 +54,11 @@ Installation
 * php bin/console doctrine:database:create
 * php bin/console make:migration
 * php bin/console doctrine:migrations:migrate
-* php bin/console doctrine:fixtures:load (pour test)
 
 ### Angular
 * Commandes : 
   * bower install (bower.json)
-  * npm install (package.json)
+  * Vérifier le répertoire node_modules (npm install (package.json))
   * Exposer les routes pour js :
     * php bin/console fos:js-routing:dump --target=public/js/fos_js_routes.js
   * gulp 

@@ -19,7 +19,6 @@
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 
-###> bower et node ###
+###> bower seulement, on garde les fichier node###
 /bower_components/
-/node_modules/
-###< bower et node ###
+###< bower ###
