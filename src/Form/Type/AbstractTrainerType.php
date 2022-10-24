@@ -127,61 +127,13 @@ class AbstractTrainerType extends AbstractType
                 'label' => 'Observations',
             ));
 
-        // add listeners to handle conditionals fields
-        $this->addEventListeners($builder);
 
-        // If the user does not have the rights, remove the organization field and force the value
-/*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_core.access_right.trainer.all.create');
-        if (!$hasAccessRightForAll) {
-            $securityContext = $this->accessRightsRegistry->getSecurityContext();
-            $user = $securityContext->getToken()->getUser();*/
             $user            = $this->security->getUser();
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
                 $trainer = $event->getData();
                 $trainer->setOrganization($user->getOrganization());
                 $event->getForm()->remove('organization');
-            });/*
-        }*/
-    }
-
-    /**
-     * Add all listeners to manage conditional fields.
-     */
-    protected function addEventListeners(FormBuilderInterface $builder)
-    {
-        // PRE_SET_DATA for the parent form
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $this->addInstitutionField($event->getForm(), $event->getData()->getOrganization());
-        });
-        // POST_SUBMIT for each field
-        if($builder->has('organization')) {
-            $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $this->addInstitutionField($event->getForm()->getParent(), $event->getForm()->getData());
             });
-        }
-    }
-
-    /**
-     * Add institution field depending organization.
-     *
-     * @param FormInterface $form
-     * @param Organization $organization
-     */
-    function addInstitutionField(FormInterface $form, $organization)
-    {
-        if ($organization) {
-            $form->add('institution', EntityType::class, array(
-                'label'         => 'Etablissement',
-                'class'         => Institution::class,
-                'query_builder' => function (EntityRepository $er) use ($organization) {
-                    return $er->createQueryBuilder('i')
-                        ->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null')
-                        ->orderBy('i.name', 'ASC');
-                },
-            ));
-        }
     }
 
 
