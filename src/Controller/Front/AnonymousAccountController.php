@@ -127,14 +127,14 @@ class AnonymousAccountController extends AbstractController
             $flagSupRequired = true;
         }
         $primary_affiliation = $doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
-            array('name' => $shibbolethAttributes['primary-affiliation'])
+            array('machinename' => $shibbolethAttributes['primary-affiliation'])
         );
         if ($primary_affiliation != null) {
             $trainee->setPublictype($primary_affiliation);
         }
         else {
             $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
-                array('name' => 'other')
+                array('machinename' => 'other')
             ));
         }
 //        $trainee->setStatus($shibbolethAttributes['postalCode']);
