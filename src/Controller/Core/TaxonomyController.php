@@ -67,7 +67,7 @@ class TaxonomyController extends AbstractController
      *
      * @Route("/{vocabularyId}/view/{organizationId}", name="taxonomy.view", defaults={"organizationId" = null})
      * @ParamConverter("organization", class="App\Entity\Core\AbstractOrganization", options={"id" = "organizationId"}, isOptional="true")
-     * @Security("is_granted('VIEW', 'Vocabulary\\VocabularyInterface')")
+     * @Security("is_granted('VIEW', 'App\\Entity\\Term\\VocabularyInterface')")
      * @throws EntityNotFoundException
      *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -126,7 +126,7 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/edit/{id}/{organizationId}", name="taxonomy.edit", defaults={"id" = null, "organizationId" = null})
-     * @Security("is_granted('EDIT', 'Vocabulary\\VocabularyInterface')")
+     * @Security("is_granted('EDIT', 'App\\Entity\\Term\\VocabularyInterface')")
      */
     public function editVocabularyTermAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organizationId, $id = null)
     {

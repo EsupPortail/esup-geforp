@@ -119,16 +119,15 @@ class TrainingType extends AbstractType
         $this->addEventListeners($builder);
 
         // If the user does not have the rights, remove the organization field and force the value
-/*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_training.rights.training.all.create');
+        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_training.rights.training.all.create');
         if (!$hasAccessRightForAll) {
-            $securityContext = $this->accessRightsRegistry->getSecurityContext(); */
             $user            = $this->security->getUser();
             $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
                 $training = $event->getData();
                 $training->setOrganization($user->getOrganization());
                 $event->getForm()->remove('organization');
-            });/*
-        }*/
+            });
+        }
     }
 
     /**
@@ -138,7 +137,6 @@ class TrainingType extends AbstractType
     {
         // PRE_SET_DATA for the parent form
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $this->addInstitutionField($event->getForm(), $event->getData()->getOrganization());
             $this->addSupervisorField($event->getForm(), $event->getData()->getOrganization());
             $this->addTagField($event->getForm(), $event->getData()->getOrganization());
         });
@@ -146,35 +144,12 @@ class TrainingType extends AbstractType
         // POST_SUBMIT for each field
         if ($builder->has('organization')) {
             $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
-                $this->addInstitutionField($event->getForm()->getParent(), $event->getForm()->getData());
                 $this->addSupervisorField($event->getForm()->getParent(), $event->getForm()->getData());
                 $this->addTagField($event->getForm()->getParent(), $event->getForm()->getData());
             });
         }
     }
 
-    /**
-     * Add institution field depending organization.
-     *
-     * @param FormInterface $form
-     * @param Organization  $organization
-     */
-    protected function addInstitutionField(FormInterface $form, $organization)
-    {
-        if ($organization) {
-            $form->add('institution', EntityType::class, array(
-                'class'         => AbstractInstitution::class,
-                'label'         => 'Etablissement',
-                'query_builder' => function (EntityRepository $er) use ($organization) {
-                    return $er->createQueryBuilder('i')
-                        ->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null')
-                        ->orderBy('i.name', 'ASC');
-                },
-            ));
-        }
-    }
 
     /**
      * Add supervisor field depending organization.
@@ -209,23 +184,21 @@ class TrainingType extends AbstractType
     protected function addTagField(FormInterface $form, $organization)
     {
         if ($organization) {
-/*            $form->add('tags', EntityTagsType::class, array(
-                'class'         => Tag::class,
-                'label'         => 'Tags',
-                'query_builder' => function (EntityRepository $er) use ($organization) {
-                    return $er->createQueryBuilder('i')
-                        ->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null')
-                        ->orderBy('i.name', 'ASC');
-                },
+            $form->add('tags', EntityType::class, array(
+                'label' => 'Tags',
+                'class' => Tag::class,
+                'choice_label' => 'name',
+                'multiple' => true,
                 'required' => false,
-                'prePersist' => function(Tag $tag) use ($form) {
-                    // on prepersist new tag, set the training organization
-                    $training = $form->getData();
-                    $tag->setOrganization($training->getOrganization());
-                }
-            ));*/
+                'query_builder' => function (EntityRepository $er) use ($organization) {
+                    return $er->createQueryBuilder('t')
+                        ->where('t.organization = :organization')
+                        ->setParameter('organization', $organization)
+                        ->orWhere('t.organization is null')
+                        ->orderBy('t.name', 'ASC');
+                },
+            ));
         }
     }
+
 }

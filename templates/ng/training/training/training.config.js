@@ -113,11 +113,11 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 return $http.get(Routing.generate('training.create', {type: $dialogParams.type })).then(function(response) {
                     var form = response.data.form;
                     // pre-fill some fields with search filters
-                    if(form.children.firstSessionPeriodYear) {
-                        form.children.firstSessionPeriodYear.value = $dialogParams.filters.year;
+                    if(form.children.firstsessionperiodyear) {
+                        form.children.firstsessionperiodyear.value = $dialogParams.filters.year;
                     }
-                    if(form.children.firstSessionPeriodSemester) {
-                        form.children.firstSessionPeriodSemester.value = $dialogParams.filters.semester + "";
+                    if(form.children.firstsessionperiodsemester) {
+                        form.children.firstsessionperiodsemester.value = $dialogParams.filters.semester + "";
                     }
                     return form;
                 });
