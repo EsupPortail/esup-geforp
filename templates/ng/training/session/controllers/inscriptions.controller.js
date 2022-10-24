@@ -75,7 +75,6 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      * @returns {promise|*|promise|promise|promise|promise}
      */
     $scope.updatePresenceStatus = function(inscription, status) {
-        inscription.inscriptionstatus = undefined;
         return $dialog.open('inscription.changeStatus', {
             items: [inscription.id],
             presencestatus: status,
