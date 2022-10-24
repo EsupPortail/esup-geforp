@@ -105,33 +105,33 @@ class Email
     /**
      * @return User
      */
-    public function getUserFrom()
+    public function getUserfrom()
     {
-        return $this->userFrom;
+        return $this->userfrom;
     }
 
     /**
      * @param User $userFrom
      */
-    public function setUserFrom($userFrom)
+    public function setUserfrom($userFrom)
     {
-        $this->userFrom = $userFrom;
+        $this->userfrom = $userFrom;
     }
 
     /**
      * @return string
      */
-    public function getEmailFrom()
+    public function getEmailfrom()
     {
-        return $this->emailFrom;
+        return $this->emailfrom;
     }
 
     /**
      * @param string $emailFrom
      */
-    public function setEmailFrom($emailFrom)
+    public function setEmailfrom($emailFrom)
     {
-        $this->emailFrom = $emailFrom;
+        $this->emailfrom = $emailFrom;
     }
 
     /**
@@ -185,17 +185,17 @@ class Email
     /**
      * @return string
      */
-    public function getSendAt()
+    public function getSendat()
     {
-        return $this->sendAt;
+        return $this->sendat;
     }
 
     /**
      * @param string $sendAt
      */
-    public function setSendAt($sendAt)
+    public function setSendat($sendAt)
     {
-        $this->sendAt = $sendAt;
+        $this->sendat = $sendAt;
     }
 
     /**

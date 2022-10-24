@@ -16,8 +16,8 @@
         <tbody>
         <tr ng-repeat="email in search.result.items">
             <td><a title="Voir le message" ng-click="dislayEmail(email.id)" href="">{{ email.subject }}</a></td>
-            <td title="Envoyé par {{ email.userFrom.username }}">{{ email.userFrom.username }}</td>
-            <td title="Date d'envoi">{{ email.sendAt | date: 'dd/MM/yyyy' }}</td>
+            <td title="Envoyé par {{ email.userfrom.username }}">{{ email.userfrom.username }}</td>
+            <td title="Date d'envoi">{{ email.sendat | date: 'dd/MM/yyyy' }}</td>
         </tr>
         </tbody>
     </table>
