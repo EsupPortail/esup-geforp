@@ -95,7 +95,7 @@ abstract class AbstractTraineeController extends AbstractController
         $trainee = new $this->traineeClass();
 
         //trainee can't be created if user has no rights for it
-        if ($this->isGranted('CREATE', $trainee)) {
+        if (!$this->isGranted('CREATE', $trainee)) {
             throw new AccessDeniedException('Action non autorisée');
         }
 
