@@ -21,13 +21,13 @@
                         <input type="text" class="form-control input-datepicker" ng-model="form.children.datebegin.value" />
                     </span>
                     <label>au</label>
-                    <span ng-class="{'has-error': form.children.dateEnd.errors.length }">
-                        <input type="text" class="form-control input-datepicker" ng-model="form.children.dateEnd.value" />
+                    <span ng-class="{'has-error': form.children.dateend.errors.length }">
+                        <input type="text" class="form-control input-datepicker" ng-model="form.children.dateend.value" />
                     </span>
                 </div>
-                <span ng-class="{'has-error': form.children.datebegin.errors.length+form.children.dateEnd.errors }">
+                <span ng-class="{'has-error': form.children.datebegin.errors.length+form.children.dateend.errors }">
                     <div ng-if="error.length" ng-repeat="error in form.children.datebegin.errors" class="help-block">{{ error }}</div>
-                    <div ng-if="error.length" ng-repeat="error in form.children.dateEnd.errors" class="help-block">{{ error }}</div>
+                    <div ng-if="error.length" ng-repeat="error in form.children.dateend.errors" class="help-block">{{ error }}</div>
                 </span>
             </div>
         </div>

@@ -143,7 +143,7 @@ abstract class AbstractSessionController extends AbstractController
      *
      * @return array
      */
-    public function duplicateAction(Request $request, AbstractSession $session = null, $inscriptionIds = null)
+    public function duplicateAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session = null, $inscriptionIds = null)
     {
         // we need at least one of both arguments
         if (!$session && empty($inscriptionIds)) {
@@ -190,9 +190,9 @@ abstract class AbstractSessionController extends AbstractController
                     'label' => 'Choisir la méthode d\'importation des inscriptions',
                     'mapped' => false,
                     'choices' => array(
-                        'none' => 'Ne pas importer les inscriptions',
-                        'copy' => 'Copier les inscriptions',
-                        'move' => 'Déplacer les inscriptions',
+                        'Ne pas importer les inscriptions' => 'none',
+                        'Copier les inscriptions' => 'copy',
+                        'Déplacer les inscriptions' => 'move',
                     ),
                     'empty_data' => 'none',
                     'required' => true,
@@ -202,8 +202,8 @@ abstract class AbstractSessionController extends AbstractController
         $form = $form->getForm();
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $doctrine->getManager();
                 $this->cloneSessionArrayCollections($session, $cloned, $inscriptions, $form->has('inscriptionManagement') ? $form->get('inscriptionManagement')->getData() : null);
                 $em->persist($cloned);
                 $em->flush();
