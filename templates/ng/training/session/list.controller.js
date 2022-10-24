@@ -19,7 +19,9 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             });
         },
         available: function () {
-            return ( training !== null ) ; // && ($user.hasAccessRight('sygefor_training.rights.training.all.update') || $user.hasAccessRight('sygefor_training.rights.training.own.update'));
+//            return ( training !== null ) ; // && ($user.hasAccessRight('sygefor_training.rights.training.all.update') || $user.hasAccessRight('sygefor_training.rights.training.own.update'));
+            // Pas de sens de créer une session si ce n'est à partir d'un stage
+            return false;
         }
      }];
 

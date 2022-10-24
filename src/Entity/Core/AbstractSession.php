@@ -790,7 +790,7 @@ abstract class AbstractSession implements SerializedAccessRights
         // set it to the day before date begin
         if (!$this->getLimitregistrationdate()) {
             $date = clone $this->getDatebegin();
-            $date->modify('-1 month');
+            $date->modify('-1 day');
             $this->setLimitregistrationdate($date);
         }
     }
@@ -853,8 +853,10 @@ abstract class AbstractSession implements SerializedAccessRights
     {
         $count = 0;
         if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
-            foreach ($this->getParticipantsSummaries() as $summary) {
-                $count += $summary->getCount();
+            if ($this->getParticipantsSummaries() != null) {
+                foreach ($this->getParticipantsSummaries() as $summary) {
+                    $count += $summary->getCount();
+                }
             }
         }
         else {
