@@ -205,7 +205,7 @@ class ProgramController extends AbstractController
 
                     $id = $inscription->getId();
                     // Lien vers la page d'autorisation
-                    $lien = $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
+                    $lien = "https://" . $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
 
 
 //                    if ($form['authorization']->getData() == TRUE) {
