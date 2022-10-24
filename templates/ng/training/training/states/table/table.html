@@ -30,7 +30,7 @@
                     <td>{{ item.training.typeLabel }}</td>
                     <td><a ui-sref="training.detail.view({id: item.id})">{{ item.training.name ? item.training.name : '(Sans titre)' }}</a></td>
                     <td>{{ item.training.category.name ? item.training.category.name : item.category }}</td>
-                    <td>{{ item.trainers | joinObjects:'fullname' }}</td>
+                    <td>{{ item.training.trainers }}</td>
                     <td>{{ item.sessionscount }}</td>
                     <td><a ui-sref="session.detail.view({id: item.lastsession.id, training: item.training.id})">{{ item.lastsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>
                     <td><a ui-sref="session.detail.view({id: item.nextsession.id, training: item.training.id})">{{ item.nextsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>

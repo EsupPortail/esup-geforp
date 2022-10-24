@@ -113,11 +113,15 @@ class TrainingRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainings = array();
-        $trainingES = array();
+
         foreach($paginator as $training) {
+            $trainingES = array();
             // On ne garde que les infos du stage dont on a besoin
             $trainingES['sessionscount'] = $training->getSessionscount();
             $trainingES['id'] = $training->getId();
+            $trainingES['number'] = $training->getNumber();
+            $trainingES['name'] = $training->getName();
+
 
             $trainingES['training']['id'] = $training->getId();
             $trainingES['training']['type'] = $training->getType();
@@ -137,17 +141,25 @@ class TrainingRepository extends ServiceEntityRepository
             $trainingES['training']['firstSessionPeriodYear'] = $training->getFirstSessionPeriodSemester();
             $trainingES['training']['publictypes'] = $training->getPublicTypes();
 
+            $trainingES['training']['trainers'] = "";
+            $i=0;
             foreach ($training->getTrainers() as $trainer) {
                 $trainingES['trainers'][]['id'] = $trainer->getId();
                 $trainingES['trainers'][]['fullname'] = $trainer->getFullname();
+                if($i>0)
+                    $trainingES['training']['trainers'] .= ', ' . $trainer->getFullname();
+                else
+                    $trainingES['training']['trainers'] .= $trainer->getFullname();
+                $i++;
             }
+
 
             $trainingES['nextsession'] = $training->getNextsession();
             $trainingES['lastsession'] = $training->getLastsession();
 
-            $sessionES['theme'] = $training->getTheme();
+            $trainingES['theme'] = $training->getTheme();
 
-            $sessionES['inscriptionsStats'] = array();
+            $trainingES['inscriptionsStats'] = array();
 
             $tabTrainings[] = $trainingES;
         }
