@@ -22,7 +22,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Inscription::class);
     }
 
-    public function getInscriptionsList($keyword, $filters,$page, $pageSize)
+    public function getInscriptionsList($keyword, $filters, $page, $pageSize, $fields)
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -140,9 +140,14 @@ class InscriptionSearchRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabIns = array();
-        foreach($paginator as $insc)
-            $tabIns[] = $insc;
-
+        foreach($paginator as $insc) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabIns[]['id'] = $insc->getId();
+            } else {
+                $tabIns[] = $insc;
+            }
+        }
+        
         $res = array('total' => $c,
             'pageSize' => $pageSize,
             'items' => $tabIns);
