@@ -1,0 +1,32 @@
+{% extends "layout.html.twig" %}
+{% block breadcrumbs %}
+    <ol class="breadcrumb full-height-item">
+        <li><a href="{{ path('core.index') }}">Accueil</a></li>
+        <li><a href="#">Administration</a></li>
+        <li class="active"><a href="{{ path('user.index') }}">Utilisateurs</a></li>
+    </ol>
+{% endblock %}
+{% block content %}
+    <div class="list-view full-height-item is-grow">
+        <div class="full-height-container is-absolute is-full-width">
+            <div class="col-xs-12">
+                <table class="table table-search table-hover">
+                    <thead>
+                    <tr>
+                        <th>Nom complet</th>
+                        <th>Etablissement</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for trainee in trainees %}
+                        <tr>
+                            <td><a href="{{ path('user.add', { 'eppn': trainee.eppn, 'email': trainee.email }) }}">{{ trainee.firstname }} {{ trainee.lastname }}</a></td>
+                            <td>{{ trainee.institution }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}

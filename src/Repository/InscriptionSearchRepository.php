@@ -147,7 +147,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 $tabIns[] = $insc;
             }
         }
-        
+
         $res = array('total' => $c,
             'pageSize' => $pageSize,
             'items' => $tabIns);

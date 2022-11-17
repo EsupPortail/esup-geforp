@@ -11,6 +11,8 @@ namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
 use App\Form\Type\AccessRightType;
+use App\Form\Type\TraineeSearchType;
+use App\Repository\TraineeSearchRepository;
 use ClassesWithParents\D;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
@@ -79,25 +81,25 @@ class UserController extends AbstractController
 
     /**
      * @param Request $request
-     *
-     * @Route("/add", name="user.add")
+     * @param ManagerRegistry $doctrine
+     * @param null eppn
+     * @param null email
+     * @Route("/add/{eppn}/{email}", name="user.add")
      *
      * @return array|RedirectResponse
      */
-    public function addAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
+    public function addAction(ManagerRegistry $doctrine, Request $request, $eppn=null, $email=null)
     {
         $user = new User();
+        $user->setUsername($eppn);
+        $user->setEmail($email);
+        $user->setPassword('xyz123456!');
 //        $user->setOrganization($this->getUser()->getOrganization());
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $hashedPassword = $passwordHasher->hashPassword(
-                    $user,
-                    $user->getPassword()
-                );
-                $user->setPassword($hashedPassword);
                 $currentDate = new \DateTime('now');
                 $user->setLastLogin($currentDate);
 
@@ -154,6 +156,60 @@ class UserController extends AbstractController
             'form' => $form->createView(),
             'user' => $user,
             'isAdmin' => 1, //$user->isAdmin(),
+        ));
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @Route("/searchadd", name="user.searchadd")
+     *
+     * @return array|RedirectResponse
+     */
+    public function searchaddAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
+    {
+        /** @var User $curUser */
+        $curUser = $this->getUser();
+        $institution = $curUser->getOrganization()->getInstitution();
+        $defaultData = array('institution' => $institution, 'nom' => "");
+
+        // Fonction de recherche
+        $traineeSearch = new TraineeSearchRepository($doctrine);
+
+        $form = $this->createForm(TraineeSearchType::class, $defaultData);
+        if ($request->getMethod() === 'POST') {
+            $form->handleRequest($request);
+            if (($form->isSubmitted()) && ($form->isValid())) {
+                $institutionF = $form['institution']->getData();
+                if (!empty($institutionF)) {
+                    $etab = $institutionF->getName();
+                }
+                $nom = $form['nom']->getData();
+
+                $keyword = $nom;
+                $filters['institution.name.source'] = $etab;
+                $page = 1;
+                $pageSize = 1000;
+                $sort = array('lastName.source');
+
+                dump($keyword);
+                $resSearch = $traineeSearch->getTraineesList($keyword, $filters, $page, $pageSize, $sort);
+                $trainees = $resSearch['items'];
+                dump($resSearch);
+
+                return $this->render('Core/views/User/searchResult.html.twig', array(
+                    'user' => $curUser,
+                    'isAdmin' => $curUser->isAdmin(),
+                    'trainees' => $trainees
+                ));
+
+            }
+        }
+
+        return $this->render('Core/views/User/search.html.twig', array(
+            'form' => $form->createView(),
+            'user' => $curUser,
+            'isAdmin' => $curUser->isAdmin(),
         ));
     }
 
