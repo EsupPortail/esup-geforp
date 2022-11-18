@@ -285,6 +285,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                             }
                             // On recupere le nombre de présences totales et partielles * nombre d'heures théoriques
                             $data[$key] = $nbPresPart * $accessor->getValue($session, 'hournumber');
+
+                            // Transformation '.' en ',' pour faciliter Excel
+                            $data[$key] = str_replace('.', ',', $data[$key]);
                         } else {
                             $data[$key] = '';
                         }
@@ -334,6 +337,9 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             // On recupere seulement le compteur du nombre d'heures de présence
                             $data[$key] = $nbHeuresPresence;
+
+                            // Transformation '.' en ',' pour faciliter Excel
+                            $data[$key] = str_replace('.', ',', $data[$key]);
 //                        } else {
 //                            $data[$key] = '';
 //                        }
