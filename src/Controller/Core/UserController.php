@@ -190,13 +190,12 @@ class UserController extends AbstractController
                 $keyword = $nom;
                 $filters['institution.name.source'] = $etab;
                 $page = 1;
-                $pageSize = 1000;
+                $pageSize = 100000;
                 $sort = array('lastName.source');
+                $fields = '';
 
-                dump($keyword);
-                $resSearch = $traineeSearch->getTraineesList($keyword, $filters, $page, $pageSize, $sort);
+                $resSearch = $traineeSearch->getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields);
                 $trainees = $resSearch['items'];
-                dump($resSearch);
 
                 return $this->render('Core/views/User/searchResult.html.twig', array(
                     'user' => $curUser,
