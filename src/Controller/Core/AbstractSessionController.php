@@ -49,9 +49,10 @@ abstract class AbstractSessionController extends AbstractController
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $fields = $request->request->get('fields', 'NO FIELDS');
 
         // Recherche avec les filtres
-        $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size);
+        $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size, $fields);
 
         // Recherche pour aggs et query_filters
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $sessionRepository);

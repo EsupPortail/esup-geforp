@@ -27,7 +27,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainee::class);
     }
 
-    public function getTraineesList($keyword, $filters, $page, $pageSize, $sort)
+    public function getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields)
     {
         $qb = $this->createQueryBuilder('trainee');
         $qb
@@ -104,8 +104,13 @@ class TraineeSearchRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainees = array();
-        foreach($paginator as $tr)
-            $tabTrainees[] = $tr;
+        foreach($paginator as $tr) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabTrainees[]['id'] = $tr->getId();
+            } else {
+                $tabTrainees[] = $tr;
+            }
+        }
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

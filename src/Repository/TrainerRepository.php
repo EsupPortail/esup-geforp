@@ -20,7 +20,7 @@ class TrainerRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainer::class);
     }
 
-    public function getTrainersList($keyword, $filters, $page, $pageSize)
+    public function getTrainersList($keyword, $filters, $page, $pageSize, $fields)
     {
         $qb = $this->createQueryBuilder('trainer');
         $qb
@@ -89,8 +89,14 @@ class TrainerRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainers = array();
-        foreach($paginator as $tr)
-            $tabTrainers[] = $tr;
+        foreach($paginator as $tr) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabTrainers[]['id'] = $tr->getId();
+            } else {
+                $tabTrainers[] = $tr;
+            }
+        }
+
 
         $res = array('total' => $c,
             'pageSize' => $pageSize,

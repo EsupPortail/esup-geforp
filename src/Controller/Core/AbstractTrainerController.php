@@ -41,9 +41,10 @@ abstract class AbstractTrainerController extends AbstractController
         $query = $request->request->get('query', 'NO QUERY');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $fields = $request->request->get('fields', 'NO FIELDS');
 
         // Recherche avec les filtres
-        $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size);
+        $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $fields);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
