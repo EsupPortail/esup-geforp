@@ -88,10 +88,8 @@ class AccessRightRegistry
         17 => 'sygefor_trainee.rights.trainee.all.view', 18 => 'sygefor_trainee.rights.trainee.all.create', 19 => 'sygefor_trainee.rights.trainee.all.update', 20 => 'sygefor_trainee.rights.trainee.all.delete',
         21 => 'sygefor_inscription.rights.inscription.own.view', 22 => 'sygefor_inscription.rights.inscription.own.create', 23 => 'sygefor_inscription.rights.inscription.own.update', 24 => 'sygefor_inscription.rights.inscription.own.delete',
         25 => 'sygefor_inscription.rights.inscription.all.view', 26 => 'sygefor_inscription.rights.inscription.all.create', 27 => 'sygefor_inscription.rights.inscription.all.update', 28 => 'sygefor_inscription.rights.inscription.all.delete',
-        29 => 'sygefor_institution.rights.institution.own.view', 30 => 'sygefor_institution.rights.institution.own.create', 31 => 'sygefor_institution.rights.institution.own.update', 32 => 'sygefor_institution.rights.institution.own.delete',
-        33 => 'sygefor_institution.rights.institution.all.view', 34 => 'sygefor_institution.rights.institution.all.create', 35 => 'sygefor_institution.rights.institution.all.update', 36 => 'sygefor_institution.rights.institution.all.delete',
-        37 => 'sygefor_trainer.rights.trainer.own.view', 38 => 'sygefor_trainer.rights.trainer.own.create', 39 => 'sygefor_trainer.rights.trainer.own.update', 40 => 'sygefor_trainer.rights.trainer.own.delete',
-        41 => 'sygefor_trainer.rights.trainer.all.view', 42 => 'sygefor_trainer.rights.trainer.all.create', 43 => 'sygefor_trainer.rights.trainer.all.update', 44 => 'sygefor_trainer.rights.trainer.all.delete'
+        29 => 'sygefor_trainer.rights.trainer.own.view', 30 => 'sygefor_trainer.rights.trainer.own.create', 31 => 'sygefor_trainer.rights.trainer.own.update', 32 => 'sygefor_trainer.rights.trainer.own.delete',
+        33 => 'sygefor_trainer.rights.trainer.all.view', 34 => 'sygefor_trainer.rights.trainer.all.create', 35 => 'sygefor_trainer.rights.trainer.all.update', 36 => 'sygefor_trainer.rights.trainer.all.delete'
     );
 
 
@@ -196,31 +194,6 @@ class AccessRightRegistry
         $this->addAccessRight($i, $accessRight, $group);
         $i++;
         $accessRight = new AllInscriptionDeleteAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $group = "Etablissements";
-        $accessRight = new OwnInstitutionViewAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new OwnInstitutionCreateAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new OwnInstitutionUpdateAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new OwnInstitutionDeleteAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new AllInstitutionViewAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new AllInstitutionCreateAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new AllInstitutionUpdateAccessRight();
-        $this->addAccessRight($i, $accessRight, $group);
-        $i++;
-        $accessRight = new AllInstitutionDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
         $i++;
         $group = "Formateurs";

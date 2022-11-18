@@ -64,7 +64,7 @@
                             {{ form_widget(right) }}
                         </div>
                     </div>
-                {% elseif right.vars.value == 37 %}
+                {% elseif right.vars.value == 29 %}
                     </div>
                     </div>
                     <div class="panel panel-default">
@@ -75,20 +75,12 @@
                             {{ form_widget(right) }}
                         </div>
                     </div>
-                {% elseif right.vars.value == 44 %}
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    {{ form_widget(right) }}
-                                </div>
-                            </div>
+                {% else %}
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form_widget(right) }}
                         </div>
                     </div>
-                {% else %}
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    {{ form_widget(right) }}
-                                </div>
-                            </div>
                 {% endif %}
             {% endfor %}
         </div>

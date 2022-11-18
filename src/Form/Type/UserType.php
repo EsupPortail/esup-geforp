@@ -59,7 +59,7 @@ class UserType extends AbstractType
                 'label' => 'Email',
             ));
 
-        $builder->add('password', RepeatedType::class, array(
+/*        $builder->add('password', RepeatedType::class, array(
             'type' =>  PasswordType::class,
             'constraints' => new Length(array('min' => 8)),
             'required' => true,
@@ -67,7 +67,7 @@ class UserType extends AbstractType
             'first_options' => array('label' => 'Mot de passe'),
             'second_options' => array('label' => 'Confirmation'),
         ));
-
+*/
 
         $builder->add('organization', EntityType::class, array(
             'required' => true,
@@ -76,8 +76,6 @@ class UserType extends AbstractType
             'query_builder' => function (EntityRepository $er) {
                 $res = $er->createQueryBuilder('o');
                 return $res;
-
-//                return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
             },
         ));
 

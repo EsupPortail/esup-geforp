@@ -98,6 +98,7 @@ class UserController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
+            dump($form);
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $currentDate = new \DateTime('now');
