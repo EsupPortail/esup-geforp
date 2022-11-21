@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityRepository;
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Core\User;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Email;
@@ -59,15 +60,6 @@ class UserType extends AbstractType
                 'label' => 'Email',
             ));
 
-/*        $builder->add('password', RepeatedType::class, array(
-            'type' =>  PasswordType::class,
-            'constraints' => new Length(array('min' => 8)),
-            'required' => true,
-            'invalid_message' => 'Les mots de passe doivent correspondre',
-            'first_options' => array('label' => 'Mot de passe'),
-            'second_options' => array('label' => 'Confirmation'),
-        ));
-*/
 
         $builder->add('organization', EntityType::class, array(
             'required' => true,
@@ -77,6 +69,12 @@ class UserType extends AbstractType
                 $res = $er->createQueryBuilder('o');
                 return $res;
             },
+        ));
+
+        $builder->add('isAdmin', CheckboxType::class, array(
+            'label' => 'Administrateur',
+            'mapped' => false,
+            'required' => false
         ));
 
         // add choice list for user creation
@@ -93,19 +91,8 @@ class UserType extends AbstractType
                 'required' => false,
             ));
         }
-
-        // If the user does not have the rights, remove the organization field and force the value
-/*        $hasAccessRightForAll = $this->accessRightsRegistry->hasAccessRight('sygefor_core.access_right.user.all');
-        if (!$hasAccessRightForAll) {
-            $securityContext = $this->accessRightsRegistry->getSecurityContext();
-            $user = $securityContext->getToken()->getUser();
-            $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($user) {
-                $trainer = $event->getData();
-                $trainer->setOrganization($user->getOrganization());
-                $event->getForm()->remove('organization');
-            });
-        } */
     }
+
 
 	/**
 	 * @param OptionsResolver $resolver

@@ -61,7 +61,7 @@ class UserController extends AbstractController
 
         return $this->render('Core/views/User/index.html.twig', array(
             'users' => $users,
-            'isAdmin' => 1, //$this->getUser()->isAdmin(),
+            'isAdmin' => $this->getUser()->isAdmin(),
         ));
     }
 
@@ -94,11 +94,9 @@ class UserController extends AbstractController
         $user->setUsername($eppn);
         $user->setEmail($email);
         $user->setPassword('xyz123456!');
-//        $user->setOrganization($this->getUser()->getOrganization());
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
-            dump($form);
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $currentDate = new \DateTime('now');
@@ -142,7 +140,14 @@ class UserController extends AbstractController
                 $userAccessRights = ['a:0:{}'];
                 $user->setAccessRights($userAccessRights);
 
-                $roles = ['a:0:{}'];
+                // Roles
+                $isAdmin = $form['isAdmin']->getData();
+                if($isAdmin) {
+                    // on ajoute le role 'admin' au user
+                    $roles = ['ROLE_ADMIN'];
+                } else {
+                    $roles = ['a:0:{}'];
+                }
                 $user->setRoles($roles);
 
                 $em->flush();
@@ -156,7 +161,7 @@ class UserController extends AbstractController
         return $this->render('Core/views/User/edit.html.twig', array(
             'form' => $form->createView(),
             'user' => $user,
-            'isAdmin' => 1, //$user->isAdmin(),
+            'isAdmin' => $user->isAdmin(),
         ));
     }
 
@@ -224,22 +229,40 @@ class UserController extends AbstractController
      */
     public function editAction(ManagerRegistry $doctrine, Request $request, User $user, UserPasswordHasherInterface $passwordHasher)
     {
-        $oldPwd = $user->getPassword();
         $form = $this->createForm(UserType::class, $user);
+        $roles = $user->getRoles();
+        $key = array_search('ROLE_ADMIN', $roles);
+        if ($key != false) {
+            // si le user est admin, on coche la case du formulaire
+            $form->get('isAdmin')->setData(true);
+        } else {
+            // si le user n'est pas admin, on decoche la case du formulaire
+            $form->get('isAdmin')->setData(false);
+        }
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
-                $newPwd = $form->get('password')->getData();
-                if (isset($newPwd)) {
-                    $hashedPassword = $passwordHasher->hashPassword(
-                        $user,
-                        $newPwd
-                    );
-                    $user->setPassword($hashedPassword);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $isAdmin = $form['isAdmin']->getData();
 
+                if ($key != false) {
+                    // si le user etait admin
+                    if($isAdmin) {
+                        // on ne change rien
+                    } else {
+                        // on supprime le role 'admin'
+                        unset($roles[$key]);
+                        $user->setRoles($roles);
+                    }
                 } else {
-                    $user->setPassword($oldPwd);
+                    // si le user n'était pas admin
+                    if($isAdmin) {
+                        // on ajoute le role 'admin' au user
+                        $roles[] = 'ROLE_ADMIN';
+                        $user->setRoles($roles);
+                    } else {
+                        // on ne change rien
+                    }
                 }
 
                 $em = $doctrine->getManager();
@@ -268,25 +291,12 @@ class UserController extends AbstractController
     public function accountAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
     {
         $user = $this->getUser();
-        $oldPwd = $user->getPassword();
         $form = $this->createForm(AccountType::class, $user);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $newPwd = $form->get('password')->getData();
-                if (isset($newPwd)) {
-                    $hashedPassword = $passwordHasher->hashPassword(
-                        $user,
-                        $newPwd
-                    );
-                    $user->setPassword($hashedPassword);
-
-                } else {
-                    $user->setPassword($oldPwd);
-                }
-
                 $doctrine->getManager()->persist($user);
                 $doctrine->getManager()->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été mis à jour.');
