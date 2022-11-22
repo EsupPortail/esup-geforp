@@ -2,53 +2,30 @@
 
 namespace App\Entity\Term;
 
-use App\Form\Type\PublipostTemplateVocabularyType;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Core\UploadableTrait;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContext;
+use App\Form\Type\ImageFileVocabularyType;
 
 /**
- * Class PublipostTemplates.
+ * Class ImageFile.
  *
- * @ORM\Table(name="publipost_template")
+ * @ORM\Table(name="image_file")
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks
  */
-class Publiposttemplate extends AbstractTerm implements VocabularyInterface
+class ImageFile extends AbstractTerm implements VocabularyInterface
 {
     use UploadableTrait;
 
-    /**
-     * @ORM\Column(name="entity", type="text", nullable=false)
-     * @Assert\NotNull()
-     *
-     * @var string
-     */
-    protected $entity;
-
-    /**
-     * @param string $entity
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntity()
-    {
-        return $this->entity;
-    }
 
     /**
      * @return mixed
      */
     public function getVocabularyName()
     {
-        return 'Modèles de publipostage';
+        return 'Fichiers images';
     }
 
     /**
@@ -58,7 +35,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
      */
     public static function getFormType()
     {
-        return PublipostTemplateVocabularyType::class;
+        return ImageFileVocabularyType::class;
     }
 
     public static function getVocabularyStatus()
@@ -82,7 +59,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     protected function getTemplatesRootDir()
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__.'/../../../var/Publipost';
+        return __DIR__.'/../../../var/Images';
     }
 
     /**

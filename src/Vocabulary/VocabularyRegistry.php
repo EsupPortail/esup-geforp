@@ -6,6 +6,7 @@ use App\Entity\Term\Actiontype;
 use App\Entity\Term\Domain;
 use App\Entity\Term\Emailtemplate;
 use App\Entity\Term\Evaluationcriterion;
+use App\Entity\Term\ImageFile;
 use App\Entity\Term\Inscriptionstatus;
 use App\Entity\Term\MenuItem;
 use App\Entity\Term\Presencestatus;
@@ -100,6 +101,9 @@ class VocabularyRegistry
         $this->addVocabulary($voc, $i);
         $i++;
         $voc = new Domain();
+        $this->addVocabulary($voc, $i);
+        $i++;
+        $voc = new ImageFile();
         $this->addVocabulary($voc, $i);
     }
 
