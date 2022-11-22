@@ -55,7 +55,7 @@ abstract class AbstractTrainerController extends AbstractController
             // on transforme le champ 'query' en 'keywords'
             if (isset($query['filtered']['query']['match']['fullName.autocomplete']['query'])) {
                 $keywords = $query['filtered']['query']['match']['fullName.autocomplete']['query'];
-                $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size);
+                $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $fields);
             }
         }
 

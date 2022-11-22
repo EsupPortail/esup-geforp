@@ -72,7 +72,7 @@ abstract class AbstractTraineeController extends AbstractController
             // on transforme le champ 'query' en 'keywords'
             if (isset($query['match']['fullname.autocomplete']['query'])) {
                 $keywords = $query['match']['fullname.autocomplete']['query'];
-                $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size, $sorts);
+                $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
             }
         }
 
