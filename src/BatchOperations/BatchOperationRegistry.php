@@ -12,15 +12,19 @@ namespace App\BatchOperations;
 use App\BatchOperations\Generic\CSVBatchOperation;
 use App\BatchOperations\Generic\EmailingBatchOperation;
 use App\BatchOperations\Generic\MailingBatchOperation;
+use App\BatchOperations\Generic\PDFBatchOperation;
 use App\BatchOperations\Inscription\InscriptionStatusChangeBatchOperation;
 use App\BatchOperations\SemesteredTraining\SemesteredTrainingCSVBatchOperation;
+use App\Kernel;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
+use Knp\Snappy\Pdf;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
+use Twig\Environment;
 
 /**
  * Class BatchOperationRegistry.
@@ -32,7 +36,7 @@ class BatchOperationRegistry
      */
     private $operations = array();
 
-    public function __construct(Security $security, ParameterBagInterface $parameterBag, ContainerInterface $container, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpa)
+    public function __construct(Security $security, ParameterBagInterface $parameterBag, ContainerInterface $container, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $hrpa, Pdf $pdf, Environment $twig)
     {
         $this->operations = array();
 
@@ -132,6 +136,16 @@ class BatchOperationRegistry
         $this->addBatchOperation($CSVBatchTrainer, $i);
         $i++;
 
+        // Recuperation conf PDF
+        $confPDF = $conf['pdf'];
+        // operation batch : export CSV pour les sessions
+        $PDFBatchAttestation = new PDFBatchOperation($pdf, $security, $twig, $parameterBag);
+        $PDFBatchAttestation->setDoctrine($doctrine);
+        $PDFBatchAttestation->setTargetClass('App\Entity\Back\Inscription');
+        $PDFBatchAttestation->setOptions($confPDF['inscription.attestation']);
+        $this->addBatchOperation($PDFBatchAttestation, $i);
+        $i++;
+
     }
 
     /**
@@ -209,6 +223,9 @@ class BatchOperationRegistry
                 break;
             case 'sygefor_core.batch.csv.trainer':
                 $id = 10;
+                break;
+            case 'sygefor_core.batch.pdf.inscription.attestation':
+                $id = 11;
                 break;
         }
         if (isset($this->operations[$id])) {

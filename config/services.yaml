@@ -398,7 +398,7 @@ parameters:
 
             inscription.attestation:
                 class: 'App\Entity\Back\Inscription'
-                template: 'SygeforMyCompanyBundle:Inscription:attestation.pdf.twig'
+                template: 'PDF\attestation.pdf.twig'
                 key: inscription
                 filename: "attestation.pdf"
 

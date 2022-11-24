@@ -9,7 +9,7 @@
 
 namespace App\BatchOperations\Generic;
 
-use Knp\Bundle\SnappyBundle\Snappy\LoggableGenerator;
+
 use Knp\Snappy\Pdf;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\AbstractInscription;
@@ -17,10 +17,9 @@ use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\SecurityContext;
-use Symfony\Component\Templating\EngineInterface;
+use Symfony\Component\Security\Core\Security;
+use Twig\Environment;
 
 /**
  * Class PDFBatchOperation.
@@ -38,9 +37,9 @@ class PDFBatchOperation extends AbstractBatchOperation
     protected $entityKey;
 
     /**
-     * @var string
+     * @var Environment
      */
-    protected $templating;
+    protected $twig;
 
     /**
      * @var string
@@ -63,29 +62,27 @@ class PDFBatchOperation extends AbstractBatchOperation
     protected $templateDiscriminator;
 
     /**
-     * @var SecurityContext
+     * @var Security
      */
     protected $securityContext;
 
-    /** @var Kernel */
-    protected $kernel;
+    protected $parameterBag;
 
     /**
      * PDFBatchOperation constructor.
      *
-     * @param LoggableGenerator $pdf
-     * @param EngineInterface   $templating
-     * @param SecurityContext   $securityContext
-     * @param Kernel            $kernel
+     * @param Pdf $pdf
+     * @param Security   $securityContext
+     * @param             $parameterBag
      */
-    public function __construct(LoggableGenerator $pdf, EngineInterface $templating, SecurityContext $securityContext, Kernel $kernel)
+    public function __construct(Pdf $pdf, Security $securityContext, Environment $twig, $parameterBag)
     {
         $this->pdf = $pdf;
-        $this->templating = $templating;
         $this->securityContext = $securityContext;
-        $this->kernel = $kernel;
-        $this->pdf->getInternalGenerator()
-            ->setTemporaryFolder(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR);
+        $this->twig = $twig;
+        $this->parameterBag = $parameterBag;
+/*        $this->pdf->getInternalGenerator()
+            ->setTemporaryFolder(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR);*/
     }
 
     /**
@@ -140,6 +137,7 @@ class PDFBatchOperation extends AbstractBatchOperation
 
         $entities = $this->getObjectList($idList);
         $pages = array();
+        /*
         foreach ($entities as $entity) {
             // security check
             if ($this->securityContext->isGranted('VIEW', $entity)) {
@@ -163,7 +161,7 @@ class PDFBatchOperation extends AbstractBatchOperation
                 }
                 //checking signature file existence
                 $fs = new Filesystem();
-                if ($fs->exists($this->kernel->getRootDir().'/../web/img/organization/'.$training->getOrganization()->getCode().'/signature.png')) {
+                if ($fs->exists($this->parameterBag->get('kernel.project_dir').'/../web/img/organization/'.$training->getOrganization()->getCode().'/signature.png')) {
                     $signature = '/img/organization/'.$training->getOrganization()->getCode().'/signature.png';
                 }
 
@@ -190,6 +188,95 @@ class PDFBatchOperation extends AbstractBatchOperation
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             )
-        );
+        );*/
+        foreach ($entities as $entity) {
+            // security check
+            if ($this->securityContext->isGranted('VIEW', $entity)) {
+                // determine the template
+                $template = $this->defaultTemplate;
+                if ($this->templateDiscriminator) {
+                    $key = $accessor->getValue($entity, $this->templateDiscriminator);
+                    if (isset($this->templates[$key])) {
+                        $template = $this->templates[$key];
+                    }
+                }
+
+                $signature = null;
+                $training = null;
+                if ($entity instanceof AbstractTraining) {
+                    $training = $entity;
+                } elseif ($entity instanceof AbstractSession) {
+                    $training = $entity->getTraining();
+                } elseif ($entity instanceof AbstractInscription) {
+                    $inscription = $entity;
+                    $session = $inscription->getSession();
+
+                    // Gestion nombre d'heures de formation
+                    // On crée le tableau de dates correspondant au tableau des présences
+                    $tabDates = array();
+                    $nbJoursDate2 = -1;
+                    foreach ($session->getDates() as $dateSes) {
+                        // Conversion date de début de session
+                        $dateDeb = $dateSes->getDateBegin();
+                        $dateNewS = $dateDeb->format('d/m/Y');
+                        $tab = explode('/', $dateNewS);
+                        $dateNew = new \DateTime();
+                        $dateNew->setDate($tab[2], $tab[1], $tab[0]);
+
+                        $nbJoursDate2 = date_diff($dateSes->getDateEnd(), $dateSes->getDateBegin());
+                        $nbJoursDate = $nbJoursDate2->format('%a');
+                        // création du tableau des dates suivant le nombre de jours à afficher
+                        for ($j = 0; $j < $nbJoursDate + 1; $j++) {
+                            $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
+                            $dateNew->modify('+ 1 days');
+
+                        }
+                    }
+
+                    // calcul du nombre d'heures de présence effective
+                    // On initialise le nombre d'heures de présence
+                    $nbHeuresPresence = 0;
+                    // Pour chaque presence, on compare avec le tableau des dates et on calcule le nombre d'heures
+                    foreach ($inscription->getPresences() as $pres) {
+                        foreach ($tabDates as $datePres) {
+                            if ($pres->getDateBegin()->format('d/m/Y') == $datePres["dateDeb"]) {
+                                if ($pres->getMorning() == "Présent") {
+                                    $nbHeuresPresence += $datePres["nbHeuresMatin"];
+                                }
+                                if ($pres->getAfternoon() == "Présent") {
+                                    $nbHeuresPresence += $datePres["nbHeuresApr"];
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    $nbHeuresSession = $session->getHourNumber();
+
+                    //filesystem for checking signature file existence
+
+                    // getting signature asset
+                    $signature = null;
+
+                    //checking signature file existence
+                    $fs = new Filesystem();
+                    if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/organization/' . $inscription->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png')) {
+                        $signature = '/img/organization/' . $inscription->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
+                    }
+
+                    $pdfView = $this->twig->render('PDF/attestation.pdf.twig', array(
+                        'inscription' => $inscription,
+                        'signature' => $signature,
+                        'nbHeuresPresence' => $nbHeuresPresence . "/" . $nbHeuresSession
+                    ));
+
+                    return new Response(
+                        $this->pdf->getOutputFromHtml($pdfView, array('print-media-type' => null)), 200,
+                        array(
+                            'Content-Type' => 'application/pdf',
+                            'Content-Disposition' => 'attachment; filename="attestation.pdf"',)
+                    );
+                }
+            }
+        }
     }
 }
