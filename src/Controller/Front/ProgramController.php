@@ -393,7 +393,7 @@ class ProgramController extends AbstractController
             $img = 'img/logo.png';
         }*/
 
-        $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution', $etablissement));
+        $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
         foreach ($organizations as $organization) {
             $codes[] = $organization->getCode();
         }
