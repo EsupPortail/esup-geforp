@@ -244,21 +244,33 @@ class AttendanceAccountController extends AbstractController
         }
         $nbHeuresSession = $session->getHourNumber();
 
-        //filesystem for checking signature file existence
+        // Recuperation des fichiers logos et signature
+        $organization = $session->getTraining()->getOrganization();
+        $images = $doctrine->getRepository('App\Entity\Term\ImageFile')->findBy(array('organization' => $organization));
 
-        // getting signature asset
-        $signature = null;
-
-        //checking signature file existence
+        //checking file existence
+        $fileSignature = null;
+        $fileLogo = null;
         $fs = new Filesystem();
-        if($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png' )) {
-            $signature = '/img/organization/' . $attendance->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
+        foreach ($images as $img) {
+            $fileName = $img->getName();
+            if(strpos($fileName, 'logo') !== false){
+                if ($fs->exists($this->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                    $fileLogo = 'img/vocabulary/'.$img->getFilepath();
+                }
+            }
+            if(strpos($fileName, 'signature') !== false){
+                if ($fs->exists($this->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                    $fileSignature = 'img/vocabulary/'.$img->getFilepath();
+                }
+            }
         }
 
         $pdf = $this->renderView('PDF/attestation.pdf.twig', array(
             'inscription' => $attendance,
-            'signature'   => $signature,
-            'nbHeuresPresence' => $nbHeuresPresence."/".$nbHeuresSession
+            'nbHeuresPresence' => $nbHeuresPresence."/".$nbHeuresSession,
+            'logo' => $fileLogo,
+            'signature' => $fileSignature
         ));
 
         return new Response(

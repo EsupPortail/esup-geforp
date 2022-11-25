@@ -27,6 +27,7 @@ use App\Form\Type\InscriptionType;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -383,16 +384,21 @@ class ProgramController extends AbstractController
         $multiEtab = $this->getParameter('multi_etab_actif');
         $listeEtab = $this->getParameter('liste_etab');
 
-        if (array_key_exists($etablissement, $listeEtab)){
+/*        if (array_key_exists($etablissement, $listeEtab)){
             $etab = $listeEtab[$etablissement];
             $code = $etab["codes"];
             $img = 'img/'.$etab["logo"];
         }else {
             $code = array("amu-drh", "AMU-CIPE");
             $img = 'img/logo.png';
+        }*/
+
+        $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution', $etablissement));
+        foreach ($organizations as $organization) {
+            $codes[] = $organization->getCode();
         }
 
-        $search = $this->createProgramQuery($code, $sessionRepository);
+        $search = $this->createProgramQuery($codes, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -467,7 +473,7 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return array('user' => $arTrainee[0], 'search' => $search, 'img' => $img, 'form' => $form->createView(),'multiEtab' => $multiEtab);
+        return array('user' => $arTrainee[0], 'search' => $search, 'img' => '', 'form' => $form->createView(),'multiEtab' => $multiEtab);
     }
 
     /**

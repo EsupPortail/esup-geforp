@@ -92,7 +92,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
             // on met une valeur par défaut (pour l'autocompletion)
             $page = 1;
-            $pageSize = 50;
+            $pageSize = 500;
         }
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)

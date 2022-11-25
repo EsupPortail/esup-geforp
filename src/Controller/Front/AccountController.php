@@ -81,17 +81,14 @@ class AccountController extends AbstractController
             $trainee = $arTrainee[0];
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
-            // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             if ($shibbolethAttributes['supannCivilite']=='')
                 $shibbolethAttributes['supannCivilite'] = 'M.';
             $trainee->setTitle($doctrine->getRepository('App\Entity\Term\Title')->findOneBy(
                 array('name' => $shibbolethAttributes['supannCivilite'])
             ));
-            $trainee->setOrganization($doctrine->getRepository('App\Entity\Back\Organization')->find(1));
             $trainee->setLastName($shibbolethAttributes['sn']);
             $trainee->setFirstName($shibbolethAttributes['givenName']);
             $trainee->setEmail($shibbolethAttributes['mail']);
-            //$trainee->setBirthDate($shibbolethAttributes['schacDateOfBirth']);
             $datenaiss = str_replace("-", "", $shibbolethAttributes['supannOIDCDateDeNaissance']);
             $trainee->setBirthDate($datenaiss);
             // Mise en forme adresse au cas où il y en a une
@@ -137,22 +134,22 @@ class AccountController extends AbstractController
                     array('machinename' => 'other')
                 ));
             }
-//            $trainee->setStatus($shibbolethAttributes['postalCode']);
 
             // Etablissement
-            $email = $shibbolethAttributes['mail'];
-            if (stripos($email , "@")>0) {
-                $domaine = substr($email, stripos($email, "@") + 1);
-                $listeDomaines = $this->getParameter('domaines');
-                // Association nom de domaine et établissement
-                if (array_key_exists($domaine, $listeDomaines)){
-                    $etab = $listeDomaines[$domaine];
-                }else {
-                    $etab = "AMU";
+            $flagEtab = 0;
+            $persitentId = $shibbolethAttributes['persistent-id'];
+            $listeEtab = $doctrine->getRepository('App\Entity\Back\Institution')->findAll();
+            foreach ($listeEtab as $etab) {
+                $idp = $etab->getIdp();
+                if(strpos($persitentId, $idp) !== false) {
+                    // Si on trouve l'idp de l'etablissement dans le shibboleth persistent id, alors on definit l'etablissement du stagiaire
+                    $trainee->setInstitution($etab);
+                    $flagEtab = 1;
+                    break;
                 }
-                $trainee->setInstitution($doctrine->getRepository('App\Entity\Back\Institution')->findOneBy(
-                    array('name' => $etab)
-                ));
+            }
+            if ($flagEtab !== 1) {
+                // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
 
             }
 
@@ -186,8 +183,7 @@ class AccountController extends AbstractController
                         $trainee->setCategory($n_corps->getCategory());
                     }
                 }
-            }
-            else {
+            } else {
                 $libAff = $this->getParameter('lib_affectation');
                 // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
                 if ($libAff === false)
@@ -259,8 +255,6 @@ class AccountController extends AbstractController
         $corrFormActif = $this->getParameter('corresp_form_actif');
 
         // Mise à jour du profil avec les attributs récupérés par Shibboleth
-//        $shibbolethAttributes = $this->get('security.token_storage')->getToken()->getAttributes();
-//        $trainee = $this->getUser();
         $shibbolethAttributes = $this->getUser()->getCredentials();
         $userEmail = $this->getUser()->getCredentials()['mail'];
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);
@@ -272,7 +266,6 @@ class AccountController extends AbstractController
         $trainee->setTitle($doctrine->getRepository('App\Entity\Term\Title')->findOneBy(
             array('name' => $shibbolethAttributes['supannCivilite'])
         ));
-        $trainee->setOrganization($doctrine->getRepository('App\Entity\Back\Organization')->find(1));
         $trainee->setLastName($shibbolethAttributes['sn']);
         $trainee->setFirstName($shibbolethAttributes['givenName']);
         $trainee->setEmail($shibbolethAttributes['mail']);
@@ -326,22 +319,22 @@ class AccountController extends AbstractController
                 array('machinename' => 'other')
             ));
         }
-//        $trainee->setStatus($shibbolethAttributes['postalCode']);
 
         // Etablissement
-        $email = $shibbolethAttributes['mail'];
-        if (stripos($email, "@") > 0) {
-            $domaine = substr($email, stripos($email, "@") + 1);
-            $listeDomaines = $this->getParameter('domaines');
-            // Association nom de domaine et établissement
-            if (array_key_exists($domaine, $listeDomaines)) {
-                $etab = $listeDomaines[$domaine];
-            } else {
-                $etab = "AMU";
+        $flagEtab = 0;
+        $persitentId = $shibbolethAttributes['persistent-id'];
+        $listeEtab = $doctrine->getRepository('App\Entity\Back\Institution')->findAll();
+        foreach ($listeEtab as $etab) {
+            $idp = $etab->getIdp();
+            if(strpos($persitentId, $idp) !== false) {
+                // Si on trouve l'idp de l'etablissement dans le shibboleth persistent id, alors on definit l'etablissement du stagiaire
+                $trainee->setInstitution($etab);
+                $flagEtab = 1;
+                break;
             }
-            $trainee->setInstitution($doctrine->getRepository('App\Entity\Core\AbstractInstitution')->findOneBy(
-                array('name' => $etab)
-            ));
+        }
+        if ($flagEtab !== 1) {
+            // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
 
         }
 
@@ -426,9 +419,12 @@ class AccountController extends AbstractController
                 if ($trainee->getEmailSup()) {
                     // Vérification du mail qui doit être institutionnel
                     if (stripos($trainee->getEmailSup(), "@") > 0) {
-                        $domaine = substr($trainee->getEmailSup(), stripos($trainee->getEmailSup(), "@") + 1);
-                        $listeDomaines = $this->getParameter('domaines');
-                        // Association nom de domaine et établissement
+                        $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
+                        $domaines = $trainee->getInstitution()->getDomains();
+                        $listeDomaines = array();
+                        foreach ($domaines as $dom) {
+                            $listeDomaines[$dom->getName()] = $dom;
+                        }
                         if (array_key_exists($domaine, $listeDomaines)) {
                             // ok : c'est bien une adresse institutionnelle qui a été renseignée
                             // Mail institutionel ok

@@ -85,12 +85,9 @@ class AnonymousAccountController extends AbstractController
         $trainee->setTitle($doctrine->getRepository('App\Entity\Term\Title')->findOneBy(
             array('name' => $shibbolethAttributes['supannCivilite'])
         ));
-        $trainee->setOrganization($doctrine->getRepository('App\Entity\Back\Organization')->find(1));
-
         $trainee->setLastname($shibbolethAttributes['sn']);
         $trainee->setFirstname($shibbolethAttributes['givenName']);
         $trainee->setEmail($shibbolethAttributes['mail']);
-        //$trainee->setBirthDate($shibbolethAttributes['schacDateOfBirth']);
         $datenaiss = str_replace("-", "", $shibbolethAttributes['supannOIDCDateDeNaissance']);
         $trainee->setBirthdate($datenaiss);
         // Mise en forme adresse au cas où il y en a une
@@ -137,23 +134,22 @@ class AnonymousAccountController extends AbstractController
                 array('machinename' => 'other')
             ));
         }
-//        $trainee->setStatus($shibbolethAttributes['postalCode']);
-
 
         // Etablissement
-        $email = $shibbolethAttributes['mail'];
-        if (stripos($email , "@")>0) {
-            $domaine = substr($email, stripos($email, "@") + 1);
-            $listeDomaines = $this->getParameter('domaines');
-            // Association nom de domaine et établissement
-            if (array_key_exists($domaine, $listeDomaines)){
-                $etab = $listeDomaines[$domaine];
-            }else {
-                $etab = "AMU";
+        $flagEtab = 0;
+        $persitentId = $shibbolethAttributes['persistent-id'];
+        $listeEtab = $doctrine->getRepository('App\Entity\Back\Institution')->findAll();
+        foreach ($listeEtab as $etab) {
+            $idp = $etab->getIdp();
+            if(strpos($persitentId, $idp) !== false) {
+                // Si on trouve l'idp de l'etablissement dans le shibboleth persistent id, alors on definit l'etablissement du stagiaire
+                $trainee->setInstitution($etab);
+                $flagEtab = 1;
+                break;
             }
-            $trainee->setInstitution($doctrine->getRepository('App\Entity\Back\Institution')->findOneBy(
-                array('name' => $etab)
-            ));
+        }
+        if ($flagEtab !== 1) {
+            // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
 
         }
 
@@ -165,8 +161,6 @@ class AnonymousAccountController extends AbstractController
 
             $trainee->setService($shibbolethAttributes['amuAffectationLib']);
             $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
-            //$trainee->setBap($shibbolethAttributes['amuBap']);
-//            $trainee->setCampus($shibbolethAttributes['amuCampus']);
             $bap = "";
             $activites = explode(";", $shibbolethAttributes['supannActivite']);
             foreach($activites as $activite) {
@@ -191,8 +185,7 @@ class AnonymousAccountController extends AbstractController
                     $trainee->setCategory($n_corps->getCategory());
                 }
             }
-        }
-        else {
+        } else {
             $libAff = $this->getParameter('lib_affectation');
             // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
             if ($libAff === false)
@@ -241,12 +234,16 @@ class AnonymousAccountController extends AbstractController
                     // Vérification du mail qui doit être institutionnel
                     if (stripos($trainee->getEmailsup() , "@")>0) {
                         $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
-                        $listeDomaines = $this->getParameter('domaines');
+                        $domaines = $trainee->getInstitution()->getDomains();
+                        $listeDomaines = array();
+                        foreach ($domaines as $dom) {
+                            $listeDomaines[$dom->getName()] = $dom;
+                        }
                         // Association nom de domaine et établissement
                         if (array_key_exists($domaine, $listeDomaines)){
                             // ok : c'est bien une adresse institutionnelle qui a été renseignée
                             // Mail institutionel ok
-                            // on vérifie que le mail du responsable est différent de clui du stagiaire
+                            // on vérifie que le mail du responsable est différent de celui du stagiaire
                             if (strtolower($trainee->getEmailsup()) == strtolower($trainee->getEmail())) {
                                 $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
