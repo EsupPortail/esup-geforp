@@ -6,7 +6,7 @@
 <body class="organization-{{ organization.code }}">
     <div class="row">
         <div class="col-xs-7">
-            <img src="{{ app.request.getSchemeAndHttpHost() ~ asset('img/organization/' ~ organization.code ~ '/logo.png') }}" />
+            <img src='{{ app.request.getSchemeAndHttpHost() }}/{{ logo }}' />
         </div>
         <div class="col-xs-5">
             <strong>{{ organization.name }}</strong><br>

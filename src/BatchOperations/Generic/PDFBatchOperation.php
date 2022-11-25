@@ -15,6 +15,8 @@ use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use App\Entity\Term\ImageFile;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -252,23 +254,35 @@ class PDFBatchOperation extends AbstractBatchOperation
                     }
                     $nbHeuresSession = $session->getHourNumber();
 
-                    //filesystem for checking signature file existence
+                    // Recuperation des fichiers logos et signature
+                    $organization = $inscription->getOrganization();
+                    $images = $this->doctrine->getRepository('App\Entity\Term\ImageFile')->findBy(array('organization' => $organization));
 
-                    // getting signature asset
-                    $signature = null;
-
-                    //checking signature file existence
+                    //checking file existence
+                    $fileSignature = null;
+                    $fileLogo = null;
                     $fs = new Filesystem();
-                    if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/organization/' . $inscription->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png')) {
-                        $signature = '/img/organization/' . $inscription->getSession()->getTraining()->getOrganization()->getCode() . '/signature.png';
+                    foreach ($images as $img) {
+                        $fileName = $img->getName();
+                        if(strpos($fileName, 'logo') !== false){
+                            if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                                $fileLogo = 'img/vocabulary/'.$img->getFilepath();
+                            }
+                        }
+                        if(strpos($fileName, 'signature') !== false){
+                            if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                                $fileSignature = 'img/vocabulary/'.$img->getFilepath();
+                            }
+                        }
                     }
 
                     $pdfView = $this->twig->render('PDF/attestation.pdf.twig', array(
                         'inscription' => $inscription,
-                        'signature' => $signature,
-                        'nbHeuresPresence' => $nbHeuresPresence . "/" . $nbHeuresSession
+                        'nbHeuresPresence' => $nbHeuresPresence . "/" . $nbHeuresSession,
+                        'logo' => $fileLogo,
+                        'signature' => $fileSignature
                     ));
-
+                    
                     return new Response(
                         $this->pdf->getOutputFromHtml($pdfView, array('print-media-type' => null)), 200,
                         array(

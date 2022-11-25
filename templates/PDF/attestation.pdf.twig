@@ -71,11 +71,11 @@
 
     <h5>Certifi&eacute Sinc&egravere et V&eacuteritable,</h5>
     {% if signature is defined %}
-        <p class="signature"><img src="{{app.request.getSchemeAndHttpHost()}}{{signature}}" /></p>
+         <p class="signature"><img src='{{app.request.getSchemeAndHttpHost()}}/{{signature}}' /></p>
         <p>&nbsp;</p>
     {% else %}
     <p>&nbsp;</p>
     <p>&nbsp;</p>
     {% endif %}
-    <h5>Fait à {{ inscription.session.training.organization.city | replace({'CEDEX': ''}) | trim }}, le {% if inscription.session.dateEnd %}{{ inscription.session.dateEnd | date("d/m/Y") }}{% else %}{{ inscription.session.dateBegin | date("d/m/Y") }}{% endif %}</h5>
+    <h5>Fait &agrave {{ inscription.session.training.organization.city | replace({'CEDEX': ''}) | trim }}, le {% if inscription.session.dateEnd %}{{ inscription.session.dateEnd | date("d/m/Y") }}{% else %}{{ inscription.session.dateBegin | date("d/m/Y") }}{% endif %}</h5>
 {% endblock %}
