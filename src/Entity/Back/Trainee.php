@@ -17,7 +17,7 @@ use App\Entity\Core\User;
  *
  * @ORM\Table(name="trainee")
  * @ORM\Entity
- * @UniqueEntity(fields={"email", "organization"}, message="Cette adresse email est déjà utilisée.", ignoreNull=true, groups={"Default", "trainee"})
+ * @UniqueEntity(fields={"email", "institution"}, message="Cette adresse email est déjà utilisée.", ignoreNull=true, groups={"Default", "trainee"})
  */
 class Trainee extends AbstractTrainee implements UserInterface
 {

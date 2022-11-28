@@ -430,20 +430,20 @@ class AccountController extends AbstractController
                             // Mail institutionel ok
                             // on vérifie que le mail du responsable est différent de clui du stagiaire
                             if (strtolower($trainee->getEmailSup()) == strtolower($trainee->getEmail())) {
-                                $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
+                                $request->getSession()->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
                                 $em = $doctrine->getManager();
                                 $em->flush();
-                                $this->get('session')->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
+                                $request->getSession()->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
                             }
                         } else {
-                            $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+                            $request->getSession()->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
                     }
                 } else {
                     $em = $doctrine->getManager();
                     $em->flush();
-                    $this->get('session')->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
+                    $request->getSession()->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
                 }
             }
         }
