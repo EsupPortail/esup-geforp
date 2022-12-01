@@ -2,6 +2,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Term\Publictype;
 use App\Entity\Back\Inscription;
@@ -35,7 +36,7 @@ abstract class AbstractInscriptionController extends AbstractController
      * @Route("/search", name="inscription.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, InscriptionSearchRepository $inscriptionSearchRepository)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
@@ -44,6 +45,12 @@ abstract class AbstractInscriptionController extends AbstractController
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
         $fields = $request->request->get('fields', 'NO FIELDS');
+
+        // security check : inscirption : 'sygefor_inscription.rights.inscription.all.view' -> id=25
+        if(!$accessRightRegistry->hasAccessRight(25)) {
+            // restriction to user's organization
+            $filters['session.training.organization.name.source'] = $this->getUser()->getOrganization()->getName();
+        }
 
         // Recherche avec les filtres
         $ret = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters, $page, $size, $fields);

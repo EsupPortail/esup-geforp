@@ -41,7 +41,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         ).then(function (res) {
             var adresses = [];
             angular.forEach (res.data.items, function (item) {
-                adresses.push ({label: item.fullname, value:item.id, organization: (item.organization.name) ? item.organization.name : '', institution: (item.institution !== null && item.institution !== undefined ) ? item.institution.name : '', contracted: (((item.institution !== null && item.institution !== undefined ) && item.institution.contracted) ? item.institution.contracted : false)})
+                adresses.push ({label: item.fullname, value:item.id, institution: (item.institution !== null && item.institution !== undefined ) ? item.institution.name : '', contracted: (((item.institution !== null && item.institution !== undefined ) && item.institution.contracted) ? item.institution.contracted : false)})
             });
 
             return adresses;

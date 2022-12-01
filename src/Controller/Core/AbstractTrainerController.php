@@ -2,6 +2,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
@@ -32,16 +33,22 @@ abstract class AbstractTrainerController extends AbstractController
      * @Route("/search", name="trainer.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, TrainerRepository $trainerRepository)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, TrainerRepository $trainerRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
+        $filters = $request->request->get('filters', array());
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $query = $request->request->get('query', 'NO QUERY');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
         $fields = $request->request->get('fields', 'NO FIELDS');
+
+        // security check : trainer : 'sygefor_trainer.rights.inscription.all.view' -> id=33
+        if(!$accessRightRegistry->hasAccessRight(33)) {
+            // restriction to user's organization
+            $filters['organization.name.source'] = $this->getUser()->getOrganization()->getName();
+        }
 
         // Recherche avec les filtres
         $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $fields);

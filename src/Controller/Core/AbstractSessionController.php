@@ -2,6 +2,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
@@ -41,7 +42,7 @@ abstract class AbstractSessionController extends AbstractController
      * @Route("/search", name="session.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
@@ -50,6 +51,12 @@ abstract class AbstractSessionController extends AbstractController
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
         $fields = $request->request->get('fields', 'NO FIELDS');
+
+        // security check : session : 'sygefor_training.rights.inscription.all.view' -> id=9
+        if(!$accessRightRegistry->hasAccessRight(9)) {
+            // restriction to user's organization
+            $filters['training.organization.name.source'] = $this->getUser()->getOrganization()->getName();
+        }
 
         // Recherche avec les filtres
         $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size, $fields);

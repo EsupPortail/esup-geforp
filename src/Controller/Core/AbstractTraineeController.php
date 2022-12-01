@@ -2,6 +2,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Trainee;
 use App\Entity\Back\Organization;
@@ -48,10 +49,10 @@ abstract class AbstractTraineeController extends AbstractController
      * 
      * @throws \Exception
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, TraineeSearchRepository $traineeRepository)
+    public function searchAction(Request $request, ManagerRegistry $doctrine, TraineeSearchRepository $traineeRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
+        $filters = $request->request->get('filters', array());
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $query = $request->request->get('query', 'NO QUERY');
@@ -59,6 +60,12 @@ abstract class AbstractTraineeController extends AbstractController
         $size = $request->request->get('size', 'NO SIZE');
         $sorts = $request->request->get('sorts', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
+
+        // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17
+        if(!$accessRightRegistry->hasAccessRight(17)) {
+            // restriction to user's institution
+            $filters['institution.name.source'] = $this->getUser()->getOrganization()->getInstitution()->getName();
+        }
 
         // Recherche avec les filtres
         $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
@@ -78,7 +85,7 @@ abstract class AbstractTraineeController extends AbstractController
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
-
+dump($ret);
         return $ret;
     }
 

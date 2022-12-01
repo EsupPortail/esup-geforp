@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Participation;
 use App\Repository\ParticipationRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -38,12 +39,18 @@ abstract class AbstractParticipationController extends AbstractController
      * @Route("/participation/search", name="participation.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
      */
-    public function participationSearchAction(Request $request, ManagerRegistry $doctrine, ParticipationRepository $participationRepository)
+    public function participationSearchAction(Request $request, ManagerRegistry $doctrine, ParticipationRepository $participationRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
+
+        // security check : trainer : 'sygefor_trainer.rights.trainer.all.view' -> id=33
+        if(!$accessRightRegistry->hasAccessRight(33)) {
+            // restriction to user's organization
+            $filters['organization.name.source'] = $this->getUser()->getOrganization()->getName();
+        }
 
         // Recherche avec les filtres
         $participations = $participationRepository->getParticipationsList($keywords, $filters);

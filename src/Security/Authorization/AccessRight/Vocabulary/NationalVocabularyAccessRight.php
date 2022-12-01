@@ -32,7 +32,7 @@ class NationalVocabularyAccessRight extends AbstractAccessRight
         try {
             $refl = new \ReflectionClass($class);
 
-            return $refl->isSubclassOf('App\Vocabulary\VocabularyInterface');
+            return $refl->isSubclassOf('App\Entity\Term\VocabularyInterface');
         }
         catch (\ReflectionException $re) {
             return false;

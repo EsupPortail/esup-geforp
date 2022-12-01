@@ -10,22 +10,49 @@
     <div class="list-view full-height-item is-grow">
         <div class="full-height-container is-absolute is-full-width">
             <div class="col-xs-12">
-                <table class="table table-search table-hover">
-                    <thead>
-                    <tr>
-                        <th>Nom complet</th>
-                        <th>Etablissement</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for trainee in trainees %}
+                {% if trainees is empty %}
+                    <table class="table table-search table-hover">
+                        <br>
+                        Aucun stagiaire trouvé pour cette recherche
+                        <br><br>
+                        <a class="btn btn-primary" href="{{ path('user.searchadd') }}" role="button"><i class="fa fa-search-plus"></i> Nouvelle recherche</a>
+                    </table>
+                {% else %}
+                    <table class="table table-search table-hover">
+                        <thead>
                         <tr>
-                            <td><a href="{{ path('user.add', { 'eppn': trainee.eppn, 'email': trainee.email }) }}">{{ trainee.firstname }} {{ trainee.lastname }}</a></td>
-                            <td>{{ trainee.institution }}</td>
+                            <th>Nom complet</th>
+                            <th>Email</th>
+                            <th>Etablissement</th>
+                            <th></th>
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {% for trainee in trainees %}
+                                <tr>
+                                    {%  if  trainee.eppn != "" %}
+                                        {% if gest[loop.index0] == 0 %}
+                                            <td><a title="Ajouter l'utilisateur" href="{{ path('user.add', { 'eppn': trainee.eppn, 'email': trainee.email }) }}">{{ trainee.firstname }} {{ trainee.lastname }}</a></td>
+                                        {% else %}
+                                            <td>{{ trainee.firstname }} {{ trainee.lastname }}</td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td>{{ trainee.firstname }} {{ trainee.lastname }}</td>
+                                    {% endif %}
+                                    <td>{{ trainee.email }}</td>
+                                    <td>{{ trainee.institution }}</td>
+                                    {%  if  trainee.eppn == "" %}
+                                        <td>Impossible d'ajouter cet utilisateur car il ne s'est jamais connecté</td>
+                                    {% else %}
+                                        {%  if  gest[loop.index0] == 1 %}
+                                            <td>Cet utilisateur possède déjà un rôle gestionnaire</td>
+                                        {% endif %}
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </div>
         </div>
     </div>

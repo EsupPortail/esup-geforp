@@ -55,33 +55,33 @@ class MenuBuilder
             'icon' => 'gear',
             'uri' => $this->router->generate('core.index'),
         ));
-//        if ($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Entity\Organization')) {
+        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Organization')) {
             $adminMenu->addChild('organizations', array(
                     'label' => 'Centres',
                     'uri' => $this->router->generate('organization.index'),
                 )
             );
-//        }
+        }
 
-//        if ($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Entity\Term\AbstractTerm') || $this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Vocabulary\VocabularyInterface') ) {
+        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Term\AbstractTerm') || $this->authorizationChecker->isGranted('VIEW', 'App\Vocabulary\VocabularyInterface') ) {
             $adminMenu->addChild('taxonomy', array(
                     'label' => 'Vocabulaires',
                     'uri' => $this->router->generate('taxonomy.index'),
                 )
             );
-//        }
+        }
 
-//        if ($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\CoreBundle\Entity\User\User')) {
+        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Core\User')) {
             $adminMenu->addChild('users', array(
                 'label' => 'Utilisateurs',
                 'uri' => $this->router->generate('user.index'),
             ));
-//        }
+        }
 
 
 
-//        try {
-//            if($this->authorizationChecker->isGranted('VIEW', 'AbstractTraining::AbstractTraining')) {
+        try {
+            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Internship')) {
                 $item = $menu->addChild('trainings', array(
                     'label' => 'Événements',
                     'icon'  => 'calendar',
@@ -98,43 +98,43 @@ class MenuBuilder
                     'uri'   => $this->router->generate('core.index') . '#/training/session',
                 ))->setAttribute('divider_prepend', true);
 
-//            }
+            }
 
-//            if($this->authorizationChecker->isGranted('VIEW', 'SygeforTraineeBundle:AbstractTrainee')) {
+            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Trainee')) {
                 $menu->addChild('trainees', array(
                     'label' => 'Publics',
                     'icon'  => 'group',
                     'uri'   => $this->router->generate('core.index') . '#/trainee',
 //                    'uri' => $this->router->generate('core.index'),
                 ));
-//            }
+            }
 
-//            if($this->securityContext->isGranted('VIEW', 'Sygefor\Bundle\InscriptionBundle\Entity\AbstractInscription')) {
+            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Inscription')) {
                 $menu->addChild('inscriptions', array(
                     'label' => 'Inscriptions',
                     'icon'  => 'graduation-cap',
                     'uri'   => $this->router->generate('core.index') . '#/inscription',
                 ));
-//            }
+            }
 
-//            if($this->authorizationChecker->isGranted('VIEW', 'SygeforInstitutionBundle:AbstractInstitution')) {
+            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Institution')) {
                 $menu->addChild('institutions', array(
                     'label' => 'Etablissements',
                     'icon'  => 'university',
                     'uri'   => $this->router->generate('core.index') . '#/institution',
                 ));
-//            }
+            }
 
-//            if($this->authorizationChecker->isGranted('VIEW', 'AbstractTrainer::class')) {
+            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Trainer')) {
                 $menu->addChild('trainers', array(
                     'label' => 'Intervenants',
                     'icon'  => 'user',
                     'uri'   => $this->router->generate('core.index') . '#/trainer',
                 ));
-//            }
+            }
 
-//        } catch (AuthenticationCredentialsNotFoundException $e) {
-//        }
+        } catch (AuthenticationCredentialsNotFoundException $e) {
+        }
 
         if (!isset($adminMenu)) {
             $menu->removeChild('administration');

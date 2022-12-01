@@ -42,20 +42,26 @@ class UserController extends AbstractController
     /**
      * @Route("/", name="user.index")
      */
-    public function indexAction(ManagerRegistry $doctrine)
+    public function indexAction(ManagerRegistry $doctrine, AccessRightRegistry $accessRightRegistry)
     {
         /* @var EntityManager */
         $em = $doctrine->getManager();
         $repository = $em->getRepository(User::class);
 
-//        $organization = $this->get('security.context')->getToken()->getUser()->getOrganization();
-//        $hasAccessRightForAll = $this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.user.all');
+        $organization = $this->getUser()->getOrganization();
+        $userAccessRights = $this->getUser()->getAccessRights();
+
+        $hasAccessRightForAll = 0;
+        if (in_array("sygefor_core.rights.user.all", $userAccessRights)) {
+            $hasAccessRightForAll = 1;
+        }
+
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $repository->createQueryBuilder('u');
-/*        if (!$hasAccessRightForAll) {
+        if (!$hasAccessRightForAll) {
             $queryBuilder->where('u.organization = :organization')
                 ->setParameter('organization', $organization);
-        } */
+        }
 
         $users = $queryBuilder->orderBy('u.username')->getQuery()->getResult();
 
@@ -82,13 +88,14 @@ class UserController extends AbstractController
     /**
      * @param Request $request
      * @param ManagerRegistry $doctrine
+     * @param AccessRightRegistry $accessRightRegistry
      * @param null eppn
      * @param null email
      * @Route("/add/{eppn}/{email}", name="user.add")
      *
      * @return array|RedirectResponse
      */
-    public function addAction(ManagerRegistry $doctrine, Request $request, $eppn=null, $email=null)
+    public function addAction(ManagerRegistry $doctrine, Request $request, AccessRightRegistry $accessRightRegistry, $eppn=null, $email=null)
     {
         $user = new User();
         $user->setUsername($eppn);
@@ -202,10 +209,26 @@ class UserController extends AbstractController
                 $resSearch = $traineeSearch->getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields);
                 $trainees = $resSearch['items'];
 
+                // Tableau pour test si trainee est deja gestionnaire
+                $tabTrainees = array();
+
+                // On prepare la requete sur les utilisateurs
+                $em = $doctrine->getManager();
+                $repository = $em->getRepository(User::class);
+                foreach($trainees as $trainee) {
+                    // On teste si le trainee est dejà gestionnaire
+                    $rUser = $repository->findByEmail($trainee->getEmail());
+                    if($rUser)
+                        $tabTrainees[] = 1;
+                    else
+                        $tabTrainees[] = 0;
+                }
+
                 return $this->render('Core/views/User/searchResult.html.twig', array(
                     'user' => $curUser,
                     'isAdmin' => $curUser->isAdmin(),
-                    'trainees' => $trainees
+                    'trainees' => $trainees,
+                    'gest' => $tabTrainees
                 ));
 
             }
