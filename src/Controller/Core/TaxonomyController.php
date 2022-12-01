@@ -31,7 +31,7 @@ use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\Publiposttemplate;
 use App\Entity\Term\TreeTrait;
 use App\Form\Type\VocabularyType;
-use App\Entity\Term\VocabularyInterface;
+use App\Vocabulary\VocabularyInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -67,7 +67,7 @@ class TaxonomyController extends AbstractController
      *
      * @Route("/{vocabularyId}/view/{organizationId}", name="taxonomy.view", defaults={"organizationId" = null})
      * @ParamConverter("organization", class="App\Entity\Core\AbstractOrganization", options={"id" = "organizationId"}, isOptional="true")
-     * @Security("is_granted('VIEW', 'App\\Entity\\Term\\VocabularyInterface')")
+     * @Security("is_granted('VIEW', 'App\\Vocabulary\\VocabularyInterface')")
      * @throws EntityNotFoundException
      *
      * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
@@ -126,7 +126,7 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/edit/{id}/{organizationId}", name="taxonomy.edit", defaults={"id" = null, "organizationId" = null})
-     * @Security("is_granted('EDIT', 'App\\Entity\\Term\\VocabularyInterface')")
+     * @Security("is_granted('EDIT', 'App\\Vocabulary\\VocabularyInterface')")
      */
     public function editVocabularyTermAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organizationId, $id = null)
     {
@@ -192,7 +192,7 @@ class TaxonomyController extends AbstractController
 
     /**
      * @Route("/{vocabularyId}/remove/{id}", name="taxonomy.remove")
-     * @Security("is_granted('REMOVE', 'Vocabulary\\VocabularyInterface')")
+     * @Security("is_granted('REMOVE', 'App\\Vocabulary\\VocabularyInterface')")
      */
     public function removeAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $id)
     {
@@ -376,17 +376,10 @@ class TaxonomyController extends AbstractController
                 if ($voc->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && !empty($userOrg)) {
                     $voc->setOrganization($userOrg);
                 }
-
                 if ($this->isGranted('VIEW', $voc)) {
                     $label = $vocRegistry->getVocabularyLabel($vid);
                     $voc->setVocabularyLabel($label);
-                    $vocNames[] = array(
-                        'id' => $vid,
-                        'vocabulary' => $voc,
-                        'name' => $voc->getVocabularyName(),
-                        'scope' => $voc->getVocabularyStatus(),
-                        'canEdit' => $this->isGranted('EDIT', $voc)
-                    );
+                    $vocNames[] = array('id' => $vid, 'vocabulary' => $voc, 'name' => $voc->getVocabularyLabel(), 'scope' => $voc->getVocabularyStatus());
                 }
             }
         }

@@ -45,7 +45,7 @@ abstract class AbstractSessionController extends AbstractController
     public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
+        $filters = $request->request->get('filters', array());
         $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
