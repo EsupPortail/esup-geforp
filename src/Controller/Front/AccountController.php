@@ -73,15 +73,23 @@ class AccountController extends AbstractController
         $userPersitentId = $this->getUser()->getCredentials()['eppn'];
 
         if (isset($userPersitentId)) {
-            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethpersistentid" => $userPersitentId));
+            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethPersistentId" => $userPersitentId));
+            if (isset($arTrainee[0])) {
+            }else {
+                if (isset($userEmail)) {
+                    $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);
+                    // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on force l'envoi vers le profil pour renseigner le N+1
+                    $url = $this->generateUrl('front.account.profile');
+                    return new RedirectResponse($url);
+                }
+            }
+
         } else {
             if (isset($userEmail)) {
                 $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);
-                // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on force l'envoi vers le profil pour renseigner le N+1
-                $url = $this->generateUrl('front.account.profile');
-                return new RedirectResponse($url);
             }
         }
+
         if (isset($arTrainee[0])) {
             $trainee = $arTrainee[0];
 
