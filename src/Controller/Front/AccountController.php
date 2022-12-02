@@ -68,10 +68,12 @@ class AccountController extends AbstractController
 
         //$trainee = $this->getUser();
         $userEmail = $this->getUser()->getCredentials()['mail'];
-        $userPersitentId = $this->getUser()->getCredentials()['persistent-id'];
+        // on utilise l'eppn comme persistent-id
+        //$userPersitentId = $this->getUser()->getCredentials()['persistent-id'];
+        $userPersitentId = $this->getUser()->getCredentials()['eppn'];
 
         if (isset($userPersitentId)) {
-            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethPersistentId" => $userPersitentId));
+            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethpersistentid" => $userPersitentId));
         } else {
             if (isset($userEmail)) {
                 $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);

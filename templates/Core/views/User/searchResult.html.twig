@@ -30,9 +30,9 @@
                         <tbody>
                             {% for trainee in trainees %}
                                 <tr>
-                                    {%  if  trainee.eppn != "" %}
+                                    {%  if  trainee.shibbolethpersistentid != "" %}
                                         {% if gest[loop.index0] == 0 %}
-                                            <td><a title="Ajouter l'utilisateur" href="{{ path('user.add', { 'eppn': trainee.eppn, 'email': trainee.email }) }}">{{ trainee.firstname }} {{ trainee.lastname }}</a></td>
+                                            <td><a title="Ajouter l'utilisateur" href="{{ path('user.add', { 'eppn': trainee.shibbolethpersistentid, 'email': trainee.email }) }}">{{ trainee.firstname }} {{ trainee.lastname }}</a></td>
                                         {% else %}
                                             <td>{{ trainee.firstname }} {{ trainee.lastname }}</td>
                                         {% endif %}
@@ -41,7 +41,7 @@
                                     {% endif %}
                                     <td>{{ trainee.email }}</td>
                                     <td>{{ trainee.institution }}</td>
-                                    {%  if  trainee.eppn == "" %}
+                                    {%  if  trainee.shibbolethpersistentid == "" %}
                                         <td>Impossible d'ajouter cet utilisateur car il ne s'est jamais connecté</td>
                                     {% else %}
                                         {%  if  gest[loop.index0] == 1 %}

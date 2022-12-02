@@ -312,8 +312,7 @@ class AnonymousAccountController extends AbstractController
             $persistentId = $cred['persistent-id'];
             $email        = $cred['mail'];
             $eppn = $cred['eppn'];
-            $trainee->setShibbolethPersistentId($persistentId ? $persistentId : $email);
-            $trainee->setEppn($eppn);
+            $trainee->setShibbolethpersistentid($eppn ? $eppn : $email);
             $trainee->setEmail($email);
             $trainee->setIsActive(true);
         }

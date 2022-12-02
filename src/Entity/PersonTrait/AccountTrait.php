@@ -45,13 +45,7 @@ trait AccountTrait
      * @ORM\Column(name="shibboleth_persistent_id", type="string", nullable=true)
      * @Serializer\Groups({"api.token", "api.profile"})
      */
-    private $shibbolethPersistentId;
-
-    /**
-     * @ORM\Column(name="eppn", type="string", nullable=true)
-     * @Serializer\Groups({"api.token", "api.profile"})
-     */
-    private $eppn;
+    private $shibbolethpersistentid;
 
     /**
      * @ORM\Column(name="data", type="array", nullable=true)
@@ -156,35 +150,19 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getShibbolethPersistentId()
+    public function getShibbolethpersistentid()
     {
-        return $this->shibbolethPersistentId;
+        return $this->shibbolethpersistentid;
     }
 
     /**
      * @param mixed $shibbolethPersistentId
      */
-    public function setShibbolethPersistentId($shibbolethPersistentId)
+    public function setShibbolethpersistentid($shibbolethPersistentId)
     {
-        $this->shibbolethPersistentId = $shibbolethPersistentId;
+        $this->shibbolethpersistentid = $shibbolethPersistentId;
     }
-
-    /**
-     * @return mixed
-     */
-    public function getEppn()
-    {
-        return $this->eppn;
-    }
-
-    /**
-     * @param mixed $eppn
-     */
-    public function setEppn($eppn)
-    {
-        $this->eppn = $eppn;
-    }
-
+    
     /**
      * @return mixed
      */
