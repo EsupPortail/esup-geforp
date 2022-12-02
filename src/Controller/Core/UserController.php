@@ -101,6 +101,9 @@ class UserController extends AbstractController
         $user->setUsername($eppn);
         $user->setEmail($email);
         $user->setPassword('xyz123456!');
+        $curOrg = $this->getUser()->getOrganization();
+        $user ->setOrganization($curOrg);
+        
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
