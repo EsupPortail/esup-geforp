@@ -167,7 +167,7 @@ trait UploadableTrait
     {
         //a new file is set : we delete the old one
         if ($args->hasChangedField('uploaded')) {//new uploaded file : old one is deleted
-            unlink($this->getTemplatesRootDir() . '/' . $args->getOldValue('filePath'));
+            unlink($this->getTemplatesRootDir() . '/' . $args->getOldValue('filepath'));
         }
     }
 

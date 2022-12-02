@@ -61,38 +61,38 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @var Trainertype
      * @ORM\ManyToOne(targetEntity="App\Entity\Term\Trainertype")
-     * @ORM\JoinColumn(nullable=true)
+     * @ORM\JoinColumn(name="trainer_type_id", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $trainerType;
+    protected $trainertype;
 
     /**
      * @var bool
      * @ORM\Column(name="is_archived", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $isArchived;
+    protected $isarchived;
 
     /**
      * @var bool
      * @ORM\Column(name="is_allow_send_mail", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer", "api.training", "api.trainer"})
      */
-    protected $isAllowSendMail = false;
+    protected $isallowsendmail = false;
 
     /**
      * @var bool
      * @ORM\Column(name="is_organization", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $isOrganization;
+    protected $isorganization;
 
     /**
      * @var bool
      * @ORM\Column(name="is_public", type="boolean")
      * @Serializer\Groups({"trainer"})
      */
-    protected $isPublic;
+    protected $ispublic;
 
     /**
      * @var string
@@ -172,81 +172,81 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return Trainertype
      */
-    public function getTrainerType()
+    public function getTrainertype()
     {
-        return $this->trainerType;
+        return $this->trainertype;
     }
 
     /**
      * @param Trainertype $trainerType
      */
-    public function setTrainerType($trainerType)
+    public function setTrainertype($trainerType)
     {
-        $this->trainerType = $trainerType;
+        $this->trainertype = $trainerType;
     }
 
     /**
      * @return bool
      */
-    public function isIsArchived()
+    public function isIsarchived()
     {
-        return $this->isArchived;
+        return $this->isarchived;
     }
 
     /**
      * @param bool $isArchived
      */
-    public function setIsArchived($isArchived)
+    public function setIsarchived($isArchived)
     {
-        $this->isArchived = $isArchived;
+        $this->isarchived = $isArchived;
     }
 
     /**
      * @return bool
      */
-    public function isIsAllowSendMail()
+    public function isIsallowsendmail()
     {
-        return $this->isAllowSendMail;
+        return $this->isallowsendmail;
     }
 
     /**
      * @param bool $isAllowSendMail
      */
-    public function setIsAllowSendMail($isAllowSendMail)
+    public function setIsallowsendmail($isAllowSendMail)
     {
-        $this->isAllowSendMail = $isAllowSendMail;
+        $this->isallowsendmail = $isAllowSendMail;
     }
 
     /**
      * @return bool
      */
-    public function getIsOrganization()
+    public function getIsorganization()
     {
-        return $this->isOrganization;
+        return $this->isorganization;
     }
 
     /**
      * @param bool $isOrganization
      */
-    public function setIsOrganization($isOrganization)
+    public function setIsorganization($isOrganization)
     {
-        $this->isOrganization = $isOrganization;
+        $this->isorganization = $isOrganization;
     }
 
     /**
      * @return bool
      */
-    public function isIsPublic()
+    public function isIspublic()
     {
-        return $this->isPublic;
+        return $this->ispublic;
     }
 
     /**
      * @param bool $isPublic
      */
-    public function setIsPublic($isPublic)
+    public function setIspublic($isPublic)
     {
-        $this->isPublic = $isPublic;
+        $this->ispublic = $isPublic;
     }
 
     /**

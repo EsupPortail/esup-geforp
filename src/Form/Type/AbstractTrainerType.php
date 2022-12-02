@@ -100,7 +100,7 @@ class AbstractTrainerType extends AbstractType
             ->add('city', null, array(
                 'label' => 'Ville',
             ))
-            ->add('trainerType', EntityType::class, array(
+            ->add('trainertype', EntityType::class, array(
                 'label'    => "Type d'intervenant",
                 'class'    => \App\Entity\Term\Trainertype::class,
                 'required' => false,
@@ -111,16 +111,16 @@ class AbstractTrainerType extends AbstractType
             ->add('status', null, array(
                 'label' => 'Statut',
             ))
-            ->add('isArchived', null, array(
+            ->add('isarchived', null, array(
                 'label' => 'Archivé',
             ))
-            ->add('isAllowSendMail', null, array(
+            ->add('isallowsendmail', null, array(
                 'label' => 'Autoriser les courriels',
             ))
-            ->add('isOrganization', null, array(
+            ->add('isorganization', null, array(
                 'label' => 'Formateur interne',
             ))
-            ->add('isPublic', null, array(
+            ->add('ispublic', null, array(
                 'label' => 'Publié sur le web',
             ))
             ->add('comments', null, array(

@@ -21,17 +21,17 @@
                         <li><label>Email</label> <span sf-xeditable="form.children.email">{{ trainer.email }}</span></li>
                         <li><label>Téléphone</label> <span sf-xeditable="form.children.phonenumber">{{ trainer.phonenumber }}</span></li>
                         <li><label>Site web</label> <span sf-xeditable="form.children.website">{{ trainer.website }}</span></li>
-                        <li><label>Publié sur le web</label>  <span sf-xeditable="form.children.isPublic">{{ trainer.isPublic ? 'Oui' : 'Non' }}</span></li>
-                        <li title="Autoriser l'envoie de courriels pour les stagiaires"><label>Autoriser les courriels</label> <span sf-xeditable="form.children.isAllowSendMail">{{ trainer.isAllowSendMail === true || trainer.isAllowSendMail === undefined ? 'Oui' : 'Non' }}</span></li>
+                        <li><label>Publié sur le web</label>  <span sf-xeditable="form.children.ispublic">{{ trainer.ispublic ? 'Oui' : 'Non' }}</span></li>
+                        <li title="Autoriser l'envoie de courriels pour les stagiaires"><label>Autoriser les courriels</label> <span sf-xeditable="form.children.isallowsendmail">{{ trainer.isallowsendmail === true || trainer.isallowsendmail === undefined ? 'Oui' : 'Non' }}</span></li>
                     </ul>
                 </div>
                 <div class="col-lg-6">
                     <ul class="summary">
                         <li><label>Etablissement</label> <span sf-xeditable="form.children.institution">{{ trainer.institution.name }}</span></li>
-                        <li><label>Formateur interne</label> <span sf-xeditable="form.children.isOrganization">{{ trainer.isOrganization ? 'Oui' : 'Non' }}</span></li>
+                        <li><label>Formateur interne</label> <span sf-xeditable="form.children.isorganization">{{ trainer.isorganization ? 'Oui' : 'Non' }}</span></li>
                         <li><label>Service</label> <span sf-xeditable="form.children.service">{{ trainer.service }}</span></li>
                         <li><label>Fonction, statut</label>  <span sf-xeditable="form.children.status">{{ trainer.status }}</span></li>
-                        <li><label>Archivé</label> <span sf-xeditable="form.children.isArchived">{{ trainer.isArchived ? 'Oui' : 'Non' }}</span></li>
+                        <li><label>Archivé</label> <span sf-xeditable="form.children.isarchived">{{ trainer.isarchived ? 'Oui' : 'Non' }}</span></li>
                     </ul>
                 </div>
             </div>

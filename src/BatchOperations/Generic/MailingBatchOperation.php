@@ -314,7 +314,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         foreach($sessions as $k) {
                             //$date = date_create_from_format('d/m/Y', $k->dateDebut);
                             //$dateDeb = $date->format('Y-m-d');
-                            $dateDeb = $k->getDatebegin()->format('d/m/Y');
+                            $dateDeb = $k->getDatebegin()->format('Y-m-d');
                             $timestamp = strtotime($dateDeb);
                             $a[$timestamp] = $k;
                         }
@@ -352,7 +352,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     foreach($inscriptions as $k) {
                         //$date = date_create_from_format('d/m/Y', $k->session->dateDebut);
                         //$dateDeb = $date->format('Y-m-d');
-                        $dateDeb = $k->getSession()->getDatebegin()->format('d/m/Y');
+                        $dateDeb = $k->getSession()->getDatebegin()->format('Y-m-d');
                         $timestamp = strtotime($dateDeb);
                         $a[$timestamp] = $k;
                     }
