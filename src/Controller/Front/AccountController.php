@@ -73,7 +73,7 @@ class AccountController extends AbstractController
         $userPersitentId = $this->getUser()->getCredentials()['eppn'];
 
         if (isset($userPersitentId)) {
-            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethPersistentId" => $userPersitentId));
+            $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array("shibbolethpersistentid" => $userPersitentId));
             if (isset($arTrainee[0])) {
             }else {
                 if (isset($userEmail)) {
