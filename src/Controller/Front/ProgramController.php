@@ -382,16 +382,6 @@ class ProgramController extends AbstractController
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
-        $listeEtab = $this->getParameter('liste_etab');
-
-/*        if (array_key_exists($etablissement, $listeEtab)){
-            $etab = $listeEtab[$etablissement];
-            $code = $etab["codes"];
-            $img = 'img/'.$etab["logo"];
-        }else {
-            $code = array("amu-drh", "AMU-CIPE");
-            $img = 'img/logo.png';
-        }*/
 
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
         foreach ($organizations as $organization) {
