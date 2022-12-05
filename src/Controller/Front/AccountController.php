@@ -274,6 +274,7 @@ class AccountController extends AbstractController
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);
         $trainee = $arTrainee[0];
 
+        $trainee->setShibbolethpersistentid($shibbolethAttributes['eppn']);
         // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
         if ($shibbolethAttributes['supannCivilite'] == '')
             $shibbolethAttributes['supannCivilite'] = 'M.';
