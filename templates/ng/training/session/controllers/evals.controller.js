@@ -6,9 +6,18 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
     // fetch all status and count
     $q.all([
 //        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
-        $taxonomy.getIndexedTerms(2)
+        $taxonomy.getTerms(2)
     ]).then(function(crit )  {
-        $scope.crit = crit[0];
+        var criteria = crit[0];
+        var crit = [];
+        for (key in criteria) {
+            var criterion = criteria[key];
+            if (criterion.organization_id == $scope.session.training.organization.id) {
+                crit.push(criterion);
+            }
+        }
+
+        $scope.crit = crit;
     });
 
     /**
