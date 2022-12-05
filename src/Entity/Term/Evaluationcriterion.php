@@ -26,6 +26,6 @@ class Evaluationcriterion extends AbstractTerm implements VocabularyInterface
 
     public static function getVocabularyStatus()
     {
-        return VocabularyInterface::VOCABULARY_NATIONAL;
+        return VocabularyInterface::VOCABULARY_LOCAL;
     }
 }
