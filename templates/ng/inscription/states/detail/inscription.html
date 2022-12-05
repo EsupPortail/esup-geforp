@@ -97,7 +97,12 @@
                     Il n'y a pas d'évaluation remplie pour cette session.
                 </div>
 
-                <table ng-if="inscription.criteria.length" class="table table-hover table-search table-condensed">
+                <div ng-if="inscription.criteria.length" class="well well-empty well-sm">
+                    L'évaluation de la session a bien été effectuée.
+                </div>
+
+                <!-- on n'affiche pas l'évaluation car cela doit rester anonyme -->
+<!--                <table ng-if="inscription.criteria.length" class="table table-hover table-search table-condensed">
                     <thead>
                         <tr>
                             <th>Critère</th>
@@ -116,7 +121,7 @@
                 <ul class="summary">
                     <li><label>Remarques</label> {{ inscription.message }} </li>
                 </ul>
-
+-->
             </div>
         </div>
 

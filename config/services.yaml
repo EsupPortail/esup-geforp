@@ -35,15 +35,15 @@ parameters:
         univ-avignon.fr: AVIGNON
         univ-tln.fr: TOULON
         centrale-marseille.fr: "CENTRALE MARSEILLE"
-    eval_critere_0_actif: false
+    eval_critere_0_actif: true
     eval_critere_1: "Pas du tout d'accord"
     eval_critere_2: "Pas vraiment d'accord"
     eval_critere_3: "Plutôt d'accord"
     eval_critere_4: "Tout à fait d'accord"
-    eval_message: "Quels sont pour vous les points forts et les axes à améliorer ? Cette formation a-t-elle suscité d'autres besoins de formation ? "
-    contact_mail: "drh-gpeec-formation@univ-amu.fr"
-    adresse_site: "https://www.univ-amu.fr/"
-    nom_etablissement: "Université d'Aix-Marseille"
+    eval_message: "Remarques à propos de cette formation "
+    contact_mail: ""
+    adresse_site: ""
+    nom_etablissement: ""
     wkhtmltopdf_bin: ../bin/wkhtmltopdf-amd64
     unoconv_bin: ../bin/unoconv
     shibboleth:
