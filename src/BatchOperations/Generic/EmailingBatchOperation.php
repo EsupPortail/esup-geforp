@@ -226,6 +226,17 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         ->subject($subject)
                         ->text($body);
 
+                    // attachements
+                    if (!empty($attachments)) {
+                        if (!is_array($attachments)) {
+                            $attachments = array($attachments);
+                        }
+                        foreach ($attachments as $attachment) {
+                            $path = $attachment->getPathname();
+                            $originalName = $attachment->getClientOriginalName();
+                            $msg->attachFromPath($path, $originalName);
+                        }
+                    }
 
                     // Dans le cas des stagiaires
                     if ((get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee')||(get_parent_class($entity) === 'App\Entity\Core\AbstractInscription')) {
