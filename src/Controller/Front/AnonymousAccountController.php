@@ -127,9 +127,32 @@ class AnonymousAccountController extends AbstractController
             array('machinename' => $shibbolethAttributes['primary-affiliation'])
         );
         if ($primary_affiliation != null) {
-            $trainee->setPublictype($primary_affiliation);
-        }
-        else {
+            // cas des etudiants doctorants
+            if ($primary_affiliation->getMachineName() == 'student') {
+                // si etudiant, on regarde aussi edupersonaffiliation pour détecter les doctorants
+                $affiliation = explode(';', $shibbolethAttributes['unscoped-affiliation']);
+                // Recup des types de public possibles
+                $flagDoc=0;
+                $allPublictypes = $doctrine->getRepository('App\Entity\Term\Publictype')->findAll();
+                foreach ($affiliation as $aff) {
+                    foreach ($allPublictypes as $pubtype) {
+                        if ($aff == $pubtype->getMachinename()) {
+                            $flagDoc=1;
+                            $trainee->setPublictype($pubtype);
+                            break 2;
+                        }
+                    }
+                }
+                if ($flagDoc==0) {
+                    // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
+                    $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                    return $this->redirectToRoute('front.public.index');
+                }
+            } else {
+                // cas general
+                $trainee->setPublictype($primary_affiliation);
+            }
+        } else {
             $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
                 array('machinename' => 'other')
             ));
@@ -150,6 +173,8 @@ class AnonymousAccountController extends AbstractController
         }
         if ($flagEtab !== 1) {
             // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
+            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+            return $this->redirectToRoute('front.public.index');
 
         }
 
