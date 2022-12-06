@@ -333,10 +333,11 @@ class TaxonomyController extends AbstractController
      *
      * @param $vocabulary
      * @param null $organization
+     * @param null $isAdmin
      *
      * @return mixed
      */
-    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization)
+    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization, $isAdmin)
     {
         $class = get_class($vocabulary);
         $repository = $doctrine->getManager()->getRepository($class);
@@ -349,12 +350,14 @@ class TaxonomyController extends AbstractController
         }
 
         if ($vocabulary->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL) {
-            if ($organization) {
-                $qb->where('node.organization = :organization')
-                    ->setParameter('organization', $organization)
-                    ->orWhere('node.organization is null');
-            } else {
-                $qb->where('node.organization is null');
+            if (!$isAdmin) {
+                if ($organization) {
+                    $qb->where('node.organization = :organization')
+                        ->setParameter('organization', $organization)
+                        ->orWhere('node.organization is null');
+                } else {
+                    $qb->where('node.organization is null');
+                }
             }
         }
 
@@ -434,7 +437,8 @@ class TaxonomyController extends AbstractController
         }
 
         $userOrg = $this->getUser()->getOrganization();
-        $terms = $this->getRootTerms($doctrine, $vocabulary, $userOrg);
+        $isAdmin = $this->getUser()->isAdmin();
+        $terms = $this->getRootTerms($doctrine, $vocabulary, $userOrg, $isAdmin);
 
         return $terms;
     }
