@@ -103,7 +103,7 @@ class TaxonomyController extends AbstractController
                 }
             }
         }
-        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization);
+        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization, $this->getUser()->isAdmin());
         if ($organization) {
             foreach ($terms as $key => $term) {
                 if (!$term->getOrganization()) {
