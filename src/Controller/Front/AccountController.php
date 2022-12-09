@@ -439,7 +439,7 @@ class AccountController extends AbstractController
                 }
             }
         } else {
-            $libAff = $this->container->getParameter('lib_affectation');
+            $libAff = $this->getParameter('lib_affectation');
             // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
             if ($libAff === false)
                 $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);

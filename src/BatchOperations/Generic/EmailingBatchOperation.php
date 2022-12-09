@@ -160,71 +160,16 @@ class EmailingBatchOperation extends AbstractBatchOperation
                     $entity = $em->getRepository(get_class($entity))->find($entity->getId());
                     $organization = $entity->getOrganization();
 
-                    /*
-                    $message = \Swift_Message::newInstance();
-                    $messageSup = \Swift_Message::newInstance();
-                    $messageCorr = \Swift_Message::newInstance();
-
-                    $message->setFrom($this->container->getParameter('mailer_from'), $organization->getName());
-                    $message->setReplyTo($organization->getEmail());
-                    $message->setContentType("text/html");
-
-                    $messageSup->setFrom($this->container->getParameter('mailer_from'), $organization->getName());
-                    $messageSup->setReplyTo($organization->getEmail());
-                    $messageSup->setContentType("text/html");
-
-                    $messageCorr->setFrom($this->container->getParameter('mailer_from'), $organization->getName());
-                    $messageCorr->setReplyTo($organization->getEmail());
-                    $messageCorr->setContentType("text/html");
-
-                    // attachements
-                    if (!empty($attachments)) {
-                        if (!is_array($attachments)) {
-                            $attachments = array($attachments);
-                        }
-                        foreach ($attachments as $attachment) {
-                            $attached = new \Swift_Attachment(file_get_contents($attachment), (method_exists($attachment, 'getClientOriginalName')) ? $attachment->getClientOriginalName() : $attachment->getFileName());
-                            $message->attach($attached);
-                            $messageSup->attach($attached);
-                            $messageCorr->attach($attached);
-                        }
-                    }
-
-                    $hrpa = $this->container->get('sygefor_core.human_readable_property_accessor_factory')->getAccessor($entity);
-                    $email = $hrpa->email;
-                    $message->setTo($email);
-                    $message->setSubject($this->replaceTokens($subject, $entity));
-                    $message->setBody($this->replaceTokens($body, $entity));
-
-                    // Dans le cas des stagiaires
-                    if ((get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee')||(get_parent_class($entity) === 'App\Entity\Core\AbstractInscription')) {
-                        $emailSupCorr = [];
-                        if ($hrpa->emailSup != null) {
-                            $emailSup = $hrpa->emailSup;
-                            $emailSupCorr[] = $emailSup;
-                        }
-
-                        if ($hrpa->emailCorr != null) {
-                            $emailCorr = $hrpa->emailCorr;
-                            $emailSupCorr[] = $emailCorr;
-                        }
-                        $message->setCc($emailSupCorr);
-                    }
-                    $last = $this->container->get('mailer')->send($message);*/
-
                     $hrpa = $this->hrpaf->getAccessor($entity);
                     $email = $hrpa->email;
-                    $subject = $this->replaceTokens($subject, $entity);
-                    $body = $this->replaceTokens($body, $entity);
+                    $subjectR = $this->replaceTokens($subject, $entity);
+                    $bodyR = $this->replaceTokens($body, $entity);
                     $msg = (new Email())
                         ->from($organization->getEmail())
                         ->to($email)
-                        //->cc('cc@example.com')
-                        //->bcc('bcc@example.com')
                         ->replyTo($organization->getEmail())
-                        //->priority(Email::PRIORITY_HIGH)
-                        ->subject($subject)
-                        ->text($body);
+                        ->subject($subjectR)
+                        ->text($bodyR);
 
                     // attachements
                     if (!empty($attachments)) {
@@ -240,24 +185,23 @@ class EmailingBatchOperation extends AbstractBatchOperation
 
                     // Dans le cas des stagiaires
                     if ((get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee')||(get_parent_class($entity) === 'App\Entity\Core\AbstractInscription')) {
-                        $emailSupCorr = "";
+                        $flagSup = 0;
                         if ($hrpa->emailSup != null) {
                             $emailSup = $hrpa->emailSup;
-                            $emailSupCorr .= $emailSup;
+                            $flagSup = 1;
+                            $msg->cc($emailSup);
                         }
 
                         if ($hrpa->emailCorr != null) {
                             $emailCorr = $hrpa->emailCorr;
-                            if ($emailSupCorr == "")
-                                $emailSupCorr .= $emailCorr;
-                            else
-                                $emailSupCorr .= "," . $emailCorr;
+                            if ($flagSup == 0){
+                                $msg->cc($emailCorr);
+                            } else {
+                                $msg->addCc($emailCorr);
+                            }
                         }
-                        $msg->cc($emailSupCorr);
                     }
-
                     $last = $this->mailer->send($msg);
-
 
                     // save email in db
                     $email = new \App\Entity\Core\Email();
@@ -330,9 +274,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 }
                 else {
                     if ($property=="lien") {
-                        //$Texte = "https://sygefor3.univ-amu.fr/account/registration/" .$HRPA->id  . "/valid";
-                        $Texte = $this->parameterBag->get('front_url') . "/account/registration/" . $HRPA->id . "/valid";
-                        $Texte = "<a href=\"$Texte\">$Texte</a>";
+                        $Texte = "https://" . $this->parameterBag->get('front_url') . "/account/registration/" . $HRPA->id . "/valid";
                         return $Texte;
                     }
                     else {

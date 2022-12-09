@@ -8,7 +8,7 @@ use App\Entity\Term\Publictype;
 use App\Entity\Back\Inscription;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
-use App\Form\Type\BaseInscriptionType;
+use App\Form\Type\InscriptionType;
 use App\Repository\InscriptionSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -115,7 +115,7 @@ abstract class AbstractInscriptionController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $inscriptionClass = BaseInscriptionType::class;
+        $inscriptionClass = InscriptionType::class;
 
         $form = $this->createForm($inscriptionClass, $inscription,
             array('attr' => array(
@@ -124,6 +124,7 @@ abstract class AbstractInscriptionController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
+                $inscription->setUpdatedAt(new \DateTime('now'));
                 $em = $doctrine->getManager();
                 $em->flush();
             }

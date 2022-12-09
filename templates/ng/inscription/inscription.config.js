@@ -246,7 +246,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 title: 'Derniers désistements',
                 size: 5,
                 filters:{
-                    'inscriptionStatus.name.source': 'Desistement',
+                    'inscriptionStatus.name.source': 'Désistement',
                     "inscriptionStatusUpdatedAt": {
                         "type": "range",
                         "gte": $filter('date')(date, 'yyyy-MM-dd')

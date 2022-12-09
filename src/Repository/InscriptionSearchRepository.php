@@ -30,18 +30,21 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             // join sur trainee et session car toujours vrai
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
             ->innerJoin('i.session', 's', 'WITH', 's = i.session')
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
+
 
             // FILTRE KEYWORD
-            ->where('trainee.firstname LIKE :keyword')
-            ->orWhere('trainee.lastname LIKE :keyword')
+            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword')
             ->andWhere('i.trainee = trainee.id')
+            ->andWhere('s.training = tr.id')
+            ->andWhere('i.session = s.id')
+
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
         // FILTRE CENTRE
         if (isset($filters['session.training.organization.name.source'])) {
             $qb
-                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
                 ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['session.training.organization.name.source']);
@@ -125,9 +128,15 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['session.id']);
         }
 
+        //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
+        if( isset($filters['inscriptionStatusUpdatedAt'])) {
+            // Tri par date de modification
+            $qb->addOrderBy('i.updatedat', 'DESC');
+        } else {
+            // TRI DES RESULTATS
+            $qb->addOrderBy('i.createdat', 'DESC');
+        }
 
-        // TRI DES RESULTATS
-        $qb->addOrderBy('i.createdat', 'DESC');
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;

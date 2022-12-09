@@ -677,17 +677,12 @@ abstract class AbstractSession implements SerializedAccessRights
             return false;
         }
 
-        // check limit registration date
-        if ($this->getLimitregistrationdate()) {
-            $limitRegistrationDate = clone $this->getLimitregistrationdate();
-            $limitRegistrationDate->modify('+1 days');
-            if ($limitRegistrationDate < $now) {
-                return false;
-            }
+        if ($this->getLimitregistrationdate() && $this->getLimitregistrationdate() < $now) {
+            return false;
         }
 
         // ok
-        return $this->getAvailablePlaces() > 0;
+        return true;
     }
 
     /**

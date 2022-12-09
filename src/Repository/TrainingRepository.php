@@ -21,14 +21,17 @@ class TrainingRepository extends ServiceEntityRepository
 
     public function getTrainingsList($keyword, $filters, $page, $pageSize)
     {
+        /* addcslashes empêchera des manipulations malveillantes éventuelles */
+        $keywordPr = '%' . addcslashes($keyword, '%_') . '%';
         $qb = $this->createQueryBuilder('training');
         $qb
             ->select('training')
 
             // FILTRE KEYWORD
-            ->where('training.name LIKE :keyword')
-            /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        ->where('training.name LIKE :keywordPr OR training.number = :keyword')
+        ->setParameter('keywordPr', $keywordPr)
+        ->setParameter('keyword', $keyword);
+
 
 
         // FILTRE CENTRE

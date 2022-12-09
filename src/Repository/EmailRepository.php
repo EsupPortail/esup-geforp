@@ -49,7 +49,7 @@ class EmailRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['session.id']);
         }
 
-
+        $qb->addOrderBy('e.sendat', 'DESC');
 
         $query = $qb->getQuery();
         $result = $query->getResult();

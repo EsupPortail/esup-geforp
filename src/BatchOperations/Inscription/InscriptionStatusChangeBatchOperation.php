@@ -81,12 +81,15 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
         foreach ($inscriptions as $inscription) {
 //            if ($this->container->get('security.context')->isGranted('EDIT', $inscription)) {
                 //setting new inscription status
-                if ($inscriptionStatus) {
-                    $inscription->setInscriptionstatus($inscriptionStatus);
-                } elseif ($presenceStatus) {
-                    $inscription->setPresencestatus($presenceStatus);
-                }
-                $arrayInscriptionsGranted[] = $inscription;
+            if ($inscriptionStatus) {
+                $inscription->setInscriptionstatus($inscriptionStatus);
+                $inscription->setUpdatedAt(new \DateTime('now'));
+            } elseif ($presenceStatus) {
+                $inscription->setPresencestatus($presenceStatus);
+                $inscription->setUpdatedAt(new \DateTime('now'));
+            }
+
+            $arrayInscriptionsGranted[] = $inscription;
 //            }
         }
 
@@ -128,6 +131,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                                     $presence->setAfternoon("");
                                 $presence->setInscription($inscription);
                                 $inscription->addPresence($presence);
+                                $inscription->setUpdatedAt(new \DateTime('now'));
                             }
                         }
                     } else {
@@ -150,6 +154,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                             else
                                 $presence->setAfternoon("");
                         }
+                        $inscription->setUpdatedAt(new \DateTime('now'));
                     }
                 }
 

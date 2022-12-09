@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    router.request_context.scheme: 'https'
+    asset.request_context.secure: true
     front_url: '%env(front_host)%'
     front_host: '%env(front_host)%'
     back_host: '%env(back_host)%'

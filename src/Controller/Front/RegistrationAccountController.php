@@ -169,7 +169,7 @@ class RegistrationAccountController extends AbstractController
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
 
         // Lien vers la page d'autorisation
-        $lien = $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
+        $lien = "https://" . $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
 
         // Envoyer un mail au supérieur hiérarchique
         $templateTerm = $vocabularyRegistry->getVocabularyById(5);
