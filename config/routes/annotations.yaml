@@ -1,6 +1,22 @@
-controllers:
-    resource: ../../src/Controller/
+back_controllers:
+    resource: ../../src/Controller/Back
     type: annotation
+    host: '%back_host%'
+
+core_controllers:
+    resource: ../../src/Controller/Core
+    type: annotation
+    host: '%back_host%'
+
+front_controllers:
+    resource: ../../src/Controller/Front
+    type: annotation
+    host: '%front_host%'
+
+homepage:
+    path: /
+    controller: App\Controller\Front\PublicController::front.public.index
+    host: '%front_host%'
 
 kernel:
     resource: ../../src/Kernel.php
