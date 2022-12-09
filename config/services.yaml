@@ -15,28 +15,7 @@ parameters:
     lib_affectation : false
     relance_actif: true
     eval_actif: true
-    multi_etab_actif: true
-    liste_etab:
-        AMU:
-            codes:
-                - AMU-DRH
-                - AMU-CIPE
-            logo: logo.jpg
-            domaines:
-                - univ-amu.fr
-        AVIGNON:
-            codes:
-                - avignon-drh
-            logo: logo-avignon.jpg
-        TOULON:
-            codes:
-                - toulon-drh
-            logo: logo-tln.jpg
-    domaines:
-        univ-amu.fr: AMU
-        univ-avignon.fr: AVIGNON
-        univ-tln.fr: TOULON
-        centrale-marseille.fr: "CENTRALE MARSEILLE"
+    multi_etab_actif: false
     eval_critere_0_actif: true
     eval_critere_1: "Pas du tout d'accord"
     eval_critere_2: "Pas vraiment d'accord"
@@ -444,28 +423,9 @@ services:
     App\Listener\SessionListener:
         tags:
             - { name: doctrine.event_subscriber }
+
     shibbundle.sup_service:
         class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider
 
     shibbundle.admin_sup_service:
         class: App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProvider
-
-#    app.menu_builder:
-#        class: App\Menu\MenuBuilder
-#        arguments:
-#            - "@knp_menu.factory"
-#            - "@event_dispatcher"
-#        tags:
-#            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
-
-#    app.configure_menu_listener:
-#        class: App\EventListener\ConfigureMenuListener
-#        arguments:
-#            - "@security.authorization_checker"
-#            - "@router"
-#        tags:
-#            - { name: kernel.event_listener, event: app.menu_configure, method: onMenuConfigure }
-
-#    App\EventListener\MenuListener:
-#        tags:
-#            - { name: kernel.event_listener, event: settings_menu.event, method: onCreate }
