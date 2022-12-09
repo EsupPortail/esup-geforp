@@ -9,21 +9,41 @@ security:
             entity:
                 class: App\Entity\Core\User
                 property: email
+        shib_users:
+            id: shibbundle.sup_service
+        shib_admins:
+            id: shibbundle.admin_sup_service
 
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
+            host: '%env(resolve:back_host)%'
             lazy: true
-            provider: app_user_provider
+            provider: shib_admins
             guard:
                 authenticators:
-                    - App\Security\LogInFormAuthenticator
+                    - admin_shibboleth_authenticator
+            anonymous: false
+            security: true
             logout:
                 path: app_logout
-                # where to redirect after logout
-                target: app_login
+                target: '/Shibboleth.sso/Logout'
+
+            front:
+                host: '%env(resolve:front_host)%'
+                pattern: ^/api/shibboleth|^/account|^/program|^/training/inscription
+                provider: shib_users
+                guard:
+                    authenticators:
+                        - shibboleth_authenticator
+                anonymous: false
+                security: true
+                logout:
+                    path: front.account.logout
+                    target: '/Shibboleth.sso/Logout'
+
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -35,10 +55,9 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # Back
-        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # Front
+        - { path: ^/account, roles: ROLE_SHIB_AUTHENTICATED }
+        - { path: ^/program, roles: ROLE_SHIB_AUTHENTICATED }
 
 when@test:
     security:
