@@ -31,18 +31,18 @@ security:
                 path: app_logout
                 target: '/Shibboleth.sso/Logout'
 
-            front:
-                host: '%env(resolve:front_host)%'
-                pattern: ^/api/shibboleth|^/account|^/program|^/training/inscription
-                provider: shib_users
-                guard:
-                    authenticators:
-                        - shibboleth_authenticator
-                anonymous: false
-                security: true
-                logout:
-                    path: front.account.logout
-                    target: '/Shibboleth.sso/Logout'
+        front:
+            host: '%env(resolve:front_host)%'
+            pattern: ^/api/shibboleth|^/account|^/program|^/training/inscription
+            provider: shib_users
+            guard:
+                authenticators:
+                    - shibboleth_authenticator
+            anonymous: false
+            security: true
+            logout:
+                path: front.account.logout
+                target: '/Shibboleth.sso/Logout'
 
 
             # activate different ways to authenticate
@@ -55,9 +55,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         # Back
-        # Front
-        - { path: ^/account, roles: ROLE_SHIB_AUTHENTICATED }
-        - { path: ^/program, roles: ROLE_SHIB_AUTHENTICATED }
+        - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/, role: IS_AUTHENTICATED_FULLY }
+        # - { path: ^/admin, roles: ROLE_ADMIN }
+        # - { path: ^/profile, roles: ROLE_USER }
 
 when@test:
     security:
