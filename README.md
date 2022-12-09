@@ -34,7 +34,7 @@ Prérequis
 
 ### Prérequis
 
-- Composer installé (>2)
+- Composer installé (>=2)
 - git installé
 - Installer node v0.12.17
 - Installer npm v2.15.1
@@ -49,6 +49,7 @@ Installation
 
 * git clone https://weblab.univ-amu.fr/polen/geforp2.git
 * composer install
+* Renommer le fichier .env.sample en .env et configurer la base de données (user et base de données)
 
 ### Commandes base de données
 * php bin/console doctrine:database:create
