@@ -111,11 +111,11 @@ class AttendanceAccountController extends AbstractController
         //Construction du tableau de choix du formulaire d'évaluation
         if ($evalCritere0Actif) {
             $tabEvalChoices = array(
+                "Non concerné" => 0,
                 $evalCritere4 => 4,
                 $evalCritere3 => 3,
                 $evalCritere2 => 2,
-                $evalCritere1 => 1,
-                "non concerné" => 0);
+                $evalCritere1 => 1);
         } else {
             $tabEvalChoices = array(
                 $evalCritere4 => 4,
