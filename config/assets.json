@@ -84,6 +84,9 @@
             "node_modules/jquery/dist/jquery.js",
             "assets/front/js/*.js",
             "node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
+        ],
+        "front-add": [
+            "assets/front/js/front.js"
         ]
     },
     "templates": [
