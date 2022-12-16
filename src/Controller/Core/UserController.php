@@ -258,7 +258,7 @@ class UserController extends AbstractController
         $form = $this->createForm(UserType::class, $user);
         $roles = $user->getRoles();
         $key = array_search('ROLE_ADMIN', $roles);
-        if ($key != false) {
+        if ($key !== false) {
             // si le user est admin, on coche la case du formulaire
             $form->get('isAdmin')->setData(true);
         } else {
