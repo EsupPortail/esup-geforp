@@ -34,7 +34,7 @@ Prérequis
 
 ### Prérequis
 
-- Composer installé (>=2)
+- Composer installé (>=2) : https://getcomposer.org/download/
 - git installé
 - Installer node v0.12.17
 - Installer npm v2.15.1
@@ -50,8 +50,21 @@ Installation
 * git clone https://weblab.univ-amu.fr/polen/geforp2.git
 * composer install
 * Renommer le fichier .env.sample en .env et configurer la base de données (user et base de données)
+* Dans un premier temps, garder APP_ENV=dev pour passer les commandes Symfony qui concernent la base de données
+* Droits pour Symfony :
+  <pre>
+  chown -R www-data var/log
+  chown -R www-data var/cache
+  </pre>
+* Droits des fichiers exe :
+  <pre>
+  chmod a+x bin/unoconv
+  chmod a+x bin/wkhtmltopdf-amd64
+  </pre>
+
 
 ### Commandes base de données
+* Créer un user avec les droits pour la base Geforp
 * php bin/console doctrine:database:create
 * php bin/console make:migration
 * php bin/console doctrine:migrations:migrate
