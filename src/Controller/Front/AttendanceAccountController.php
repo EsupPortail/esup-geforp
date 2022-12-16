@@ -125,7 +125,10 @@ class AttendanceAccountController extends AbstractController
         }
 
         if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
-            throw new AccessDeniedHttpException("This session has already been evaluated.");
+            // Pb : l'évaluation a déjà été remplie
+            $this->get('session')->getFlashBag()->add('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
+            return $this->redirectToRoute('front.public.index');
+
         }
 
         $evaluationCriterions = $doctrine
