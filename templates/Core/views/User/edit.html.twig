@@ -10,7 +10,7 @@
     {% if form.organization is defined %}
         {{ form_row(form.organization) }}
     {% endif %}
-    {%  if isAdmin == true %}
+    {%  if is_granted('ROLE_ADMIN') == true %}
         {{ form_row(form.isAdmin) }}
     {% endif %}
 
