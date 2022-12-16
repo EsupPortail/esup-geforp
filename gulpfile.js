@@ -25,6 +25,10 @@ gulp.task('scripts', ['templates'], function(){
         .pipe(concat('scss.js'))
         .pipe(gulp.dest('public/build'));
 
+    gulp.src(assets.scripts["front-add"])
+            .pipe(gulp.dest('public/build'));
+
+
     //.pipe(notify({ message: 'scripted!' }));
 });
 
