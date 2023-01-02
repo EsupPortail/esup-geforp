@@ -161,15 +161,21 @@ class AnonymousAccountController extends AbstractController
 
         // Etablissement
         $flagEtab = 0;
-        $persitentId = $shibbolethAttributes['persistent-id'];
         $listeEtab = $doctrine->getRepository('App\Entity\Back\Institution')->findAll();
-        foreach ($listeEtab as $etab) {
-            $idp = $etab->getIdp();
-            if(strpos($persitentId, $idp) !== false) {
-                // Si on trouve l'idp de l'etablissement dans le shibboleth persistent id, alors on definit l'etablissement du stagiaire
-                $trainee->setInstitution($etab);
-                $flagEtab = 1;
-                break;
+        $eppn = $shibbolethAttributes['eppn'];
+        if (stripos($eppn , "@")>0) {
+            // recup domaine dans l'eppn
+            $domaine = substr($eppn, stripos($eppn, "@") + 1);
+            foreach ($listeEtab as $etab) {
+                $domaines = $etab->getDomains();
+                foreach ($domaines as $dom) {
+                    // test domaine de l'eppn et domaines renseignés pour les établissements définis en BDD
+                    if (strtolower($dom->getName()) == strtolower($domaine)) {
+                        $trainee->setInstitution($etab);
+                        $flagEtab = 1;
+                        break 2;
+                    }
+                }
             }
         }
         if ($flagEtab !== 1) {
