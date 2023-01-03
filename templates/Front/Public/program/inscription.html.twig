@@ -45,7 +45,9 @@
                         {{ form_row(form.children.motivation) }}
                         {{ form_errors(form.children.motivation) }}
                         {{ form_row(form.children.actiontype) }}
-                        {{ form_widget(form.children.dif) }}
+                        <div style='display:none' >
+                            {{ form_row(form.children.dif) }}
+                        </div>
                         {{ form_widget(form.children.authorization) }}
                         {{ form_errors(form) }}
                         <br>
