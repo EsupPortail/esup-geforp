@@ -685,10 +685,14 @@ class ProgramController extends AbstractController
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
         $theme = $em->getRepository('App\Entity\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
-        $organization = $em->getRepository('App\Entity\Back\Organization')->findOneBy(array('name' => 'Tous les établissements'));
+        $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
 
-        $defaultData = array('centre' => $organization, 'theme' => $theme, 'texte' => "");
-        $form = $this->createForm(ProgramSearchType::class, $defaultData);
+        $defaultData = array('centre' => $organizations[0], 'theme' => $theme, 'texte' => "");
+        $form = $this->createForm(ProgramSearchType::class, $defaultData,
+            array('attr' => array(
+                'institution' => $arTrainee[0]->getInstitution())
+            ));
+
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if (($form->isSubmitted()) && ($form->isValid())) {
