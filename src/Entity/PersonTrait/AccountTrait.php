@@ -39,7 +39,7 @@ trait AccountTrait
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Groups({"trainee"})
      */
-    private $isActive;
+    private $isactive;
 
     /**
      * @ORM\Column(name="shibboleth_persistent_id", type="string", nullable=true)
@@ -134,17 +134,17 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getIsActive()
+    public function getIsactive()
     {
-        return $this->isActive;
+        return $this->isactive;
     }
 
     /**
      * @param mixed $isActive
      */
-    public function setIsActive($isActive)
+    public function setIsactive($isActive)
     {
-        $this->isActive = $isActive;
+        $this->isactive = $isActive;
     }
 
     /**

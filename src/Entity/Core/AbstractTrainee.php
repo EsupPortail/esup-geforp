@@ -63,7 +63,7 @@ abstract class AbstractTrainee implements UserInterface, \Serializable, Serializ
     function __construct()
     {
         $this->inscriptions = new ArrayCollection();
-        $this->isActive = true;
+        $this->isactive = true;
         $this->salt     = md5(uniqid(null, true));
         $this->password = md5(uniqid(null, true));
         $this->addressType = 0;

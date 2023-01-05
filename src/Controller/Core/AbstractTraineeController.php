@@ -176,14 +176,8 @@ dump($ret);
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
         }
 
-        $trainee->setIsActive(!$trainee->getIsActive());
+        $trainee->setIsactive(!$trainee->getIsactive());
         $this->getDoctrine()->getManager()->flush();
-
-        if ($trainee->getIsActive()) {
-	        $this->get('notification.mailer')->send('trainee.activated', $trainee, [
-		        'trainee' => $trainee,
-	        ]);
-        }
 
         return array('trainee' => $trainee);
     }

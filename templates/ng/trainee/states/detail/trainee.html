@@ -3,8 +3,8 @@
         <div class="col-md-8">
 
             <div class="btn-group pull-right">
-                <a class="btn btn-fa" href="" tooltip="{{ trainee.isActive ? 'Désactiver le compte' : 'Activer le compte' }}" ng-if="trainee._accessRights.edit" ng-click="toggleActivation()">
-                    <span class="fa" ng-class="{'fa-thumbs-o-up': !trainee.isActive, 'fa-thumbs-o-down': trainee.isActive }"></span>
+                <a class="btn btn-fa" href="" tooltip="{{ trainee.isactive ? 'Désactiver le compte' : 'Activer le compte' }}" ng-if="trainee._accessRights.edit" ng-click="toggleActivation()">
+                    <span class="fa" ng-class="{'fa-thumbs-o-up': !trainee.isactive, 'fa-thumbs-o-down': trainee.isactive }"></span>
                 </a>
                 <a class="btn btn-fa" href="" tooltip="Publipostage" ng-click="$dialog.open('batch.publipost', { items: [trainee.id], service: 'trainee' })"><span class="fa fa-file-word-o"></span></a>
                 <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="$user.hasAccessRight('sygefor_trainee.rights.trainee.all.update')" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
