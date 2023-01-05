@@ -33,8 +33,8 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
 
             angular.forEach($scope.search.result.items, function(result) {
                 if ($scope.trainee.id == result.id) {
-                    result.isActive = $scope.trainee.isActive;
-                    result.class = $scope.trainee.isActive ? '' : 'alert-danger';
+                    result.isactive = $scope.trainee.isactive;
+                    result.class = $scope.trainee.isactive ? '' : 'alert-danger';
                 }
             });
         });
