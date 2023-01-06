@@ -9,6 +9,7 @@ use App\Entity\Back\Inscription;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
 use App\Form\Type\InscriptionType;
+use App\Form\Type\BaseInscriptionType;
 use App\Repository\InscriptionSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
