@@ -270,6 +270,10 @@ class AttendanceAccountController extends AbstractController
             }
         }
 
+        // patch pb encodage HTML
+        $nameForm = htmlentities($session->getTraining()->getName());
+        $session->getTraining()->setName($nameForm);
+
         $pdf = $this->renderView('PDF/attestation.pdf.twig', array(
             'inscription' => $attendance,
             'nbHeuresPresence' => $nbHeuresPresence."/".$nbHeuresSession,
@@ -281,7 +285,8 @@ class AttendanceAccountController extends AbstractController
             $knpPdf->getOutputFromHtml($pdf, array('print-media-type' => null)), 200,
             array(
                 'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="attestation.pdf"', )
+                'Content-Disposition' => 'attachment; filename="attestation.pdf"',
+                )
         );
     }
 

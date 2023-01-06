@@ -34,7 +34,9 @@
 
     <p>a bien suivi le stage :</p>
     <p>&nbsp;</p>
+    {% autoescape false %}
     <h3>{{ inscription.session.training.name }}</h3>
+    {% endautoescape %}
 
     <h4>Aux dates suivantes :</h4>
     {% if inscription.session.dates | length >0 %}
