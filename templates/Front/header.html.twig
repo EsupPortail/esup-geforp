@@ -20,16 +20,17 @@
                 </div>
             </a>
             <ul class="nav navbar-nav">
-                <li class="hidden-xs">
-{#                    <a class="navbar-brand" href="{{ path('front.public.index') }}">
-                        <img src="{{ asset('img/logo.png') }}" height="30" alt="Logo">
-                    </a>#}
-                    {% if user.fullName is defined %}
-                        <a href="{{ path('front.program.myprogram') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Catalogue des formations</a></li>
-                    {% endif %}
-                </li>
-                <li><a href="{{ path('front.public.contact') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Contact</a></li>
-                <li><a href="{{ path('front.public.faq') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
+                {% if user.fullName is defined %}
+                    <li class="hidden-xs">
+                            <a href="{{ path('front.program.myprogram') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Catalogue des formations</a></li>
+                        <li><a href="{{ path('front.pg.contact') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Contact</a></li>
+                        <li><a href="{{ path('front.pg.faq') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
+
+                    </li>
+                {% else %}
+                    <li><a href="{{ path('front.public.contact') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Contact</a></li>
+                    <li><a href="{{ path('front.public.faq') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
+                {%  endif %}
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
