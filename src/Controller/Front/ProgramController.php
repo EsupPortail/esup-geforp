@@ -46,6 +46,30 @@ use Symfony\Component\Mime\Email;
 class ProgramController extends AbstractController
 {
     /**
+     * @Route("/contact", name="front.pg.contact")
+     * @Template("Front/Public/contact.html.twig")
+     */
+    public function contactAction(Request $request, ManagerRegistry $doctrine)
+    {
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'user' => $trainee);
+    }
+
+    /**
+     * @Route("/faq", name="front.pg.faq")
+     * @Template("Front/Public/faq.html.twig")
+     */
+    public function faqAction(Request $request, ManagerRegistry $doctrine)
+    {
+        $user = $this->getUser();
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $trainee = $arTrainee[0];
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $trainee);
+    }
+
+    /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param App\Entity\Core\AbstractTraining $training
      * @param null $sessionId
