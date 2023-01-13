@@ -3,6 +3,10 @@ Geforp2 : gestion des formations
 
 Geforp2 : nouvelle version sous Symfony 5.4
 
+Documentation
+------------
+La présentation de l'outil est disponible ici : https://www.esup-portail.org/wiki/display/GEFORP
+
 Configuration requise
 ------------
 
@@ -47,7 +51,7 @@ Installation
 
 ### Projet
 
-* git clone https://weblab.univ-amu.fr/polen/geforp2.git
+* git clone https://github.com/EsupPortail/esup-geforp.git
 * composer install
 * Renommer le fichier .env.sample en .env et configurer la base de données (user et base de données)
 * Dans un premier temps, garder APP_ENV=dev pour passer les commandes Symfony qui concernent la base de données
