@@ -46,18 +46,6 @@
     }]);</script>
 {% endif %}
 
-{#
-   <script language="javascript">sygeforApp.config(['$userProvider', function($userProvider) {
-                  $userProvider.setUser({{ app.user|serialize()|raw }});
-                         $userProvider.setUser([{{ app.user.id }}]);
-    }]);</script>
-
-<script language="javascript">
-sygeforApp.config(['$userProvider', function($userProvider) {
-$userProvider.setUser({"id":2,"username":"user-amu-drh","email":"test@univ.fr","roles":["ROLE_ADMIN"],"organization":{"id":1,"name":"AMU-DRH","code":"amu-drh","email":"drh-test@univ.fr"},"accessRights":["sygefor_core.rights.user.all","sygefor_core.rights.vocabulary.all","sygefor_core.rights.vocabulary.national","sygefor_inscription.rights.inscription.all.create","sygefor_inscription.rights.inscription.all.delete","sygefor_inscription.rights.inscription.all.update","sygefor_inscription.rights.inscription.all.view","sygefor_institution.rights.institution.all.create","sygefor_institution.rights.institution.all.delete","sygefor_institution.rights.institution.all.update","sygefor_institution.rights.institution.all.view","sygefor_trainee.rights.trainee.all.create","sygefor_trainee.rights.trainee.all.delete","sygefor_trainee.rights.trainee.all.update","sygefor_trainee.rights.trainee.all.view","sygefor_trainer.rights.trainer.all.create","sygefor_trainer.rights.trainer.all.delete","sygefor_trainer.rights.trainer.all.update","sygefor_trainer.rights.trainer.all.view","sygefor_training.rights.training.all.create","sygefor_training.rights.training.all.delete","sygefor_training.rights.training.all.update","sygefor_training.rights.training.all.view"]});
-}]);
-</script>
-#}
 <!-- page scripts -->
 {% block javascripts %}{% endblock %}
 </body>
