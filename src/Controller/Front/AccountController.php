@@ -222,7 +222,7 @@ class AccountController extends AbstractController
                         $corps = ltrim($spCorp, "{NCORPS}");
                         if (ctype_digit($corps))
                             $corps = (int)$corps;
-                        $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                        $n_corps = $this->getDoctrine()->getRepository('App\Entity\Back\Corps')->findOneBy(
                             array('corps' => $corps)
                         );
                         if ($n_corps != null) {
@@ -265,7 +265,7 @@ class AccountController extends AbstractController
                         $corps = ltrim($spCorp, "{NCORPS}");
                         if (ctype_digit($corps))
                             $corps = (int)$corps;
-                        $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                        $n_corps = $this->getDoctrine()->getRepository('App\Entity\Back\Corps')->findOneBy(
                             array('corps' => $corps)
                         );
                         if ($n_corps != null) {
@@ -456,7 +456,7 @@ class AccountController extends AbstractController
                     $corps = ltrim($spCorp, "{NCORPS}");
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Back\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
@@ -499,7 +499,7 @@ class AccountController extends AbstractController
                     $corps = ltrim($spCorp, "{NCORPS}");
                     if (ctype_digit($corps))
                         $corps = (int)$corps;
-                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                    $n_corps = $this->getDoctrine()->getRepository('App\Entity\Back\Corps')->findOneBy(
                         array('corps' => $corps)
                     );
                     if ($n_corps != null) {
