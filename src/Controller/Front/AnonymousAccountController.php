@@ -204,17 +204,23 @@ class AnonymousAccountController extends AbstractController
                 }
             }
             $trainee->setBap($bap);
-            $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
-            // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if (isset($corps)) {
-                if (ctype_digit($corps))
-                    $corps = (int)$corps;
-                $n_corps = $doctrine->getRepository('App\Entity\Back\Corps')->findOneBy(
-                    array('corps' => $corps)
-                );
-                if ($n_corps != null) {
-                    $trainee->setCorps($n_corps->getLibelleLong());
-                    $trainee->setCategory($n_corps->getCategory());
+            $spCorps = explode(";", $shibbolethAttributes['supannEmpCorps']);
+            foreach($spCorps as $spCorp) {
+                $pos = stripos($spCorp, "{NCORPS}");
+                if ($pos !== false) {
+                    $corps = ltrim($spCorp, "{NCORPS}");
+                    if (ctype_digit($corps))
+                        $corps = (int)$corps;
+                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                        array('corps' => $corps)
+                    );
+                    if ($n_corps != null) {
+                        $trainee->setCorps($n_corps->getLibelleLong());
+                        $trainee->setCategory($n_corps->getCategory());
+                    }
+
+                    // si {NCORPS} est trouvé, on arrête
+                    break;
                 }
             }
         } else {
@@ -241,17 +247,24 @@ class AnonymousAccountController extends AbstractController
             }
             $trainee->setBap($bap);
             $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
-            $corps = ltrim($shibbolethAttributes['supannEmpCorps'], "{NCORPS}");
-            // Si on a une valeur, on cherche le libellé et la catégorie dans la table
-            if ((isset($corps))) {
-                if (ctype_digit($corps))
-                    $corps = (int)$corps;
-                $n_corps = $doctrine->getRepository('App\Entity\Back\Corps')->findOneBy(
-                    array('corps' => $corps)
-                );
-                if ($n_corps != null) {
-                    $trainee->setCorps($n_corps->getLibelleLong());
-                    $trainee->setCategory($n_corps->getCategory());
+
+            $spCorps = explode(";", $shibbolethAttributes['supannEmpCorps']);
+            foreach($spCorps as $spCorp) {
+                $pos = stripos($spCorp, "{NCORPS}");
+                if ($pos !== false) {
+                    $corps = ltrim($spCorp, "{NCORPS}");
+                    if (ctype_digit($corps))
+                        $corps = (int)$corps;
+                    $n_corps = $this->getDoctrine()->getRepository('SygeforMyCompanyBundle:Corps')->findOneBy(
+                        array('corps' => $corps)
+                    );
+                    if ($n_corps != null) {
+                        $trainee->setCorps($n_corps->getLibelleLong());
+                        $trainee->setCategory($n_corps->getCategory());
+                    }
+
+                    // si {NCORPS} est trouvé, on arrête
+                    break;
                 }
             }
         }
