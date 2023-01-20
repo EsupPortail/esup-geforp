@@ -103,7 +103,7 @@ class TaxonomyController extends AbstractController
                 }
             }
         }
-        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization, $this->getUser()->isAdmin());
+        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization);
         if ($organization) {
             foreach ($terms as $key => $term) {
                 if (!$term->getOrganization()) {
@@ -337,7 +337,7 @@ class TaxonomyController extends AbstractController
      *
      * @return mixed
      */
-    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization, $isAdmin)
+    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization, $isAdmin=null)
     {
         $class = get_class($vocabulary);
         $repository = $doctrine->getManager()->getRepository($class);
