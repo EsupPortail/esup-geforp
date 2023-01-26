@@ -65,10 +65,23 @@ abstract class AbstractInstitution implements SerializedAccessRights
      */
     protected $domains;
 
+    /**
+     * @var ArrayCollection
+     * @ORM\ManyToMany(targetEntity="App\Entity\Core\AbstractInstitution")
+     * @ORM\JoinTable(name="institution__visuinstitutions",
+     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")}
+     * )
+     * @Serializer\Groups({"Default", "api"})
+     */
+    protected $visuinstitutions;
+
     public function __construct()
     {
         $this->domains = new ArrayCollection();
+        $this->visuinstitutions = new ArrayCollection();
     }
+
 
     /**
      * @return int
@@ -151,6 +164,54 @@ abstract class AbstractInstitution implements SerializedAccessRights
     {
         if ($this->domains->contains($domain)) {
             $this->domains->removeElement($domain);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getVisuinstitutions()
+    {
+        return $this->visuinstitutions;
+    }
+
+    /**
+     * @param mixed $visuinstitutions
+     */
+    public function setVisuinstitutions($visuinstitutions)
+    {
+        $this->visuinstitutions = $visuinstitutions;
+    }
+
+    /**
+     * @param AbstractInstitution $institution
+     *
+     * @return bool
+     */
+    public function addVisuinstitution($institution)
+    {
+        if (!$this->visuinstitutions->contains($institution)) {
+            $this->visuinstitutions->add($institution);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param AbstractInstitution $institution
+     *
+     * @return bool
+     */
+    public function removeVisuinstitution($institution)
+    {
+        if ($this->visuinstitutions->contains($institution)) {
+            $this->visuinstitutions->removeElement($institution);
 
             return true;
         }
