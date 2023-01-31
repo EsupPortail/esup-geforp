@@ -409,6 +409,7 @@ class ProgramController extends AbstractController
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->getParameter('multi_etab_actif');
 
+        // Recupération des centres de mon établissement
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
         foreach ($organizations as $organization) {
             $codes[] = $organization->getCode();
@@ -502,12 +503,25 @@ class ProgramController extends AbstractController
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
-        // Recuperation de tous les centres
-        $centres = $doctrine->getRepository(Organization::class)->findAll();
+        // Recup allProgram = toutes les formations des centres et établissements liés
+        // Récupération des centres de l'établissement du stagiaire
+        $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
         $codes = array();
-        foreach ($centres as $centre) {
+        foreach ($organizations as $centre) {
             $codes[] = $centre->getName();
         }
+        // Récupération des établissements liés
+        $otherEtabs = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+        if ($otherEtabs != null) {
+            // Récupération des centres pour chaque établissement
+            foreach ($otherEtabs as $otherEtab) {
+                $otherOrgs = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $otherEtab));
+                foreach ($otherOrgs as $centre) {
+                    $codes[] = $centre->getName();
+                }
+            }
+        }
+
         $search = $this->createProgramQuery($codes, $sessionRepository);
         $sessions = $search["items"];
 
@@ -602,10 +616,24 @@ class ProgramController extends AbstractController
         $multiEtab = $this->getParameter('multi_etab_actif');
 
         if ($centreCode=="tous") {
-            $centres = $doctrine->getRepository(Organization::class)->findAll();
             $centreName = array();
-            foreach ($centres as $centre) {
+            // Recup allProgram = toutes les formations des centres et établissements liés
+            // Récupération des centres de l'établissement du stagiaire
+            $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
+            foreach ($organizations as $centre) {
                 $centreName[] = $centre->getName();
+            }
+
+            // Récupération des établissements liés
+            $otherEtabs = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+            if ($otherEtabs != null) {
+                // Récupération des centres pour chaque établissement
+                foreach ($otherEtabs as $otherEtab) {
+                    $otherOrgs = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $otherEtab));
+                    foreach ($otherOrgs as $centre) {
+                        $centreName[] = $centre->getName();
+                    }
+                }
             }
         } else
             $centreName = $centreCode;
@@ -711,6 +739,7 @@ class ProgramController extends AbstractController
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
         $theme = $em->getRepository('App\Entity\Term\Theme')->findOneBy(array('name' => 'Tous les domaines' ));
+        // Récupération des centres de l'établissement du stagiaire
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
 
         $defaultData = array('centre' => $organizations[0], 'theme' => $theme, 'texte' => "");
