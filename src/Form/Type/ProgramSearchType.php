@@ -26,23 +26,30 @@ class ProgramSearchType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        /** @var AbstractInstitution $institution */
+        // Mise en forme des établissements visibles par le stagiaire -> visibilité des centres
+        $institutions = array();
         $institution = $options['attr']['institution'];
-
+        // Récupération des établissements liés
+        $visuInstitutions = $institution->getVisuinstitutions();
+        // creer le tableau des établissements visibles
+        $institutions[0] = $institution;
+        foreach($visuInstitutions as $visuInst) {
+            $institutions[] = $visuInst;
+        }
         $builder
             ->add('centre', EntityType::class, array(
                 'label' => 'Centre organisateur',
                 'choice_label' => 'name',
                 'class' => Organization::class,
-                'query_builder' => function (EntityRepository $repository) use ($institution) {
+                'query_builder' => function (EntityRepository $repository) use ($institutions) {
                     $qb = $repository->createQueryBuilder('o');
-                    $qb->where('o.institution = :institution')
-                        ->setParameter('institution', $institution)
+                    $qb->where('o.institution in (:institution)')
+                        ->setParameter('institution', $institutions)
                         ->orWhere('o.institution is null');
 
                     return $qb;
                 },
-                ))
+            ))
             ->add('theme', EntityType::class, array(
                 'label' => 'Domaine de formation',
                 'choice_label' => 'name',
@@ -53,6 +60,7 @@ class ProgramSearchType extends AbstractType
                 'required' => false,
                 'attr' => array('placeholder' => 'Tapez un mot clé')
             ));
+
     }
 
     public function configureOptions(OptionsResolver $resolver)

@@ -46,7 +46,7 @@ class SessionRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('s.training = tr.id')
                 ->andWhere('tr.organization = o.id')
-                ->andWhere('o.name in (:centers)')
+                ->andWhere('o.code in (:centers)')
                 ->setParameter('centers', $filters['training.organization.name.source']);
         }
 

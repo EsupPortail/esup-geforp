@@ -118,11 +118,6 @@ class AnonymousAccountController extends AbstractController
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
         }
-        // on teste si biatss : si oui, supérieur hiérarchique obligatoire dans le formulaire
-        $flagSupRequired = false;
-        if ($shibbolethAttributes['primary-affiliation'] == "employee") {
-            $flagSupRequired = true;
-        }
         $primary_affiliation = $doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
             array('machinename' => $shibbolethAttributes['primary-affiliation'])
         );
