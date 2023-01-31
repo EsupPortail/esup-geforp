@@ -70,7 +70,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
      * @ORM\ManyToMany(targetEntity="App\Entity\Core\AbstractInstitution")
      * @ORM\JoinTable(name="institution__visuinstitutions",
      *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")}
+     *      inverseJoinColumns={@ORM\JoinColumn(name="visu_institution_id", referencedColumnName="id", onDelete="cascade")}
      * )
      * @Serializer\Groups({"Default", "api"})
      */
