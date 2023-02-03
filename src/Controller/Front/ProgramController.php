@@ -407,7 +407,7 @@ class ProgramController extends AbstractController
         $etablissement = $arTrainee[0]->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->getParameter('multi_etab_actif');
+        $multiEtab = $this->isMultiEtab($arTrainee[0]);
 
         // Recupération des centres de mon établissement
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
@@ -613,7 +613,7 @@ class ProgramController extends AbstractController
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->getParameter('multi_etab_actif');
+        $multiEtab = $this->isMultiEtab($arTrainee[0]);
 
         if ($centreCode=="tous") {
             $centreName = array();
@@ -734,7 +734,7 @@ class ProgramController extends AbstractController
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->getParameter('multi_etab_actif');
+        $multiEtab = $this->isMultiEtab($arTrainee[0]);
 
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
@@ -841,6 +841,22 @@ class ProgramController extends AbstractController
         );
         return $ret;
 
+    }
+
+    /**
+     * @param $trainee
+     * @return bool
+     */
+    protected function isMultiEtab($trainee)
+    {
+        $multiEtab = false;
+        // Récupération des établissements liés
+        $otherEtabs = $trainee->getInstitution()->getVisuinstitutions();
+        if ((isset($otherEtabs[0])) && ($otherEtabs[0] != null)) {
+            // S'il y a des établissements liés, on active la conf multi-établissements
+            $multiEtab = true;
+        }
+        return $multiEtab;
     }
 
 }
