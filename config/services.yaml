@@ -15,7 +15,6 @@ parameters:
     lib_affectation : false
     relance_actif: true
     eval_actif: true
-    multi_etab_actif: false
     eval_critere_0_actif: true
     eval_critere_1: "Pas du tout d'accord"
     eval_critere_2: "Pas vraiment d'accord"
