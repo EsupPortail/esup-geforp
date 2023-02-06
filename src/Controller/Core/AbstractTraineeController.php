@@ -85,7 +85,7 @@ abstract class AbstractTraineeController extends AbstractController
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
-dump($ret);
+
         return $ret;
     }
 
