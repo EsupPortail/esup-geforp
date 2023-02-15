@@ -139,7 +139,7 @@
                         <td><a ui-sref-access="inscription._accessRights.view" ui-sref="inscription.detail.view({id: inscription.id, session: session.id})">{{ inscription.session.training.name }}</a></td>
                         <td>{{ inscription.session.training.typeLabel }} - Session du <a ui-sref-access="inscription.session._accessRights.view" ui-sref="session.detail.view({id: inscription.session.id})">{{ inscription.session.datebegin | date:'dd/MM/yyyy' }}</a></td>
                         <td><span class="label" ng-class="$root.presenceStatusClass(inscription.presencestatus.status)">{{ inscription.presencestatus.name }}</span></td>
-                        <td><span class="label" ng-hide="inscription.presencestatus" ng-class="$root.inscriptionstatusClass(inscription.inscriptionstatus.status)">{{ inscription.inscriptionstatus.name }}</span></td>
+                        <td><span class="label" ng-hide="inscription.presencestatus" ng-class="$root.inscriptionStatusClass(inscription.inscriptionstatus.status)">{{ inscription.inscriptionstatus.name }}</span></td>
                     </tr>
                     </tbody>
                 </table>
