@@ -273,18 +273,39 @@ class SessionRepository extends ServiceEntityRepository
                 $sessionES['training']['firstSessionPeriodYear'] = $session->getTraining()->getFirstSessionPeriodSemester();
                 $sessionES['training']['publictypes'] = $session->getTraining()->getPublicTypes();
 
+                $statsInsc = array();
                 foreach ($session->getInscriptions() as $insc) {
                     $sessionES['inscriptions'][]['id'] = $insc->getId();
+
+                    // création des stats de statut d'inscription
+                    $flagExiste = 0;
+                    $i=0;
+                    // On parcourt le tableau des stats
+                    foreach ($statsInsc as $stat) {
+                        // si le statut de l'inscription est trouvé dans le tableau
+                        if ($stat['id'] == $insc->getInscriptionStatus()->getId()) {
+                            // on incrémente le compteur
+                            $statsInsc[$i]['count']++;
+                            $flagExiste = 1;
+                        }
+                        $i++;
+                    }
+                    // si on n'a pas trouvé le statut de l'inscription dans le tableau, on l'ajoute
+                    if ($flagExiste == 0) {
+                        $statsInsc [] = array( 'id' => $insc->getInscriptionStatus()->getId(),
+                            'name' => $insc->getInscriptionStatus()->getName(),
+                            'status' => $insc->getInscriptionStatus()->getStatus(),
+                            'count' => 1);
+                    }
                 }
 
                 foreach ($session->getParticipations() as $part) {
                     $sessionES['participations'][]['id'] = $part->getId();
                 }
 
-
                 $sessionES['theme'] = $session->getTraining()->getTheme();
 
-                $sessionES['inscriptionsStats'] = array();
+                $sessionES['inscriptionStats'] = $statsInsc;
 
                 $tabSession[] = $sessionES;
             }
