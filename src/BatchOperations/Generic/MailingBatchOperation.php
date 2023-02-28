@@ -362,7 +362,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     foreach ($a as $tinsc) {
                         if (($tinsc->getPresencestatus() == 'Présent') || ($tinsc->getPresencestatus() == 'Partiel')) {
                             // on récupère la date de la première formation du stagiaire
-                            $lines[0]['date1insc'] = $tinsc->getSession()->getDateBegin()->format('d/m/Y');
+                            $lines[0]['date1insc'] = $tinsc->getSession()->getDatebegin()->format('d/m/Y');
                             break;
                         }
                     }
@@ -399,11 +399,11 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             // Pour chaque presence, on compare avec le tableau des dates et on calcule le nombre d'heures
                             foreach ($insc->getPresences() as $pres) {
                                 foreach ($tabDates as $datePres) {
-                                    if ($pres->getDateBegin() == $datePres["dateDeb"]) {
-                                        if ($pres->morning == "Présent") {
+                                    if ($pres->getDatebegin()->format('d/m/Y') == $datePres["dateDeb"]) {
+                                        if ($pres->getMorning() == "Présent") {
                                             $nbHeuresPresence += $datePres["nbHeuresMatin"];
                                         }
-                                        if ($pres->afternoon == "Présent") {
+                                        if ($pres->getAfternoon() == "Présent") {
                                             $nbHeuresPresence += $datePres["nbHeuresApr"];
                                         }
                                         break;
