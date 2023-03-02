@@ -131,9 +131,13 @@ class AttendanceAccountController extends AbstractController
 
         }
 
-        $evaluationCriterions = $doctrine
+        $evaluationCriterionsLoc = $doctrine
             ->getRepository('App\Entity\Term\EvaluationCriterion')
             ->findBy(array('organization'=> $attendance->getSession()->getTraining()->getOrganization()));
+        $evaluationCriterionsNat = $doctrine
+            ->getRepository('App\Entity\Term\EvaluationCriterion')
+            ->findBy(array('organization'=> null));
+        $evaluationCriterions = array_merge($evaluationCriterionsLoc, $evaluationCriterionsNat);
 
         foreach ($evaluationCriterions as $evaluationCriterion) {
             $evaluationNotedCriterion = new EvaluationNotedCriterion();
