@@ -12,7 +12,7 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
         var crit = [];
         for (key in criteria) {
             var criterion = criteria[key];
-            if (criterion.organization_id == $scope.session.training.organization.id) {
+            if ((criterion.organization_id == $scope.session.training.organization.id) || (criterion.organization_id == null)) {
                 crit.push(criterion);
             }
         }
