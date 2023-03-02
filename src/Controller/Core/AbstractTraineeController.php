@@ -101,6 +101,12 @@ abstract class AbstractTraineeController extends AbstractController
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
+        // Ajout de l'établissement du trainee que l'on crée
+        try {
+            $trainee->setInstitution($this->getUser()->getOrganization()->getInstitution());
+        } catch (\Exception $e) {
+            return array($e->getMessage());
+        }
 
         //trainee can't be created if user has no rights for it
         if (!$this->isGranted('CREATE', $trainee)) {
