@@ -79,9 +79,9 @@ class AccountController extends AbstractController
                 if (isset($userEmail)) {
                     $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($userEmail);
                     if (isset($arTrainee[0])) {
-                        // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on force l'envoi vers le profil pour le mettre à jour
-                        $url = $this->generateUrl('front.account.profile');
-                        return new RedirectResponse($url);
+                        // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on met à jour le persistent id
+                        $trainee = $arTrainee[0];
+                        $trainee->setShibbolethpersistentid($userPersitentId);
                     }
                 }
             }

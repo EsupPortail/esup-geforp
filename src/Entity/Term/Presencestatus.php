@@ -75,7 +75,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
      */
     public static function getVocabularyStatus()
     {
-        return VocabularyInterface::VOCABULARY_LOCAL;
+        return VocabularyInterface::VOCABULARY_MIXED;
     }
 
     /**
