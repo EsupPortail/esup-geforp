@@ -34,6 +34,9 @@ class InscriptionStatusVocabularyType extends VocabularyType
                 'Rejeté' => Inscriptionstatus::STATUS_REJECTED,
             ),
         ));
+        $builder->add('machinename', null, array(
+            'label' => 'Libellé court',
+        ));
     }
 
     /**

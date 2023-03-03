@@ -26,6 +26,9 @@ class PresenceStatusVocabularyType extends VocabularyType
                 'Absent' => Presencestatus::STATUS_ABSENT,
             ),
         ));
+        $builder->add('machinename', null, array(
+            'label' => 'Libellé court',
+        ));
     }
 
     /**
