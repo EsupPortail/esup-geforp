@@ -21,7 +21,7 @@ class InscriptionStatusVocabularyType extends VocabularyType
     {
         parent::buildForm($builder, $options);
 
-        $builder->add('notify', CheckboxType::class, array('label' => "Notification lorsqu'une inscription prend ce statut", 'required' => false));
+        $builder->add('notify', CheckboxType::class, array('label' => "Pour les gestionnaires : notification de changement de statut", 'required' => false));
         $builder->add('status', ChoiceType::class, array(
             'label' => 'Statut élémentaire',
             'expanded' => true,
