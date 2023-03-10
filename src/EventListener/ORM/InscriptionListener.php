@@ -2,11 +2,14 @@
 
 namespace App\EventListener\ORM;
 
+use App\BatchOperations\Generic\EmailingBatchOperation;
 use Doctrine\ORM\Events;
 use Html2Text\Html2Text;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use App\Entity\Term\Emailtemplate;
 use App\Entity\Core\AbstractInscription;
 
@@ -16,14 +19,17 @@ use App\Entity\Core\AbstractInscription;
  */
 class InscriptionListener implements EventSubscriber
 {
-    private $container;
+    private $emailingBatchOp;
+    private $mailer;
 
     /**
-     * @param Container $container
+     * @param EmailingBatchOperation $emailingBatchOp
+     * @param MailerInterface $mailer
      */
-    public function __construct(Container $container)
+    public function __construct(EmailingBatchOperation $emailingBatchOp, MailerInterface $mailer)
     {
-        $this->container = $container;
+        $this->emailingBatchOp = $emailingBatchOp;
+        $this->mailer = $mailer;
     }
 
     /**
@@ -44,7 +50,7 @@ class InscriptionListener implements EventSubscriber
      */
     public function postProcess(LifecycleEventArgs $eventArgs, $new = false)
     {
-        $inscription = $eventArgs->getEntity();
+        $inscription = $eventArgs->getObject();
         if ($inscription instanceof AbstractInscription) {
             if ($inscription->isSendinscriptionstatusmail()) {
                 $this->sendInscriptionStatusMail($eventArgs);
@@ -92,7 +98,7 @@ class InscriptionListener implements EventSubscriber
 
 	    if ($template) {
 		    // send the mail with the batch service
-		    $this->container->get('sygefor_core.batch.email')->sendEmails(
+		    $this->emailingBatchOp->sendEmails(
 		    	$inscription,
 			    $template->getSubject(),
 			    $template->getCc(),
@@ -117,15 +123,24 @@ class InscriptionListener implements EventSubscriber
 	    $uow = $eventArgs->getEntityManager()->getUnitOfWork();
 	    $chgSet = $uow->getEntityChangeSet($inscription);
 
-	    if (isset($chgSet['inscriptionStatus'])) {
+	    if (isset($chgSet['inscriptionstatus'])) {
 		    $status = $inscription->getInscriptionstatus();
 
 		    if ($status->getNotify()) {
-			    return $this->container->get('notification.mailer')->send('inscription.status_changed', $inscription->getSession()->getTraining()->getOrganization(), [
-				    'inscription' => $inscription,
-				    'status' => $status,
-			    ]);
-		    }
+                $body = "Bonjour,\n" .
+                    "Le statut de l'inscription de " . $inscription->getTrainee()->getFullName() . ' à la session du ' . $inscription->getSession()->getDateBegin()->format('d/m/Y') . "\nde la formation intitulée '" . $inscription->getSession()->getTraining()->getName() . "'\n"
+                    . "est passé à '" . $status->getName() . "'";
+
+                $message = (new Email())
+                    ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->replyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->to($inscription->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->subject("Changement de statut d'inscription : ". $status->getName())
+                    ->text($body);
+
+                $this->mailer->send($message);
+
+            }
 	    }
     }
 }
