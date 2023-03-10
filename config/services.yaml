@@ -423,6 +423,10 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
+    App\EventListener\ORM\InscriptionListener:
+        tags:
+            - { name: doctrine.event_subscriber }
+
     shibbundle.sup_service:
         class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider
 
