@@ -127,9 +127,21 @@ class InscriptionListener implements EventSubscriber
 		    $status = $inscription->getInscriptionstatus();
 
 		    if ($status->getNotify()) {
+                $Dates = $inscription->getSession()->getDates();
+                $Texte = "";
+                foreach ($Dates as $date) {
+                    if ($date->getDateend() == $date->getDatebegin()) {
+                        $Texte .= $date->getDatebegin()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
+                    }
+                    else {
+                        $Texte .= $date->getDatebegin()->format('d/m/Y')." au ".$date->getDateend()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
+                    }
+                }
+
                 $body = "Bonjour,\n" .
                     "Le statut de l'inscription de " . $inscription->getTrainee()->getFullName() . ' à la session du ' . $inscription->getSession()->getDateBegin()->format('d/m/Y') . "\nde la formation intitulée '" . $inscription->getSession()->getTraining()->getName() . "'\n"
-                    . "est passé à '" . $status->getName() . "'";
+                    . "est passé à '" . $status->getName() . "'.\n"
+                    . "Le calendrier de la session est le suivant : \n" . $Texte;
 
                 $message = (new Email())
                     ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
