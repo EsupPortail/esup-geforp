@@ -223,8 +223,8 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         $email->setTrainer($entity->getTrainer());
                         $email->setSession($entity->getSession());
                     }
-                    $email->setSubject($subject);
-                    $email->setBody($body);
+                    $email->setSubject($subjectR);
+                    $email->setBody($bodyR);
                     $email->setSendAt(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
                     $em->persist($email);
                     if (++$i % 500 === 0) {
