@@ -4,6 +4,7 @@
 sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$dialog', '$trainingBundle', '$user', '$state', '$window','search', 'data', function($scope, $taxonomy, $dialog, $trainingBundle, $user, $state, $window, search, data)
 {
     $scope.session = data.session;
+    $scope.front_url = data.front_url;
     $scope.$trainingBundle = $trainingBundle;
     $scope.form = data.form ? data.form : false;
 
