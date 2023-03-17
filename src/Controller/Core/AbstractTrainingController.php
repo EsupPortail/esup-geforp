@@ -78,6 +78,7 @@ abstract class AbstractTrainingController extends AbstractController
         $training = new $class();
         try {
             $training->setOrganization($this->getUser()->getOrganization());
+            $training->setInstitution($this->getUser()->getOrganization()->getInstitution());
         }
         catch (\Exception $e) {
             return array($e->getMessage());
