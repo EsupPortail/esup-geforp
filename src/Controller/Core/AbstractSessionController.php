@@ -136,7 +136,7 @@ abstract class AbstractSessionController extends AbstractController
                 return $this->redirectToRoute('session.view', array('id' => $session->getId()));
             }
         }
-        $url = 'https://' . $_ENV['front_host'] . '/training/' . $session->getTraining()->getId() . '/' . $session->getId();
+        $url = 'https://' . $_ENV['front_host'] . '/training/program/' . $session->getTraining()->getId() . '/' . $session->getId();
         return array('form' => $form->createView(), 'session' => $session, 'front_url' => $url);
     }
 
