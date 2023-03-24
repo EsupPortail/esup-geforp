@@ -207,6 +207,7 @@ parameters:
                     typeAction: { property: actiontype }
                     listeFormateurs: { property: session.listeFormateurs }
                     refuse: { property: refuse }
+                    motivation: { property: motivation }
             trainee:
                 class: 'App\Entity\Back\Trainee'
                 alias: 'stagiaire'
