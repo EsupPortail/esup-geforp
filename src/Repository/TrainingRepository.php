@@ -181,7 +181,7 @@ class TrainingRepository extends ServiceEntityRepository
             ->select('training')
 
             // FILTRE KEYWORD
-            ->where('s.name LIKE :keyword')
+            ->where('training.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
