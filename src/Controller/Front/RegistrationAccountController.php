@@ -277,7 +277,7 @@ class RegistrationAccountController extends AbstractController
                                     ->subject("Avis favorable pour inscription à une formation")
                                     ->text($body);
                                 if ($registration->getTrainee()->getEmailcorr() != null)
-                                    $message->setCc($registration->getTrainee()->getEmailcorr());
+                                    $message->cc($registration->getTrainee()->getEmailcorr());
 
                                 $mailer->send($message);
 
