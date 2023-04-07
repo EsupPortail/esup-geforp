@@ -168,6 +168,11 @@ class RegistrationAccountController extends AbstractController
         $registration = $doctrine->getRepository('App\Entity\Core\AbstractInscription')->find($id);
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
 
+        if (!$registration->getTrainee()->getEmailSup()) {
+            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas relancer votre demande de validation car vous n\'avez pas renseigné de supérieur hiérarchique.');
+            return $this->redirectToRoute('front.account.registrations');
+        }
+
         // Lien vers la page d'autorisation
         $lien = "https://" . $this->getParameter('front_url') . "/account/registration/" . $id . "/valid";
 
