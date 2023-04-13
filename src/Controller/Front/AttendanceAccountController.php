@@ -264,12 +264,12 @@ class AttendanceAccountController extends AbstractController
             $fileName = $img->getName();
             if(strpos($fileName, 'logo') !== false){
                 if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                    $fileLogo = 'img/vocabulary/'.$img->getFilepath();
+                    $fileLogo = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }
             if(strpos($fileName, 'signature') !== false){
                 if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                    $fileSignature = 'img/vocabulary/'.$img->getFilepath();
+                    $fileSignature = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }
         }
