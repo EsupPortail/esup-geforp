@@ -9,8 +9,10 @@
             <img src='{{ app.request.getSchemeAndHttpHost() }}/{{ logo }}' />
         </div>
         <div class="col-xs-5">
+            {% autoescape false %}
             <strong>{{ organization.name }}</strong><br>
             {{ organization.fullAddress|nl2br }}
+            {% endautoescape %}
         </div>
     </div>
     <div class="row">
