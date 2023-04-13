@@ -6,12 +6,13 @@
 <body class="organization-{{ organization.code }}">
     <div class="row">
         <div class="col-xs-7">
-            <img src='{{ app.request.getSchemeAndHttpHost() }}/{{ logo }}' />
+            <img src='{{ logo }}' />
         </div>
         <div class="col-xs-5">
             {% autoescape false %}
-            <strong>{{ organization.name }}</strong><br>
-            {{ organization.fullAddress|nl2br }}
+                <strong>{{ organization.name }}</strong><br>
+                {{ organization.address }} <br>
+                {{ organization.zip }} {{ organization.city }}
             {% endautoescape %}
         </div>
     </div>

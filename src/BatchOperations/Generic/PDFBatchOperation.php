@@ -266,12 +266,12 @@ class PDFBatchOperation extends AbstractBatchOperation
                         $fileName = $img->getName();
                         if(strpos($fileName, 'logo') !== false){
                             if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                                $fileLogo = 'img/vocabulary/'.$img->getFilepath();
+                                $fileLogo = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/'.$img->getFilepath();
                             }
                         }
                         if(strpos($fileName, 'signature') !== false){
                             if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                                $fileSignature = 'img/vocabulary/'.$img->getFilepath();
+                                $fileSignature = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/'.$img->getFilepath();
                             }
                         }
                     }
