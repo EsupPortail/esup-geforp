@@ -275,6 +275,27 @@ class PDFBatchOperation extends AbstractBatchOperation
                             }
                         }
                     }
+                    // patch pb encodage HTML
+                    $firstNameTrainee = htmlentities($inscription->getTrainee()->getFirstname());
+                    $inscription->getTrainee()->setFirstname($firstNameTrainee);
+                    $lastNameTrainee = htmlentities($inscription->getTrainee()->getLastname());
+                    $inscription->getTrainee()->setLastname($lastNameTrainee);
+                    $orgName = htmlentities($session->getTraining()->getOrganization()->getName());
+                    $session->getTraining()->getOrganization()->setName($orgName);
+                    $orgAdr = htmlentities($session->getTraining()->getOrganization()->getAddress());
+                    $session->getTraining()->getOrganization()->setAddress($orgAdr);
+                    $orgCity = htmlentities($session->getTraining()->getOrganization()->getCity());
+                    $session->getTraining()->getOrganization()->setCity($orgCity);
+                    $nameForm = htmlentities($session->getTraining()->getName());
+                    $session->getTraining()->setName($nameForm);
+                    $trainers = $session->getTrainers();
+                    foreach ($trainers as $trainer) {
+                        $firstNameTrainer = htmlentities($trainer->getFirstname());
+                        $trainer->setFirstName($firstNameTrainer);
+                        $lastNameTrainer = htmlentities($trainer->getLastname());
+                        $trainer->setLastname($lastNameTrainer);
+                    }
+                    $session->getTraining()->setName($nameForm);
 
                     $pdfView = $this->twig->render('PDF/attestation.pdf.twig', array(
                         'inscription' => $inscription,
