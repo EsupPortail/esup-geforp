@@ -29,7 +29,9 @@
     <p>&nbsp;</p>
 
     <p>Nous certifions que :</p>
+    {% autoescape false %}
     <h3>{{ inscription.trainee.fullName }}</h3>
+    {% endautoescape %}
     <p>&nbsp;</p>
 
     <p>a bien suivi le stage :</p>
@@ -65,7 +67,9 @@
     {% if inscription.session.participations|length %}
         <p>anim&eacute par :</p>
         {% for participation in inscription.session.participations %}
+            {% autoescape false %}
             <h4>{{ participation.trainer.fullName }}</h4>
+            {% endautoescape %}
         {% endfor %}
     {% endif %}
     <p>&nbsp;</p>
@@ -79,5 +83,7 @@
     <p>&nbsp;</p>
     <p>&nbsp;</p>
     {% endif %}
+    {% autoescape false %}
     <h5>Fait &agrave {{ inscription.session.training.organization.city | replace({'CEDEX': ''}) | trim }}, le {% if inscription.session.dateEnd %}{{ inscription.session.dateEnd | date("d/m/Y") }}{% else %}{{ inscription.session.dateBegin | date("d/m/Y") }}{% endif %}</h5>
+    {% endautoescape %}
 {% endblock %}
