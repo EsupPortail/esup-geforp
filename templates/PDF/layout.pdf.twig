@@ -1,6 +1,6 @@
 <html>
 <head>
-    <link href="{{ app.request.getSchemeAndHttpHost() ~ asset('build/pdf.css') }}" rel="stylesheet" type="text/css" />
+    <link href="https://{{front_url}}/{{~ asset('build/pdf.css')}}" rel="stylesheet" type="text/css" />
     {% block head %}{% endblock %}
 </head>
 <body class="organization-{{ organization.code }}">
