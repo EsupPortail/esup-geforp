@@ -93,7 +93,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         if( isset($filters['inscriptionStatus.name.source'])) {
             $qb
                 ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
-                ->andWhere('istatus.name = :status')
+                ->andWhere('istatus.name in (:status)')
                 ->setParameter('status', $filters['inscriptionStatus.name.source']);
         }
 
@@ -101,7 +101,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         if( isset($filters['presenceStatus.name.source'])) {
             $qb
                 ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
-                ->andWhere('pstatus.name = :status')
+                ->andWhere('pstatus.name in (:status)')
                 ->setParameter('status', $filters['presenceStatus.name.source']);
         }
 
