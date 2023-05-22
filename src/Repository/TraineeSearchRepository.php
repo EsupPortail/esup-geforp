@@ -29,15 +29,33 @@ class TraineeSearchRepository extends ServiceEntityRepository
 
     public function getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields)
     {
-        $qb = $this->createQueryBuilder('trainee');
-        $qb
-            ->select(' trainee')
+        // Mise en forme en cas de recherche nom + prénom
+        $tabKey = explode(" ", $keyword, 2);
 
-            // FILTRE KEYWORD
-            ->where('trainee.firstname LIKE :keyword')
-            ->orWhere('trainee.lastname LIKE :keyword')
-            /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        $qb = $this->createQueryBuilder('trainee');
+
+        if (count($tabKey) == 2) {
+            $qb
+                ->select(' trainee')
+
+                // FILTRE KEYWORD
+                ->andWhere('(trainee.firstname LIKE :keyword1 AND trainee.lastname LIKE :keyword2) OR (trainee.lastname LIKE :keyword)')
+                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                ->setParameter('keyword1', '%' . addcslashes($tabKey[0], '%_') . '%')
+                ->setParameter('keyword2', '%' . addcslashes($tabKey[1], '%_') . '%')
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        } else {
+            $qb
+                ->select(' trainee')
+
+                // FILTRE KEYWORD
+                ->where('trainee.firstname LIKE :keyword')
+                ->orWhere('trainee.lastname LIKE :keyword')
+                ->orWhere('trainee.email LIKE :keyword')
+                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        }
+
 
         //FILTRE DATE DE CREATION
         if( isset($filters['createdAt']) ) {
@@ -92,7 +110,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
             // on met une valeur par défaut (pour l'autocompletion)
             $page = 1;
-            $pageSize = 500;
+            $pageSize = 50;
         }
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
