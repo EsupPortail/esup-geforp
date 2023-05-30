@@ -130,16 +130,18 @@ class AnonymousAccountController extends AbstractController
             if ($shibbolethAttributes['primary-affiliation'] == 'student') {
                 $flagDoc = 0;
 
-                // Test si doctorant sur supannEtuCursusAnnee
-                $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
-                foreach ($tabCursus as $cursus) {
-                    if (strpos($cursus, 'D') !== false) {
-                        // c'est un doctorant
-                        $flagDoc = 1;
-                        $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
-                            array('name' => 'enseignant')
-                        ));
-                        break;
+                if (isset($shibbolethAttributes['supannEtuCursusAnnee'])) {
+                    // Test si doctorant sur supannEtuCursusAnnee
+                    $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
+                    foreach ($tabCursus as $cursus) {
+                        if (strpos($cursus, 'D') !== false) {
+                            // c'est un doctorant
+                            $flagDoc = 1;
+                            $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
+                                array('name' => 'enseignant')
+                            ));
+                            break;
+                        }
                     }
                 }
 
