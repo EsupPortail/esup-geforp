@@ -150,7 +150,7 @@ class AccountController extends AbstractController
                     $flagDoc = 0;
 
                     // Test si doctorant sur supannEtuCursusAnnee
-                    if (isset($shibbolethAttributes['supannEtuCursusAnnee'])) {
+                    if ($shibbolethAttributes['supannEtuCursusAnnee']!= "") {
                         $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
                         foreach ($tabCursus as $cursus) {
                             if (strpos($cursus, 'D') !== false) {
@@ -399,7 +399,7 @@ class AccountController extends AbstractController
                 $flagDoc = 0;
 
                 // Test si doctorant sur supannEtuCursusAnnee
-                if (isset($shibbolethAttributes['supannEtuCursusAnnee'])) {
+                if ($shibbolethAttributes['supannEtuCursusAnnee']!= "") {
                     $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
                     foreach ($tabCursus as $cursus) {
                         if (strpos($cursus, 'D') !== false) {
