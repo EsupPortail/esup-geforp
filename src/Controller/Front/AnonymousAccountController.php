@@ -130,7 +130,7 @@ class AnonymousAccountController extends AbstractController
             if ($shibbolethAttributes['primary-affiliation'] == 'student') {
                 $flagDoc = 0;
 
-                if (isset($shibbolethAttributes['supannEtuCursusAnnee'])) {
+                if ($shibbolethAttributes['supannEtuCursusAnnee']!= "") {
                     // Test si doctorant sur supannEtuCursusAnnee
                     $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
                     foreach ($tabCursus as $cursus) {
