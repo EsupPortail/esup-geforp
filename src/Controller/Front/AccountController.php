@@ -154,7 +154,7 @@ class AccountController extends AbstractController
                         $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
                         if (is_array($tabCursus)) {
                             foreach ($tabCursus as $cursus) {
-                                if (strpos($cursus, 'D') !== false) {
+                                if (strpos($cursus, '{SUPANN}D') !== false) {
                                     // c'est un doctorant
                                     $flagDoc = 1;
                                     $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
@@ -413,7 +413,7 @@ class AccountController extends AbstractController
                     $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
                     if (is_array($tabCursus)) {
                         foreach ($tabCursus as $cursus) {
-                            if (strpos($cursus, 'D') !== false) {
+                            if (strpos($cursus, '{SUPANN}D') !== false) {
                                 // c'est un doctorant
                                 $flagDoc = 1;
                                 $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
