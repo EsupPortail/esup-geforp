@@ -149,17 +149,27 @@ class AccountController extends AbstractController
                 if ($shibbolethAttributes['primary-affiliation'] == 'student') {
                     $flagDoc = 0;
 
-                    // Test si doctorant sur supannEtuCursusAnnee
                     if ($shibbolethAttributes['supannEtuCursusAnnee']!= "") {
+                        // Test si doctorant sur supannEtuCursusAnnee
                         $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
-                        foreach ($tabCursus as $cursus) {
-                            if (strpos($cursus, 'D') !== false) {
+                        if (is_array($tabCursus)) {
+                            foreach ($tabCursus as $cursus) {
+                                if (strpos($cursus, 'D') !== false) {
+                                    // c'est un doctorant
+                                    $flagDoc = 1;
+                                    $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
+                                        array('name' => 'enseignant')
+                                    ));
+                                    break;
+                                }
+                            }
+                        } else {
+                            if (strpos($tabCursus, 'D') !== false) {
                                 // c'est un doctorant
                                 $flagDoc = 1;
                                 $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
                                     array('name' => 'enseignant')
                                 ));
-                                break;
                             }
                         }
                     }
@@ -398,17 +408,27 @@ class AccountController extends AbstractController
             if ($shibbolethAttributes['primary-affiliation'] == 'student') {
                 $flagDoc = 0;
 
-                // Test si doctorant sur supannEtuCursusAnnee
                 if ($shibbolethAttributes['supannEtuCursusAnnee']!= "") {
+                    // Test si doctorant sur supannEtuCursusAnnee
                     $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
-                    foreach ($tabCursus as $cursus) {
-                        if (strpos($cursus, 'D') !== false) {
+                    if (is_array($tabCursus)) {
+                        foreach ($tabCursus as $cursus) {
+                            if (strpos($cursus, 'D') !== false) {
+                                // c'est un doctorant
+                                $flagDoc = 1;
+                                $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
+                                    array('name' => 'enseignant')
+                                ));
+                                break;
+                            }
+                        }
+                    } else {
+                        if (strpos($tabCursus, 'D') !== false) {
                             // c'est un doctorant
                             $flagDoc = 1;
                             $trainee->setPublictype($doctrine->getRepository('App\Entity\Term\Publictype')->findOneBy(
                                 array('name' => 'enseignant')
                             ));
-                            break;
                         }
                     }
                 }
