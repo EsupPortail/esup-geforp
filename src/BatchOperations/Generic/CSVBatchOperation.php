@@ -673,7 +673,11 @@ SQL;
                         }
                         // Petite mise en forme pour faciliter les manips avec Excel
                         if (stripos($key,  'cost') !== false) {
-                            // Transformation '.' en ',' pour faciliter Excel
+                            // traitement specifique valeur nulle
+                            if ($rvalue == '0.0') {
+                                $rvalue = '0,0';
+
+                                // Transformation '.' en ',' pour faciliter Excel
                             $rvalue = str_replace('.', ',', $rvalue);
                         }
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
