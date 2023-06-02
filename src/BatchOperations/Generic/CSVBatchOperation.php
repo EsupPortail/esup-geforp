@@ -676,8 +676,9 @@ SQL;
                             // traitement specifique valeur nulle
                             if ($rvalue == '0.0') {
                                 $rvalue = '0,0';
+                            }
 
-                                // Transformation '.' en ',' pour faciliter Excel
+                            // Transformation '.' en ',' pour faciliter Excel
                             $rvalue = str_replace('.', ',', $rvalue);
                         }
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
