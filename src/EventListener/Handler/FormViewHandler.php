@@ -82,6 +82,7 @@ class FormViewHandler implements SubscribingHandlerInterface
         if (isset($variables['choices'])) {
             $expanded = !empty($variables['expanded']);
             $element['choices'] = $this->buildChoices($variables['choices'], $expanded, $variables);
+
             if (!$variables['required'] && (!isset($variables['multiple']) || !$variables['multiple']) && $variables['value'] && strpos($variables['id'], 'presence') === false) {
                 array_unshift($element['choices'], array(
                     'v' => null,
