@@ -115,7 +115,10 @@ class EmailTemplateVocabularyType extends VocabularyType
                 },
                 'required' => false,
             ))
-        ;
+            ->add('private', CheckboxType::class, array(
+                'label' => 'Lien calendrier',
+                'required' => false
+            ));
     }
 
     /**

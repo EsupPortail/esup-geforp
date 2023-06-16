@@ -22,6 +22,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             'label': config.templates[i]['name'],
             'subject': config.templates[i]['subject'],
             'body': config.templates[i]['body'],
+            'ical': config.templates[i]['private'],
             'attachmentTemplates': config.templates[i]['attachmentTemplates']
         };
     }
@@ -32,6 +33,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $scope.message.template = $scope.templates[0];
         $scope.message.subject = $scope.templates[0].subject;
         $scope.message.body = $scope.templates[0].body;
+        $scope.message.ical = $scope.templates[0].ical;
     }
 
     /**
