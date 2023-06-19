@@ -24,6 +24,12 @@ use Symfony\Component\Mime\Message;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Jsvrcek\ICS\Model\CalendarEvent;
+use Jsvrcek\ICS\Model\Calendar;
+use Jsvrcek\ICS\CalendarExport;
+use Jsvrcek\ICS\CalendarStream;
+use Jsvrcek\ICS\Utility\Formatter;
+use Symfony\Component\Mime\Part\DataPart;
 
 class EmailingBatchOperation extends AbstractBatchOperation
 {
@@ -128,7 +134,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return array
      */
-    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false)
+    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false, $ical = false)
     {
         $last = "";
         $doClear = true;
@@ -200,7 +206,35 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                 $msg->addCc($emailCorr);
                             }
                         }
+
+                        // AJOUT ICS CAL
+                        $calendar = new Calendar();
+                        $calendar->setTimezone(new \DateTimeZone('Europe/Paris'));
+                        $calendar->setProdId('-//Calendrier GEFORP//');
+
+                        $sessionName = $entity->getSession()->getTraining()->getName();
+
+                        // Creation tableau des evenements
+                        $tabDates = $entity->getSession()->getDates();
+                        $tabEvent = array(); $i=0;
+                        foreach ($tabDates as $dateSession) {
+                            $tabEvent[$i] = new CalendarEvent();
+                            $tabEvent[$i]->setStart($dateSession->getDatebegin()->modify('+8 hours'))
+                                ->setEnd($dateSession->getDateend()->modify('+18 hours'))
+                                ->setSummary($sessionName)
+                                ->setUid('event-uid'.$i);
+                            $calendar->addEvent($tabEvent[$i]);
+                            $i++;
+                        }
+                        $calendarExport = new CalendarExport(new CalendarStream(), new Formatter());
+                        $calendarExport->addCalendar($calendar);
+                        $ics = $calendarExport->getStream();
+
+                        $msg->attach($ics, 'ical.ics', 'text/calendar');
+
                     }
+
+                    // Envoi message
                     $last = $this->mailer->send($msg);
 
                     // save email in db

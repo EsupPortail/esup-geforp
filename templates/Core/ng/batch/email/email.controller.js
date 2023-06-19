@@ -18,6 +18,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             'label': config.templates[i]['name'],
             'subject': config.templates[i]['subject'],
             'body': config.templates[i]['body'],
+            'ical': config.templates[i]['private'],
             'templateAttachments': config.templates[i]['attachmentTemplates'],
             'templateAttachmentChecklist': []
         };

@@ -66,6 +66,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 sendMail: $scope.send.Mail,
                 subject: $scope.message.subject,
                 message: $scope.message.body,
+                ical: $scope.message.ical,
                 attachmentTemplates: attTemplates,
                 objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
