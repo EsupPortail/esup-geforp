@@ -223,7 +223,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                 $tabEvent[$i]->setStart($dateSession->getDatebegin()->modify('+8 hours'))
                                     ->setEnd($dateSession->getDateend()->modify('+18 hours'))
                                     ->setSummary($sessionName)
-                                    ->setUid('event-uid'.$i);
+                                    ->setUid('eventuid'.$i);
                                 $calendar->addEvent($tabEvent[$i]);
                                 $i++;
                             }
