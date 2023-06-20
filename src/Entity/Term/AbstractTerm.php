@@ -43,7 +43,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @var bool
      * @ORM\Column(name="private", type="boolean")
-     * @Serializer\Exclude
+     * @Serializer\Groups({"Default", "api"})
      */
     private $private = false;
 

@@ -164,10 +164,12 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             if (typeof oldValue != 'undefined') {
                 oldValue.subject = $scope.message.subject;
                 oldValue.body = $scope.message.body;
+                oldValue.ical = $scope.message.ical;
             }
             //replacing values
             $scope.message.subject = newValue.subject;
             $scope.message.body = newValue.body;
+            $scope.message.ical = newValue.ical;
             $scope.attCheckList = newValue.attachmentTemplates;
         }
     });

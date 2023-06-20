@@ -89,7 +89,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null);
+        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, isset($options['ical']) ? $options['ical'] : false);
 
         return new Response('', 204);
     }
@@ -207,31 +207,32 @@ class EmailingBatchOperation extends AbstractBatchOperation
                             }
                         }
 
-                        // AJOUT ICS CAL
-                        $calendar = new Calendar();
-                        $calendar->setTimezone(new \DateTimeZone('Europe/Paris'));
-                        $calendar->setProdId('-//Calendrier GEFORP//');
+                        if ($ical) {
+                            // AJOUT ICS CAL
+                            $calendar = new Calendar();
+                            $calendar->setTimezone(new \DateTimeZone('Europe/Paris'));
+                            $calendar->setProdId('-//Calendrier GEFORP//');
 
-                        $sessionName = $entity->getSession()->getTraining()->getName();
+                            $sessionName = $entity->getSession()->getTraining()->getName();
 
-                        // Creation tableau des evenements
-                        $tabDates = $entity->getSession()->getDates();
-                        $tabEvent = array(); $i=0;
-                        foreach ($tabDates as $dateSession) {
-                            $tabEvent[$i] = new CalendarEvent();
-                            $tabEvent[$i]->setStart($dateSession->getDatebegin()->modify('+8 hours'))
-                                ->setEnd($dateSession->getDateend()->modify('+18 hours'))
-                                ->setSummary($sessionName)
-                                ->setUid('event-uid'.$i);
-                            $calendar->addEvent($tabEvent[$i]);
-                            $i++;
+                            // Creation tableau des evenements
+                            $tabDates = $entity->getSession()->getDates();
+                            $tabEvent = array(); $i=0;
+                            foreach ($tabDates as $dateSession) {
+                                $tabEvent[$i] = new CalendarEvent();
+                                $tabEvent[$i]->setStart($dateSession->getDatebegin()->modify('+8 hours'))
+                                    ->setEnd($dateSession->getDateend()->modify('+18 hours'))
+                                    ->setSummary($sessionName)
+                                    ->setUid('event-uid'.$i);
+                                $calendar->addEvent($tabEvent[$i]);
+                                $i++;
+                            }
+                            $calendarExport = new CalendarExport(new CalendarStream(), new Formatter());
+                            $calendarExport->addCalendar($calendar);
+                            $ics = $calendarExport->getStream();
+
+                            $msg->attach($ics, 'ical.ics', 'text/calendar');
                         }
-                        $calendarExport = new CalendarExport(new CalendarStream(), new Formatter());
-                        $calendarExport->addCalendar($calendar);
-                        $ics = $calendarExport->getStream();
-
-                        $msg->attach($ics, 'ical.ics', 'text/calendar');
-
                     }
 
                     // Envoi message
