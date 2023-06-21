@@ -146,6 +146,15 @@ class BatchOperationRegistry
         $this->addBatchOperation($PDFBatchAttestation, $i);
         $i++;
 
+        // operation batch : publipostage inscription
+        $mailingBatchInscription = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
+        $mailingBatchInscription->setContainer($container);
+        $mailingBatchInscription->setDoctrine($doctrine);
+        $mailingBatchInscription->setTargetClass('App\Entity\Back\Inscription');
+        $mailingBatchInscription->setOptions($confMail['inscription']);
+        $this->addBatchOperation($mailingBatchInscription, $i);
+        $i++;
+
     }
 
     /**
@@ -226,6 +235,9 @@ class BatchOperationRegistry
                 break;
             case 'sygefor_core.batch.pdf.inscription.attestation':
                 $id = 11;
+                break;
+            case 'sygefor_core.batch.publipost.inscription':
+                $id = 12;
                 break;
         }
         if (isset($this->operations[$id])) {
