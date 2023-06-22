@@ -305,7 +305,7 @@ class CSVBatchOperation extends AbstractBatchOperation
 //                        if($inscription->getInscriptionstatus()->getMachinename() == "convoke") {
 
                         // on regarde si l'inscription est bien dans un statut présent ou partiel
-                        if (($inscription->getPresencestatus()->getMachinename() == "present") || ($inscription->getPresencestatus()->getMachinename() == "partiel")) {
+                        if (($inscription->getPresencestatus()) && (($inscription->getPresencestatus()->getMachinename() == "present") || ($inscription->getPresencestatus()->getMachinename() == "partiel"))) {
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                             $query = $em
                                 ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
