@@ -303,6 +303,9 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                         // on regarde si l'inscription est bien dans un statut convoqué // DEMANDE DRH : NE PLUS VERIFIER
 //                        if($inscription->getInscriptionstatus()->getMachinename() == "convoke") {
+
+                        // on regarde si l'inscription est bien dans un statut présent ou partiel
+                        if (($inscription->getPresencestatus()->getMachinename() == "present") || ($inscription->getPresencestatus()->getMachinename() == "partiel")) {
                             // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                             $query = $em
                                 ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
@@ -340,9 +343,9 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             // Transformation '.' en ',' pour faciliter Excel
                             $data[$key] = str_replace('.', ',', $data[$key]);
-//                        } else {
-//                            $data[$key] = '';
-//                        }
+                        } else {
+                            $data[$key] = '';
+                        }
                     } elseif ($key == "presence.partiel") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
