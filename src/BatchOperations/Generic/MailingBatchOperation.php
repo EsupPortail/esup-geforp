@@ -832,6 +832,9 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     $lines[$i]['dateDebut'] = $entity->getSession()->getDatebegin();
                     $lines[$i]['centre.nom'] = $entity->getSession()->getOrganization()->getName();
                     $lines[$i]['domaine'] = $entity->getSession()->getTraining()->getTheme()->getName();
+                    $lines[$i]['session.nom'] = $entity->getSession()->getName();
+                    $lines[$i]['session.formation.description'] = $entity->getSession()->getTraining()->getDescription();
+                    $lines[$i]['session.commentaires'] = $entity->getSession()->getComments();
                     $lines[$i]['listeFormateurs'] = $entity->getSession()->getTrainersListString();
 
                     $lines[$i]['stagiaire.nom'] = $entity->getTrainee()->getLastname();
