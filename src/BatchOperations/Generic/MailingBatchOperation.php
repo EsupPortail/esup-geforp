@@ -529,12 +529,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 //            }
             //var_dump(current($lines));
 
-            if (($fileTest === false) && ($fileTest2 === false) && ($fileTest3 === false) && ($fileTest4 === false) && ($fileTest5 === false) && ($fileTest6 === false)) {
+/*            if (($fileTest === false) && ($fileTest2 === false) && ($fileTest3 === false) && ($fileTest4 === false) && ($fileTest5 === false) && ($fileTest6 === false)) {
                 $TBS->MergeField('global', current($lines)->toArray());
             }
-            else {
+            else {*/
                 $TBS->MergeField('global', current($lines));
-            }
+//            }
         }
 
         reset($lines);
@@ -804,5 +804,102 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         $str = str_replace('\'', '-', $str);
 
         return $str;
+    }
+
+    /**
+     * @param $entities
+     *
+     * @return mixed
+     */
+    private function dataForTBS($entities)
+    {
+        $data = array();
+        $lines = array();
+
+        switch (get_class($entities[0])) {
+            case \App\Entity\Back\Inscription::class:
+                $data['entityName'] = 'inscription';
+
+                // Construction des lignes
+                $i = 0;
+                foreach ($entities as $entity) {
+                    $data = $this->hrpaf->getAccessor($entity);
+
+                    $lines[$i]['typeaction'] = $data->typeAction;
+                    $lines[$i]['motivation'] = $data->motivation;
+                    $lines[$i]['refus'] = $data->refuse;
+
+                    $lines[$i]['dateDebut'] = $entity->getSession()->getDatebegin();
+                    $lines[$i]['centre.nom'] = $entity->getSession()->getOrganization()->getName();
+                    $lines[$i]['domaine'] = $entity->getSession()->getTraining()->getTheme()->getName();
+                    $lines[$i]['listeFormateurs'] = $entity->getSession()->getTrainersListString();
+
+                    $lines[$i]['stagiaire.nom'] = $entity->getTrainee()->getLastname();
+                    $lines[$i]['stagiaire.prenom'] = $entity->getTrainee()->getFirstname();
+                    $lines[$i]['stagiaire.mail'] = $entity->getTrainee()->getEmail();
+                    $lines[$i]['stagiaire.unite'] = $entity->getTrainee()->getInstitution() ? $entity->getTrainee()->getInstitution()->getName() : '';
+                    $lines[$i]['stagiaire.service'] = $entity->getTrainee()->getService();
+                    $lines[$i]['stagiaire.corps'] = $entity->getTrainee()->getCorps();
+                    $lines[$i]['stagiaire.bap'] = $entity->getTrainee()->getBap();
+                    $lines[$i]['stagiaire.fonction'] = $entity->getTrainee()->getFonction();
+
+                    $lines[$i]['statutInscription'] = $entity->getInscriptionStatus()->getName();
+                    $lines[$i]['statutPresence'] = $entity->getPresenceStatus()->getName();
+
+                    $datesSess = $entity->getSession()->getDates();
+                    foreach ($datesSess as $ds) {
+                        $lines[0]['dates'][] = array('dateDebut' => $ds->getDatebegin(),
+                                                    'dateFin' => $ds->getDateend(),
+                                                    'horairesMatin' =>  $ds->getSchedulemorn(),
+                                                    'horairesAprem' =>  $ds->getScheduleafter(),
+                                                    'nbHeuresMatin' =>  $ds->getHournumbermorn(),
+                                                    'nbHeuresApr' =>  $ds->getHournumberafter(),
+                                                    'lieu' =>  $ds->getPlace());
+                    }
+
+                    $i += 1;
+                }
+                $data['lines'] = $lines;
+                break;
+
+            case \App\Entity\Back\Session::class:
+                $data['entityName'] = 's';
+
+                // Construction des lignes
+                $i = 0;
+                foreach ($entities as $entity) {
+                    $data = $this->hrpaf->getAccessor($entity);
+
+                    $lines[$i]['dateDebut'] = $data->dateDebut;
+                    $lines[$i]['nom'] = $data->nom;
+                    $lines[$i]['centre.nom'] = $entity->getOrganization()->getName();
+                    $lines[$i]['domaine'] = $entity->getTraining()->getTheme()->getName();
+                    $lines[$i]['listeFormateurs'] = $entity->getTrainersListString();
+
+                    $inscriptions = $entities[0]->getInscriptions();
+                    foreach ($inscriptions as $insc) {
+                        $lines[0]['inscriptions'][] = array('stagiaire.nom' => $insc->getTrainee()->getLastname(),
+                            'stagiaire.prenom' => $insc->getTrainee()->getFirstname(),
+                            'stagiaire.nomComplet' => $insc->getTrainee()->getFullname(),
+                            'stagiaire.mail' => $insc->getTrainee()->getEmail(),
+                            'stagiaire.unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '',
+                            'stagiaire.service' => $insc->getTrainee()->getService(),
+                            'stagaire.corps' => $insc->getTrainee()->getCorps(),
+                            'stagiaire.bap' => $insc->getTrainee()->getBap(),
+                            'stagiaire.fonction' => $insc->getTrainee()->getFonction(),
+                            'statutInscription' => $insc->getInscriptionStatus()->getName(),
+                            'statutPresence' => $insc->getPresenceStatus()->getName(),
+                            'refus' => $insc->getRefuse(),
+                            'motivation' => $insc->getMotivation());
+                    }
+
+                    usort($lines[0]['inscriptions'], function ($a, $b) {
+                        return strcasecmp($a['nom'], $b['nom']);
+                    });
+
+                    $i += 1;
+                }
+                $data['lines'] = $lines;
+        }
     }
 }
