@@ -269,10 +269,10 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         if ($fileTest5 == false) {
                             if ($fileTest6 == false) {
                                 //tous les autres cas
-                                $tabRes = dataForTBS($entities);
+                                $tabRes = $this->dataForTBS($entities);
                                 $lines = $tabRes['lines'];
                                 $entityName = $tabRes['entityName'];
-                             
+
                             } else {
                                 // Cas de la liste des personnes en liste d'attente
                                 // Cas de la liste des inscrits à une session acceptés
@@ -806,60 +806,63 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      */
     private function dataForTBS($entities)
     {
-        $data = array();
+        $dataRes = array();
         $lines = array();
 
         switch (get_class($entities[0])) {
             case \App\Entity\Back\Inscription::class:
-                $data['entityName'] = 'inscription';
+                $dataRes['entityName'] = 'inscription';
 
                 // Construction des lignes
                 $i = 0;
                 foreach ($entities as $entity) {
-                    $data = $this->hrpaf->getAccessor($entity);
 
-                    $lines[$i]['typeaction'] = $data->typeAction;
-                    $lines[$i]['motivation'] = $data->motivation;
-                    $lines[$i]['refus'] = $data->refuse;
+                    $lines[$i]['typeaction'] = $entity->getActiontype();
+                    $lines[$i]['motivation'] = $entity->getMotivation();
+                    $lines[$i]['refus'] = $entity->getRefuse();
 
                     $lines[$i]['dateDebut'] = $entity->getSession()->getDatebegin();
-                    $lines[$i]['centre.nom'] = $entity->getSession()->getOrganization()->getName();
+                    $lines[$i]['centreNom'] = $entity->getSession()->getTraining()->getOrganization()->getName();
                     $lines[$i]['domaine'] = $entity->getSession()->getTraining()->getTheme()->getName();
-                    $lines[$i]['session.nom'] = $entity->getSession()->getName();
-                    $lines[$i]['session.formation.description'] = $entity->getSession()->getTraining()->getDescription();
-                    $lines[$i]['session.commentaires'] = $entity->getSession()->getComments();
+                    $lines[$i]['nom'] = $entity->getSession()->getName();
+                    $lines[$i]['sessionDescription'] = $entity->getSession()->getTraining()->getDescription();
+                    $lines[$i]['sessionCommentaires'] = $entity->getSession()->getComments();
                     $lines[$i]['listeFormateurs'] = $entity->getSession()->getTrainersListString();
 
-                    $lines[$i]['stagiaire.nom'] = $entity->getTrainee()->getLastname();
-                    $lines[$i]['stagiaire.prenom'] = $entity->getTrainee()->getFirstname();
-                    $lines[$i]['stagiaire.mail'] = $entity->getTrainee()->getEmail();
-                    $lines[$i]['stagiaire.unite'] = $entity->getTrainee()->getInstitution() ? $entity->getTrainee()->getInstitution()->getName() : '';
-                    $lines[$i]['stagiaire.service'] = $entity->getTrainee()->getService();
-                    $lines[$i]['stagiaire.corps'] = $entity->getTrainee()->getCorps();
-                    $lines[$i]['stagiaire.bap'] = $entity->getTrainee()->getBap();
-                    $lines[$i]['stagiaire.fonction'] = $entity->getTrainee()->getFonction();
+                    $lines[$i]['stagiaireNom'] = $entity->getTrainee()->getLastname();
+                    $lines[$i]['stagiairePrenom'] = $entity->getTrainee()->getFirstname();
+                    $lines[$i]['stagiaireNomComplet'] = $entity->getTrainee()->getFullName();
+                    $lines[$i]['stagiaireMail'] = $entity->getTrainee()->getEmail();
+                    $lines[$i]['stagiaireUnite'] = $entity->getTrainee()->getInstitution() ? $entity->getTrainee()->getInstitution()->getName() : '';
+                    $lines[$i]['stagiaireCivilite'] = $entity->getTrainee()->getTitle()->getName();
+                    $lines[$i]['stagiaireService'] = $entity->getTrainee()->getService();
+                    $lines[$i]['stagiaireCorps'] = $entity->getTrainee()->getCorps();
+                    $lines[$i]['stagiaireBap'] = $entity->getTrainee()->getBap();
+                    $lines[$i]['stagiaireFonction'] = $entity->getTrainee()->getFonction();
 
-                    $lines[$i]['statutInscription'] = $entity->getInscriptionStatus()->getName();
-                    $lines[$i]['statutPresence'] = $entity->getPresenceStatus()->getName();
+                    if($entity->getInscriptionStatus() != null)
+                        $lines[$i]['statutInscription'] = $entity->getInscriptionStatus()->getName();
+                    if($entity->getPresenceStatus() != null)
+                        $lines[$i]['statutPresence'] = $entity->getPresenceStatus()->getName();
 
                     $datesSess = $entity->getSession()->getDates();
                     foreach ($datesSess as $ds) {
-                        $lines[0]['dates'][] = array('dateDebut' => $ds->getDatebegin(),
-                                                    'dateFin' => $ds->getDateend(),
-                                                    'horairesMatin' =>  $ds->getSchedulemorn(),
-                                                    'horairesAprem' =>  $ds->getScheduleafter(),
-                                                    'nbHeuresMatin' =>  $ds->getHournumbermorn(),
-                                                    'nbHeuresApr' =>  $ds->getHournumberafter(),
-                                                    'lieu' =>  $ds->getPlace());
+                        $lines[$i]['dates'][] = array('dateDebut' => $ds->getDatebegin()->format('d/m/Y'),
+                            'dateFin' => $ds->getDateend()->format('d/m/Y'),
+                            'horairesMatin' =>  $ds->getSchedulemorn(),
+                            'horairesAprem' =>  $ds->getScheduleafter(),
+                            'nbHeuresMatin' =>  $ds->getHournumbermorn(),
+                            'nbHeuresApr' =>  $ds->getHournumberafter(),
+                            'lieu' =>  $ds->getPlace());
                     }
 
                     $i += 1;
                 }
-                $data['lines'] = $lines;
+                $dataRes['lines'] = $lines;
                 break;
 
             case \App\Entity\Back\Session::class:
-                $data['entityName'] = 's';
+                $dataRes['entityName'] = 's';
 
                 // Construction des lignes
                 $i = 0;
@@ -874,7 +877,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
                     $inscriptions = $entities[0]->getInscriptions();
                     foreach ($inscriptions as $insc) {
-                        $lines[0]['inscriptions'][] = array('stagiaire.nom' => $insc->getTrainee()->getLastname(),
+                        $lines[$i]['inscriptions'][] = array('stagiaire.nom' => $insc->getTrainee()->getLastname(),
                             'stagiaire.prenom' => $insc->getTrainee()->getFirstname(),
                             'stagiaire.nomComplet' => $insc->getTrainee()->getFullname(),
                             'stagiaire.mail' => $insc->getTrainee()->getEmail(),
@@ -895,7 +898,9 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
                     $i += 1;
                 }
-                $data['lines'] = $lines;
+                $dataRes['lines'] = $lines;
+                break;
         }
+        return $dataRes;
     }
 }
