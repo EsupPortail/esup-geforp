@@ -9,7 +9,9 @@
 
 namespace App\BatchOperations\Inscription;
 
+use App\BatchOperations\BatchOperationRegistry;
 use App\BatchOperations\Generic\EmailingBatchOperation;
+use App\BatchOperations\Generic\MailingBatchOperation;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -37,17 +39,19 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
     private $security;
     private $vocRegistry;
     private $emailBatch;
+    private $batchOpRegistry;
 
     /**
      * @var string
      */
     protected $targetClass = AbstractInscription::class;
 
-    public function __construct(Security $security, VocabularyRegistry $vocRegistry, EmailingBatchOperation $emailBatch)
+    public function __construct(Security $security, VocabularyRegistry $vocRegistry, EmailingBatchOperation $emailBatch, BatchOperationRegistry $batchOpRegistry)
     {
         $this->security = $security;
         $this->vocRegistry =$vocRegistry;
         $this->emailBatch = $emailBatch;
+        $this->batchOpRegistry = $batchOpRegistry;
     }
 
 
@@ -171,7 +175,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                     $repo = $this->doctrine->getRepository('App\Entity\Term\Publiposttemplate');
                     foreach ($options['attachmentTemplates'] as $tplId) {
                         $tpl           = $repo->find($tplId);
-                        $attachments[] = $this->container->get('sygefor_core.batch.publipost.inscription')->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
+                        $attachments[] = $this->batchOpRegistry->getByName('sygefor_core.batch.publipost.inscription')->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
                     }
                 }
 
