@@ -269,17 +269,10 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         if ($fileTest5 == false) {
                             if ($fileTest6 == false) {
                                 //tous les autres cas
-                                //iterating through properties to construct a (nested) array of properties => values
-                                foreach ($entities as $entity) {
-                                    //                    if ($this->securityContext->isGranted('VIEW', $entity)) {
-                                    $data = $this->hrpaf->getAccessor($entity);
-                                    $lines[$entity->getId()] = $data;
-                                    //                    }
-                                }
-
-                                if (!empty($this->idList)) {
-                                    $this->reorderByKeys($lines, $this->idList);
-                                }
+                                $tabRes = dataForTBS($entities);
+                                $lines = $tabRes['lines'];
+                                $entityName = $tabRes['entityName'];
+                             
                             } else {
                                 // Cas de la liste des personnes en liste d'attente
                                 // Cas de la liste des inscrits à une session acceptés
