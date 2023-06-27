@@ -184,7 +184,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         }
                         foreach ($attachments as $attachment) {
                             $path = $attachment->getPathname();
-                            $originalName = $attachment->getClientOriginalName();
+                            $originalName = $attachment->getFilename();
                             $msg->attachFromPath($path, $originalName);
                         }
                     }
