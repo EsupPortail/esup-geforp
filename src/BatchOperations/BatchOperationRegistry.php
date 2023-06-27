@@ -80,8 +80,17 @@ class BatchOperationRegistry
         $this->addBatchOperation($mailingBatchTrainer, $i);
         $i++;
 
+        // operation batch : publipostage inscription
+        $mailingBatchInscription = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
+        $mailingBatchInscription->setContainer($container);
+        $mailingBatchInscription->setDoctrine($doctrine);
+        $mailingBatchInscription->setTargetClass('App\Entity\Back\Inscription');
+        $mailingBatchInscription->setOptions($confMail['inscription']);
+        $this->addBatchOperation($mailingBatchInscription, $i);
+        $i++;
+
         // operation batch : changement de statut d'inscription
-        $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatch);
+        $operation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatch, $mailingBatchInscription);
         $operation->setDoctrine($doctrine);
         $this->addBatchOperation($operation, $i);
         $i++;
@@ -146,15 +155,6 @@ class BatchOperationRegistry
         $this->addBatchOperation($PDFBatchAttestation, $i);
         $i++;
 
-        // operation batch : publipostage inscription
-        $mailingBatchInscription = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $hrpa);
-        $mailingBatchInscription->setContainer($container);
-        $mailingBatchInscription->setDoctrine($doctrine);
-        $mailingBatchInscription->setTargetClass('App\Entity\Back\Inscription');
-        $mailingBatchInscription->setOptions($confMail['inscription']);
-        $this->addBatchOperation($mailingBatchInscription, $i);
-        $i++;
-
     }
 
     /**
@@ -212,33 +212,34 @@ class BatchOperationRegistry
             case 'sygefor_core.batch.publipost.trainer':
                 $id = 3;
                 break;
-            case 'sygefor_inscription.batch.inscription_status_change':
+            case 'sygefor_core.batch.publipost.inscription':
                 $id = 4;
                 break;
-            case 'sygefor_core.batch.csv.session':
+            case 'sygefor_inscription.batch.inscription_status_change':
                 $id = 5;
                 break;
-            case 'sygefor_core.batch.csv.semestered_training':
+            case 'sygefor_core.batch.csv.session':
                 $id = 6;
                 break;
-            case 'sygefor_core.batch.csv.inscription':
+            case 'sygefor_core.batch.csv.semestered_training':
                 $id = 7;
                 break;
-            case 'sygefor_core.batch.csv.trainee':
+            case 'sygefor_core.batch.csv.inscription':
                 $id = 8;
                 break;
-            case 'sygefor_core.batch.csv.institution':
+            case 'sygefor_core.batch.csv.trainee':
                 $id = 9;
                 break;
-            case 'sygefor_core.batch.csv.trainer':
+            case 'sygefor_core.batch.csv.institution':
                 $id = 10;
                 break;
-            case 'sygefor_core.batch.pdf.inscription.attestation':
+            case 'sygefor_core.batch.csv.trainer':
                 $id = 11;
                 break;
-            case 'sygefor_core.batch.publipost.inscription':
+            case 'sygefor_core.batch.pdf.inscription.attestation':
                 $id = 12;
                 break;
+
         }
         if (isset($this->operations[$id])) {
             return $this->operations[$id];

@@ -39,19 +39,19 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
     private $security;
     private $vocRegistry;
     private $emailBatch;
-    private $batchOpRegistry;
+    private $mailingBatch;
 
     /**
      * @var string
      */
     protected $targetClass = AbstractInscription::class;
 
-    public function __construct(Security $security, VocabularyRegistry $vocRegistry, EmailingBatchOperation $emailBatch, BatchOperationRegistry $batchOpRegistry)
+    public function __construct(Security $security, VocabularyRegistry $vocRegistry, EmailingBatchOperation $emailBatch, MailingBatchOperation $mailingBatch)
     {
         $this->security = $security;
         $this->vocRegistry =$vocRegistry;
         $this->emailBatch = $emailBatch;
-        $this->batchOpRegistry = $batchOpRegistry;
+        $this->mailingBatch = $mailingBatch;
     }
 
 
@@ -175,7 +175,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                     $repo = $this->doctrine->getRepository('App\Entity\Term\Publiposttemplate');
                     foreach ($options['attachmentTemplates'] as $tplId) {
                         $tpl           = $repo->find($tplId);
-                        $attachments[] = $this->batchOpRegistry->getByName('sygefor_core.batch.publipost.inscription')->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
+                        $attachments[] = $this->mailingBatch->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
                     }
                 }
 
