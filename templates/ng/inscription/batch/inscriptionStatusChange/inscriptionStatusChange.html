@@ -72,6 +72,21 @@
                 </div>
             </div>
         </div>
+        <div class="form-group" ng-show='send.Mail'ng-if="message.attachments.length > 0">
+            <label for="attachments" class="col-sm-3 control-label">Pièce{{ message.attachments.length > 1 ? 's' : '' }} jointe{{ message.attachments.length > 1 ? 's' : '' }} supplémentaire{{ message.attachments.length > 1 ? 's' : '' }}</label>
+            <div class="col-sm-9">
+                <div ng-repeat="(id, attachment) in message.attachments track by $index">
+                    <label class="control-label" for="attachment_{{ id }}">{{attachment.name}}</label>&nbsp;
+                    <a href="" ng-click="removeAttachment(id)">&nbsp;x&nbsp;</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail'>
+            <label for="inputTplFile" class="col-sm-3 control-label">Ajouter des pièces jointes</label>
+            <div class="col-sm-9">
+                <input multiple type="file" class="form-control" onChange="angular.element(this).scope().fileChanged(this,angular.element(this).scope())" id="inputAttachment"/>
+            </div>
+        </div>
 
         <div class="alert alert-danger" ng-show="formError != ''">{{ formError }}</div>
     </form>

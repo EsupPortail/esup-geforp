@@ -33,8 +33,10 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $scope.message.template = $scope.templates[0];
         $scope.message.subject = $scope.templates[0].subject;
         $scope.message.body = $scope.templates[0].body;
+        $scope.message.attachmentTemplates = $scope.templates[0].attachmentTemplates;
         $scope.message.ical = $scope.templates[0].ical;
     }
+    $scope.message.attachments = [];
 
     /**
      * ensures the form was correctly filed (sets an error message otherwise), then asks for server-side message sending
@@ -70,6 +72,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 attachmentTemplates: attTemplates,
                 objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
+            attachments: $scope.message.attachments,
             ids: $scope.items.join(",")
         };
 
@@ -81,9 +84,32 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             data['options']['presencestatus'] = $scope.presencestatus.id
         }
 
-        $http.post(url, data).success(function() {
+        $http({
+            method: 'POST',
+            url: url,
+            transformRequest: function (data) {
+                var formData = new FormData();
+                //need to convert our json object to a string version of json otherwise
+                // the browser will do a 'toString()' on the object which will result
+                // in the value '[Object object]' on the server.
+                formData.append("options", angular.toJson(data.options));
+                //now add all of the assigned files
+                formData.append("ids", angular.toJson(data.ids));
+                //add each file to the form data and iteratively name them
+                for (var key in data.attachments) {
+                    formData.append("attachment_" + key, data.attachments[key]);
+                }
+                return formData;
+            },
+            headers: {'Content-Type': undefined},
+            data: data
+        }).success(function (data) {
             $scope.dialog.close();
         });
+/*
+        $http.post(url, data).success(function() {
+            $scope.dialog.close();
+        });*/
     };
 
     $scope.preview = function () {
@@ -151,9 +177,26 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     $scope.fileChanged = function (element, $scope) {
         $scope.$apply(function (scope) {
             $scope.options.templateFile = element.files[0];
+
+            for (var key in element.files) {
+                if (typeof element.files[key] === "object") {
+                    $scope.message.attachments.push(element.files[key]);
+                }
+            }
         });
+        angular.element($('#inputAttachment')).val(null);
     };
 
+    /**
+     * Remove file attachment
+     * @param key
+     */
+    $scope.removeAttachment = function(key) {
+        $scope.message.attachments.splice(key, 1);
+        angular.element($('#inputAttachment')).val(null);
+    };
+
+    
     /**
      * Watches selected template. When changed, current field contents are stored,
      * then replaced byselected template values
