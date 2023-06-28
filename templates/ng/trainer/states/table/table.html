@@ -23,7 +23,7 @@
                         <td><a href="" ui-sref="trainer.detail.view({ id: item.id })">{{ item.fullname }}</a></td>
                         <td>{{ item.institution.name }}</td>
                         <td>{{ item.service }}</td>
-                        <td>{{ item.isOrganization ? 'Formateur interne' : 'Formateur externe' }}</td>
+                        <td>{{ item.isorganization ? 'Formateur interne' : 'Formateur externe' }}</td>
                         <td><span ng-class="{'label label-lg label-danger': item.isArchived}">{{ item.isArchived === true ? 'Oui' : 'Non' }}</span></td>
                         <td><span class="label label-lg" ng-class="{'label-success': item.isPublic, 'label-danger': !item.isPublic}">{{ item.isPublic ? 'Publié' : 'Non publié' }}</span></td>
                     </tr>
