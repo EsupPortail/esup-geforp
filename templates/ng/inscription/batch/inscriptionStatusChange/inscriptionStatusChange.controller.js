@@ -23,7 +23,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             'subject': config.templates[i]['subject'],
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
-            'attachmentTemplates': config.templates[i]['attachmentTemplates']
+            'attachmentTemplates': config.templates[i]['attachment_templates']
         };
     }
 
