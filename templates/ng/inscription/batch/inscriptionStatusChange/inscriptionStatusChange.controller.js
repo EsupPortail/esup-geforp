@@ -177,7 +177,14 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     $scope.fileChanged = function (element, $scope) {
         $scope.$apply(function (scope) {
             $scope.options.templateFile = element.files[0];
+        });
+    };
 
+    /**
+     * watches file upload, and updates the form accordingly
+     */
+    $scope.fileChangedAtt = function (element, $scope) {
+        $scope.$apply(function (scope) {
             for (var key in element.files) {
                 if (typeof element.files[key] === "object") {
                     $scope.message.attachments.push(element.files[key]);
@@ -194,6 +201,10 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
     $scope.removeAttachment = function(key) {
         $scope.message.attachments.splice(key, 1);
         angular.element($('#inputAttachment')).val(null);
+    };
+
+    $scope.isAObject = function(mixed) {
+        return typeof mixed === "object";
     };
 
     

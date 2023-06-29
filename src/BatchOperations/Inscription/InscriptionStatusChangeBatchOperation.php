@@ -171,6 +171,11 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
             //managing attachments
             foreach ($arrayInscriptionsGranted as $inscription) {
                 $attachments = array();
+
+                if (isset($options['attachment'])) {
+                    $attachments = $options['attachment'];
+                }
+
                 if ($options['attachmentTemplates']) {
                     $repo = $this->doctrine->getRepository('App\Entity\Term\Publiposttemplate');
                     foreach ($options['attachmentTemplates'] as $tplId) {
