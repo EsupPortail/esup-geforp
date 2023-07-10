@@ -19,7 +19,7 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Security;
-use Volcanus\Csv\Writer;
+use League\Csv\Writer;
 
 /**
  * Class CSVBatchOperation.
@@ -717,11 +717,17 @@ SQL;
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
         $fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
-        $writer = new Writer($this->options['volcanus_config']);
-        $writer->fields($fields);
-        $file = new \SplFileObject($this->options['tempDir'] . $fileName, 'w+');
-        $writer->setFile($file);
-        $writer->write($lines);
+
+//        $writer = new Writer($this->options['volcanus_config']);
+//        $writer->fields($fields);
+        $csv = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
+        $csv->setDelimiter(';');
+        $csv->insertOne($fields);
+        $csv->insertAll($lines);
+
+//        $file = new \SplFileObject($this->options['tempDir'] . $fileName, 'w+');
+//        $writer->setFile($file);
+//        $writer->write($lines);
         //$writer->send();
         return array('fileUrl' => $fileName);
     }
