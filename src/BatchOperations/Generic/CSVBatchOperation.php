@@ -20,6 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Security\Core\Security;
 use League\Csv\Writer;
+use League\Csv\CharsetConverter;
 
 /**
  * Class CSVBatchOperation.
@@ -700,6 +701,7 @@ SQL;
 
         // fields
         $fields = array();
+        $heads = array();
 
         foreach ($this->options['fields'] as $label => $value) {
             ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
@@ -707,8 +709,10 @@ SQL;
 
             if (isset($value['label'])) {
                 $fields[] = array($label, $value['label']);
+                $heads[] = $value['label'];
             } else {
                 $fields[] = array($label, $value);
+                $heads[] = $value;
             }
         }
 
@@ -718,17 +722,23 @@ SQL;
         }
         $fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
 
-//        $writer = new Writer($this->options['volcanus_config']);
-//        $writer->fields($fields);
+        // encodage fichier
+        $encoder = (new CharsetConverter())
+            ->inputEncoding($this->options['volcanus_config']['inputEncoding'])
+            ->outputEncoding($this->options['volcanus_config']['outputEncoding']);
+
         $csv = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
-        $csv->setDelimiter(';');
-        $csv->insertOne($fields);
+        // Mise en forme fichier
+        $csv->setDelimiter($this->options['volcanus_config']['delimiter']);
+        $csv->setEnclosure($this->options['volcanus_config']['enclosure']);
+        $csv->setEscape($this->options['volcanus_config']['escape']);
+        $csv->addFormatter($encoder);
+        $bom = $csv->getInputBOM();
+
+        // Insertion
+        $csv->insertOne($heads);
         $csv->insertAll($lines);
 
-//        $file = new \SplFileObject($this->options['tempDir'] . $fileName, 'w+');
-//        $writer->setFile($file);
-//        $writer->write($lines);
-        //$writer->send();
         return array('fileUrl' => $fileName);
     }
 
