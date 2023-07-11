@@ -57,8 +57,7 @@
         "twbs/bootstrap": "^5.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/string-extra": "^3.4",
-        "twig/twig": "^2.12|^3.0",
-        "volcanus/csv": "^1.2"
+        "twig/twig": "^2.12|^3.0"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.4",
