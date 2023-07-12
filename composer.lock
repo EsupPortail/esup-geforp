@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1259a7f91e00f7b876d37b38baa6d4eb",
+    "content-hash": "ad55651aa1911c340d3aceaa4661157a",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -8973,6 +8973,101 @@
                 }
             ],
             "time": "2023-04-23T19:33:36+00:00"
+        },
+        {
+            "name": "tinybutstrong/opentbs",
+            "version": "v1.11.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Skrol29/opentbs.git",
+                "reference": "89aea4db66bc76808f70e7fc7bd37980da0f5011"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Skrol29/opentbs/zipball/89aea4db66bc76808f70e7fc7bd37980da0f5011",
+                "reference": "89aea4db66bc76808f70e7fc7bd37980da0f5011",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0",
+                "tinybutstrong/tinybutstrong": ">=3.15.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "tbs_plugin_opentbs.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Skrol29",
+                    "email": "skrol29dev@gmail.com"
+                }
+            ],
+            "description": "With OpenTBS you can merge OpenOffice - LibreOffice and Ms Office documents with PHP using the TinyButStrong template engine. Simple use OpenOffice - LibreOffice or Ms Office to edit your templates : DOCX, XLSX, PPTX, ODT, OSD, ODP and other formats.",
+            "homepage": "http://www.tinybutstrong.com/opentbs.php",
+            "keywords": [
+                "docx",
+                "odp",
+                "ods",
+                "odt",
+                "pptx",
+                "templating",
+                "xlsx"
+            ],
+            "support": {
+                "issues": "https://github.com/Skrol29/opentbs/issues",
+                "source": "https://github.com/Skrol29/opentbs/tree/v1.11.0"
+            },
+            "time": "2023-05-15T12:14:41+00:00"
+        },
+        {
+            "name": "tinybutstrong/tinybutstrong",
+            "version": "v3.15.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Skrol29/tinybutstrong.git",
+                "reference": "9d28b5384c5370b8bf4239dde5e3e6399afd3dce"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Skrol29/tinybutstrong/zipball/9d28b5384c5370b8bf4239dde5e3e6399afd3dce",
+                "reference": "9d28b5384c5370b8bf4239dde5e3e6399afd3dce",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "tbs_class.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-only"
+            ],
+            "authors": [
+                {
+                    "name": "Skrol29",
+                    "email": "skrol29dev@gmail.com"
+                }
+            ],
+            "description": "Template Engine for Pro and Beginners ",
+            "homepage": "http://www.tinybutstrong.com",
+            "keywords": [
+                "templating"
+            ],
+            "support": {
+                "issues": "https://github.com/Skrol29/tinybutstrong/issues",
+                "source": "https://github.com/Skrol29/tinybutstrong/tree/v3.15.0"
+            },
+            "time": "2023-05-15T12:12:38+00:00"
         },
         {
             "name": "twbs/bootstrap",

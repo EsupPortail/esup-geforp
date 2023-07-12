@@ -235,7 +235,10 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         return array('fileUrl' => $fileName); */
         //getting the file generator
-        $TBS = new OpenTBS();
+//        $TBS = new OpenTBS();
+        $TBS = new clsTinyButStrong;
+        $TBS->Plugin(TBS_INSTALL, 'clsOpenTBS');
+
         $TBS->setOption('noerr', true);
 
         //loading the template
