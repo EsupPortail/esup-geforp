@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad55651aa1911c340d3aceaa4661157a",
+    "content-hash": "de080c1bc620346e0917c10349117940",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -2715,63 +2715,6 @@
                 "source": "https://github.com/thephpleague/csv/tree/master"
             },
             "time": "2017-08-18T10:27:55+00:00"
-        },
-        {
-            "name": "mbence/opentbs-bundle",
-            "version": "dev-master",
-            "target-dir": "MBence/OpenTBSBundle",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mbence/OpenTBSBundle.git",
-                "reference": "6e6be4befb7f659df522cecd10cd27d0935d65c9"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mbence/OpenTBSBundle/zipball/6e6be4befb7f659df522cecd10cd27d0935d65c9",
-                "reference": "6e6be4befb7f659df522cecd10cd27d0935d65c9",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "default-branch": true,
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-0": {
-                    "MBence\\OpenTBSBundle": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Bence Meszaros",
-                    "email": "bence@bencemeszaros.com",
-                    "homepage": "http://bencemeszaros.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "OpenTBS Bundle for Symfony - create OpenOffice and Ms Office documents with Symfony",
-            "homepage": "https://github.com/mbence/OpenTBSBundle",
-            "keywords": [
-                "MS Office",
-                "OpenOffice",
-                "OpenTBS",
-                "TBS",
-                "document",
-                "docx",
-                "odt",
-                "pptx",
-                "symfony",
-                "xlsx"
-            ],
-            "support": {
-                "issues": "https://github.com/mbence/OpenTBSBundle/issues",
-                "source": "https://github.com/mbence/OpenTBSBundle/tree/master"
-            },
-            "time": "2016-09-27T12:20:06+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -11864,9 +11807,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "mbence/opentbs-bundle": 20
-    },
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

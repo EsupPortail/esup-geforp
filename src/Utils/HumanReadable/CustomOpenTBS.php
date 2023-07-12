@@ -8,8 +8,8 @@
 
 namespace App\Utils\HumanReadable;
 
-require_once __DIR__.'/../../../vendor/mbence/opentbs-bundle/MBence/OpenTBSBundle/lib/tbs_class.php';
-require_once __DIR__.'/../../../vendor/mbence/opentbs-bundle/MBence/OpenTBSBundle/lib/tbs_plugin_opentbs.php';
+require_once __DIR__.'/../../../vendor/tinybutstrong/tinybutstrong/tbs_class.php';
+require_once __DIR__.'/../../../vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php';
 
 /**
  * Service for OpenTBS Bundle.
