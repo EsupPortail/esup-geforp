@@ -173,12 +173,12 @@ class SemesteredTrainingListener extends Listener
         else if (get_class($object) === 'Sygefor\Bundle\TrainingBundle\Entity\Session\AbstractSession') {
             $training = $object->getTraining();
             if ($training) {
-                $query = new Match();
+/*                $query = new Match();
                 $query->setField('training.id', $training->getId());
 
                 //deleting objects
                 $this->index->deleteByQuery($query);
-
+*/
                 //inserting new objects
                 $semTrainings                = SemesteredTraining::getSemesteredTrainingsForTraining($training);
                 $this->scheduledForInsertion = array_merge($this->scheduledForInsertion, $semTrainings);

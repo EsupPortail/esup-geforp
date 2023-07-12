@@ -168,12 +168,12 @@ class SemesteredTrainingListener extends Listener
         } elseif (get_class($object) === AbstractSession::class) {
             $training = $object->getTraining();
             if ($training) {
-                $query = new Match();
+/*                $query = new Match();
                 $query->setField('training.id', $training->getId());
 
                 //deleting objects
                 $this->index->deleteByQuery($query);
-
+*/
                 //inserting new objects
                 $semTrainings = SemesteredTraining::getSemesteredTrainingsForTraining($training);
                 $this->scheduledForInsertion = array_merge($this->scheduledForInsertion, $semTrainings);
