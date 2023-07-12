@@ -18,6 +18,8 @@ use Symfony\Bundle\MonologBundle\SwiftMailer\MessageFactory;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use App\Entity\Core\AbstractTrainee;
 use Symfony\Component\Mime\Message;
@@ -184,7 +186,12 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         }
                         foreach ($attachments as $attachment) {
                             $path = $attachment->getPathname();
-                            $originalName = $attachment->getClientOriginalName();
+
+                            if (get_class($attachment) == UploadedFile::class)
+                                $originalName = $attachment->getClientOriginalName();
+                            else
+                                $originalName = $attachment->getFilename();
+
                             $msg->attachFromPath($path, $originalName);
                         }
                     }
