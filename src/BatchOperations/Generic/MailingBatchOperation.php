@@ -13,6 +13,7 @@ use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityManager;
 use MBence\OpenTBSBundle\Services\OpenTBS;
+use clsTinyButStrong;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Process\Process;
@@ -235,7 +236,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         return array('fileUrl' => $fileName); */
         //getting the file generator
-//        $TBS = new OpenTBS();
         $TBS = new clsTinyButStrong;
         $TBS->Plugin(TBS_INSTALL, 'clsOpenTBS');
 
@@ -638,7 +638,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
     protected function initializeOpenTbs($template, $entities)
     {
 //        $TBS = $this->container->get('opentbs');
-        $TBS = new OpenTBS();
+        $TBS = new clsTinyButStrong;
         $TBS->setOption('noerr', true);
         $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8);
         $classCatalog = $this->hrpaf->getTermCatalog(get_class(current($entities)));
