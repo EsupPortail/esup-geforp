@@ -67,10 +67,6 @@ class TrainingType extends AbstractType
             ->add('name', null, array(
                 'label' => 'Titre',
             ))
-            ->add('theme', EntityType::class, array(
-                'label' => 'Thématique',
-                'class' => Theme::class,
-            ))
             ->add('program', null, array(
                 'label'    => 'Programme',
                 'required' => false,
@@ -139,6 +135,7 @@ class TrainingType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $this->addSupervisorField($event->getForm(), $event->getData()->getOrganization());
             $this->addTagField($event->getForm(), $event->getData()->getOrganization());
+            $this->addThemeField($event->getForm(), $event->getData()->getOrganization());
         });
 
         // POST_SUBMIT for each field
@@ -146,6 +143,7 @@ class TrainingType extends AbstractType
             $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $this->addSupervisorField($event->getForm()->getParent(), $event->getForm()->getData());
                 $this->addTagField($event->getForm()->getParent(), $event->getForm()->getData());
+                $this->addThemeField($event->getForm(), $event->getData()->getOrganization());
             });
         }
     }
@@ -197,6 +195,30 @@ class TrainingType extends AbstractType
                         ->orWhere('t.organization is null')
                         ->orderBy('t.name', 'ASC');
                 },
+            ));
+        }
+    }
+
+    /**
+     * Add theme field depending organization.
+     *
+     * @param FormInterface $form
+     * @param Organization  $organization
+     */
+    protected function addThemeField(FormInterface $form, $organization)
+    {
+        if ($organization) {
+            $form->add('theme', EntityType::class, array(
+                'class'         => Theme::class,
+                'label'         => 'Thématique',
+                'query_builder' => function (EntityRepository $er) use ($organization) {
+                    return $er->createQueryBuilder('th')
+                        ->where('th.organization = :organization')
+                        ->setParameter('organization', $organization)
+                        ->orWhere('th.organization is null')
+                        ->orderBy('th.name', 'ASC');
+                },
+                'required' => false,
             ));
         }
     }

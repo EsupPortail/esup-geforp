@@ -302,14 +302,14 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 $property = $matches[1];
                 if ($property=="dates"){
                     $session = $entity->getSession();
-                    $Dates = $session->getDates();
+                    $tabDatesSessions = $session->getDates();
                     $Texte = "";
-                    foreach ($Dates as $date) {
-                        if ($date->getDateend() == $date->getDatebegin()) {
-                            $Texte .= $date->getDatebegin()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
+                    foreach ($tabDatesSessions as $dateSession) {
+                        if ($dateSession->getDateend() == $dateSession->getDatebegin()) {
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace()."\n";
                         }
                         else {
-                            $Texte .= $date->getDatebegin()->format('d/m/Y')." au ".$date->getDateend()->format('d/m/Y')."        ".$date->getSchedulemorn()."        ".$date->getScheduleafter()."        ".$date->getPlace()."\n";
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')." au ".$dateSession->getDateend()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace()."\n";
                         }
                     }
                     return $Texte;
