@@ -690,6 +690,8 @@ SQL;
                         $data[$key] = ($rvalue) ? $rvalue : '';
                     }
                 } catch (UnexpectedTypeException $e) {
+                    $key = str_replace('.', '', $key);
+                    $data[$key] = '';
                 }
             }
             $lines[$entity->getId()] = $data;
