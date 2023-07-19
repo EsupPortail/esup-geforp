@@ -143,7 +143,7 @@ class TrainingType extends AbstractType
             $builder->get('organization')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
                 $this->addSupervisorField($event->getForm()->getParent(), $event->getForm()->getData());
                 $this->addTagField($event->getForm()->getParent(), $event->getForm()->getData());
-                $this->addThemeField($event->getForm(), $event->getData()->getOrganization());
+                $this->addThemeField($event->getForm()->getParent(), $event->getForm()->getData());
             });
         }
     }
