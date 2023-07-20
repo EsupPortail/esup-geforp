@@ -765,6 +765,8 @@ class ProgramController extends AbstractController
                 'organizations' => $organizations)
             );
 
+        $centreCode = '';
+        $themeName = '';
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if (($form->isSubmitted()) && ($form->isValid())) {
@@ -777,8 +779,8 @@ class ProgramController extends AbstractController
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
-                    $centreName = $organization->getName();
-                    if ($centreName == "Tous les centres") {
+                    $centreCode = $organization->getName();
+                    if ($centreCode == "Tous les centres") {
                         $centreCode = "tous";
                     }
                 }
