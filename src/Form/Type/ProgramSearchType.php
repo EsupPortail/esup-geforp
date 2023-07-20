@@ -28,7 +28,7 @@ class ProgramSearchType extends AbstractType
     {
         // Mise en forme des établissements visibles par le stagiaire -> visibilité des centres
         $institutions = array();
-        $institution = $options['attr']['institution'];
+        $institution = $options['institution'];
         // Récupération des établissements liés
         $visuInstitutions = $institution->getVisuinstitutions();
         // creer le tableau des établissements visibles
@@ -36,6 +36,9 @@ class ProgramSearchType extends AbstractType
         foreach($visuInstitutions as $visuInst) {
             $institutions[] = $visuInst;
         }
+
+        $organizations = $options['organizations'];
+
         $builder
             ->add('centre', EntityType::class, array(
                 'label' => 'Centre organisateur',
@@ -53,7 +56,15 @@ class ProgramSearchType extends AbstractType
             ->add('theme', EntityType::class, array(
                 'label' => 'Domaine de formation',
                 'choice_label' => 'name',
-                'class' => Theme::class
+                'class' => Theme::class,
+                'query_builder' => function (EntityRepository $repository) use ($organizations) {
+                    $qb = $repository->createQueryBuilder('th');
+                    $qb->where('th.organization in (:organization)')
+                        ->setParameter('organization', $organizations)
+                        ->orWhere('th.organization is null');
+
+                    return $qb;
+                },
             ))
             ->add('texte', null, array(
                 'label' => 'Recherche par mot clé',
@@ -67,6 +78,8 @@ class ProgramSearchType extends AbstractType
     {
         $resolver->setDefaults(array(
             'data_class' => null,
+            'institution' => null,
+            'organizations' => null,
             'id' => 'search'
         ));
     }

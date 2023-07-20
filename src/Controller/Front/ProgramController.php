@@ -631,18 +631,24 @@ class ProgramController extends AbstractController
                 foreach ($otherEtabs as $otherEtab) {
                     $otherOrgs = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $otherEtab));
                     foreach ($otherOrgs as $centre) {
+                        $organizations[] = $centre;
                         $centreName[] = $centre->getName();
                     }
                 }
             }
-        } else
+        } else {
             $centreName = $centreCode;
+            $organizations[0] = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('name' => $centreName));
+        }
 
         if ($theme=="tous") {
-            $themes = $doctrine->getRepository(Theme::class)->findAll();
             $themeName = array();
-            foreach ($themes as $the) {
-                $themeName[] = $the->getName();
+            // recuperation theme des centres associés
+            foreach($organizations as $org) {
+                $themes = $doctrine->getRepository(Theme::class)->findBy(array('organization' => $org));
+                foreach ($themes as $the) {
+                    $themeName[] = $the->getName();
+                }
             }
         }else
             $themeName = $theme;
@@ -742,11 +748,22 @@ class ProgramController extends AbstractController
         // Récupération des centres de l'établissement du stagiaire
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
 
+        // Récupération des établissements liés
+        $visuInstitutions = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+        // creer le tableau des centres liés aux établissements visibles
+        foreach($visuInstitutions as $visuInst) {
+            $organizationsVisu = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $visuInst));
+            foreach ($organizationsVisu as $orgVisu) {
+                $organizations[] = $orgVisu;
+            }
+        }
+
         $defaultData = array('centre' => $organizations[0], 'theme' => $theme, 'texte' => "");
         $form = $this->createForm(ProgramSearchType::class, $defaultData,
-            array('attr' => array(
-                'institution' => $arTrainee[0]->getInstitution())
-            ));
+            array(
+                'institution' => $arTrainee[0]->getInstitution(),
+                'organizations' => $organizations)
+            );
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -760,8 +777,8 @@ class ProgramController extends AbstractController
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
-                    $centreCode = $organization->getName();
-                    if ($centreCode == "Tous les établissements") {
+                    $centreName = $organization->getName();
+                    if ($centreName == "Tous les centres") {
                         $centreCode = "tous";
                     }
                 }
