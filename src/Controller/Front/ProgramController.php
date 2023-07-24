@@ -650,6 +650,12 @@ class ProgramController extends AbstractController
                     $themeName[] = $the->getName();
                 }
             }
+            // themes sans centre (org -> null)
+            $themesNull = $doctrine->getRepository(Theme::class)->findBy(array('organization' => null));
+            foreach ($themesNull as $theNull) {
+                $themeName[] = $theNull->getName();
+            }
+
         }else
             $themeName = $theme;
 
