@@ -30,7 +30,7 @@
                     </td>
                     <td>
                         {% if relance == true %}
-                            {% if registration.upcoming and (registration.inscriptionStatus.id == 1) %}
+                            {% if registration.upcoming and (registration.inscriptionStatus.machine_name == 'waiting') %}
                                 <a href="{{ path('front.account.registration.authorize', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
                                     Relancer ma demande d'autorisation hiérarchique
                                 </a>

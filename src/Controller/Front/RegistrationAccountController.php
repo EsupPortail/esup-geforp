@@ -252,7 +252,7 @@ class RegistrationAccountController extends AbstractController
             // Si la personne authentifiée est bien le supérieur hiérarchique
             if ($supMailTrainee == $supMail) {
                 // On vérifie que la demande n'a pas déjà été traitée (statut de l'inscription =1 ou 2)
-                if ($registration->getInscriptionstatus()->getId() < 3) {
+                if ($registration->getInscriptionstatus()->getMachinename() == 'waiting') {
                     // On renvoie vers le formulaire d'autorisation
                     $access = "Formulaire";
 
