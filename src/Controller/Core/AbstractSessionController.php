@@ -50,6 +50,7 @@ abstract class AbstractSessionController extends AbstractController
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $sorts = $request->request->get('sorts', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
 
         // security check : session : 'sygefor_training.rights.inscription.all.view' -> id=9
@@ -59,7 +60,7 @@ abstract class AbstractSessionController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size, $fields);
+        $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size, $sorts, $fields);
 
         // Recherche pour aggs et query_filters
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $sessionRepository);

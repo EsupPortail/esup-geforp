@@ -213,8 +213,13 @@ class SessionRepository extends ServiceEntityRepository
         }
 
         // TRI DES RESULTATS
-        $qb->addOrderBy('s.datebegin')
-            ->addOrderBy('s.name');
+        if (isset($sorts['training.name.source']))
+            $qb->addOrderBy('s.name', $sorts['training.name.source']);
+        elseif (isset($sorts['datebegin']))
+            $qb->addOrderBy('s.datebegin', $sorts['datebegin']);
+        else
+            $qb->addOrderBy('s.datebegin')
+                ->addOrderBy('s.name');
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;

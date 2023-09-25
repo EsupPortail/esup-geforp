@@ -19,7 +19,7 @@ class TrainingRepository extends ServiceEntityRepository
         parent::__construct($registry, Internship::class);
     }
 
-    public function getTrainingsList($keyword, $filters, $page, $pageSize)
+    public function getTrainingsList($keyword, $filters, $page, $pageSize, $sorts)
     {
         /* addcslashes empêchera des manipulations malveillantes éventuelles */
         $keywordPr = '%' . addcslashes($keyword, '%_') . '%';
@@ -103,7 +103,10 @@ class TrainingRepository extends ServiceEntityRepository
         }
 
         // TRI DES RESULTATS
-        $qb->addOrderBy('training.name');
+        if (isset($sorts['training.name.source']))
+            $qb->addOrderBy('training.name', $sorts['training.name.source']);
+        else
+            $qb->addOrderBy('training.name');
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;

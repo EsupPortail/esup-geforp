@@ -47,6 +47,8 @@ abstract class AbstractTrainingController extends AbstractController
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $sorts = $request->request->get('sorts', 'NO SORTS');
+
 
         // security check : training : 'sygefor_training.rights.inscription.all.view' -> id=9
         if(!$accessRightRegistry->hasAccessRight(9)) {
@@ -55,7 +57,7 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size);
+        $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size, $sorts);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
