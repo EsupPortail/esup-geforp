@@ -87,7 +87,7 @@ class SessionRepository extends ServiceEntityRepository
         return $result = $query->getResult();
     }
 
-    public function getSessionsList($keyword, $filters, $page, $pageSize, $fields)
+    public function getSessionsList($keyword, $filters, $page, $pageSize, $sorts, $fields)
     {
         $qb = $this->createQueryBuilder('s');
         $qb
