@@ -22,7 +22,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         parent::__construct($registry, Inscription::class);
     }
 
-    public function getInscriptionsList($keyword, $filters, $page, $pageSize, $fields)
+    public function getInscriptionsList($keyword, $filters, $page, $pageSize, $sorts, $fields)
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -137,6 +137,13 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             $qb->addOrderBy('i.createdat', 'DESC');
         }
 
+        // TRI DES RESULTATS
+        if (isset($sorts['createdat']))
+            $qb->addOrderBy('i.createdat', $sorts['createdat']);
+        elseif (isset($sorts['trainee.fullname']))
+            $qb->addOrderBy('i.trainee.name', $sorts['trainee.fullname']);
+        elseif (isset($sorts['session.datebegin']))
+            $qb->addOrderBy('i.session.datebegin', $sorts['session.datebegin']);
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;

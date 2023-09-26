@@ -45,6 +45,7 @@ abstract class AbstractInscriptionController extends AbstractController
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $sorts = $request->request->get('size', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
 
         // security check : inscirption : 'sygefor_inscription.rights.inscription.all.view' -> id=25
@@ -54,7 +55,7 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters, $page, $size, $fields);
+        $ret = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters, $page, $size, $sorts, $fields);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
