@@ -60,7 +60,7 @@
             <label for="format" class="col-sm-3 control-label">Format HTML </label>
             <div class="col-sm-9">
                 <select type="text" ng-disabled='!send.Mail' class="form-control" id="format" ng-options="opt.val as opt.name for opt in [{val:0,name:'NON'},{val:1,name:'OUI'}]" ng-model="message.format">
-                    <option value="" ng-disabled="true">Choisir le format du mail</option>
+                    <option value="" ng-disabled="true">Choisir le format HTML pour le mail</option>
                 </select>
             </div>
         </div>
