@@ -59,7 +59,9 @@
         <div class="form-group" ng-show='send.Mail' >
             <label for="format" class="col-sm-3 control-label">Format HTML </label>
             <div class="col-sm-9">
-                <span sf-xeditable="form.children.format">{{ message.format ? 'Oui' : 'Non' }}</span>
+                <select type="text" ng-disabled='!send.Mail' class="form-control" id="format" ng-options="opt.val as opt.name for opt in [{val:0,name:'NON'},{val:1,name:'OUI'}]" ng-model="message.format">
+                    <option value="" ng-disabled="true">Choisir le format du mail</option>
+                </select>
             </div>
         </div>
         <div class="form-group" ng-show='send.Mail'>
