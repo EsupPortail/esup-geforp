@@ -271,8 +271,13 @@ class ProgramController extends AbstractController
                             ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
                             ->replyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail())
                             ->to($inscription->getTrainee()->getEmailsup())
-                            ->subject($subject)
-                            ->text($newbody);
+                            ->subject($subject);
+
+                        // si Format HTML coché pour ce modèle, sinon format texte
+                        if ($templates[0]->getPosition() == 1) {
+                            $message->html($newbody);
+                        } else
+                            $message->text($newbody);
 
                         $mailer->send($message);
 

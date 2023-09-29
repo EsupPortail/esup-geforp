@@ -91,7 +91,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, isset($options['ical']) ? $options['ical'] : false);
+        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0);
 
         return new Response('', 204);
     }
@@ -136,7 +136,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return array
      */
-    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false, $ical = false)
+    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false, $ical = false, $format = 0)
     {
         $last = "";
         $doClear = true;
@@ -176,8 +176,14 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         ->from($organization->getEmail())
                         ->to($email)
                         ->replyTo($organization->getEmail())
-                        ->subject($subjectR)
-                        ->text($bodyR);
+                        ->subject($subjectR);
+
+                    // si Format HTML coché pour ce modèle, sinon format texte
+                    if ($format == 1) {
+                        $msg->html($bodyR);
+                    } else
+                        $msg->text($bodyR);
+
 
                     // attachements
                     if (!empty($attachments)) {

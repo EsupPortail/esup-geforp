@@ -185,7 +185,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                 }
 
                 //sending with e-mail service
-                $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false, isset($options['ical']) ? $options['ical'] : false);
+                $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0);
 
                 //removing files
                 /** @var File[] $attachments */

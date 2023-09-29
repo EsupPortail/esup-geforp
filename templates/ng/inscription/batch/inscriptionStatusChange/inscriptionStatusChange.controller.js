@@ -23,6 +23,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             'subject': config.templates[i]['subject'],
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
+            'format': config.templates[i]['position'],
             'attachmentTemplates': config.templates[i]['attachment_templates']
         };
     }
@@ -35,6 +36,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $scope.message.body = $scope.templates[0].body;
         $scope.message.attachmentTemplates = $scope.templates[0].attachmentTemplates;
         $scope.message.ical = $scope.templates[0].ical;
+        $scope.message.format = $scope.templates[0].format;
     }
     $scope.message.attachments = [];
 
@@ -69,6 +71,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 subject: $scope.message.subject,
                 message: $scope.message.body,
                 ical: $scope.message.ical,
+                format: $scope.message.format,
                 attachmentTemplates: attTemplates,
                 objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
@@ -219,11 +222,13 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 oldValue.subject = $scope.message.subject;
                 oldValue.body = $scope.message.body;
                 oldValue.ical = $scope.message.ical;
+                oldValue.format = $scope.message.format;
             }
             //replacing values
             $scope.message.subject = newValue.subject;
             $scope.message.body = newValue.body;
             $scope.message.ical = newValue.ical;
+            $scope.message.format = newValue.format;
             $scope.attCheckList = newValue.attachmentTemplates;
         }
     });
