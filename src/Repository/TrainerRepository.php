@@ -20,7 +20,7 @@ class TrainerRepository extends ServiceEntityRepository
         parent::__construct($registry, Trainer::class);
     }
 
-    public function getTrainersList($keyword, $filters, $page, $pageSize, $fields)
+    public function getTrainersList($keyword, $filters, $page, $pageSize, $sorts, $fields)
     {
         $qb = $this->createQueryBuilder('trainer');
         $qb
@@ -71,7 +71,13 @@ class TrainerRepository extends ServiceEntityRepository
         }
 
         // TRI DES RESULTATS
-        $qb->addOrderBy('trainer.lastname');
+        if ((is_array($sorts)) && (array_key_exists('lastname', $sorts)))
+            $qb->addOrderBy('trainer.lastname', $sorts['lastname']);
+        elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
+            $qb->addOrderBy('trainer.isOrganization', $sorts['isOrganization']);
+        else
+            $qb->addOrderBy('trainer.lastname');
+
 
         // PAGINATION
         if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {

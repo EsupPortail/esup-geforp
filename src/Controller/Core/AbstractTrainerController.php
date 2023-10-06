@@ -42,6 +42,7 @@ abstract class AbstractTrainerController extends AbstractController
         $query = $request->request->get('query', 'NO QUERY');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
+        $sorts = $request->request->get('sorts', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
 
         // security check : trainer : 'sygefor_trainer.rights.inscription.all.view' -> id=33
