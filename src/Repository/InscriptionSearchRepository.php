@@ -128,22 +128,23 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['session.id']);
         }
 
-        //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
-        if( isset($filters['inscriptionStatusUpdatedAt'])) {
-            // Tri par date de modification
-            $qb->addOrderBy('i.updatedat', 'DESC');
-        } else {
-            // TRI DES RESULTATS
-            $qb->addOrderBy('i.createdat', 'DESC');
-        }
-
         // TRI DES RESULTATS
-        if (isset($sorts['createdat']))
+        if ((is_array($sorts)) && (array_key_exists('createdat', $sorts)))
             $qb->addOrderBy('i.createdat', $sorts['createdat']);
-        elseif (isset($sorts['trainee.fullname']))
-            $qb->addOrderBy('i.trainee.name', $sorts['trainee.fullname']);
-        elseif (isset($sorts['session.datebegin']))
-            $qb->addOrderBy('i.session.datebegin', $sorts['session.datebegin']);
+        elseif ((is_array($sorts)) && (array_key_exists('trainee.fullname', $sorts)))
+            $qb->addOrderBy('trainee.lastname', $sorts['trainee.fullname']);
+        elseif ((is_array($sorts)) && (array_key_exists('session.datebegin', $sorts)))
+            $qb->addOrderBy('s.datebegin', $sorts['session.datebegin']);
+        else {
+            //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
+            if( isset($filters['inscriptionStatusUpdatedAt'])) {
+                // Tri par date de modification
+                $qb->addOrderBy('i.updatedat', 'DESC');
+            } else {
+                // TRI DES RESULTATS
+                $qb->addOrderBy('i.createdat', 'DESC');
+            }
+        }
 
         // PAGINATION
         $offset = ($page-1) * $pageSize;

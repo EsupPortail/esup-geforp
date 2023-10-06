@@ -45,7 +45,7 @@ abstract class AbstractInscriptionController extends AbstractController
         $aggs = $request->request->get('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('size', 'NO SORTS');
+        $sorts = $request->request->get('sorts', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
 
         // security check : inscirption : 'sygefor_inscription.rights.inscription.all.view' -> id=25
