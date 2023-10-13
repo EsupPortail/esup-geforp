@@ -12,7 +12,15 @@
                             <div class="list-group">
                                 {% for vocabularyc in vocabularies %}
                                     <div class="list-group-item {{ vocabularyc.id == vocabulary.vocabularyId ? 'active' : '' }}">
-                                        <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
+                                        {% if vocabulary.vocabularyStatus > 0 %}
+                                            {% if organization is not null %}
+                                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id, 'organizationId': organization.id }) }}">
+                                            {% elseif vocabulary.vocabularyStatus == 2 %}
+                                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
+                                            {% endif %}
+                                        {% else %}
+                                            <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
+                                        {% endif %}
                                             <span class="badge pull-right" title="Vocabulaire {{ vocabularyc.scope == 0 ? 'national' : (vocabularyc.scope == 1 ? 'local' : 'mixte') }}">
                                                 {% if vocabularyc.scope == 0 %}
                                                     N

@@ -7,10 +7,12 @@
         <li><a href="#">Administration</a></li>
         <li><a href="{{ path('taxonomy.index') }}">Vocabulaires</a></li>
         <li><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">{{ vocabulary.vocabularyLabel }}</a></li>
-        {% if organization is not null %}
-            <li class="active"><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId, organizationId: organization.id }) }}">{{ organization.name }}</a></li>
-        {% elseif vocabulary.vocabularyStatus == 2 %}
-            <li class="active"><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a></li>
+        {% if vocabulary.vocabularyStatus > 0 %}
+            {% if organization is not null %}
+                <li class="active"><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId, organizationId: organization.id }) }}">{{ organization.name }}</a></li>
+            {% elseif vocabulary.vocabularyStatus == 2 %}
+                <li class="active"><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a></li>
+            {% endif %}
         {% endif %}
     </ol>
 {% endblock %}
@@ -47,12 +49,14 @@
         <ul class="nav nav-tabs">
             {#if mixed add national tab#}
              {% if (vocabulary.vocabularyStatus == 2)  %}
-                <li {% if organization is null %} class="active" {% endif %} >
-                    <a href="{{ path('taxonomy.view', {'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a>
-                </li>
+                 {% if (canEditNationalTerms)  %}
+                    <li {% if organization is null %} class="active" {% endif %} >
+                        <a href="{{ path('taxonomy.view', {'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a>
+                    </li>
+                 {% endif %}
             {% endif %}
             {#organizations tabs#}
-             {% if (organizations | length > 1)  %}
+             {% if (organizations | length >= 1)  %}
                 {% for org in organizations %}
                     <li {% if organization is not null and org is defined and org.id == organization.id %} class="active" {% endif %}>
                         <a href="{{ path('taxonomy.view', {'vocabularyId': vocabulary.vocabularyId, 'organizationId': org.id}) }}">{{ org.name }}</a>

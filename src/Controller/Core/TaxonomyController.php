@@ -58,6 +58,7 @@ class TaxonomyController extends AbstractController
 
         return $this->render('Core/views/Taxonomy/index.html.twig', array(
             'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
+            'organization' => $this->getUser()->getOrganization()
         ));
     }
 

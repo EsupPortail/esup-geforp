@@ -20,7 +20,7 @@
                     <tbody>
                     {% for vocabulary in vocabularies %}
                         <tr ng-class="{warning: isSelected(item.id)}">
-                            <td><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.id }) }}">{{ vocabulary.vocabulary.vocabularyLabel }}</a></td>
+                            <td><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.id, 'organizationId': organization.id }) }}">{{ vocabulary.vocabulary.vocabularyLabel }}</a></td>
                             <td><span class="badge">
                                     {% if vocabulary.scope == 0 %}
                                         Nationale
