@@ -52,7 +52,7 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $fields);
+        $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $sorts, $fields);
 
         // Recherche pour aggs et query_filters
         $tabAggs = array();
@@ -63,7 +63,7 @@ abstract class AbstractTrainerController extends AbstractController
             // on transforme le champ 'query' en 'keywords'
             if (isset($query['filtered']['query']['match']['fullName.autocomplete']['query'])) {
                 $keywords = $query['filtered']['query']['match']['fullName.autocomplete']['query'];
-                $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $fields);
+                $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $sorts, $fields);
             }
         }
 
