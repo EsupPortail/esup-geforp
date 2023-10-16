@@ -14,7 +14,7 @@
         <li class="training-detail-info" title="Public(s) prioritaire(s)"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;
             {% for key, publicType in training.publicTypes %}
                 {% if key > 0 %}<span>, </span>{% endif %}
-                {{ publicType.machineName }}
+                {{ publicType.name }}
             {% endfor %}
         </li>
     {% else %}

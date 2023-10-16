@@ -23,7 +23,7 @@
                         <h4>Public(s) cible(s)</h4>
                        {% for key, publicTypeRestrict in training.publicTypesRestrict %}
                             {% if key > 0 %}, {% endif %}
-                           {{ publicTypeRestrict.machineName }}
+                           {{ publicTypeRestrict.name }}
                        {% endfor %}
                     {% else %}
                         <h4>Public(s) cible(s)</h4>
