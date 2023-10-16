@@ -7,7 +7,7 @@
                     <span class="fa" ng-class="{'fa-thumbs-o-up': !trainee.isactive, 'fa-thumbs-o-down': trainee.isactive }"></span>
                 </a>
                 <a class="btn btn-fa" href="" tooltip="Publipostage" ng-click="$dialog.open('batch.publipost', { items: [trainee.id], service: 'trainee' })"><span class="fa fa-file-word-o"></span></a>
-                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="$user.hasAccessRight('sygefor_trainee.rights.trainee.all.update')" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="$user.hasAccessRight('sygefor_trainee.rights.trainee.own.delete')" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
             <div class="pre-title">Inscrit le {{ trainee.createdat|date: 'dd/MM/yyyy' }} - {{ trainee.organization.name }}</div>
