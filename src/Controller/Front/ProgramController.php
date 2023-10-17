@@ -513,7 +513,7 @@ class ProgramController extends AbstractController
         $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
         $codes = array();
         foreach ($organizations as $centre) {
-            $codes[] = $centre->getName();
+            $codes[] = $centre->getCode();
         }
         // Récupération des établissements liés
         $otherEtabs = $arTrainee[0]->getInstitution()->getVisuinstitutions();
@@ -522,7 +522,7 @@ class ProgramController extends AbstractController
             foreach ($otherEtabs as $otherEtab) {
                 $otherOrgs = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $otherEtab));
                 foreach ($otherOrgs as $centre) {
-                    $codes[] = $centre->getName();
+                    $codes[] = $centre->getCode();
                 }
             }
         }
