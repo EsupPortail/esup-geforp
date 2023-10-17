@@ -621,12 +621,12 @@ class ProgramController extends AbstractController
         $multiEtab = $this->isMultiEtab($arTrainee[0]);
 
         if ($centreCode=="tous") {
-            $centreName = array();
+            $centreCodes = array();
             // Recup allProgram = toutes les formations des centres et établissements liés
             // Récupération des centres de l'établissement du stagiaire
             $organizations = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $arTrainee[0]->getInstitution()));
             foreach ($organizations as $centre) {
-                $centreName[] = $centre->getName();
+                $centreCodes[] = $centre->getCode();
             }
 
             // Récupération des établissements liés
@@ -637,13 +637,13 @@ class ProgramController extends AbstractController
                     $otherOrgs = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('institution' => $otherEtab));
                     foreach ($otherOrgs as $centre) {
                         $organizations[] = $centre;
-                        $centreName[] = $centre->getName();
+                        $centreCodes[] = $centre->getCode();
                     }
                 }
             }
         } else {
-            $centreName = $centreCode;
-            $organizations[0] = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('name' => $centreName));
+            $centreCodes = $centreCode;
+            $organizations[0] = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('name' => $centreCodes));
         }
 
         if ($theme=="tous") {
@@ -664,7 +664,7 @@ class ProgramController extends AbstractController
         }else
             $themeName = $theme;
 
-        $search = $this->createProgramQuerySearch($centreName, $themeName, $texte, $sessionRepository);
+        $search = $this->createProgramQuerySearch($centreCodes, $themeName, $texte, $sessionRepository);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -790,10 +790,7 @@ class ProgramController extends AbstractController
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
-                    $centreCode = $organization->getName();
-                    if ($centreCode == "Tous les centres") {
-                        $centreCode = "tous";
-                    }
+                    $centreCode = $organization->geCode();
                 }
                 $texte = $form['texte']->getData();
 
