@@ -790,7 +790,7 @@ class ProgramController extends AbstractController
                 }
                 $organization = $form['centre']->getData();
                 if (!empty($organization)) {
-                    $centreCode = $organization->geCode();
+                    $centreCode = $organization->getCode();
                 }
                 $texte = $form['texte']->getData();
 
