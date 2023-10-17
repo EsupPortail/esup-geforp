@@ -28,11 +28,15 @@ class TrainingRepository extends ServiceEntityRepository
             ->select('training')
 
             // FILTRE KEYWORD
-        ->where('training.name LIKE :keywordPr OR training.number = :keyword')
-        ->setParameter('keywordPr', $keywordPr)
-        ->setParameter('keyword', $keyword);
+            ->where('training.name LIKE :keywordPr OR training.number = :keyword')
+            ->setParameter('keywordPr', $keywordPr)
+            ->setParameter('keyword', $keyword);
 
-
+        // Filtre keyword sur les tags
+        $qb
+            ->leftJoin('training.tags', 'tag')
+            ->orWhere('tag.name LIKE :tagName')
+            ->setParameter('tagName', $keywordPr);
 
         // FILTRE CENTRE
         if (isset($filters['training.organization.name.source'])) {
