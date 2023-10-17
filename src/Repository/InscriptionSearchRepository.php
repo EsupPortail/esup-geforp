@@ -31,10 +31,10 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
             ->innerJoin('i.session', 's', 'WITH', 's = i.session')
             ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
-
+            ->innerJoin('tr.tags', 'tag')
 
             // FILTRE KEYWORD
-            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword')
+            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword OR tag.name LIKE :keyword')
             ->andWhere('i.trainee = trainee.id')
             ->andWhere('s.training = tr.id')
             ->andWhere('i.session = s.id')
