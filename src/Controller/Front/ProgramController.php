@@ -643,7 +643,7 @@ class ProgramController extends AbstractController
             }
         } else {
             $centreCodes = $centreCode;
-            $organizations[0] = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('name' => $centreCodes));
+            $organizations[0] = $doctrine->getRepository('App\Entity\Back\Organization')->findBy(array('code' => $centreCodes));
         }
 
         if ($theme=="tous") {
