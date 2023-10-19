@@ -141,7 +141,8 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         elseif ((is_array($sorts)) && (array_key_exists('session.datebegin', $sorts)))
             $qb->addOrderBy('s.datebegin', $sorts['session.datebegin']);
         elseif ((is_array($sorts)) && (array_key_exists('trainee.publictype.name', $sorts))){
-            $qb->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype');
+            if(!isset($filters['publicType.source']))
+                $qb->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype');
             $qb->addOrderBy('publictype.name', $sorts['trainee.publictype.name']);
         } else {
             //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
