@@ -43,7 +43,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
 
             // Filtre keyword sur les tags
             $qb
-                ->leftJoin('training.tags', 'tag')
+                ->leftJoin('tr.tags', 'tag')
                 ->orWhere('tag.name LIKE :tagName')
                 ->setParameter('tagName', '%' . addcslashes($keyword, '%_') . '%');
 
