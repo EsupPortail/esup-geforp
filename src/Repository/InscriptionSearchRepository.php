@@ -31,16 +31,21 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
             ->innerJoin('i.session', 's', 'WITH', 's = i.session')
             ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
-            ->innerJoin('tr.tags', 'tag')
 
             // FILTRE KEYWORD
-            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword OR tag.name LIKE :keyword')
+            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword')
             ->andWhere('i.trainee = trainee.id')
             ->andWhere('s.training = tr.id')
             ->andWhere('i.session = s.id')
 
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+
+            // Filtre keyword sur les tags
+            $qb
+                ->leftJoin('training.tags', 'tag')
+                ->orWhere('tag.name LIKE :tagName')
+                ->setParameter('tagName', '%' . addcslashes($keyword, '%_') . '%');
 
         // FILTRE CENTRE
         if (isset($filters['session.training.organization.name.source'])) {
