@@ -63,8 +63,57 @@ abstract class AbstractTraineeController extends AbstractController
 
         // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17
         if(!$accessRightRegistry->hasAccessRight(17)) {
-            // restriction to user's institution
-            $filters['institution.name.source'] = $this->getUser()->getOrganization()->getInstitution()->getName();
+            // recup établissement du user
+            $ownInst = $this->getUser()->getOrganization()->getInstitution();
+            // recup des établissements liés
+            $otherInst = $this->getUser()->getOrganization()->getInstitution()->getVisuinstitutions();
+            if (isset($filters['institution.name.source'])) {
+                if (is_array($filters['institution.name.source'])) {
+                    // si filtre sur plusieurs etablissements, on verifie les droits en visibilite
+                    $tabFilters = array();
+                    // on parcourt les filtres pour vérifier qu'on a la visibilité sur les établissements
+                    foreach ($filters['institution.name.source'] as $filter) {
+                        if ($filter == $ownInst->getName())
+                            $tabFilters[] = $filter;
+                        else {
+                            foreach ($otherInst as $etab) {
+                                if ($filter == $etab->getName()) {
+                                    $tabFilters[] = $filter;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    $filters['institution.name.source'] = $tabFilters;
+                } else {
+                    // si filtre sur un seul etablissement, on verifie les droits
+                    if ($filters['institution.name.source'] == $ownInst->getName())
+                        // on verifie l'établissement du  user
+                        $tabFilters[] = $filters['institution.name.source'];
+                    else {
+                        // sinon, on regarde les etablissements associés
+                        $flag = 0;
+                        foreach ($otherInst as $etab) {
+                            if ($filters['institution.name.source'] == $etab->getName()) {
+                                $flag = 1;
+                                break;
+                            }
+                        }
+                        // si pas autorisé, par défaut, on met le filtre sur établissement du user
+                        if ($flag==0)
+                            $filters['institution.name.source'] = $this->getUser()->getOrganization()->getInstitution()->getName();
+                    }
+                }
+            } else {
+                // restriction to user's institution
+                $filters['institution.name.source'] = array();
+                $filters['institution.name.source'][] = $this->getUser()->getOrganization()->getInstitution()->getName();
+                if ($otherInst != null) {
+                    foreach ($otherInst as $otherEtab) {
+                        $filters['institution.name.source'][] = $otherEtab->getName();
+                    }
+                }
+            }
         }
 
         // Recherche avec les filtres
