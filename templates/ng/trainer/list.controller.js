@@ -21,22 +21,22 @@ sygeforApp.controller('TrainerListController', ['$scope', '$user', '$injector', 
         'isOrganization' : {
             label: 'Statut',
             values: {
-                'T': 'Formateur interne',
-                'F': 'Formateur extérieur'
+                1: 'Formateur interne',
+                0: 'Formateur extérieur'
             }
         },
         'isPublic' : {
             label: 'Publié',
             values: {
-                'T': 'Oui',
-                'F': 'Non'
+                '1': 'Oui',
+                '0': 'Non'
             }
         },
         'isArchived' : {
             label: 'Archivé',
             values: {
-                'T': 'Oui',
-                'F': 'Non'
+                '1': 'Oui',
+                '0': 'Non'
             }
         }
     };

@@ -125,6 +125,14 @@ class AbstractTrainerType extends AbstractType
             ))
             ->add('comments', null, array(
                 'label' => 'Observations',
+            ))
+            ->add('institution', EntityType::class, array(
+                'required'      => true,
+                'class'         => Institution::class,
+                'label'         => 'Etablissement',
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('i')->orderBy('i.name', 'ASC');
+                },
             ));
 
 

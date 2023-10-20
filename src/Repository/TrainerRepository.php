@@ -52,29 +52,42 @@ class TrainerRepository extends ServiceEntityRepository
         //FILTRE STATUT (true,false) = (0,1)
         if (isset($filters['isOrganization'])) {
             $qb
-                ->andWhere('trainer.isOrganization = :isOrg')
+                ->andWhere('trainer.isorganization = :isOrg')
                 ->setParameter('isOrg', $filters['isOrganization']);
         }
 
         //FILTRE PUBLIE (true,false) = (0,1)
         if (isset($filters['isPublic'])) {
             $qb
-                ->andWhere('trainer.isPublic = :isPub')
+                ->andWhere('trainer.ispublic = :isPub')
                 ->setParameter('isPub', $filters['isPublic']);
         }
 
         //FILTRE ARCHIVE (true,false) = (0,1)
         if (isset($filters['isArchived'])) {
             $qb
-                ->andWhere('trainer.isArchived = :isArch')
+                ->andWhere('trainer.isarchived = :isArch')
                 ->setParameter('isArch', $filters['isArchived']);
         }
 
-        // TRI DES RESULTATS
         if ((is_array($sorts)) && (array_key_exists('lastname', $sorts)))
             $qb->addOrderBy('trainer.lastname', $sorts['lastname']);
-        elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
-            $qb->addOrderBy('trainer.isOrganization', $sorts['isOrganization']);
+        elseif ((is_array($sorts)) && (array_key_exists('organization.name', $sorts))) {
+            if(!isset($filters['organization.name.source']))
+                $qb->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization');
+            $qb->addOrderBy('o.name', $sorts['organization.name']);
+        } elseif ((is_array($sorts)) && (array_key_exists('institution.name', $sorts))) {
+            if(!isset($filters['institution.name.source']))
+                $qb->innerJoin('trainer.institution', 'i', 'WITH', 'i = trainer.institution');
+            $qb->addOrderBy('i.name', $sorts['institution.name']);
+        } elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
+            $qb->addOrderBy('trainer.isorganization', $sorts['isOrganization']);
+        elseif ((is_array($sorts)) && (array_key_exists('isPublic', $sorts)))
+            $qb->addOrderBy('trainer.ispublic', $sorts['isPublic']);
+        elseif ((is_array($sorts)) && (array_key_exists('isArchived', $sorts)))
+            $qb->addOrderBy('trainer.isarchived', $sorts['isArchived']);
+        elseif ((is_array($sorts)) && (array_key_exists('service', $sorts)))
+            $qb->addOrderBy('trainer.service', $sorts['service']);
         else
             $qb->addOrderBy('trainer.lastname');
 
@@ -153,33 +166,33 @@ class TrainerRepository extends ServiceEntityRepository
         //FILTRE STATUT (true,false) = (0,1)
         if(isset( $aggs['isOrganization'])) {
             $qb
-                ->andWhere('trainer.isOrganization = :isOrg')
+                ->andWhere('trainer.isorganization = :isOrg')
                 ->setParameter('isOrg', $name);
         } elseif( isset($query_filters['isOrganization']) ) {
             $qb
-                ->andWhere('trainer.isOrganization = :isOrg')
+                ->andWhere('trainer.isorganization = :isOrg')
                 ->setParameter('isOrg', $query_filters['isOrganization']);
         }
 
         //FILTRE PUBLIE (true,false) = (0,1)
         if(isset( $aggs['isPublic'])) {
             $qb
-                ->andWhere('trainer.isPublic = :isPub')
+                ->andWhere('trainer.ispublic = :isPub')
                 ->setParameter('isPub', $name);
         } elseif( isset($query_filters['isPublic']) ) {
             $qb
-                ->andWhere('trainer.isPublic = :isPub')
+                ->andWhere('trainer.ispublic = :isPub')
                 ->setParameter('isPub', $query_filters['isPublic']);
         }
 
         //FILTRE ARCHIVE (true,false) = (0,1)
         if(isset( $aggs['isArchived'])) {
             $qb
-                ->andWhere('trainer.isArchived = :isArch')
+                ->andWhere('trainer.isarchived = :isArch')
                 ->setParameter('isArch', $name);
         } elseif( isset($query_filters['isArchived']) ) {
             $qb
-                ->andWhere('trainer.isArchived = :isArch')
+                ->andWhere('trainer.isarchived = :isArch')
                 ->setParameter('isArch', $query_filters['isArchived']);
         }
 
