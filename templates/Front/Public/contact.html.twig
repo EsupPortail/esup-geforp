@@ -18,7 +18,10 @@
     <br><br>
     <h3>Pour toute question sur le Plan de Formation ou les modalités d'inscription, vous pouvez contacter :
     <br><br>
-        <div style="text-align: center"><a href="mailto:{{ contact_mail }}">{{ contact_mail }}</a></div>
+        {%  for institution in etablissements %}
+            <div>{{ institution.name }}</div>
+            <div style="text-align: center"><a href="mailto:{{ institution.email }}">{{ institution.email }}</a></div>
+        {% endfor %}
     <br><br>
     </h3>
 </div>

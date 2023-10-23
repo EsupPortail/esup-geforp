@@ -58,9 +58,16 @@ class PublicController extends AbstractController
      * @Route("/contact", name="front.public.contact")
      * @Template("Front/Public/contact.html.twig")
      */
-    public function contactAction(Request $request)
+    public function contactAction(ManagerRegistry $doctrine, Request $request)
     {
-        return array('contact_mail' => $this->getParameter('contact_mail'));
+        // Récupération des établissements de la plate-forme
+        $institutions = $doctrine->getRepository('App\Entity\Back\Institution')->findBy(array(), array('name' => 'ASC'));
+        $instContacts = array();
+        foreach ($institutions as $institution) {
+            if ($institution->getEmail() !== null)
+                $instContacts[] = $institution;
+        }
+        return array('etablissements' => $instContacts);
     }
 
     /**
