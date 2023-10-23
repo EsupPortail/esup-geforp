@@ -169,6 +169,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
         //if asked, a mail sent to user
         if (isset($options['sendMail']) && ($options['sendMail'] === true) && (count($arrayInscriptionsGranted) > 0)) {
             //managing attachments
+            $tablAllAttach = array();
             foreach ($arrayInscriptionsGranted as $inscription) {
                 $attachments = array();
 
@@ -183,16 +184,20 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                         $attachments[] = $this->mailingBatch->parseFile($tpl->getFile(), array($inscription), true, $tpl->getFileName(), true);
                     }
                 }
+                foreach($attachments as $att)
+                    $tabAllAttach[] = $att;
 
                 //sending with e-mail service
                 $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0);
 
-                //removing files
-                /** @var File[] $attachments */
-                foreach ($attachments as $att) {
-                    unlink($att->getPathname());
-                }
             }
+
+            //removing files
+            foreach ($tabAllAttach as $att) {
+                if (file_exists($att->getPathname()))
+                    unlink($att->getPathname());
+            }
+
         }
 
 	    return count($arrayInscriptionsGranted);
