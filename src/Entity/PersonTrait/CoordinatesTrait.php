@@ -47,7 +47,7 @@ trait CoordinatesTrait
      * @var string
      * @Assert\Email(message="Vous devez renseigner un email valide.")
      * @ORM\Column(name="email", type="string", length=128, nullable=true)
-     * @Serializer\Groups({"trainee", "inscription", "trainer", "session", "api.profile", "api.inscription", "api.token"})
+     * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "session", "api.profile", "api.inscription", "api.token"})
      */
     protected $email;
 
