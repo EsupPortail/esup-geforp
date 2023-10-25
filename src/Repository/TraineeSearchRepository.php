@@ -111,6 +111,10 @@ class TraineeSearchRepository extends ServiceEntityRepository
             if(!isset($filters['publicType.source']))
                 $qb->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt');
             $qb->addOrderBy('pt.name', $sort['publicType.source']);
+        } elseif ((is_array($sort)) && (array_key_exists('institution.name.source', $sort))) {
+            if(!isset($filters['institution.name.source']))
+                $qb->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution');
+            $qb->addOrderBy('institution.name', $sort['institution.source']);
         } elseif ((is_array($sort)) && (array_key_exists('createdAt', $sort)))
             $qb->addOrderBy('trainee.createdat', $sort['createdAt']);
         else
