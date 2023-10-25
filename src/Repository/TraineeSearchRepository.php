@@ -114,7 +114,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         } elseif ((is_array($sort)) && (array_key_exists('institution.name.source', $sort))) {
             if(!isset($filters['institution.name.source']))
                 $qb->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution');
-            $qb->addOrderBy('institution.name', $sort['institution.source']);
+            $qb->addOrderBy('institution.name', $sort['institution.name.source']);
         } elseif ((is_array($sort)) && (array_key_exists('createdAt', $sort)))
             $qb->addOrderBy('trainee.createdat', $sort['createdAt']);
         else
