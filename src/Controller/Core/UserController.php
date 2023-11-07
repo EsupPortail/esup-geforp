@@ -271,7 +271,7 @@ class UserController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $isAdmin = $form['isAdmin']->getData();
 
-                if ($key != false) {
+                if ($key !== false) {
                     // si le user etait admin
                     if($isAdmin) {
                         // on ne change rien
