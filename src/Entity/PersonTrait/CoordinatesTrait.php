@@ -70,7 +70,7 @@ trait CoordinatesTrait
     /**
      * @var string
      * @ORM\Column(name="website", type="string", length=512, nullable=true)
-     * @Serializer\Groups({"organization", "trainee", "trainer", "api.profile"})
+     * @Serializer\Groups({"organization", "trainee", "trainer", "institution", "api.profile"})
      */
     protected $website;
 
