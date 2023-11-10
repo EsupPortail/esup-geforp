@@ -63,6 +63,10 @@ class BaseInstitutionType extends AbstractType
             ->add('city', TextType::class, array(
                 'label' => 'Ville',
                 'required' => false,
+            ))
+            ->add('website', TextType::class, array(
+                'label' => 'Lien',
+                'required' => false,
             ));
 
     }

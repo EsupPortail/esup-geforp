@@ -21,6 +21,9 @@
         {%  for institution in etablissements %}
             <div>{{ institution.name }}</div>
             <div style="text-align: center"><a href="mailto:{{ institution.email }}">{{ institution.email }}</a></div>
+            {% if institution.website is defined %}
+                <div style="text-align: center"><a href="{{ institution.website }}">{{ institution.website }}</a></div>
+            {% endif %}
         {% endfor %}
     <br><br>
     </h3>

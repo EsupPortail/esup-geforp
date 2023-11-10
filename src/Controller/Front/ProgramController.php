@@ -51,10 +51,14 @@ class ProgramController extends AbstractController
      */
     public function contactAction(Request $request, ManagerRegistry $doctrine)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('contact_mail' => $this->getParameter('contact_mail'), 'user' => $trainee);
+        // Récupération des établissements de la plate-forme
+        $institutions = $doctrine->getRepository('App\Entity\Back\Institution')->findBy(array(), array('name' => 'ASC'));
+        $instContacts = array();
+        foreach ($institutions as $institution) {
+            if ($institution->getEmail() !== null)
+                $instContacts[] = $institution;
+        }
+        return array('etablissements' => $instContacts);
     }
 
     /**
@@ -63,10 +67,7 @@ class ProgramController extends AbstractController
      */
     public function faqAction(Request $request, ManagerRegistry $doctrine)
     {
-        $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
-        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $trainee);
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'));
     }
 
     /**
