@@ -28,6 +28,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -86,75 +87,82 @@ class ProgramController extends AbstractController
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
 
-        $focusSession = null;
-        foreach ($training->getSessions() as $session) {
-            if ($session->getId() == $sessionId) {
-                $focusSession = $session;
-                break;
+        // si pas de trainee enregistré
+        if (!isset($arTrainee[0])) {
+            // redirect user to registration form
+            $url = $this->generateUrl('front.account.register');
+            return new RedirectResponse($url);
+        } else {
+            $trainee = $arTrainee[0];
+
+            $focusSession = null;
+            foreach ($training->getSessions() as $session) {
+                if ($session->getId() == $sessionId) {
+                    $focusSession = $session;
+                    break;
+                }
             }
+
+            $now = new \DateTime();
+            $pastSessions = array();
+            $upcomingSessions = array();
+
+            /** @var Session $session */
+            foreach ($training->getSessions() as $session) {
+
+                $sesId = $session->getId();
+                $inscription = null;
+
+                /** @var EntityManager $em */
+                $em = $doctrine->getManager();
+                $inscription = $em->getRepository('App\Entity\Core\AbstractInscription')->createQueryBuilder('inscription')
+                    ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'inscription.session = session.id')
+                    ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'inscription.trainee = trainee.id')
+                    ->where('session.id = :sessionId')
+                    ->andWhere('trainee.id = :traineeId')
+                    ->setParameter('sessionId', $sesId)
+                    ->setParameter('traineeId', $trainee->getId())
+                    ->getQuery()->execute();
+
+                $alert = $em->getRepository('App\Entity\Back\Alert')->createQueryBuilder('alert')
+                    ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
+                    ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
+                    ->where('session.id = :sessionId')
+                    ->andWhere('trainee.id = :traineeId')
+                    ->setParameter('sessionId', $sesId)
+                    ->setParameter('traineeId', $trainee->getId())
+                    ->getQuery()->execute();
+
+
+                $session->isRegistered = !empty($inscription);
+
+                $session->getDatebegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
+                // Gestion des alertes existantes pour les sessions à venir
+                if ($session->getDatebegin() > $now) {
+                    $session->isAlerted = !empty($alert);
+                }
+                if ($session->getRegistration() === $session::REGISTRATION_PRIVATE) {
+                    $session->availablePrivateSession = true;
+                } else {
+                    $session->availablePrivateSession = false;
+                }
+
+            }
+
+            // Affichage d'un flag si le stage en public désigné
+            if ($training->getDesignatedpublic())
+                $this->get('session')->getFlashBag()->add('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
+
+            return array(
+                'user' => $trainee,
+                'training' => $training,
+                'session' => $focusSession,
+                'upcomingSessions' => $upcomingSessions,
+                'pastSessions' => $pastSessions,
+                'token' => $token
+            );
         }
-
-        $now = new \DateTime();
-        $pastSessions = array();
-        $upcomingSessions = array();
-
-        /** @var Session $session */
-        foreach ($training->getSessions() as $session) {
-
-            $sesId = $session->getId();
-            $inscription = null;
-
-            /** @var EntityManager $em */
-            $em = $doctrine->getManager();
-            $inscription = $em->getRepository('App\Entity\Core\AbstractInscription')->createQueryBuilder('inscription')
-                ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'inscription.session = session.id')
-                ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'inscription.trainee = trainee.id')
-                ->where('session.id = :sessionId')
-                ->andWhere('trainee.id = :traineeId')
-                ->setParameter('sessionId', $sesId)
-                ->setParameter('traineeId', $trainee->getId())
-                ->getQuery()->execute();
-
-            $alert = $em->getRepository('App\Entity\Back\Alert')->createQueryBuilder('alert')
-                ->leftJoin('App\Entity\Core\AbstractSession', 'session', 'WITH', 'alert.session = session.id')
-                ->leftJoin('App\Entity\Core\AbstractTrainee', 'trainee', 'WITH', 'alert.trainee = trainee.id')
-                ->where('session.id = :sessionId')
-                ->andWhere('trainee.id = :traineeId')
-                ->setParameter('sessionId', $sesId)
-                ->setParameter('traineeId', $trainee->getId())
-                ->getQuery()->execute();
-
-
-            $session->isRegistered = !empty($inscription);
-
-            $session->getDatebegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
-            // Gestion des alertes existantes pour les sessions à venir
-            if ($session->getDatebegin() > $now) {
-                $session->isAlerted = !empty($alert);
-            }
-            if ($session->getRegistration() === $session::REGISTRATION_PRIVATE ) {
-                $session->availablePrivateSession = true;
-            }
-            else {
-                $session->availablePrivateSession = false;
-            }
-
-        }
-
-        // Affichage d'un flag si le stage en public désigné
-        if ($training->getDesignatedpublic())
-            $this->get('session')->getFlashBag()->add('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
-
-        return array(
-            'user' => $trainee,
-            'training' => $training,
-            'session' => $focusSession,
-            'upcomingSessions' => $upcomingSessions,
-            'pastSessions' => $pastSessions,
-            'token' => $token
-        );
     }
 
     /**
