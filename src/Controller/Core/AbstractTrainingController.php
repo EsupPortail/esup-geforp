@@ -119,6 +119,10 @@ abstract class AbstractTrainingController extends AbstractController
     public function viewAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training)
     {
         if (!$this->isGranted('EDIT', $training)) {
+            if ($this->isGranted('VIEW', $training)) {
+                return array('training' => $training);
+            }
+
             throw new AccessDeniedException('Action non autorisée');
         }
 
