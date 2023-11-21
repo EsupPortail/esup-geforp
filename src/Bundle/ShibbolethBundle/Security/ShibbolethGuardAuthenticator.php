@@ -2,6 +2,7 @@
 
 namespace App\Bundle\ShibbolethBundle\Security;
 
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -69,13 +70,15 @@ class ShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
      */
     private $attributes;
 
+    private $doctrine;
+
     /**
      * ShibbolethGuardAuthenticator constructor.
      * @param array $config
      * @param Router $router
      * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(array $config, Router $router, TokenStorageInterface $tokenStorage)
+    public function __construct(array $config, Router $router, TokenStorageInterface $tokenStorage, ManagerRegistry $doctrine)
     {
         $this->config = $config;
         $this->router = $router;
@@ -88,6 +91,7 @@ class ShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
         $this->attributes = $config['attributes'];
         if(!in_array($this->username, $this->attributes))
             throw new InvalidConfigurationException("Shibboleth configuration error : the value of username parameter must be in attributes list parameter");
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -134,10 +138,21 @@ class ShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
     {
         if(empty($credentials['username']))
             throw new UsernameNotFoundException("The username attribute is empty");
-        if($userProvider instanceof ShibbolethUserProviderInterface)
-            return $userProvider->loadUser($credentials);
-        else if($userProvider instanceof  UserProviderInterface)
-            return $userProvider->loadUserByUsername($credentials['username']);
+        if($userProvider instanceof ShibbolethUserProviderInterface) {
+            $us =  $userProvider->loadUser($credentials);
+
+            // test responsable N+1 et ajout role
+            $tabUs = $this->doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $us->getCredentials()['mail']));
+            if (!empty($tabUs))
+                $us->setRoles('ROLE_RESP');
+
+            return($us);
+        }
+        else if($userProvider instanceof  UserProviderInterface) {
+            $us = $userProvider->loadUserByUsername($credentials['username']);
+            return($us);
+        }
+
         return null;
 
     }

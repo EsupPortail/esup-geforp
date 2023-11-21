@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denoix
- * Date: 29/03/18
- * Time: 13:43
- */
 
 namespace App\Bundle\ShibbolethBundle\Security\User;
 

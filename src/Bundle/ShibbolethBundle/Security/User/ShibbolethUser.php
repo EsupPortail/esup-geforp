@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: denoix
- * Date: 29/03/18
- * Time: 13:39
- */
 
 namespace App\Bundle\ShibbolethBundle\Security\User;
 
@@ -27,6 +21,11 @@ class ShibbolethUser implements UserInterface, EquatableInterface
         $this->salt = $salt;
         $this->roles = $roles;
         $this->credentials = $credentials;
+    }
+
+    public function setRoles($roles)
+    {
+        $this->roles[] = $roles;
     }
 
     public function getRoles()
