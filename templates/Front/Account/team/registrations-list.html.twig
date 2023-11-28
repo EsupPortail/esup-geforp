@@ -7,9 +7,6 @@
                 <th>Centre</th>
                 <th>Formation</th>
                 <th>Session</th>
-                {% if user is defined and user.isPaying == true %}
-                    <th>Tarif</th>
-                {% endif %}
                 <th>Statut</th>
                 <th></th>
                 <th></th>
@@ -22,9 +19,6 @@
                     <td>{{ registration.session.training.organization.name }}</td>
                     <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
                     <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
-                    {% if user is defined and user.isPaying == true %}
-                        <td title="Tarif de la formation"> {{registration.session.price ? registration.session.price : '0'}} €</td>
-                    {% endif %}
                     <td>
                         {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
                     </td>

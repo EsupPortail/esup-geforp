@@ -50,8 +50,8 @@ class TeamAccountController extends AbstractController
     /**
      * Registrations.
      *
-     * @Route("/team/registrations", name="front.account.team.registrations")
-     * @Template("Front/Account/Team/registrations.html.twig")
+     * @Route("/registrations", name="front.account.team.registrations")
+     * @Template("Front/Account/team/registrations.html.twig")
      * @Method("GET")
      */
     public function teamregistrationsAction(Request $request, ManagerRegistry $doctrine)

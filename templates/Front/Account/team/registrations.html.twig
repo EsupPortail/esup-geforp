@@ -29,7 +29,7 @@
                         <blockquote class="small">Vous n'avez aucune demande d'inscription.</blockquote>
                     {% else %}
                         {% set list = upcoming %}
-                        {% include 'Front/Account/registration/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list.html.twig' %}
                     {% endif %}
                 </section>
 
@@ -39,7 +39,7 @@
                         <blockquote class="small">Vous n'avez aucune demande d'inscription archivée.</blockquote>
                     {% else %}
                         {% set list = past %}
-                        {% include 'Front/Account/registration/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list.html.twig' %}
                     {% endif %}
                 </section>
             </div>
