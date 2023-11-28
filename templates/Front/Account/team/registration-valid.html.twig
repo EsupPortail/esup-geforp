@@ -1,0 +1,102 @@
+{% extends "Front/base.html.twig" %}
+
+
+{% block header %}
+    <header xmlns="http://www.w3.org/1999/html">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1>Responsable hiérarchique</h1>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+{#                <li class="active"><a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="button secondary">Avis pour une inscription</a></li> #}
+            </ul>
+        </div>
+    </header>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+  <section>
+    <div class="row">
+      <div class="col-md-12 columns">
+          {% if access == "Formulaire" %}
+              <h3>Autorisation d'inscription à une formation</h3>
+              <p>Merci de saisir un avis pour l'inscription de <b>{{ trainee.fullName }}</b> à la formation</p>
+
+              <blockquote class="small">
+                {{ registration.session.training.name }}<br>
+                {{ registration.session.dateRange | u.replace('le' , '') }}
+              </blockquote>
+
+              <p><b>Motivation pour participer à la formation :</b> {{ registration.motivation }} </p>
+
+              {{ form_start(form) }}
+              <span onclick="afficher()"> {{ form_row(form.children.validation) }} </span>
+              <div id="refuse" style="display: none"> {{ form_row(form.children.refuse) }}</div>
+
+              <div class="form-group">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary" onclick="return verifier()"> Valider la décision</button>
+                </div>
+              </div>
+              {{ form_end(form) }}
+
+          {% elseif access == "Demande déjà traitée"  %}
+              <h3>Autorisation d'inscription à une formation</h3>
+              <p>La demande d'inscription de <b>{{ trainee.fullName }}</b> à la formation suivante a déjà été traitée.</p>
+
+              <blockquote class="small">
+                {{ registration.session.training.name }}<br>
+                {{ registration.session.dateRange | u.replace('le' , '') }}
+              </blockquote>
+
+          {% elseif access == "Avis émis"  %}
+              <h3>Votre avis a été envoyé.</h3>
+
+          {% elseif access == "Non autorisé" %}
+              <h3>Vous n'avez pas accès à cette partie de l'application.</h3>
+              <h3>Votre adresse mail ne correspond pas à l'adresse mail renseignée par {{ trainee.fullName }}.</h3>
+          {% else %}
+              <h3>Cette demande de formation n'existe plus ! </h3>
+              <h3>Elle a été annulée par le stagiaire ou par un gestionnaire.</h3>
+
+          {% endif %}
+        </div>
+    </div>
+  </section>
+</div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>
+        function afficher() {
+            if (document.getElementById('authorization_validation_0').checked == true) {
+                document.getElementById('refuse').style.display='none';
+            }
+            else{
+                document.getElementById('refuse').style.display='block';
+            }
+        }
+
+        function verifier() {
+            var r;
+            if (document.getElementById('authorization_validation_0').checked == true) {
+                r = true;
+            } else {
+                var refuse = document.getElementById('authorization_refuse').value;
+                if (refuse == "") {
+                    alert("Veuillez renseigner un motif de refus !");
+                    document.getElementById('authorization_refuse').focus;
+                    r = false;
+                }else {
+                    r = true;
+                }
+            }
+
+            return r;
+        }
+
+    </script>
+
+{% endblock %}

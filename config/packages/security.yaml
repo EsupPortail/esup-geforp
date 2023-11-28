@@ -60,6 +60,9 @@ security:
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
+    role_hierarchy:
+        ROLE_RESP: IS_AUTHENTICATED_FULLY
+
 when@test:
     security:
         password_hashers:
