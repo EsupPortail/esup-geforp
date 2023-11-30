@@ -83,7 +83,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return array('user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif);
+        return array('user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds));
     }
 
     /**

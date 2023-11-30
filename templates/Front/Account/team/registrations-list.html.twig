@@ -25,9 +25,9 @@
                     </td>
                     <td>
                         {% if registration.upcoming and (registration.inscriptionStatus.machinename == 'waiting') %}
-{#                             <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
-                                Accepter ou refuser
-                            </a> #}
+                             <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                                Accepter ou refuser la demande
+                            </a>
                         {% endif %}
                     </td>
                 </tr>
