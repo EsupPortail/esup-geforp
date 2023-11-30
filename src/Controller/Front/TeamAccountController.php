@@ -1,9 +1,6 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: erwan
- * Date: 9/15/16
- * Time: 10:42 AM
  */
 
 namespace App\Controller\Front;
@@ -41,7 +38,7 @@ use Symfony\Component\Mime\Message;
  * This controller regroup actions related to registration.
  *
  * @Route("/account/team")
- * @Security("is_granted('ROLE_RESP')")
+ * @Security("is_granted('IS_AUTHENTICATED_FULLY') and is_granted('ROLE_RESP')")
  */
 class TeamAccountController extends AbstractController
 {
@@ -56,10 +53,10 @@ class TeamAccountController extends AbstractController
      */
     public function teamregistrationsAction(Request $request, ManagerRegistry $doctrine)
     {
-        // Recup param pour l'activation du bouton de relance au N+1
-        $relanceActif = $this->getParameter('relance_actif');
-
         $user = $this->getUser();
+        // Récupération du user avec le format trainee
+        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
@@ -86,7 +83,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return array('user' => $user, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif);
+        return array('user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif);
     }
 
     /**
@@ -99,11 +96,14 @@ class TeamAccountController extends AbstractController
     public function teamtraineesAction(Request $request, ManagerRegistry $doctrine)
     {
         $user = $this->getUser();
+        // Récupération du user avec le format trainee
+        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
 
-        return array('user' => $user, 'trainees' => $arTrainee);
+        return array('user' => $traineeUser, 'trainees' => $arTrainee);
     }
 
 }
