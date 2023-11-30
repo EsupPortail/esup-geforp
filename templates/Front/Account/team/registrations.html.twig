@@ -22,7 +22,7 @@
         <div class="row">
             <div class="col-md-12">
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Demandes en cours</span></h3>
+                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions à venir</span></h3>
                     {% if upcoming is not defined or upcoming | length == 0 %}
                         <blockquote class="small">Il n'y a aucune demande d'inscription pour vos agents.</blockquote>
                     {% else %}
@@ -32,7 +32,7 @@
                 </section>
 
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Demandes archivées</span></h3>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions passées</span></h3>
                     {% if past is not defined or past | length == 0 %}
                         <blockquote class="small">Il n'y a aucune demande d'inscription archivée pour vos agents.</blockquote>
                     {% else %}

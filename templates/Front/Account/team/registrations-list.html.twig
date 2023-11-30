@@ -7,9 +7,9 @@
                 <th>Nom</th>
                 <th>Centre</th>
                 <th>Formation</th>
-                <th>Session</th>
+                <th>Date de début de session</th>
                 <th>Statut</th>
-                <th></th>
+                <th>Action possible</th>
             </tr>
             </thead>
             <tbody>
@@ -19,7 +19,7 @@
                     <td>{{ registration.trainee.fullname }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>
                     <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
-                    <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    <td>{{ registration.session.dateBegin | date('d/m/Y') }}</td>
                     <td>
                         {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
                     </td>
