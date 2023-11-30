@@ -330,6 +330,8 @@ class RegistrationAccountController extends AbstractController
                             }
                         }
                         $access = "Avis émis";
+                        // On renvoie sur la page d'accueil des responsables
+                        return $this->redirectToRoute('front.account.team.registrations');
                     }
                 } else {
                     $access = "Demande déjà traitée";
