@@ -1,0 +1,54 @@
+{% extends "Front/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Espace agents</h1>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li><a href="{{ path('front.account.team.registrations') }}" title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes" class="button secondary">Demandes d'inscription</a></li>
+                <li class="active"><a href="{{ path('front.account.team.trainees') }}" title="Pour retrouver tous les agents supervisés et accéder a leur historique de formation" class="button secondary">Mes agents</a></li>
+            </ul>
+        </div>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Liste des agents</span></h3>
+                    {% if trainees is not defined or trainees | length == 0 %}
+                        <blockquote class="small">Il n'y a aucune agent.</blockquote>
+                    {% else %}
+                        <div class="registrations-list">
+                            <div class="table-responsive">
+                                <table class="table table-hover table-condensed">
+                                    <thead>
+                                    <tr>
+                                        <th>Nom</th>
+                                        <th>Prénom</th>
+                                        <th>Mail</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for trainee in trainees %}
+                                        <tr>
+                                            <td>{{ trainee.lastname }}</td>
+                                            <td>{{ trainee.firstname }}</td>
+                                            <td>{{ trainee.email }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock body %}

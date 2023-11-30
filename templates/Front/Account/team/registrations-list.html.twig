@@ -4,11 +4,11 @@
             <thead>
             <tr>
                 <th>Inscription</th>
+                <th>Nom</th>
                 <th>Centre</th>
                 <th>Formation</th>
                 <th>Session</th>
                 <th>Statut</th>
-                <th></th>
                 <th></th>
             </tr>
             </thead>
@@ -16,6 +16,7 @@
             {% for registration in list |sort((a, b) => a.createdat <=> b.createdat) %}
                 <tr>
                     <td>{{ registration.createdAt | date('d/m/Y') }}</td>
+                    <td>{{ registration.trainee.fullname }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>
                     <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
                     <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
@@ -23,19 +24,10 @@
                         {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
                     </td>
                     <td>
-                        {% if relance == true %}
-                            {% if registration.upcoming and (registration.inscriptionStatus.machinename == 'waiting') %}
-                                <a href="{{ path('front.account.registration.authorize', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
-                                    Relancer ma demande d'autorisation hiérarchique
-                                </a>
-                            {% endif %}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if registration.upcoming and (registration.inscriptionStatus.id == 1) %}
-                            <a href="{{ path('front.account.registration.desist', {id: registration.id}) }}" class="btn btn-danger btn-xs pull-right">
-                                {{ registration.inscriptionStatus.id == 1 ? 'Annuler cette demande' : 'Déclarer un désistement' }}
-                            </a>
+                        {% if registration.upcoming and (registration.inscriptionStatus.machinename == 'waiting') %}
+{#                             <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                                Accepter ou refuser
+                            </a> #}
                         {% endif %}
                     </td>
                 </tr>

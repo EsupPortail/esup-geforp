@@ -62,33 +62,48 @@ class TeamAccountController extends AbstractController
         $user = $this->getUser();
 
         // Recupération des agents dont on est responsable
-        $tabUs = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
 
         $upcoming = array();
         $upcomingIds = array();
         $past = array();
         $now = new \DateTime();
-        $sup = "vide";
-        foreach ($arTrainee as $trainee) {
-            $inscriptions = $trainee->getInscriptions();
 
-            foreach ($inscriptions as $inscription) {
-                if ($inscription->getSession()->getDatebegin() < $now) {
-                    $past[] = $inscription;
-                    $inscription->upcoming = false;
-                } else {
-                    $inscription->upcoming = true;
-                    $upcoming[] = $inscription;
-                    $upcomingIds[] = $inscription->getId();
-                    if ($inscription->getInscriptionstatus()->getName() == "En attente") {
-                        $sup = $inscription->getTrainee()->getFirstnamesup() ." ". $inscription->getTrainee()->getLastnamesup();
+        if (!empty($arTrainee)) {
+            foreach ($arTrainee as $trainee) {
+                $inscriptions = $trainee->getInscriptions();
+
+                foreach ($inscriptions as $inscription) {
+                    if ($inscription->getSession()->getDatebegin() < $now) {
+                        $past[] = $inscription;
+                        $inscription->upcoming = false;
+                    } else {
+                        $inscription->upcoming = true;
+                        $upcoming[] = $inscription;
+                        $upcomingIds[] = $inscription->getId();
                     }
                 }
             }
         }
 
         return array('user' => $user, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif);
+    }
+
+    /**
+     * Trainees.
+     *
+     * @Route("/trainees", name="front.account.team.trainees")
+     * @Template("Front/Account/team/trainees.html.twig")
+     * @Method("GET")
+     */
+    public function teamtraineesAction(Request $request, ManagerRegistry $doctrine)
+    {
+        $user = $this->getUser();
+
+        // Recupération des agents dont on est responsable
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
+
+        return array('user' => $user, 'trainees' => $arTrainee);
     }
 
 }
