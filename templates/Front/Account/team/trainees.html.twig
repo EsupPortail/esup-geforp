@@ -38,7 +38,7 @@
                                     <tbody>
                                     {% for trainee in trainees %}
                                         <tr>
-                                            <td>{{ trainee.lastname }}</td>
+                                            <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ trainee.lastname }}</a></td>
                                             <td>{{ trainee.firstname }}</td>
                                             <td>{{ trainee.email }}</td>
                                         </tr>

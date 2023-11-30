@@ -106,4 +106,40 @@ class TeamAccountController extends AbstractController
         return array('user' => $traineeUser, 'trainees' => $arTrainee);
     }
 
+    /**
+     * Registrations from one trainee.
+     *
+     * @Route("/trainee/{id}/registrations", name="front.account.team.trainee.registrations")
+     * @Template("Front/Account/team/trainee-registrations.html.twig")
+     * @Method("GET")
+     */
+    public function traineeregistrationsAction(Request $request, ManagerRegistry $doctrine, $id)
+    {
+        $user = $this->getUser();
+        $arSup = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $sup = $arSup[0];
+
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findById($id);
+        $trainee = $arTrainee[0];
+
+        $inscriptions = $trainee->getInscriptions();
+        $upcoming = array();
+        $upcomingIds = array();
+        $past = array();
+        $now = new \DateTime();
+        foreach ($inscriptions as $inscription) {
+            if ($inscription->getSession()->getDatebegin() < $now) {
+                $past[] = $inscription;
+                $inscription->upcoming = false;
+            }
+            else {
+                $inscription->upcoming = true;
+                $upcoming[] = $inscription;
+                $upcomingIds[] = $inscription->getId();
+            }
+        }
+
+        return array('user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee);
+    }
+
 }
