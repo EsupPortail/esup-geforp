@@ -227,6 +227,10 @@ class RegistrationAccountController extends AbstractController
     {
         // Authentification et récup du mail retourné par Shibboleth
         $user = $this->getUser();
+        // Récupération du user avec le format trainee
+        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $traineeUser = $arTraineeUser[0];
+
         $supMail = $user->getCredentials()['mail'];
 
         // transforme le mail en minu
@@ -334,11 +338,11 @@ class RegistrationAccountController extends AbstractController
                 // Sinon, on affiche un message d'erreur
                 $access = "Non autorisé";
             }
-            return array('form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access);
+            return array('form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser);
         } else {
             // Sinon, on affiche un message d'erreur
             $access = "Inscription non trouvée";
-            return array('form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access);
+            return array('form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser);
         }
 
     }
