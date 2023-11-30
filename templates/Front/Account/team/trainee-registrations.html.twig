@@ -1,0 +1,47 @@
+{% extends "Front/base.html.twig" %}
+
+{% block header %}
+    <header>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h3>Plate-forme de gestion des formations</h3>
+                    <h1>Responsable hiérarchique</h1>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="{{ path('front.account.team.registrations') }}" title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes" class="button secondary">Demandes d'inscription</a></li>
+                <li><a href="{{ path('front.account.team.trainees') }}" title="Pour retrouver tous les agents supervisés et accéder a leur historique de formation" class="button secondary">Mes agents</a></li>
+            </ul>
+        </div>
+    </header>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{{ trainee.fullname }}</h1>
+                <section>
+                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions à venir</span></h3>
+                    {% if upcoming is not defined or upcoming | length == 0 %}
+                        <blockquote class="small">Il n'y a aucune demande d'inscription pour cet agent.</blockquote>
+                    {% else %}
+                        {% set list = upcoming %}
+                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                    {% endif %}
+                </section>
+
+                <section>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions passées</span></h3>
+                    {% if past is not defined or past | length == 0 %}
+                        <blockquote class="small">Il n'y a aucune demande d'inscription archivée pour cet agent.</blockquote>
+                    {% else %}
+                        {% set list = past %}
+                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                    {% endif %}
+                </section>
+            </div>
+        </div>
+    </div>
+{% endblock body %}
