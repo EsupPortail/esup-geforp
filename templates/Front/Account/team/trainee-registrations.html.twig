@@ -10,8 +10,9 @@
                 </div>
             </div>
             <ul class="nav nav-tabs">
-                <li class="active"><a href="{{ path('front.account.team.registrations') }}" title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes" class="button secondary">Demandes d'inscription</a></li>
-                <li><a href="{{ path('front.account.team.trainees') }}" title="Pour retrouver tous les agents supervisés et accéder a leur historique de formation" class="button secondary">Mes agents</a></li>
+                <li><a href="{{ path('front.account.team.registrations') }}" title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes" class="button secondary">Demandes d'inscription</a></li>
+                <li><a href="{{ path('front.account.team.trainees') }}" title="Pour retrouver tous les agents supervisés et accéder à leur historique de formation" class="button secondary">Mes agents</a></li>
+                <li class="active"><a href="{{ path('front.account.team.trainees') }}" title="Pour accéder l'historique de formation d'un agent" class="button secondary">{{ trainee.fullname }}</a></li>
             </ul>
         </div>
     </header>
