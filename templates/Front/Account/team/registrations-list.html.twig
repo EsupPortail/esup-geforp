@@ -13,7 +13,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for registration in list |sort((a, b) => a.createdat <=> b.createdat) %}
+            {% for registration in list |sort((a, b) => b.createdat <=> a.createdat) %}
                 <tr>
                     <td>{{ registration.createdAt | date('d/m/Y') }}</td>
                     <td>{{ registration.trainee.fullname }}</td>
