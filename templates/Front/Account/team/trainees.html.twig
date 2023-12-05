@@ -33,6 +33,8 @@
                                         <th>Nom</th>
                                         <th>Prénom</th>
                                         <th>Mail</th>
+                                        <th>Affectation</th>
+                                        <th>Fonction</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -41,6 +43,8 @@
                                             <td><a href="{{ path('front.account.team.trainee.registrations', {id: trainee.id}) }}">{{ trainee.lastname }}</a></td>
                                             <td>{{ trainee.firstname }}</td>
                                             <td>{{ trainee.email }}</td>
+                                            <td>{{ trainee.service }}</td>
+                                            <td>{{ trainee.fonction }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
