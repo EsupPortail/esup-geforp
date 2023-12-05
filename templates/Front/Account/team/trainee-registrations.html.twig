@@ -29,16 +29,27 @@
                         <blockquote class="small">Il n'y a aucune demande d'inscription pour cet agent.</blockquote>
                     {% else %}
                         {% set list = upcoming %}
+                        {% set flagUp = 1 %}
+                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                    {% endif %}
+                </section>
+                {% set flagUp = 0 %}
+                <section>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions qui ont été suivies</span></h3>
+                    {% if pastEffective is not defined or pastEffective | length == 0 %}
+                        <blockquote class="small">Il n'y a aucune formation suivie par cet agent.</blockquote>
+                    {% else %}
+                        {% set list = pastEffective %}
                         {% include 'Front/Account/team/registrations-list.html.twig' %}
                     {% endif %}
                 </section>
 
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions passées</span></h3>
-                    {% if past is not defined or past | length == 0 %}
-                        <blockquote class="small">Il n'y a aucune demande d'inscription archivée pour cet agent.</blockquote>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des autres inscriptions à des sessions passées</span></h3>
+                    {% if pastOther is not defined or pastOther | length == 0 %}
+                        <blockquote class="small">Il n'y a aucune autre demande d'inscription archivée pour cet agent.</blockquote>
                     {% else %}
-                        {% set list = past %}
+                        {% set list = pastOther %}
                         {% include 'Front/Account/team/registrations-list.html.twig' %}
                     {% endif %}
                 </section>

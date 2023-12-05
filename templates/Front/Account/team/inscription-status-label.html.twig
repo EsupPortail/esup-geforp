@@ -1,1 +1,14 @@
-<span inscription-status-label="registration.inscriptionstatus">{{ registration.inscriptionstatus.name }}</span>
+<span class="{% if registration.inscriptionstatus.status == 0 %} label-status-default
+                {% elseif registration.inscriptionstatus.status == 1 %} label-status-warning
+                {% elseif registration.inscriptionstatus.status == 2 %} label-status-success
+                {% elseif registration.inscriptionstatus.status == 3 %} label-status-danger
+                {% endif %}">
+            {{ registration.inscriptionstatus.name }}
+</span>
+{% if registration.presencestatus is not null %}
+    <span class="{% if registration.presencestatus.status == 0 %} label-status-danger
+                {% elseif registration.presencestatus.status == 1 %} label-status-success
+                {% endif %}">
+            {{ registration.presencestatus.name }}
+</span>
+{% endif %}

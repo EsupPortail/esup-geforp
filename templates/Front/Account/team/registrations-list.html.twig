@@ -9,7 +9,7 @@
                 <th>Formation</th>
                 <th>Date de début de session</th>
                 <th>Statut</th>
-                <th></th>
+                <th>{% if flagUp %} Action {% endif %}</th>
             </tr>
             </thead>
             <tbody>
@@ -21,11 +21,11 @@
                     <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
                     <td>{{ registration.session.dateBegin | date('d/m/Y') }}</td>
                     <td>
-                        {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
+                        {% include 'Front/Account/team/inscription-status-label.html.twig' %}
                     </td>
                     <td>
-                        {% if registration.upcoming and (registration.inscriptionStatus.machinename == 'waiting') %}
-                             <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                        {% if registration.upcoming and (registration.inscriptionstatus.machinename == 'waiting') %}
+                            <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
                                 Accepter ou refuser la demande
                             </a>
                         {% endif %}

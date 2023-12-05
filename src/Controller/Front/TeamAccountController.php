@@ -76,7 +76,7 @@ class TeamAccountController extends AbstractController
                     if ($inscription->getSession()->getDatebegin() < $now) {
                         $past[] = $inscription;
                         $inscription->upcoming = false;
-                        if ($inscription->getPresencestatus()->getStatus() == true) {
+                        if (($inscription->getPresencestatus() != null) && ($inscription->getPresencestatus()->getStatus() == true)) {
                             $pastEffective[] = $inscription;
                         } else {
                             $pastOther[] = $inscription;
@@ -133,11 +133,19 @@ class TeamAccountController extends AbstractController
         $upcoming = array();
         $upcomingIds = array();
         $past = array();
+        $pastEffective = array();
+        $pastOther = array();
+
         $now = new \DateTime();
         foreach ($inscriptions as $inscription) {
             if ($inscription->getSession()->getDatebegin() < $now) {
                 $past[] = $inscription;
                 $inscription->upcoming = false;
+                if (($inscription->getPresencestatus() != null) && ($inscription->getPresencestatus()->getStatus() == true)) {
+                    $pastEffective[] = $inscription;
+                } else {
+                    $pastOther[] = $inscription;
+                }
             }
             else {
                 $inscription->upcoming = true;
@@ -146,7 +154,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return array('user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee);
+        return array('user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee);
     }
 
 }
