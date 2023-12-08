@@ -192,10 +192,11 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
 
             }
 
-            //removing files
-            foreach ($tabAllAttach as $att) {
-                if (file_exists($att->getPathname()))
-                    unlink($att->getPathname());
+            if ((isset($tabAllAttach)) && ($tabAllAttach != null)) {
+                foreach ($tabAllAttach as $att) {
+                    if (file_exists($att->getPathname()))
+                        unlink($att->getPathname());
+                }
             }
 
         }

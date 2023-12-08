@@ -2,9 +2,6 @@
 
 /**
  * Created by PhpStorm.
- * User: maxime
- * Date: 12/06/14
- * Time: 18:13.
  */
 namespace App\BatchOperations\Generic;
 
@@ -232,21 +229,38 @@ class EmailingBatchOperation extends AbstractBatchOperation
                             $tabDates = $entity->getSession()->getDates();
                             $tabEvent = array(); $i=0;
                             foreach ($tabDates as $dateSession) {
+                                $j=$i+1;
                                 $tabEvent[$i] = new CalendarEvent();
                                 $dateBegin = clone $dateSession->getDatebegin();
                                 $dateEnd = clone $dateSession->getDateend();
                                 $tabEvent[$i]->setStart($dateBegin->modify('+8 hours'))
                                     ->setEnd($dateEnd->modify('+18 hours'))
                                     ->setSummary($sessionName)
-                                    ->setUid('eventuid'.$i);
+                                    ->setUid('eventuid'.$j);
                                 $calendar->addEvent($tabEvent[$i]);
                                 $i++;
                             }
                             $calendarExport = new CalendarExport(new CalendarStream(), new Formatter());
-                            $calendarExport->addCalendar($calendar);
-                            $ics = $calendarExport->getStream();
 
-                            $msg->attach($ics, 'ical.ics', 'text/calendar');
+                            // Fichier attaché ou demande dans outlook suivant une ou plusieurs dates pour la session
+                            if ($i == 1) {
+                                // une seule date -> demande d'acceptation
+                                $calendar->setMethod('REQUEST'); // or PUBLISH
+                                $calendarExport->addCalendar($calendar);
+
+                                $ics = $calendarExport->getStream();
+                                // inline it
+                                $attachment = new DataPart($ics, 'inline.ics', 'text/calendar', 'quoted-printable');
+                                $attachment->asInline();
+                                $attachment->getHeaders()->addParameterizedHeader('Content-Type', 'text/calendar', ['charset' => 'utf-8', 'method' => 'REQUEST']);
+                                $msg->attachPart($attachment);
+                            } else {
+                                // plusieurs dates -> fichier attaché
+                                $calendarExport->addCalendar($calendar);
+
+                                $ics = $calendarExport->getStream();
+                                $msg->attach($ics, 'ical.ics', 'text/calendar');
+                            }
                         }
                     }
 
