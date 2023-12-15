@@ -86,7 +86,8 @@
             "node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
         ],
         "front-add": [
-            "assets/front/js/front.js"
+            "assets/front/js/front.js",
+            "assets/front/js/datatables.js"
         ]
     },
     "templates": [

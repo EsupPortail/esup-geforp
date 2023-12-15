@@ -56,3 +56,34 @@
         </div>
     </div>
 {% endblock body %}
+
+{% block javascripts %}
+    <script type="text/javascript">
+        $('#registrations').DataTable({
+            "paging": true,
+            "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "tous"] ],
+            "oLanguage": {
+                "sLengthMenu": "Afficher  _MENU_  éléments  par page",
+                "sZeroRecords": "Aucune entrée trouvée",
+                "sInfo": "Affichage éléments _START_ à _END_ sur _TOTAL_ éléments",
+                "sInfoEmpty": "Pas d'élément disponible",
+                "sInfoFiltered": "(filtrage sur un total de _MAX_ éléments)",
+                "sSearch": "Recherche",
+                "oPaginate": {
+                    "sFirst": "Premier",
+                    "sLast": "Dernier",
+                    "sNext": ">>",
+                    "sPrevious": "<<"
+                },
+            },
+            "columns": [
+                null, null,null, null, null, null,
+                { "orderDataType": "dom-checkbox" },
+                { "orderDataType": "dom-checkbox" },
+                { "orderDataType": "dom-checkbox" }
+            ],
+            "iDisplayLength": 25
+        });
+    </script>
+
+{% endblock %}
