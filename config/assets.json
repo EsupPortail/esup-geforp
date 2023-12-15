@@ -87,6 +87,7 @@
         ],
         "front-add": [
             "assets/front/js/front.js",
+            "assets/front/js/jquery-3.7.0.js",
             "assets/front/js/datatables.js"
         ]
     },
