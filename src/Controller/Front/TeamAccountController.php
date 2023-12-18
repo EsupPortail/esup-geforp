@@ -59,7 +59,7 @@ class TeamAccountController extends AbstractController
         $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail'], 'isactive' => true));
 
         $upcoming = array();
         $upcomingIds = array();
@@ -108,7 +108,7 @@ class TeamAccountController extends AbstractController
         $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail']));
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail'], 'isactive' => true));
 
         return array('user' => $traineeUser, 'trainees' => $arTrainee);
     }
