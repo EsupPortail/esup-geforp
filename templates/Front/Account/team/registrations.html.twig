@@ -28,7 +28,7 @@
                     {% else %}
                         {% set list = upcoming %}
                         {% set flagUp = 1 %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-upcoming.html.twig' %}
                     {% endif %}
                 </section>
 
@@ -39,7 +39,7 @@
                         <blockquote class="small">Il n'y a aucune formation suivie par vos agents.</blockquote>
                     {% else %}
                         {% set list = pastEffective %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-pastEffective.html.twig' %}
                     {% endif %}
                 </section>
 
@@ -49,7 +49,7 @@
                         <blockquote class="small">Il n'y a aucune autre demande d'inscription archivée pour vos agents.</blockquote>
                     {% else %}
                         {% set list = pastOther %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-pastOther.html.twig' %}
                     {% endif %}
                 </section>
             </div>
@@ -57,27 +57,3 @@
     </div>
 {% endblock body %}
 
-{% block javascripts %}
-    <script type="text/javascript">
-        $('#registrations').DataTable({
-            "paging": true,
-            "lengthMenu": [ [10, 25, 50, -1], [10, 25, 50, "tous"] ],
-            "oLanguage": {
-                "sLengthMenu": "Afficher  _MENU_  éléments  par page",
-                "sZeroRecords": "Aucune entrée trouvée",
-                "sInfo": "Affichage éléments _START_ à _END_ sur _TOTAL_ éléments",
-                "sInfoEmpty": "Pas d'élément disponible",
-                "sInfoFiltered": "(filtrage sur un total de _MAX_ éléments)",
-                "sSearch": "Recherche",
-                "oPaginate": {
-                    "sFirst": "Premier",
-                    "sLast": "Dernier",
-                    "sNext": ">>",
-                    "sPrevious": "<<"
-                },
-            },
-            "iDisplayLength": 25
-        });
-    </script>
-
-{% endblock %}

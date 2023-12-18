@@ -1,0 +1,50 @@
+<div class="registrations-list">
+    <div class="table-responsive">
+        <table id="registrations-pastEffective" class="table table-hover table-condensed">
+            <thead>
+            <tr>
+                <th>Inscription</th>
+                <th>Nom</th>
+                <th>Centre</th>
+                <th>Formation</th>
+                <th>Date de début de session</th>
+                <th>Statut</th>
+                <th>{% if flagUp %} Action {% endif %}</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for registration in list |sort((a, b) => b.createdat <=> a.createdat) %}
+                <tr>
+                    <td>{{ registration.createdAt | date('d/m/Y') }}</td>
+                    <td>{{ registration.trainee.fullname }}</td>
+                    <td>{{ registration.session.training.organization.name }}</td>
+                    <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
+                    <td>{{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    <td>
+                        {% include 'Front/Account/team/inscription-status-label.html.twig' %}
+                    </td>
+                    <td>
+                        {% if registration.upcoming and (registration.inscriptionstatus.machinename == 'waiting') %}
+                            <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                                Accepter ou refuser la demande
+                            </a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% block javascripts %}
+    <script type="text/javascript">
+        $(document).ready( function () {
+            var table = $('#registrations-pastEffective').DataTable({
+                "searching": false,
+                "paging": false,
+                "info": false
+            });
+        } );
+    </script>
+{% endblock %}
