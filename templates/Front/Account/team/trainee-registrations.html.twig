@@ -30,7 +30,7 @@
                     {% else %}
                         {% set list = upcoming %}
                         {% set flagUp = 1 %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-upcoming.html.twig' %}
                     {% endif %}
                 </section>
                 {% set flagUp = 0 %}
@@ -40,7 +40,7 @@
                         <blockquote class="small">Il n'y a aucune formation suivie par cet agent.</blockquote>
                     {% else %}
                         {% set list = pastEffective %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-pastEffective.html.twig' %}
                     {% endif %}
                 </section>
 
@@ -50,7 +50,7 @@
                         <blockquote class="small">Il n'y a aucune autre demande d'inscription archivée pour cet agent.</blockquote>
                     {% else %}
                         {% set list = pastOther %}
-                        {% include 'Front/Account/team/registrations-list.html.twig' %}
+                        {% include 'Front/Account/team/registrations-list-pastOther.html.twig' %}
                     {% endif %}
                 </section>
             </div>
