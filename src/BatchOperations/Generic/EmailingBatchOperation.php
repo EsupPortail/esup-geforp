@@ -229,14 +229,14 @@ class EmailingBatchOperation extends AbstractBatchOperation
                             $tabDates = $entity->getSession()->getDates();
                             $tabEvent = array(); $i=0;
                             foreach ($tabDates as $dateSession) {
-                                $j=$i+1;
+                                $id = $dateSession->getId();
                                 $tabEvent[$i] = new CalendarEvent();
                                 $dateBegin = clone $dateSession->getDatebegin();
                                 $dateEnd = clone $dateSession->getDateend();
                                 $tabEvent[$i]->setStart($dateBegin->modify('+8 hours'))
                                     ->setEnd($dateEnd->modify('+18 hours'))
                                     ->setSummary($sessionName)
-                                    ->setUid('eventuid'.$j);
+                                    ->setUid('geforp'.$id);
                                 $calendar->addEvent($tabEvent[$i]);
                                 $i++;
                             }
