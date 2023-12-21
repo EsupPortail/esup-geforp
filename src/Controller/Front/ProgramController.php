@@ -59,7 +59,7 @@ class ProgramController extends AbstractController
             if ($institution->getEmail() !== null)
                 $instContacts[] = $institution;
         }
-        return array('etablissements' => $instContacts);
+        return array('etablissements' => $instContacts, 'user' => $this->getUser());
     }
 
     /**
@@ -68,7 +68,7 @@ class ProgramController extends AbstractController
      */
     public function faqAction(Request $request, ManagerRegistry $doctrine)
     {
-        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'));
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $this->getUser());
     }
 
     /**
