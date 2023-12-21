@@ -52,6 +52,17 @@ class ProgramController extends AbstractController
      */
     public function contactAction(Request $request, ManagerRegistry $doctrine)
     {
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+
+        // si pas de trainee enregistré
+        if (!isset($arTrainee[0])) {
+            // redirect user to registration form
+            $url = $this->generateUrl('front.account.register');
+            return new RedirectResponse($url);
+        } else {
+            $trainee = $arTrainee[0];
+        }
+
         // Récupération des établissements de la plate-forme
         $institutions = $doctrine->getRepository('App\Entity\Back\Institution')->findBy(array(), array('name' => 'ASC'));
         $instContacts = array();
@@ -59,7 +70,7 @@ class ProgramController extends AbstractController
             if ($institution->getEmail() !== null)
                 $instContacts[] = $institution;
         }
-        return array('etablissements' => $instContacts, 'user' => $this->getUser());
+        return array('etablissements' => $instContacts, 'user' => $trainee);
     }
 
     /**
@@ -68,7 +79,18 @@ class ProgramController extends AbstractController
      */
     public function faqAction(Request $request, ManagerRegistry $doctrine)
     {
-        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $this->getUser());
+        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+
+        // si pas de trainee enregistré
+        if (!isset($arTrainee[0])) {
+            // redirect user to registration form
+            $url = $this->generateUrl('front.account.register');
+            return new RedirectResponse($url);
+        } else {
+            $trainee = $arTrainee[0];
+        }
+
+        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $trainee);
     }
 
     /**
