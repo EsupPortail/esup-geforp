@@ -47,8 +47,8 @@ use Symfony\Component\Mime\Email;
 class ProgramController extends AbstractController
 {
     /**
-     * @Route("/contact", name="front.pg.contact")
-     * @Template("Front/Public/contact.html.twig")
+     * @Route("/contact", name="front.program.contact")
+     * @Template("Front/Public/program/contact.html.twig")
      */
     public function contactAction(Request $request, ManagerRegistry $doctrine)
     {
@@ -63,8 +63,8 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @Route("/faq", name="front.pg.faq")
-     * @Template("Front/Public/faq.html.twig")
+     * @Route("/faq", name="front.program.faq")
+     * @Template("Front/Public/program/faq.html.twig")
      */
     public function faqAction(Request $request, ManagerRegistry $doctrine)
     {
