@@ -52,6 +52,7 @@ class ProgramController extends AbstractController
      */
     public function contactAction(Request $request, ManagerRegistry $doctrine)
     {
+        $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // si pas de trainee enregistré
@@ -79,6 +80,7 @@ class ProgramController extends AbstractController
      */
     public function faqAction(Request $request, ManagerRegistry $doctrine)
     {
+        $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
 
         // si pas de trainee enregistré
