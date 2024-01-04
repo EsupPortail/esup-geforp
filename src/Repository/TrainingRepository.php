@@ -107,9 +107,15 @@ class TrainingRepository extends ServiceEntityRepository
         }
 
         // TRI DES RESULTATS
-        if (isset($sorts['training.name.source']))
+        if ((is_array($sorts)) && (array_key_exists('training.name.source', $sorts)))
             $qb->addOrderBy('training.name', $sorts['training.name.source']);
-        else
+        elseif ((is_array($sorts)) && (array_key_exists('training.number', $sorts)))
+            $qb->addOrderBy('training.number', $sorts['training.number']);
+        elseif ((is_array($sorts)) && (array_key_exists('training.category.source', $sorts))) {
+            if(!isset($filters['training.category.source']))
+                $qb->innerJoin('training.category', 'category', 'WITH', 'training.category = category');
+            $qb->addOrderBy('category.name', $sorts['training.category.source']);
+        } else
             $qb->addOrderBy('training.name');
 
         // PAGINATION
