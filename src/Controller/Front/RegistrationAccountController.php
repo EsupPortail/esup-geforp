@@ -149,6 +149,7 @@ class RegistrationAccountController extends AbstractController
                 // else set the status to "Desist"
                 $status = $this->getDesistInscriptionStatus($doctrine, $trainee);
                 $inscription->setInscriptionstatus($status);
+                $em->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
                 return $this->redirectToRoute('front.account.registrations');
             }
@@ -404,9 +405,9 @@ class RegistrationAccountController extends AbstractController
     protected function getDesistInscriptionStatus(ManagerRegistry $doctrine, AbstractTrainee $trainee)
     {
         $em     = $doctrine->getManager();
-        $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => null));
+        $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machinename' => 'desist', 'organization' => null));
         if (!$status) {
-            $status = $em->getRepository('pp\Entity\Term\Inscriptionstatus')->findOneBy(array('machineName' => 'desist', 'organization' => $trainee->getOrganization()));
+            $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machinename' => 'desist', 'organization' => $trainee->getOrganization()));
         }
 
         return $status;
