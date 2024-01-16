@@ -222,6 +222,23 @@ class ProgramController extends AbstractController
             $inscription = new Inscription();
             $inscription->setTrainee($trainee);
             $inscription->setSession($session);
+            $datesInsc = ['begin' => $session->getDatebegin(), 'end' => $session->getDateend()];
+
+            // Recuperation des inscriptions du stagiaire pour vérifier les dates de chevauchement
+            $inscriptionsTrainee = $doctrine->getManager()->getRepository('App\Entity\Core\AbstractInscription')->findBy(array(
+                'trainee' => $trainee
+            ));
+
+            // Test dates des sessions des inscriptions existantes
+            foreach ($inscriptionsTrainee as $insc) {
+                if (($insc->getSession()->getDatebegin() > $datesInsc['end']) || ($insc->getSession()->getDateend() < $datesInsc['begin'])) {
+                    // pas de chevauchement possible
+                }else {
+                    // chevauchement possible
+                    $libelleinsc = $insc->getSession()->getName();
+                    $this->get('session')->getFlashBag()->add('warning', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+                }
+            }
         }
         $inscription->setInscriptionstatus(
             $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
