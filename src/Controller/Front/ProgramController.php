@@ -236,7 +236,7 @@ class ProgramController extends AbstractController
                 }else {
                     // chevauchement possible
                     $libelleinsc = $insc->getSession()->getName();
-                    $this->get('session')->getFlashBag()->add('warning', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+                    $this->get('session')->getFlashBag()->add('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
                 }
             }
         }
