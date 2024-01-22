@@ -267,6 +267,12 @@ class ProgramController extends AbstractController
         }
 
         if ($flagInsc==1) {
+            // Ajout affichage supérieur hiérarchique s'il existe
+            if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
+                $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
+                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '.\n Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+            }
+
             $form = $this->createForm(InscriptionType::class, $inscription);
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
@@ -339,9 +345,6 @@ class ProgramController extends AbstractController
                             'inscriptionId' => $inscription->getId())
                     );
                 }
-
-                $sup = $inscription->getTrainee()->getFirstnamesup() . " " . $inscription->getTrainee()->getLastnamesup();
-                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
 
@@ -353,13 +356,13 @@ class ProgramController extends AbstractController
                 'token' => $token,
                 'flag' => $flagInsc
             );
-        }
-        else {
+        } else {
             //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
             return array(
                 'user' => $trainee,
                 'training' => $training,
                 'session' => $session,
+                'token' => $token,
                 'flag' => $flagInsc
             );
         }
