@@ -299,6 +299,7 @@ abstract class AbstractSessionController extends AbstractController
             $newParticipation = new $this->participationClass();
             $newParticipation->setSession($cloned);
             $newParticipation->setTrainer($participation->getTrainer());
+            $newParticipation->setOrganization($cloned->getTraining()->getOrganization());
             $cloned->addParticipation($newParticipation);
             $em->persist($newParticipation);
         }
