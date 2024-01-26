@@ -270,6 +270,7 @@ parameters:
                 fields:
                     # AbstractSession
                     nom: { property: "name" }
+                    id: { property: "id" }
                     dateDebut: { property: "datebegin", type: "date" }
                     dateFin: { property: "dateend", type: "date" }
                     dates: { property: "dates" }
@@ -301,6 +302,7 @@ parameters:
                 alias: 'formation'
                 fields:
                     # Training
+                    id: { property: id }
                     nom: { property: name }
                     theme: { property: theme.name }
                     centre: { property: organization }
