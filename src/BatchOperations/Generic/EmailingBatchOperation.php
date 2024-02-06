@@ -88,7 +88,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0);
+        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0);
 
         return new Response('', 204);
     }
