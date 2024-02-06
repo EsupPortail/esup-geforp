@@ -1,5 +1,14 @@
 # Geforp changelog :
 
+## 2.3.2 (2024-02-06)
+
+### Ajouts
+- Format HTML rendu disponible pour l'envoi de mails indépendants
+
+### Corrections
+- Affichage email au lieu de l'identifiant pour les gestionnaires connectés
+- Accessibilité du param format HTML lors de l'envoi de mail
+
 ## 2.3.1 (2024-01-22)
 
 ### Ajouts
