@@ -29,6 +29,14 @@
                 <textarea class="form-control" rows="10" id="message" ng-model="message.body"  placeholder="Message du mail"></textarea>
             </div>
         </div>
+        <div class="form-group" >
+            <label for="format" class="col-sm-2 control-label">Format HTML </label>
+            <div class="col-sm-10">
+                <select type="text" class="form-control" id="format" ng-options="opt.val as opt.name for opt in [{val:0,name:'NON'},{val:1,name:'OUI'}]" ng-model="message.format">
+                    <option value="" ng-disabled="true">Choisir le format HTML pour le mail</option>
+                </select>
+            </div>
+        </div>
         <div class="form-group" ng-if="message.templateAttachments.length > 0">
             <label for="attachmentTemplate" class="col-sm-2 control-label">Pièces jointes du modèle</label>
             <div class="col-sm-10">
