@@ -8,7 +8,7 @@ trait SortableTrait
 {
     /**
      * @ORM\Column(name="position", type="integer")
-     * @Serializer\Exclude
+     * @Serializer\Groups({"Default", "api"})
      */
     private $position = 0;
 
