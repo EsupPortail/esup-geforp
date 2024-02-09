@@ -22,6 +22,8 @@ sygeforApp.run(['$rootScope', function($rootScope) {
                 return prefix + 'success';
             case 3:
                 return prefix + 'danger';
+            case 4:
+                return prefix + 'success';
         }
     }
 

@@ -2,6 +2,7 @@
                 {% elseif registration.inscriptionstatus.status == 1 %} label-status-warning
                 {% elseif registration.inscriptionstatus.status == 2 %} label-status-success
                 {% elseif registration.inscriptionstatus.status == 3 %} label-status-danger
+                {% elseif registration.inscriptionstatus.status == 4 %} label-status-success
                 {% endif %}">
             {{ registration.inscriptionstatus.name }}
 </span>
