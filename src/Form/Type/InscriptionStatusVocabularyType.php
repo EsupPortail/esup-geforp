@@ -28,6 +28,7 @@ class InscriptionStatusVocabularyType extends VocabularyType
             'multiple' => false,
             'required' => true,
             'choices' => array(
+                'Convoqué' => Inscriptionstatus::STATUS_CONVOKED,
                 'Accepté' => Inscriptionstatus::STATUS_ACCEPTED,
                 'En attente' => Inscriptionstatus::STATUS_WAITING,
                 'En attente de traitement' => Inscriptionstatus::STATUS_PENDING,

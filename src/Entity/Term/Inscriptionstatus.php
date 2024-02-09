@@ -25,6 +25,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     const STATUS_WAITING = 1;
     const STATUS_ACCEPTED = 2;
     const STATUS_REJECTED = 3;
+    const STATUS_CONVOKED = 4;
 
     /**
      * This term is required during term replacement.
