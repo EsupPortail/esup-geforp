@@ -101,7 +101,11 @@ sygeforApp.controller('SessionInscriptionsController', ['$scope', '$dialog', '$f
      * Get the total accepted inscriptions count
      */
     $scope.totalAcceptedInscriptions = function() {
-        return $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 2}}).length;
+        // filtre statut 2 : accepté
+        var filter2 = $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 2}}).length;
+        // filtre statut 4: convoqué
+        var filter4 = $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 4}}).length;
+        return (filter2+filter4);
     }
 
     /**

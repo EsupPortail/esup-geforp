@@ -1,5 +1,10 @@
 # Geforp changelog :
 
+## 2.3.5 (2024-02-20)
+
+### Corrections
+- Corrections tableau de bord et recap des inscriptions : nb acceptés doit inclure nb acceptés et nb convoqués
+
 ## 2.3.4 (2024-02-19)
 
 ### Corrections

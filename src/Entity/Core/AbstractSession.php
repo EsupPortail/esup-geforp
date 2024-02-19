@@ -750,7 +750,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
         $nAccepted = 0;
         foreach ($this->inscriptions as $inscription) {
-            if ($inscription->getInscriptionstatus()->getStatus() === Inscriptionstatus::STATUS_ACCEPTED) {
+            if (($inscription->getInscriptionstatus()->getStatus() === Inscriptionstatus::STATUS_ACCEPTED) || ($inscription->getInscriptionstatus()->getStatus() === Inscriptionstatus::STATUS_CONVOKED)) {
                 ++$nAccepted;
             }
         }
