@@ -81,9 +81,9 @@
                             <li class="dropdown-header">Statuts d'inscription</li>
                             <li ng-repeat="status in status.inscription track by status.id" ng-class="{disabled :inscription.inscriptionstatus.id == status.id}"><a href="" ng-click="updateInscriptionStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.inscriptionstatus.id == status.id"></i> {{ status.name }}</a></li>
 
-                            <li ng-if="inscription.inscriptionstatus.status == 2" class="divider"></li>
-                            <li ng-if="inscription.inscriptionstatus.status == 2" class="dropdown-header">Statuts de présence</li>
-                            <li ng-if="inscription.inscriptionstatus.status == 2" ng-repeat="status in status.presence track by status.id" ng-class="{disabled :inscription.presencestatus.id == status.id}"><a href="" ng-click="updatePresenceStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.presencestatus.id == status.id"></i> {{ status.name }}</a></li>
+                            <li ng-if="inscription.inscriptionstatus.status == 4" class="divider"></li>
+                            <li ng-if="inscription.inscriptionstatus.status == 4" class="dropdown-header">Statuts de présence</li>
+                            <li ng-if="inscription.inscriptionstatus.status == 4" ng-repeat="status in status.presence track by status.id" ng-class="{disabled :inscription.presencestatus.id == status.id}"><a href="" ng-click="updatePresenceStatus(inscription, status)"><i class="fa fa-check" ng-if="inscription.presencestatus.id == status.id"></i> {{ status.name }}</a></li>
 
                             <li class="divider"></li>
                             <li><a href="" ng-click="delete(inscription)">Supprimer cette inscription</a></li>
