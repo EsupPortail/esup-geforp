@@ -22,7 +22,7 @@
                     <li ng-repeat="status in inscriptionstatus track by status.id" ng-class="{disabled :inscription.inscriptionstatus.id == status.id}"><a href="" ng-click="updateInscriptionStatus(status)"><i class="fa fa-check" ng-if="inscription.inscriptionstatus.id == status.id"></i> {{ status.name }}</a></li>
                 </ul>
             </div>
-            <div ng-if="inscription.presencestatus || inscription.inscriptionstatus.status == 2" class="btn-group dropdown">
+            <div ng-if="inscription.presencestatus || inscription.inscriptionstatus.status == 4" class="btn-group dropdown">
                 <button class="btn btn-xs dropdown-toggle" ng-class="$root.presenceStatusClass(inscription.presencestatus.status, 'btn')" data-toggle="dropdown">
                     <span ng-if="inscription.presencestatus">{{ inscription.presencestatus.name }}</span>
                     <span ng-if="!inscription.presencestatus"><em>Statut de présence</em></span>
