@@ -69,11 +69,11 @@
 
                     <!-- editable -->
                     <div class="btn-group dropdown">
-                        <button class="btn btn-xs dropdown-toggle" ng-if="!inscription.presencestatus || inscription.inscriptionstatus.status!=2" class="label" ng-class="$root.inscriptionStatusClass(inscription.inscriptionstatus.status, 'btn')" data-toggle="dropdown">
+                        <button class="btn btn-xs dropdown-toggle" ng-if="!inscription.presencestatus || inscription.inscriptionstatus.status!=4" class="label" ng-class="$root.inscriptionStatusClass(inscription.inscriptionstatus.status, 'btn')" data-toggle="dropdown">
                             {{ inscription.inscriptionstatus.name }}
                             <span class="caret"></span>
                         </button>
-                        <button class="btn btn-xs dropdown-toggle" ng-if="inscription.presencestatus &&  inscription.inscriptionstatus.status==2" class="label" ng-class="$root.presenceStatusClass(inscription.presencestatus.status, 'btn')" data-toggle="dropdown">
+                        <button class="btn btn-xs dropdown-toggle" ng-if="inscription.presencestatus &&  inscription.inscriptionstatus.status==4" class="label" ng-class="$root.presenceStatusClass(inscription.presencestatus.status, 'btn')" data-toggle="dropdown">
                             {{ inscription.presencestatus.name }}
                             <span class="caret"></span>
                         </button>
