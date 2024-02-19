@@ -1,5 +1,10 @@
 # Geforp changelog :
 
+## 2.3.3 (2024-02-19)
+
+### Corrections
+- Modification désistement côté stagiaire : possible uniquement jusqu'au statut 'accepté'
+
 ## 2.3.2 (2024-02-06)
 
 ### Ajouts
