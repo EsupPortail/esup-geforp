@@ -1,5 +1,10 @@
 # Geforp changelog :
 
+## 2.3.4 (2024-02-19)
+
+### Corrections
+- Corrections effet de bord statut accepté/convoqué
+
 ## 2.3.3 (2024-02-19)
 
 ### Corrections
