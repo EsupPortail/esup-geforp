@@ -235,8 +235,12 @@ class ProgramController extends AbstractController
                     // pas de chevauchement possible
                 }else {
                     // chevauchement possible
-                    $libelleinsc = $insc->getSession()->getName();
-                    $this->get('session')->getFlashBag()->add('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+
+                    // Test statut de l'inscription pour eliminer les avis défavorables, session annulée, ...
+                    if ($insc->getInscriptionstatus()->getStatus() != 3) {
+                        $libelleinsc = $insc->getSession()->getName();
+                        $this->get('session')->getFlashBag()->add('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+                    }
                 }
             }
         }
