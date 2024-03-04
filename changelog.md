@@ -1,5 +1,10 @@
 # Geforp changelog :
 
+## 2.3.6 (2024-03-04)
+
+### Corrections
+- Corrections Correction avertissement chevauchement dates en cas de statut désisté, refusé...
+
 ## 2.3.5 (2024-02-20)
 
 ### Corrections
