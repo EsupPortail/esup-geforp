@@ -477,7 +477,7 @@ class ProgramController extends AbstractController
             $codes[] = $organization->getCode();
         }
 
-        $search = $this->createProgramQuery($codes, $sessionRepository);
+        $search = $this->createProgramQuery($sessionRepository, $codes);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -584,7 +584,7 @@ class ProgramController extends AbstractController
             }
         }
 
-        $search = $this->createProgramQuery($codes, $sessionRepository);
+        $search = $this->createProgramQuery($sessionRepository, $codes);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -721,7 +721,7 @@ class ProgramController extends AbstractController
         }else
             $themeName = $theme;
 
-        $search = $this->createProgramQuerySearch($centreCodes, $themeName, $texte, $sessionRepository);
+        $search = $this->createProgramQuerySearch($sessionRepository, $centreCodes, $themeName, $texte);
         $sessions = $search["items"];
 
         // creation entites pour recuperer les alertes
@@ -866,7 +866,7 @@ class ProgramController extends AbstractController
      * @param $code
      * @return array
      */
-    protected function createProgramQuery($code = null, $sessionRepository)
+    protected function createProgramQuery($sessionRepository, $code = null)
     {
         // Construction filtres : code et date
         $filters["training.organization.name.source"] = $code;
@@ -897,7 +897,7 @@ class ProgramController extends AbstractController
      * @param $theme
      * @return array
      */
-    protected function createProgramQuerySearch($code = null, $theme = null, $texte = null, $sessionRepository)
+    protected function createProgramQuerySearch($sessionRepository, $code = null, $theme = null, $texte = null)
     {
         $keywords = $texte;
 

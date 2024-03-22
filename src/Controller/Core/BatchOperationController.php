@@ -109,7 +109,7 @@ class BatchOperationController extends AbstractController
      * @Route("/batchoperation/{service}/get/{file}/as/{filename}", name="sygefor_core.batch_operation.get_file", options={"expose"=true}, defaults={"_format" = "json", "filename"=null})
      * @Rest\View
      */
-    public function fileDownloadAction($service, BatchOperationRegistry $batchReg, $file, $filename = null, Request $request)
+    public function fileDownloadAction(Request $request, $service, BatchOperationRegistry $batchReg, $file, $filename = null)
     {
         $pdf = ($request->get('pdf') === 'true') ? true : false;
         //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($service);
