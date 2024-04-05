@@ -158,6 +158,12 @@ class RegistrationAccountController extends AbstractController
                 /** @var Emailtemplate $template */
                 $templates = $repo->findBy(array('name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
                 $subject = $templates[0]->getSubject();
+                $newsub = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject);
+                $newsub = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newsub);
+                $newsub = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newsub);
+                $newsub = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newsub);
+                $newsub = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newsub);
+
                 $body = $templates[0]->getBody();
                 $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
                 $Texte = "";
@@ -171,12 +177,14 @@ class RegistrationAccountController extends AbstractController
                 $newbody = str_replace("[dates]", $Texte, $newbody);
                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+                $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
+                $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
 
                 $message = (new Email())
                     ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
                     ->replyTo($registration->getSession()->getTraining()->getOrganization()->getEmail())
                     ->to($registration->getTrainee()->getEmail())
-                    ->subject($subject);
+                    ->subject($newsub);
 
                 $flagSup = 0;
                 if ($registration->getTrainee()->getEmailSup() != null) {
