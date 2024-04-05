@@ -106,7 +106,7 @@ class RegistrationAccountController extends AbstractController
      * @Route("/registration/{id}/desist", name="front.account.registration.desist")
      * @Template("Front/Account/registration/registration-desist.html.twig")
      */
-    public function desistAction($id, Request $request, ManagerRegistry $doctrine)
+    public function desistAction($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer)
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
@@ -150,6 +150,56 @@ class RegistrationAccountController extends AbstractController
                 $status = $this->getDesistInscriptionStatus($doctrine, $trainee);
                 $inscription->setInscriptionstatus($status);
                 $em->flush();
+
+                // Envoyer un mail au supérieur hiérarchique
+                $templateTerm = $vocabularyRegistry->getVocabularyById(5);
+                $em = $doctrine->getManager();
+                $repo = $em->getRepository(get_class($templateTerm));
+                /** @var Emailtemplate $template */
+                $templates = $repo->findBy(array('name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                $subject = $templates[0]->getSubject();
+                $body = $templates[0]->getBody();
+                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+                $Texte = "";
+                foreach ($registration->getSession()->getDates() as $date) {
+                    if ($date->getDatebegin() == $date->getDateend()) {
+                        $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                    } else {
+                        $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                    }
+                }
+                $newbody = str_replace("[dates]", $Texte, $newbody);
+                $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
+                $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+
+                $message = (new Email())
+                    ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->replyTo($registration->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->to($registration->getTrainee()->getEmail())
+                    ->subject($subject);
+
+                $flagSup = 0;
+                if ($registration->getTrainee()->getEmailSup() != null) {
+                    $flagSup = 1;
+                    $message->cc($registration->getTrainee()->getEmailSup());
+                }
+
+                if ($registration->getTrainee()->getEmailcorr() != null) {
+                    if ($flagSup == 0){
+                        $message->cc($registration->getTrainee()->getEmailcorr());
+                    } else {
+                        $message->addCc($registration->getTrainee()->getEmailcorr());
+                    }
+                }
+
+                // si Format HTML coché pour ce modèle, sinon format texte
+                if ($templates[0]->getPosition() == 1) {
+                    $message->html($newbody);
+                } else
+                    $message->text($newbody);
+
+                $mailer->send($message);
+
                 $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
                 return $this->redirectToRoute('front.account.registrations');
             }
