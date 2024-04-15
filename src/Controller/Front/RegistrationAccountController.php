@@ -157,6 +157,11 @@ class RegistrationAccountController extends AbstractController
                 $repo = $em->getRepository(get_class($templateTerm));
                 /** @var Emailtemplate $template */
                 $templates = $repo->findBy(array('name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                $formathtml = $templates[0]->getPosition();
+                if ($formathtml)
+                    $newline = '<br>';
+                else
+                    $newline = '\n';
                 $subject = $templates[0]->getSubject();
                 $newsub = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject);
                 $newsub = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newsub);
@@ -169,9 +174,9 @@ class RegistrationAccountController extends AbstractController
                 $Texte = "";
                 foreach ($registration->getSession()->getDates() as $date) {
                     if ($date->getDatebegin() == $date->getDateend()) {
-                        $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                        $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                     } else {
-                        $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                        $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                     }
                 }
                 $newbody = str_replace("[dates]", $Texte, $newbody);
@@ -241,15 +246,20 @@ class RegistrationAccountController extends AbstractController
         $repo = $em->getRepository(get_class($templateTerm));
         /** @var Emailtemplate $template */
         $templates = $repo->findBy(array('name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+        $formathtml = $templates[0]->getPosition();
+        if ($formathtml)
+            $newline = '<br>';
+        else
+            $newline = '\n';
         $subject = $templates[0]->getSubject();
         $body = $templates[0]->getBody();
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
         $Texte = "";
         foreach ($registration->getSession()->getDates() as $date) {
             if ($date->getDatebegin() == $date->getDateend()) {
-                $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
             } else {
-                $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
             }
         }
         $newbody = str_replace("[dates]", $Texte, $newbody);

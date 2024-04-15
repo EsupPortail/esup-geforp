@@ -303,14 +303,20 @@ class ProgramController extends AbstractController
                         $templates = $repo->findBy(array('name' => "Demande de validation d'inscription", 'organization' => $inscription->getSession()->getTraining()->getOrganization()));
                         $subject = $templates[0]->getSubject();
                         $body = $templates[0]->getBody();
+                        $formathtml = $templates[0]->getPosition();
+                        if ($formathtml)
+                            $newline = '<br>';
+                        else
+                            $newline = '\n';
+
                         $newbody = str_replace("[session.formation.nom]", $inscription->getSession()->getTraining()->getName(), $body);
 
                         $Texte = "";
                         foreach ($inscription->getSession()->getDates() as $date) {
                             if ($date->getDatebegin() == $date->getDateend()) {
-                                $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                                $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                             } else {
-                                $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . "\n";
+                                $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                             }
                         }
                         $newbody = str_replace("[dates]", $Texte, $newbody);

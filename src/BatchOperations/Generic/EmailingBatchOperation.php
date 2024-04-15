@@ -168,7 +168,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                     $hrpa = $this->hrpaf->getAccessor($entity);
                     $email = $hrpa->email;
                     $subjectR = $this->replaceTokens($subject, $entity);
-                    $bodyR = $this->replaceTokens($body, $entity);
+                    $bodyR = $this->replaceTokens($body, $entity, $format);
                     $msg = (new Email())
                         ->from($organization->getEmail())
                         ->to($email)
@@ -314,13 +314,17 @@ class EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return string
      */
-    protected function replaceTokens($content, $entity)
+    protected function replaceTokens($content, $entity, $format=0)
     {
         /** @var HumanReadablePropertyAccessor $HRPA */
         $HRPA = $this->hrpaf->getAccessor($entity);
 
         $newContent = preg_replace_callback('/\[(.*?)\]/',
-            function ($matches) use ($HRPA, $entity) {
+            function ($matches) use ($HRPA, $entity, $format) {
+                if ($format)
+                    $newline = '<br>';
+                else
+                    $newline = '\n';
                 $property = $matches[1];
                 if ($property=="dates"){
                     $session = $entity->getSession();
@@ -328,10 +332,10 @@ class EmailingBatchOperation extends AbstractBatchOperation
                     $Texte = "";
                     foreach ($tabDatesSessions as $dateSession) {
                         if ($dateSession->getDateend() == $dateSession->getDatebegin()) {
-                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace()."\n";
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace().$newline;
                         }
                         else {
-                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')." au ".$dateSession->getDateend()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace()."\n";
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')." au ".$dateSession->getDateend()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace().$newline;
                         }
                     }
                     return $Texte;
