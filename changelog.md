@@ -1,12 +1,13 @@
 # Geforp changelog :
 
-## 2.3.7 (2024-04-15)
+## 2.3.7 (2024-04-16)
 
 ### Ajouts
 - Envoi mail et copie au N+1 (et correspondant formation) en cas de désistement côté stagiaire
 
 ### Corrections
 - Correction affichage dates dans email au format HTML
+- Correction fiche stagiaire en cas de formation le même jour
 
 ## 2.3.6 (2024-03-04)
 
