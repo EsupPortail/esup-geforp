@@ -365,6 +365,10 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         //$dateDeb = $date->format('Y-m-d');
                         $dateDeb = $k->getSession()->getDatebegin()->format('Y-m-d');
                         $timestamp = strtotime($dateDeb);
+                        // si formations ayant lieu le même jour, on modifie un peu le timestamp pour toutes les conserver
+                        if (array_key_exists($timestamp, $a))
+                            $timestamp++;
+
                         $a[$timestamp] = $k;
                     }
                     // Tri du tableau par date croissante
