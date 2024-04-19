@@ -305,9 +305,9 @@ class ProgramController extends AbstractController
                         $body = $templates[0]->getBody();
                         $formathtml = $templates[0]->getPosition();
                         if ($formathtml)
-                            $newline = '<br>';
+                            $newline = "<br>";
                         else
-                            $newline = '\n';
+                            $newline = "\n";
 
                         $newbody = str_replace("[session.formation.nom]", $inscription->getSession()->getTraining()->getName(), $body);
 

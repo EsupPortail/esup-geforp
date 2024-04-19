@@ -159,9 +159,9 @@ class RegistrationAccountController extends AbstractController
                 $templates = $repo->findBy(array('name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
                 $formathtml = $templates[0]->getPosition();
                 if ($formathtml)
-                    $newline = '<br>';
+                    $newline = "<br>";
                 else
-                    $newline = '\n';
+                    $newline = "\n";
                 $subject = $templates[0]->getSubject();
                 $newsub = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject);
                 $newsub = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newsub);
@@ -248,9 +248,9 @@ class RegistrationAccountController extends AbstractController
         $templates = $repo->findBy(array('name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
         $formathtml = $templates[0]->getPosition();
         if ($formathtml)
-            $newline = '<br>';
+            $newline = "<br>";
         else
-            $newline = '\n';
+            $newline = "\n";
         $subject = $templates[0]->getSubject();
         $body = $templates[0]->getBody();
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
