@@ -322,9 +322,9 @@ class EmailingBatchOperation extends AbstractBatchOperation
         $newContent = preg_replace_callback('/\[(.*?)\]/',
             function ($matches) use ($HRPA, $entity, $format) {
                 if ($format)
-                    $newline = '<br>';
+                    $newline = "<br>";
                 else
-                    $newline = '\n';
+                    $newline = "\n";
                 $property = $matches[1];
                 if ($property=="dates"){
                     $session = $entity->getSession();
