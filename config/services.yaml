@@ -147,6 +147,7 @@ parameters:
                     trainee.category: "Catégorie"
                     trainee.corps: "Corps"
                     trainee.bap: "BAP"
+                    trainee.campus: "Campus"
                     trainee.address: "Adresse du stagiaire"
                     trainee.zip: "Code postal"
                     trainee.city: "Ville"

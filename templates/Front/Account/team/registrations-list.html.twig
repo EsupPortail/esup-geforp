@@ -15,11 +15,11 @@
             <tbody>
             {% for registration in list |sort((a, b) => b.createdat <=> a.createdat) %}
                 <tr>
-                    <td>{{ registration.createdAt | date('d/m/Y') }}</td>
+                    <td data-order="{{ registration.createdAt|date('U') }}">{{ registration.createdAt | date('d/m/Y') }}</td>
                     <td>{{ registration.trainee.fullname }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>
                     <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
-                    <td>{{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    <td data-order="{{ registration.session.dateBegin|date('U') }}">{{ registration.session.dateBegin | date('d/m/Y') }}</td>
                     <td>
                         {% include 'Front/Account/team/inscription-status-label.html.twig' %}
                     </td>
