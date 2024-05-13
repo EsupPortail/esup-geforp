@@ -1,5 +1,13 @@
 # Geforp changelog :
 
+## 2.3.8 (2024-05-13)
+
+### Ajouts
+- Ajout campus dans export inscriptions
+
+### Corrections
+- Correction tri des inscriptions côté stagiaire
+
 ## 2.3.7 (2024-04-16)
 
 ### Ajouts
