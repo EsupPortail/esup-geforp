@@ -292,7 +292,7 @@ class RegistrationAccountController extends AbstractController
      * @Template("Front/Account/registration/registration-valid.html.twig")
      *
      */
-    public function validAction($id, ManagerRegistry $doctrine, Request $request, MailerInterface $mailer)
+    public function validAction($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer)
     {
         // Authentification et récup du mail retourné par Shibboleth
         $user = $this->getUser();
@@ -349,18 +349,49 @@ class RegistrationAccountController extends AbstractController
                                 $em->persist($registration);
                                 $em->flush();
 
-                                $body = "Bonjour,\n" .
-                                    "Votre inscription à la session du " . $registration->getSession()->getDatebegin()->format('d/m/Y') . "\nde la formation intitulée '" . $registration->getSession()->getTraining()->getName() . "'\n"
-                                    . "a été approuvée par " . $supFirstName . " " . $supLastName . "\n";
+                                // Recuperation des templates emails dans le registre des vocabulaires
+                                $templateTerm = $vocRegistry->getVocabularyById(5);
+                                $repo = $em->getRepository(get_class($templateTerm));
+                                /** @var Emailtemplate $template */
+                                $templates = $repo->findBy(array('name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                                $subject = $templates[0]->getSubject();
+                                $body = $templates[0]->getBody();
+                                $formathtml = $templates[0]->getPosition();
+                                if ($formathtml)
+                                    $newline = "<br>";
+                                else
+                                    $newline = "\n";
 
+                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+
+                                $Texte = "";
+                                foreach ($registration->getSession()->getDates() as $date) {
+                                    if ($date->getDatebegin() == $date->getDateend()) {
+                                        $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
+                                    } else {
+                                        $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
+                                    }
+                                }
+                                $newbody = str_replace("[dates]", $Texte, $newbody);
+                                $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
+                                $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+                                $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
+                                $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
+
+                                // Envoyer un mail au stagiaire
                                 $message = (new Email())
                                     ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
                                     ->replyTo($registration->getSession()->getTraining()->getOrganization()->getEmail())
                                     ->to($registration->getTrainee()->getEmail())
-                                    ->subject("Avis favorable pour inscription à une formation")
-                                    ->text($body);
+                                    ->subject($subject);
                                 if ($registration->getTrainee()->getEmailcorr() != null)
                                     $message->cc($registration->getTrainee()->getEmailcorr());
+
+                                // si Format HTML coché pour ce modèle, sinon format texte
+                                if ($templates[0]->getPosition() == 1) {
+                                    $message->html($newbody);
+                                } else
+                                    $message->text($newbody);
 
                                 $mailer->send($message);
 
@@ -379,18 +410,49 @@ class RegistrationAccountController extends AbstractController
                                 $em->persist($registration);
                                 $em->flush();
 
-                                $body = "Bonjour,\n" .
-                                    "Votre inscription à la session du " . $registration->getSession()->getDatebegin()->format('d/m/Y') . "\nde la formation intitulée '" . $registration->getSession()->getTraining()->getName() . "'\n"
-                                    . "a été refusée par " . $supFirstName . " " . $supLastName . ", au motif de : " . $registration->getRefuse() . "\n";
+                                // Recuperation des templates emails dans le registre des vocabulaires
+                                $templateTerm = $vocRegistry->getVocabularyById(5);
+                                $repo = $em->getRepository(get_class($templateTerm));
+                                /** @var Emailtemplate $template */
+                                $templates = $repo->findBy(array('name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                                $subject = $templates[0]->getSubject();
+                                $body = $templates[0]->getBody();
+                                $formathtml = $templates[0]->getPosition();
+                                if ($formathtml)
+                                    $newline = "<br>";
+                                else
+                                    $newline = "\n";
 
+                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+
+                                $Texte = "";
+                                foreach ($registration->getSession()->getDates() as $date) {
+                                    if ($date->getDatebegin() == $date->getDateend()) {
+                                        $Texte .= $date->getDatebegin()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
+                                    } else {
+                                        $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
+                                    }
+                                }
+                                $newbody = str_replace("[dates]", $Texte, $newbody);
+                                $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
+                                $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+                                $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
+                                $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
+
+                                // Envoyer un mail au stagiaire
                                 $message = (new Email())
                                     ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
                                     ->replyTo($registration->getSession()->getTraining()->getOrganization()->getEmail())
                                     ->to($registration->getTrainee()->getEmail())
-                                    ->subject("Avis défavorable pour inscription à une formation")
-                                    ->text($body);
+                                    ->subject($subject);
                                 if ($registration->getTrainee()->getEmailcorr() != null)
                                     $message->cc($registration->getTrainee()->getEmailcorr());
+
+                                // si Format HTML coché pour ce modèle, sinon format texte
+                                if ($templates[0]->getPosition() == 1) {
+                                    $message->html($newbody);
+                                } else
+                                    $message->text($newbody);
 
                                 $mailer->send($message);
 
