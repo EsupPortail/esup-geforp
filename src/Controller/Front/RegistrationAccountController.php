@@ -375,6 +375,7 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+                                $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
 
@@ -436,6 +437,7 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+                                $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
 
