@@ -1,5 +1,11 @@
 # Geforp changelog :
 
+## 2.3.9 (2024-05-27)
+
+### Ajouts
+- Ajout param export formateurs
+- Prise en compte modèles de mails avis favorable/défavorable du N+1 côté validation par le N+1
+
 ## 2.3.8 (2024-05-13)
 
 ### Ajouts
