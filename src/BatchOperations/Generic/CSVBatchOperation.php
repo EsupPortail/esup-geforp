@@ -471,9 +471,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                             $statsTrainer[] = array(
                                 'id'     => $trainer->getId(),
                                 'first'   => $trainer->getFirstName(),
-                                'last' => $trainer->getLastName(),
+                                'last' => $trainer->getLastName()
                             );
-                            $liste = $liste . $trainer->getFirstName() ." " . $trainer->getLastName() . ", ";
+                            $liste = $liste . $trainer->getFirstName() ." " . $trainer->getLastName() . " (". ($trainer->getIsorganization() ? "interne" : "externe") . "), ";
                         }
                         // On recupere la liste des formateurs
                         $data[$key] = $liste;
