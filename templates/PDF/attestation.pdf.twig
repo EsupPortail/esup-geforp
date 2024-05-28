@@ -1,0 +1,89 @@
+{% set organization = inscription.session.training.organization %}
+{% extends "PDF/layout.pdf.twig" %}
+
+{% block head %}
+<style>
+    h1, h2, h3, h4 {
+        text-align: center;
+    }
+    h5 {
+        text-align: right;
+    }
+    .signature {
+        text-align: right;
+    }
+    .signature img {
+        width:180px;
+    }
+</style>
+{% endblock  %}
+
+{% block body %}
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+
+    <h2>Attestation de pr&eacutesence</h2>
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+    <p>Nous certifions que :</p>
+    {% autoescape false %}
+    <h3>{{ inscription.trainee.fullName }}</h3>
+    {% endautoescape %}
+    <p>&nbsp;</p>
+
+    <p>a bien suivi le stage :</p>
+    <p>&nbsp;</p>
+    {% autoescape false %}
+    <h3>{{ inscription.session.training.name }}</h3>
+    {% endautoescape %}
+
+    <h4>Aux dates suivantes :</h4>
+    {% if inscription.session.dates | length >0 %}
+        {% for date in (inscription.session.dates) | sort((a, b) => a.datebegin <=> b.datebegin) %}
+
+            {% if date.dateEnd is defined and date.dateEnd is not null %}
+                {%  if date.dateEnd != date.dateBegin %}
+                    <h4>du {{ date.dateBegin | date('d/m/Y') }} au {{ date.dateEnd | date('d/m/Y') }}</h4>
+                {% else %}
+                    <h4>le {{ date.dateBegin | date('d/m/Y') }} </h4>
+                {% endif %}
+            {% else %}
+                <h4>le {{ date.dateBegin | date('d/m/Y') }} </h4>
+            {% endif %}
+
+        {% endfor %}
+    {% endif %}
+
+    <h4> Nombre d'heures suivies : {{ nbHeuresPresence }}</h4>
+
+    {% if inscription.session.getSchedule %}
+        <p><center>[Horaires : {{ inscription.session.getSchedule }} ]</center></p>
+    {% endif %}
+    <p>&nbsp;</p>
+
+    {% if inscription.session.participations|length %}
+        <p>anim&eacute par :</p>
+        {% for participation in inscription.session.participations %}
+            {% autoescape false %}
+            <h4>{{ participation.trainer.fullName }}</h4>
+            {% endautoescape %}
+        {% endfor %}
+    {% endif %}
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+
+    <h5>Certifi&eacute Sinc&egravere et V&eacuteritable,</h5>
+    {% if signature is defined %}
+         <p class="signature"><img src='{{ signature }}' /></p>
+        <p>&nbsp;</p>
+    {% else %}
+    <p>&nbsp;</p>
+    <p>&nbsp;</p>
+    {% endif %}
+    {% autoescape false %}
+    <h5>Fait &agrave {{ inscription.session.training.organization.city | replace({'CEDEX': ''}) | trim }}, le {% if inscription.session.dateEnd %}{{ inscription.session.dateEnd | date("d/m/Y") }}{% else %}{{ inscription.session.dateBegin | date("d/m/Y") }}{% endif %}</h5>
+    {% endautoescape %}
+{% endblock %}

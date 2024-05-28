@@ -1,0 +1,36 @@
+<div>
+    <div class="mb-1">
+        <!-- filter -->
+        <span><small>Nombre d'évaluations remplies :</small>
+            <!-- stats -->
+            <span class="label" ng-class="$root.sessionInscriptionStatsClass(totalEvaluatedInscriptions(), totalAcceptedInscriptions)" tooltip-placement="bottom">{{ totalEvaluatedInscriptions() }} / {{ totalAcceptedInscriptions() }}</span>
+        </span>
+
+    </div>
+
+    <div ng-if="totalEvaluatedInscriptions() == 0" class="well well-empty well-sm">
+        Il n'y a aucune evaluation pour cette session.
+    </div>
+
+    <table ng-if="totalEvaluatedInscriptions()" class="table table-hover table-search table-condensed">
+        <tbody>
+        <tr ng-repeat="criter in crit">
+            <td> {{ criter.name }} </td>
+            <td> {{ EvalAverage(criter) }} </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <table ng-if="totalEvaluatedInscriptions()" class="table table-hover table-search table-condensed">
+        <thead>
+            <th>Remarques</th>
+        </thead>
+        <tbody>
+            <tr ng-repeat="inscription in session.inscriptions" ng-if="inscription.message.length">
+                <td> {{ inscription.message }} </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+

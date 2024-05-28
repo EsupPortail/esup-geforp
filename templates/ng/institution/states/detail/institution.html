@@ -1,0 +1,36 @@
+<form sf-xeditable-form="form" sf-href='institution.view({id: institution.id})' on-success="onSuccess(data)">
+    <div class="row">
+        <div class="col-md-8">
+
+            <div class="btn-group pull-right">
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="institution._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+            </div>
+
+            <div class="pre-title">Créé le {{ institution.createdat|date: 'dd/MM/yyyy' }} - {{ institution.organization.name }}</div>
+            <h2><span sf-xeditable="form.children.name">{{ institution.name }}</span></h2>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <h3>Informations</h3>
+                    <hr>
+                    <ul class="summary">
+                        <li><label>Adresse</label> <span sf-xeditable="form.children.address" data-type="textarea">{{ institution.address }}</span></li>
+                        <li><label>Code postal</label> <span sf-xeditable="form.children.zip">{{ institution.zip }}</span></li>
+                        <li><label>Ville</label> <span sf-xeditable="form.children.city">{{ institution.city }}</span></li>
+                        <li><label>Email de contact</label> <span sf-xeditable="form.children.email">{{ institution.email }}</span></li>
+                        <li><label>Site web ou lien</label> <span sf-xeditable="form.children.website">{{ institution.website }}</span></li>
+                    </ul>
+                </div>
+                <div class="col-lg-6">
+                    <h3>Paramètres informatiques</h3>
+                    <hr>
+                    <ul class="summary">
+                        <li><label>URL IDP</label> <span sf-xeditable="form.children.idp" data-type="textarea">{{ institution.idp }}</span></li>
+                        <li><label>Noms de domaines</label> <span sf-xeditable="form.children.domains" data-type="select2">{{ institution.domains | joinObjects:'name' }}</span></li>
+                        <li><label>Autres établissements visibles</label> <span sf-xeditable="form.children.visuinstitutions" data-type="select2">{{ institution.visuinstitutions | joinObjects:'name' }}</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,105 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()">×</button>
+    <h4 class="modal-title" ng-if="inscriptionstatus">Modification du statut d'inscription</h4>
+    <h4 class="modal-title" ng-if="presencestatus">Modification du statut de présence</h4>
+</div>
+<div class="modal-body">
+    <form novalidate class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Nombre de stagiaires </label>
+            <div class="col-sm-9">
+                <span class="form-control">{{ items.length }}</span>
+            </div>
+        </div>
+        <div class="form-group" ng-show="inscriptionstatus">
+            <label class="col-sm-3 control-label">Nouveau statut</label>
+            <div class="col-sm-9">
+                <span class="form-control">{{ inscriptionstatus.name }}</span>
+            </div>
+        </div>
+        <div class="form-group" ng-show="presencestatus">
+            <label class="col-sm-3 control-label">Nouveau statut</label>
+            <div class="col-sm-9">
+                <span class="form-control">{{ presencestatus.name }}</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-3">
+            </div>
+            <div class="col-sm-9">
+                <input type="checkbox" ng-model="send.Mail" id="send_mail"/>
+                <label class="control-label" for="send_mail">Envoyer un email</label>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail' >
+            <label for="subject" class="col-sm-3 control-label">Modèle </label>
+            <div class="col-sm-9">
+                <select type="text" ng-disabled='!send.Mail' class="form-control" id="template" ng-options="template.label for template in templates" ng-model="message.template" placeholder="Modèle du mail">
+                </select>
+            </div>
+        </div>
+        <div class="form-group animate-show" ng-show='send.Mail'>
+            <label for="subject" class="col-sm-3 control-label">Sujet </label>
+            <div class="col-sm-9">
+                <input type="text" ng-disabled='!send.Mail' class="form-control" id="subject" ng-model="message.subject" placeholder="Sujet du mail">
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail' >
+            <label for="message" class="col-sm-3 control-label">Message </label>
+            <div class="col-sm-9">
+                <textarea class="form-control" ng-disabled='!send.Mail' rows="10" id="message" ng-model="message.body"  placeholder="Message du mail"></textarea>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail' >
+            <label for="ical" class="col-sm-3 control-label">Ajout calendrier ical </label>
+            <div class="col-sm-9">
+                <input type="checkbox" ng-disabled='!send.Mail' class="form-control" id="ical" ng-model="message.ical" >
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail' >
+            <label for="format" class="col-sm-3 control-label">Format HTML </label>
+            <div class="col-sm-9">
+                <select type="text" ng-disabled='!send.Mail' class="form-control" id="format" ng-options="opt.val as opt.name for opt in [{val:0,name:'NON'},{val:1,name:'OUI'}]" ng-model="message.format">
+                    <option value="" ng-disabled="true">Choisir le format HTML pour le mail</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail'>
+            <div class="col-sm-3">
+            </div>
+            <div class="col-sm-9">
+            <button type="button" ng-disabled='!send.Mail' class="btn" ng-click="preview()">Prévisualiser</button>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail && attCheckList.length'>
+            <div class="col-sm-3 control-label"><b>Pièces jointes du modèle</b> </div>
+            <div class="col-sm-5">
+                <div ng-repeat="attachmentTemplate in attCheckList">
+                <input type="checkbox" ng-model="attachmentTemplate.selected" id="attachmentTemplate_{{ attachmentTemplate.id }}"/>
+                <label class="control-label" for="attachmentTemplate_{{ attachmentTemplate.id }}">{{ attachmentTemplate.name }}</label><a href="" class="pull-right" ng-click="previewAttachment(attachmentTemplate)"><i class="fa fa-download"></i> Prévisualiser</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail'ng-if="message.attachments.length > 0">
+            <label for="attachments" class="col-sm-3 control-label">Pièce{{ message.attachments.length > 1 ? 's' : '' }} jointe{{ message.attachments.length > 1 ? 's' : '' }} supplémentaire{{ message.attachments.length > 1 ? 's' : '' }}</label>
+            <div class="col-sm-9">
+                <div ng-repeat="(id, attachment) in message.attachments track by $index">
+                    <label class="control-label" for="attachment_{{ id }}">{{attachment.name}}</label>&nbsp;
+                    <a href="" ng-click="removeAttachment(id)">&nbsp;x&nbsp;</a>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-show='send.Mail'>
+            <label for="inputAttachment" class="col-sm-3 control-label">Ajouter des pièces jointes</label>
+            <div class="col-sm-9">
+                <input multiple type="file" class="form-control" onChange="angular.element(this).scope().fileChangedAtt(this,angular.element(this).scope())" id="inputAttachment"/>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" ng-show="formError != ''">{{ formError }}</div>
+    </form>
+</div>
+<div class="modal-footer">
+    <a class="btn btn-default" ng-click="cancel()">Annuler</a>
+    <a class="btn btn-primary" ng-click="ok()">Valider</a>
+</div>

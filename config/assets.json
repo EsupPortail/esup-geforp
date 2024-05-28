@@ -1,0 +1,108 @@
+{
+    "sass": {
+        "styles": [
+            "node_modules/X-editable/dist/bootstrap3-editable/css/bootstrap-editable.css",
+            "node_modules/angular-loading-bar/build/loading-bar.css",
+
+            "node_modules/angularjssearchbox/build/angularjssearchbox.css",
+
+            "node_modules/Select2/select2.css",
+            "node_modules/Select2/select2-bootstrap.css",
+
+            "node_modules/bootstrap-daterangepicker/daterangepicker-bs3.css",
+
+            "node_modules/timepicker/jquery.timepicker.css",
+
+            "node_modules/angular-growl/build/angular-growl.css",
+            "node_modules/blueimp-file-upload/css/jquery.fileupload.css",
+            "node_modules/blueimp-file-upload/css/jquery.fileupload-ui.css",
+            "assets/scss/**/*",
+            "!assets/scss/pdf.scss"
+        ],
+        "pdf": [
+            "assets/scss/pdf.scss"
+        ],
+        "front": [
+            "assets/front/css/*.css",
+            "assets/front/scss/**/*.scss"
+        ]
+    },
+    "scripts": {
+        "scripts": [
+            "node_modules/jquery/dist/jquery.js",
+            "node_modules/bootstrap/dist/js/bootstrap.js",
+            "bower_components/angular/angular.js",
+
+            "bower_components/angular-resource/angular-resource.js",
+            "bower_components/angular-animate/angular-animate.js",
+            "node_modules/angular-ui-router/release/angular-ui-router.js",
+
+            "node_modules/angular-ui-bootstrap/ui-bootstrap-tpls.js",
+
+            "node_modules/bootstrap-datepicker/js/bootstrap-datepicker.js",
+            "node_modules/bootstrap-datepicker/js/locales/bootstrap-datepicker.fr.js",
+            "node_modules/X-editable/dist/bootstrap3-editable/js/bootstrap-editable.js",
+
+            "node_modules/angular-loading-bar/build/loading-bar.js",
+            "node_modules/jquery-autosize/jquery.autosize.js",
+
+            "node_modules/Select2/select2.js",
+            "node_modules/Select2/select2_locale_fr.js",
+            "node_modules/angular-ui-select2/src/select2.js",
+
+            "node_modules/moment/moment.js",
+            "node_modules/moment/lang/fr.js",
+
+            "node_modules/angular-hotkeys/build/hotkeys.js",
+
+            "node_modules/checklist-model/checklist-model.js",
+
+            "node_modules/angular-growl/build/angular-growl.js",
+            "node_modules/jquery-slimscroll/jquery.slimscroll.js",
+
+            "node_modules/angularjssearchbox/build/angularjssearchbox.deps.js",
+
+            "node_modules/blueimp-file-upload/js/vendor/jquery.ui.widget.js",
+            "node_modules/blueimp-file-upload/js/jquery.fileupload.js",
+            "node_modules/blueimp-file-upload/js/jquery.fileupload-process.js",
+            "node_modules/blueimp-file-upload/js/jquery.fileupload-angular.js",
+
+            "node_modules/zeroclipboard/dist/ZeroClipboard.js",
+            "node_modules/angular-zeroclipboard/src/angular-zeroclipboard.js",
+
+            "node_modules/ngstorage/ngStorage.js",
+
+            "node_modules/timepicker/jquery.timepicker.js",
+
+            "templates/Core/js/*.js",
+            "public/js/fos_js_routes.js",
+            "assets/js/modernizr-custom.js",
+            "templates/Core/ng/**/*.js",
+            "templates/ng/**/*.js"
+        ],
+        "front": [
+            "node_modules/jquery/dist/jquery.js",
+            "assets/front/js/*.js",
+            "node_modules/bootstrap-sass/assets/javascripts/bootstrap.js"
+        ],
+        "front-add": [
+            "assets/front/js/front.js",
+            "assets/front/js/datatables.js"
+        ]
+    },
+    "templates": [
+        "templates/Core/ng/**/*.html",
+        "templates/ng/**/*.html"
+    ],
+    "images": {
+        "favicon": [
+            "assets/images/favicon.ico"
+        ],
+        "img": [
+            "node_modules/X-editable/src/inputs/select2/lib/select2-spinner.gif"
+        ]
+    },
+    "fonts": [
+        "assets/fonts/**/*"
+    ]
+}

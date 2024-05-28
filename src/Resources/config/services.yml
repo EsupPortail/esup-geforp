@@ -1,0 +1,78 @@
+services:
+    # user provider
+    # override abtract class to real class to make it work
+    sygefor_api.account_repository:
+        class: Sygefor\Bundle\ApiBundle\Repository\AccountRepository
+        factory_service:  doctrine
+        factory_method:   getRepository
+        arguments:
+            - 'Sygefor\Bundle\CoreBundle\Entity\AbstractTrainee'
+
+    # override
+    security.authentication.entry_point.shibboleth:
+      class: Sygefor\Bundle\ApiBundle\Security\ShibbolethAuthenticationEntryPoint
+      arguments:
+          - "@shibboleth"
+          - "@service_container"
+
+    # shibboleth user provider
+    sygefor_api.shibboleth.user_provider:
+        class: Sygefor\Bundle\ApiBundle\Security\ShibbolethUserProvider
+        arguments:
+            - "@service_container"
+            - "@sygefor_api.account_repository"
+
+    # oauth token generator
+    sygefor_api.oauth.token_generator:
+        class: Sygefor\Bundle\ApiBundle\Security\OAuthTokenGenerator
+        arguments:
+            - "@fos_oauth_server.server"
+            - "@fos_oauth_server.storage"
+            - "@fos_rest.serializer"
+
+    # trainee own inscription access voter
+    sygefor_api.access_inscription_voter:
+        class: Sygefor\Bundle\ApiBundle\Security\Authorization\Voter\OwnInscriptionVoter
+        public: false
+        tags:
+            - { name:security.voter }
+
+    # kernel
+    sygefor_api.kernel.listener.oauth_public_client:
+        class: Sygefor\Bundle\ApiBundle\EventListener\OauthKernelEventSubscriber
+        arguments:
+            - "@fos_oauth_server.client_manager"
+            - "@fos_oauth_server.server"
+            - "@fos_rest.serializer"
+        tags:
+            - { name: kernel.event_subscriber }
+
+    # error parser
+    sygefor_api.form_errors.parser:
+        class: Sygefor\Bundle\ApiBundle\Utils\FormErrorsParser
+        calls:
+            - [setContainer, ["@service_container"]]
+
+    # ORM listeners
+    sygefor_api.account.orm.listener:
+        class: Sygefor\Bundle\ApiBundle\EventListener\ORM\AccountListener
+        arguments:
+            - "@service_container"
+        tags:
+            - { name: doctrine.event_subscriber, connection: default }
+
+    # Serializer
+    sygefor_api.serializer.trainee.event_subscriber:
+        class: Sygefor\Bundle\ApiBundle\EventListener\Serializer\TraineeEventSubscriber
+        tags:
+            - { name: jms_serializer.event_subscriber }
+
+    sygefor_api.serializer.training.event_subscriber:
+        class: Sygefor\Bundle\ApiBundle\EventListener\Serializer\TrainingEventSubscriber
+        tags:
+            - { name: jms_serializer.event_subscriber }
+
+    sygefor_api.serializer.session.event_subscriber:
+        class: Sygefor\Bundle\ApiBundle\EventListener\Serializer\SessionEventSubscriber
+        tags:
+            - { name: jms_serializer.event_subscriber }

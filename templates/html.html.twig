@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Geforp{% endblock %}</title>
+    <!-- global styles -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="{{ asset('build/styles.css') }}" />
+    <!-- page styles -->
+    {% block stylesheets %}{% endblock %}
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+</head>
+<body class="{{ body_classes is defined ? body_classes|join(" ") : '' }}">
+<!-- body -->
+{% block body %}
+{% endblock %}
+<!-- global scripts -->
+<script src="{{ asset('build/scripts.js') }}"></script>
+
+<!-- Mise en forme array user  -->
+{% if app.user is not null %}
+    {% set array_user = {
+        'id':  app.user.id ,
+        'username':  app.user.username ,
+        'email':  app.user.email ,
+        'roles':  app.user.roles ,
+        'organization': {
+            'id':  app.user.organization.id ,
+            'name':  app.user.organization.name ,
+            'code':  app.user.organization.code ,
+            'email':  app.user.organization.email ,
+        },
+        'institution': app.user.organization.institution.name,
+        "accessRights":  app.user.accessRights
+    }
+    %}
+
+<script language="javascript">sygeforApp.config(['$userProvider', function($userProvider) {
+        $userProvider.setUser( {{ array_user|serialize()|raw }});
+    }]);</script>
+{% endif %}
+
+<!-- page scripts -->
+{% block javascripts %}{% endblock %}
+</body>
+</html>
+
+

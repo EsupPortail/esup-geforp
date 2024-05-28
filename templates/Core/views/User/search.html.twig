@@ -1,0 +1,22 @@
+{% extends "layout.html.twig" %}
+{% block breadcrumbs %}
+    <ol class="breadcrumb full-height-item">
+        <li><a href="{{ path('core.index') }}">Accueil</a></li>
+        <li><a href="#">Administration</a></li>
+        <li class="active"><a href="{{ path('user.index') }}">Utilisateurs</a></li>
+    </ol>
+{% endblock %}
+{% block content %}
+
+    {{ form_start(form) }}
+    {{ form_row(form.institution) }}
+    {{ form_row(form.nom) }}
+
+    <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+        </div>
+    </div>
+    {{ form_widget(form._token) }}
+    {{ form_end(form, {'render_rest': false}) }}
+{% endblock %}
