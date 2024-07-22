@@ -1,5 +1,15 @@
 # Geforp changelog :
 
+## 2.3.10 (2024-07-22)
+
+### Ajouts
+- Ajout formateur interne ou externe dans les exports de session
+- 
+### Corrections
+- Correction ordre des critères d'évaluation côté stagiaire
+- Suppression pagination mails envoyés par session
+- Affichage FAQ
+
 ## 2.3.9 (2024-05-27)
 
 ### Ajouts
