@@ -354,7 +354,8 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository(get_class($templateTerm));
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(array('name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
-                                $subject = $templates[0]->getSubject();
+                                $subject1 = $templates[0]->getSubject();
+                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject1);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)
@@ -417,7 +418,8 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository(get_class($templateTerm));
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(array('name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
-                                $subject = $templates[0]->getSubject();
+                                $subject1 = $templates[0]->getSubject();
+                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject1);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)

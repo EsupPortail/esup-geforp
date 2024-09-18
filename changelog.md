@@ -1,5 +1,15 @@
 # Geforp changelog :
 
+## 2.3.11 (2024-09-18)
+
+### Ajouts
+- Ajout mots clés pour avis favorable/défavorable du N+1
+-
+### Corrections
+- Mise à jour librairie CSV pour PHP8.3
+- Corrections conf CSV
+- Affichage contacts
+
 ## 2.3.10 (2024-07-22)
 
 ### Ajouts
