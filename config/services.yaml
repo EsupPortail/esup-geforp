@@ -54,8 +54,8 @@ parameters:
                     id: "Numéro"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
-                    training.theme: "Thématique"
-                    training.category: "Catégorie de stage"
+                    training.theme.name: "Thématique"
+                    training.category.name: "Catégorie de stage"
                     datebegin: { label: "Date de début", type: "date" }
                     dateend: { label: "Date de fin", type: "date" }
                     daynumber: "Nombre de jours théoriques"
@@ -86,7 +86,7 @@ parameters:
                     materialcost: "Coût support"
                     totalCost: "Coût total"
                     training.designated_public: "Public désigné"
-#                    evalResume: "Evaluations"
+                    evalResume: "Evaluations"
             semestered_training:
                 class: 'App\Model\SemesteredTraining'
                 filename: 'formation.csv'
@@ -95,7 +95,7 @@ parameters:
                     year: { label: 'Année' }
                     semester: { label: 'Semestre' }
                     training.name: { label: 'Intitulé' }
-                    training.theme: { label: 'Thématique' }
+                    training.theme.name: { label: 'Thématique' }
                     sessionsCount: { label: 'nombre de sessions' }
                     nextSession.dateBegin: { label: 'Prochaine', type: 'date' }
                     lastSession.dateBegin: { label: 'Dernière', type: 'date' }
@@ -104,13 +104,13 @@ parameters:
                 class: 'App\Entity\Back\Trainee'
                 filename: 'stagiaire.csv'
                 fields:
-                    title: "Civilité"
+                    title.name: "Civilité"
                     lastName: "Nom"
                     firstName: "Prénom"
                     email: "Email"
                     phoneNumber: "Téléphone"
                     institution.name: "Etablissement"
-                    publicType: "Catégorie de public"
+                    publicType.name: "Catégorie de public"
                     status: "Statut"
                     address: "Adresse"
                     zip: "Code postal"
@@ -120,7 +120,7 @@ parameters:
                 filename: 'formateur.csv'
                 fields:
                     createdAt: { label: "Date d'inscription", type: "date" }
-                    title: "Civilité"
+                    title.name: "Civilité"
                     fullName: "Nom"
                     organization.name: "Centre"
                     isorganization: "Interne"
@@ -138,10 +138,10 @@ parameters:
                 fields:
                     trainee.lastName: "Nom du stagiaire"
                     trainee.firstName: "Prénom du stagiaire"
-                    trainee.title: "Civilité du stagiaire"
+                    trainee.title.name: "Civilité du stagiaire"
                     trainee.birthDate: "Date de naissance"
                     trainee.email: "Email du stagiaire"
-                    trainee.institution: "Etablissement"
+                    trainee.institution.name: "Etablissement"
                     trainee.service: "Service"
                     trainee.amuStatut: "Statut"
                     trainee.publictype.name: "Type de public"
@@ -162,11 +162,11 @@ parameters:
                     session.dateEnd: { label: 'Date de fin de la session', type: "date" }
                     session.training.supervisor.name: "Nom du responsable pédagogique"
                     session.training.supervisor.first_name: "Prénom du responsable pédagogique"
-                    session.training.theme: "Domaine de formation"
+                    session.training.theme.name: "Domaine de formation"
                     session.dayNumber: "Nombre de jours"
                     session.totalCost: "Coût total de la session"
-                    inscriptionStatus: "Statut de l'inscription"
-                    presenceStatus: "Statut de présence"
+                    inscriptionStatus.name: "Statut de l'inscription"
+                    presenceStatus.name: "Statut de présence"
                     presence.nbheures: "Nombre d'heures de présence"
                     actiontype: "Type d'inscription"
                     dif: "CPF"
