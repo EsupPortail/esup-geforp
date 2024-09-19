@@ -168,7 +168,7 @@ parameters:
                     inscriptionStatus.name: "Statut de l'inscription"
                     presenceStatus.name: "Statut de présence"
                     presence.nbheures: "Nombre d'heures de présence"
-                    actiontype: "Type d'inscription"
+                    actiontype.name: "Type d'inscription"
                     dif: "CPF"
             institution:
                 class: 'App\Entity\Core\AbstractInstitution'
