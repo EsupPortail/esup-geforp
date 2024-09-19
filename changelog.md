@@ -1,10 +1,15 @@
 # Geforp changelog :
 
+## 2.3.12 (2024-09-19)
+
+### Corrections
+- Corrections conf CSV
+
 ## 2.3.11 (2024-09-18)
 
 ### Ajouts
 - Ajout mots clés pour avis favorable/défavorable du N+1
--
+
 ### Corrections
 - Mise à jour librairie CSV pour PHP8.3
 - Corrections conf CSV
@@ -14,7 +19,7 @@
 
 ### Ajouts
 - Ajout formateur interne ou externe dans les exports de session
-- 
+
 ### Corrections
 - Correction ordre des critères d'évaluation côté stagiaire
 - Suppression pagination mails envoyés par session
