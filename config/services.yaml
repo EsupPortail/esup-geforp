@@ -85,7 +85,7 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
-                    training.designated_public: "Public désigné"
+                    training.designated_public: { label: "Public désigné", type: "boolean" }
                     evalResume: "Evaluations"
             semestered_training:
                 class: 'App\Model\SemesteredTraining'
