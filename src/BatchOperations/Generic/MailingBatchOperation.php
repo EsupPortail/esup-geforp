@@ -506,9 +506,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             $lines[$i]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService());
                         }
                     }
-                    usort($lines[$i]['inscriptions'], function ($a, $b) {
-                        return strcasecmp($a['nom'], $b['nom']);
-                    });
+
+                    if ((isset($lines[$i]['inscriptions'])) && ($lines[$i]['inscriptions'] !== null)) {
+                        usort($lines[$i]['inscriptions'], function ($a, $b) {
+                            return strcasecmp($a['nom'], $b['nom']);
+                        });
+                    }
                     $i += 1;
                 }
             }
