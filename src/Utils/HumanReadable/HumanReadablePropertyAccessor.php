@@ -84,11 +84,19 @@ class HumanReadablePropertyAccessor
                 }
                 break;
             case 'emailSup':
-                $path = 'trainee.emailSup';
+                if(get_parent_class($this->object)=== 'App\Entity\Core\AbstractInscription')
+                    $path = 'trainee.emailSup';
+                elseif(get_parent_class($this->object)=== 'App\Entity\Core\AbstractTrainee')
+                    $path='emailSup';
+
                 $accessor = PropertyAccess::createPropertyAccessor();
                 return $accessor->getValue($this->object, $path);
             case 'emailCorr':
-                $path = 'trainee.emailCorr';
+                if(get_parent_class($this->object)=== 'App\Entity\Core\AbstractInscription')
+                    $path = 'trainee.emailCorr';
+                elseif(get_parent_class($this->object)=== 'App\Entity\Core\AbstractTrainee')
+                    $path='emailCorr';
+
                 $accessor = PropertyAccess::createPropertyAccessor();
                 return $accessor->getValue($this->object, $path);
             default:

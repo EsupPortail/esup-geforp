@@ -163,7 +163,11 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 try {
                     // reload entity because of em clear
                     $entity = $em->getRepository(get_class($entity))->find($entity->getId());
-                    $organization = $entity->getOrganization();
+
+                    if (get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee')
+                        $organization = $this->security->getUser()->getOrganization();
+                    else
+                        $organization = $entity->getOrganization();
 
                     $hrpa = $this->hrpaf->getAccessor($entity);
                     $email = $hrpa->email;
