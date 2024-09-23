@@ -225,6 +225,8 @@ parameters:
                     nomNaissance: { property: maidenName }
                     nom: { property: lastname }
                     prenom: { property: firstname }
+                    emailSup: { property: emailSup }
+                    emailCorr: { property: emailCorr }
                     # CoordinatesTrait
                     adresse: { property: address }
                     codePostal: { property: zip }
