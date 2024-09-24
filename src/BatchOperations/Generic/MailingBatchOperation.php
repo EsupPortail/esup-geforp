@@ -627,9 +627,10 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 //            }
         }
 
-        if (!empty($process->getErrorOutput())) {
+        // Suppression du test car renvoie les erreurs et les warnings (deprecated)
+/*        if (!empty($process->getErrorOutput())) {
             throw new RuntimeException('The PDF file has not been generated : '.$process->getErrorOutput());
-        }
+        }*/
 
         return $outputFileName;
     }
