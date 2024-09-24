@@ -97,6 +97,17 @@ class UserController extends AbstractController
      */
     public function addAction(ManagerRegistry $doctrine, Request $request, AccessRightRegistry $accessRightRegistry, $eppn=null, $email=null)
     {
+        // Test si current user is admin
+        $curUserRoles = $this->getUser()->getRoles();
+        $key = array_search('ROLE_ADMIN', $curUserRoles);
+        if ($key !== false) {
+            // si le user est admin
+            $curUserAdmin = true;
+        } else {
+            // si le user n'est pas admin
+            $curUserAdmin = false;
+        }
+
         $user = new User();
         $user->setUsername($eppn);
         $user->setEmail($email);
@@ -170,6 +181,7 @@ class UserController extends AbstractController
 
         return $this->render('Core/views/User/edit.html.twig', array(
             'form' => $form->createView(),
+            'curUserAdmin' => $curUserAdmin,
             'user' => $user,
             'isAdmin' => $user->isAdmin(),
         ));
@@ -255,6 +267,17 @@ class UserController extends AbstractController
      */
     public function editAction(ManagerRegistry $doctrine, Request $request, User $user, UserPasswordHasherInterface $passwordHasher)
     {
+        // Test si current user is admin
+        $curUserRoles = $this->getUser()->getRoles();
+        $key = array_search('ROLE_ADMIN', $curUserRoles);
+        if ($key !== false) {
+            // si le user est admin
+            $curUserAdmin = true;
+        } else {
+            // si le user n'est pas admin
+            $curUserAdmin = false;
+        }
+
         $form = $this->createForm(UserType::class, $user);
         $roles = $user->getRoles();
         $key = array_search('ROLE_ADMIN', $roles);
@@ -302,6 +325,7 @@ class UserController extends AbstractController
 
         return $this->render('Core/views/User/edit.html.twig', array(
             'form' => $form->createView(),
+            'curUserAdmin' => $curUserAdmin,
             'user' => $user,
             'isAdmin' => $user->isAdmin(),
         ));
