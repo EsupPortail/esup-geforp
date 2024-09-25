@@ -1,5 +1,15 @@
 # Geforp changelog :
 
+## 2.3.13 (2024-09-25)
+
+### Ajouts
+- Ajout envoi direct mail aux stagiaires
+
+### Corrections
+- Correction tableau des inscriptions avant tri
+- Correction génération PDF suite à deprecated sur unoconv
+- Correction ajout/modif utilisateur 
+
 ## 2.3.12 (2024-09-19)
 
 ### Corrections
