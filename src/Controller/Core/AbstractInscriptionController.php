@@ -290,7 +290,7 @@ abstract class AbstractInscriptionController extends AbstractController
         // CONSTRUCTION DOMAINES DE FORMATION
         if (isset($aggs['session.training.theme.name'])) {
             $allThemes = $doctrine->getRepository(Theme::class)->findAll();
-            $i = 0; $tabSemesters = array();
+            $i = 0; $tabTh = array();
             //Pour chaque thème on teste la requête
             foreach($allThemes as $theme){
                 $nbInscThemes = $inscriptionRepository->getNbInscriptions($query_filters, $keyword, $aggs, $theme->getName());
@@ -299,7 +299,7 @@ abstract class AbstractInscriptionController extends AbstractController
                     $i++;
                 }
             }
-            $tabAggs['session.training.theme.name']['buckets'] = $tabSemesters;
+            $tabAggs['session.training.theme.name']['buckets'] = $tabTh;
         }
 
 
