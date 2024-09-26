@@ -185,6 +185,9 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
         },
         'session.training.name.source' : {
             label: 'Formation'
+        },
+        'session.training.theme.name' : {
+            label: 'Domaine de formation'
         }
     };
 }]);

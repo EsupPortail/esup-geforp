@@ -133,6 +133,14 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['session.id']);
         }
 
+        //FILTRE THEME
+        if( isset($filters['session.training.theme.name'])) {
+            $qb
+                ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                ->andWhere('th.name in (:themes)')
+                ->setParameter('themes', $filters['session.training.theme.name']);
+        }
+
         // TRI DES RESULTATS
         if ((is_array($sorts)) && (array_key_exists('createdat', $sorts)))
             $qb->addOrderBy('i.createdat', $sorts['createdat']);
@@ -188,6 +196,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             ->select('i')
             ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
             ->innerJoin('i.session', 's', 'WITH', 's = i.session')
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
 
             // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword')
@@ -199,13 +208,11 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         // FILTRE CENTRE
         if(isset( $aggs['session.training.organization.name.source'])) {
             $qb
-                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
                 ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name = :center')
                 ->setParameter('center', $name);
         } elseif (isset($query_filters['session.training.organization.name.source'])) {
             $qb
-                ->innerJoin('s.training', 'tr', 'WITH', 's.training = tr')
                 ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $query_filters['session.training.organization.name.source']);
@@ -296,6 +303,20 @@ class InscriptionSearchRepository extends ServiceEntityRepository
                 ->andWhere('publictype.name = :publictype')
                 ->setParameter('publictype', $query_filters['publicType.source']);
         }
+
+        //FILTRE DOMAINE DE FORMATION
+        if( isset($aggs['session.training.theme.name'])) {
+            $qb
+                ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                ->andWhere('th.name in (:themes)')
+                ->setParameter('themes', $name);
+        }elseif( isset($query_filters['session.training.theme.name'])) {
+            $qb
+                ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                ->andWhere('th.name in (:themes)')
+                ->setParameter('themes', $query_filters['session.training.theme.name']);
+        }
+
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());

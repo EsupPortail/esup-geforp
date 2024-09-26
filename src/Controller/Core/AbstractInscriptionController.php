@@ -8,6 +8,7 @@ use App\Entity\Term\Publictype;
 use App\Entity\Back\Inscription;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
+use App\Entity\Term\Theme;
 use App\Form\Type\InscriptionType;
 use App\Form\Type\BaseInscriptionType;
 use App\Repository\InscriptionSearchRepository;
@@ -285,6 +286,23 @@ abstract class AbstractInscriptionController extends AbstractController
             }
             $tabAggs['session.semester']['buckets'] = $tabSemesters;
         }
+
+        // CONSTRUCTION DOMAINES DE FORMATION
+        if (isset($aggs['session.training.theme.name'])) {
+            $allThemes = $doctrine->getRepository(Theme::class)->findAll();
+            $i = 0; $tabSemesters = array();
+            //Pour chaque thème on teste la requête
+            foreach($allThemes as $theme){
+                $nbInscThemes = $inscriptionRepository->getNbInscriptions($query_filters, $keyword, $aggs, $theme->getName());
+                if ($nbInscThemes > 0) {
+                    $tabTh[$i] = [ 'key' => $theme->getName(), 'doc_count' => $nbInscThemes];
+                    $i++;
+                }
+            }
+            $tabAggs['session.training.theme.name']['buckets'] = $tabSemesters;
+        }
+
+
 
         return $tabAggs;
     }
