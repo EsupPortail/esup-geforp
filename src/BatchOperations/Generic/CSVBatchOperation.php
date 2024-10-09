@@ -149,6 +149,40 @@ class CSVBatchOperation extends AbstractBatchOperation
                         } else {
                             $data[$key] = '';
                         }
+                    } elseif ($key == "inscription.desist") {
+                        ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
+                        $key = str_replace('.', '', $key);
+
+                        $statsListe = array();
+                        /** @var EntityManager $em */
+                        $em    = $this->doctrine->getManager();
+                        $session = $entity;
+                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
+                            $query = $em
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
+                    JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
+                    WHERE i.session = :session and s.machinename = :status
+                    GROUP BY s.id')
+                                ->setParameter('session', $session)
+                                ->setParameter('status', "desist");
+
+                            $result = $query->getResult();
+                            foreach($result as $status) {
+                                $statsListe[] = array(
+                                    'id'     => $status[0]->getId(),
+                                    'name'   => $status[0]->getName(),
+                                    'status' => $status[0]->getStatus(),
+                                    'count'  => (int) $status[1],
+                                );
+                            }
+                            // On recupere seulement le compteur
+                            if (isset($statsListe[0]['count']))
+                                $data[$key] = $statsListe[0]['count'];
+                            else
+                                $data[$key] = '';
+                        } else {
+                            $data[$key] = '';
+                        }
                     } elseif ($key == "inscription.convoke") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
