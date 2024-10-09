@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 namespace App\Menu;
 
+use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\ManagerRegistry;
 use Knp\Menu\FactoryInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Knp\Menu\ItemInterface;
@@ -27,6 +29,7 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationCredentialsNotFoundException;
 use Symfony\Component\Routing\Router;
 use App\Event\ConfigureMenuEvent;
+use App\Vocabulary\VocabularyRegistry;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 
@@ -37,12 +40,15 @@ class MenuBuilder
     private $authorizationChecker;
     private $router;
     private $registry;
+    private $doctrine;
 
-    public function __construct(FactoryInterface $factory, AuthorizationCheckerInterface $authorizationChecker, Router $router)
+    public function __construct(FactoryInterface $factory, AuthorizationCheckerInterface $authorizationChecker, Router $router, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine)
     {
         $this->factory = $factory;
         $this->authorizationChecker = $authorizationChecker;
         $this->router = $router;
+        $this->registry = $vocabularyRegistry;
+        $this->doctrine = $doctrine;
     }
 
     public function createMainMenu(array $options): ItemInterface
@@ -123,6 +129,27 @@ class MenuBuilder
                     'icon'  => 'university',
                     'uri'   => $this->router->generate('core.index') . '#/institution',
                 ));
+            }
+
+            // Vocabulary id=6 => menuitem
+            $menuitemTerm = $this->registry->getVocabularyById(6); // vocabulary_menuitem;
+            /** @var EntityManager $em */
+            $em = $this->doctrine->getManager();
+            $repo = $em->getRepository(get_class($menuitemTerm));
+
+            if (($repo->findAll()!==null) && (count($repo->findAll()) !==0)) {
+                // si des liens externes ont été renseignés, on ajoute l'onglet pour y accéder
+                $item = $menu->addChild('menuitems', array(
+                    'label' => 'Liens externes',
+                    'icon'  => 'external-link',
+                    'uri'   => '',
+                ));
+                foreach ($repo->findAll() as $menuitem) {
+                    $item->addChild('liens', array(
+                        'label' => $menuitem->getName(),
+                        'uri' => $menuitem->getLink(),
+                    ));
+                }
             }
 
             if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Trainer')) {
