@@ -1,5 +1,15 @@
 # Geforp changelog :
 
+## 2.3.14 (2024-10-09)
+
+### Ajouts
+- Ajout dans l'export des sessions
+- Ajout 'liens externes' barre de menu
+- Ajout paramètre recherche d'inscription
+
+### Corrections
+- Correction export des inscriptions
+
 ## 2.3.13 (2024-09-25)
 
 ### Ajouts
