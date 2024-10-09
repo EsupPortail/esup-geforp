@@ -68,6 +68,7 @@ parameters:
                     trainers.fullName: "Formateur(s)"
                     inscription.listeatt: "Nombre d'inscriptions en liste d'attente"
                     inscription.refus: "nombre d'inscription refusées"
+                    inscription.desist: "Nombre d'inscriptions en désistement"
                     inscription.convoke: "Nombre de convoqués"
                     inscription.presence.nbheures: "Nombre d'heures de présence effective"
                     maximumnumberofregistrations: 'Nombre de places'
