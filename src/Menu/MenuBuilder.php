@@ -145,7 +145,7 @@ class MenuBuilder
                     'uri'   => '',
                 ));
                 foreach ($repo->findAll() as $menuitem) {
-                    $item->addChild('liens', array(
+                    $item->addChild($menuitem->getName(), array(
                         'label' => $menuitem->getName(),
                         'uri' => $menuitem->getLink(),
                     ));
