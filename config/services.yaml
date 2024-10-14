@@ -87,6 +87,7 @@ parameters:
                     materialcost: "Coût support"
                     totalCost: "Coût total"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
+                    comments: "Commentaires"
                     evalResume: "Evaluations"
             semestered_training:
                 class: 'App\Model\SemesteredTraining'
