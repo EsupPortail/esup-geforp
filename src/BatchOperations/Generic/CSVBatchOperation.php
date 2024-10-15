@@ -719,6 +719,10 @@ SQL;
                             // Transformation '.' en ',' pour faciliter Excel
                             $rvalue = str_replace('.', ',', $rvalue);
                         }
+
+                        // Transformation '\n' en '|' pour affichage avec saut de ligne
+                        $rvalue = str_replace("\n", "|", $rvalue);
+
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', $key);
                         $data[$key] = ($rvalue) ? $rvalue : '';
