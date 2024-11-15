@@ -643,8 +643,11 @@ SQL;
                                     $tabAv[$critNot->getCriterion()->getId()]['nb']++;
                                 }
                             }
-                            if ($insc->getMessage() != '')
-                                $evalsMsg .= $insc->getMessage() . '; ';
+                            if ($insc->getMessage() != '') {
+                                // Suppression retour chariot
+                                $fixMsg = str_replace( array("\n", "\r"), array(' ', ''), $insc->getMessage() );
+                                $evalsMsg .= $fixMsg . '// ';
+                            }
                         }
                         // Calcul moyenne
                         foreach ($tabCrit as $crit) {
