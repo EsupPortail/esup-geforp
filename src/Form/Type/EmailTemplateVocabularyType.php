@@ -122,11 +122,9 @@ class EmailTemplateVocabularyType extends VocabularyType
             ->add('position', ChoiceType::class, array(
                 'label' => 'Format HTML',
                 'choices'  => [
-                    'NON' => 0,
                     'OUI' => 1,
                 ],
-                'placeholder' => false,
-                'required' => false
+                'placeholder' => false
             ));
 
     }

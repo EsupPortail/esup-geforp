@@ -20,6 +20,8 @@
   "dependencies": {
     "angular": "angular/bower-angular#v1.3.0-build.2687+sha.ac37915",
     "angular-resource": "angular/bower-angular-resource#v1.3.0-build.2687+sha.ac37915",
-    "angular-animate": "angular/bower-angular-animate#v1.3.0-build.2687+sha.ac37915"
+    "angular-animate": "angular/bower-angular-animate#v1.3.0-build.2687+sha.ac37915",
+    "base64image": "RCOSDP/base64image#main",
+    "ckeditor": "ckeditor/ckeditor-releases#4.7.0"
   }
 }

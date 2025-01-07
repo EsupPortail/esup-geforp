@@ -26,6 +26,7 @@
     "moment": "2.5.1",
     "ngstorage": "^0.3.11",
     "timepicker": "git://github.com/jonthornton/jquery-timepicker.git#1.11.1",
+    "ckeditor": "^4.12.1",
     "zeroclipboard": "~2.1.6"
   },
   "devDependencies": {
