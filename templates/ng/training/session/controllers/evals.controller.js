@@ -74,4 +74,24 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
 
     }
 
+    /**
+     * Get the number of occurencies for a note of a criterion
+     */
+    $scope.EvalOccur = function(note, criterion) {
+        var nb=0;
+        for (var i=0; i < $scope.session.inscriptions.length; i++) {
+            var insc = $scope.session.inscriptions[i];
+            for (var j=0; j<insc.criteria.length; j++) {
+                var crit = insc.criteria[j];
+                if (crit.criterion.name == criterion.name) {
+                    if ((crit.note != 0) && (crit.note == note)) {
+                        nb++;
+                    }
+                }
+            }
+        }
+        return nb;
+
+    }
+
 }]);
