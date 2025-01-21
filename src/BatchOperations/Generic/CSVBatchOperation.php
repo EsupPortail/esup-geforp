@@ -623,6 +623,10 @@ SQL;
                             $tabAv[$crit->getId()]['sum'] = 0;
                             $tabAv[$crit->getId()]['nb'] = 0;
                             $tabAv[$crit->getId()]['av'] = 0;
+                            $tabAv[$crit->getId()]['1et'] = 0;
+                            $tabAv[$crit->getId()]['2et'] = 0;
+                            $tabAv[$crit->getId()]['3et'] = 0;
+                            $tabAv[$crit->getId()]['4et'] = 0;
                         }
                         $evalsMsg = '';
 
@@ -641,6 +645,15 @@ SQL;
                                 if ($critNot->getNote() != 0) {
                                     $tabAv[$critNot->getCriterion()->getId()]['sum'] += $critNot->getNote();
                                     $tabAv[$critNot->getCriterion()->getId()]['nb']++;
+
+                                    if ($critNot->getNote() == 1)
+                                        $tabAv[$critNot->getCriterion()->getId()]['1et']++;
+                                    if ($critNot->getNote() == 2)
+                                        $tabAv[$critNot->getCriterion()->getId()]['2et']++;
+                                    if ($critNot->getNote() == 3)
+                                        $tabAv[$critNot->getCriterion()->getId()]['3et']++;
+                                    if ($critNot->getNote() == 4)
+                                        $tabAv[$critNot->getCriterion()->getId()]['4et']++;
                                 }
                             }
                             if ($insc->getMessage() != '') {
@@ -661,7 +674,7 @@ SQL;
                         $rvalue = '';
                         // Moyenne des critères
                         foreach ($tabCrit as $crit) {
-                            $rvalue .= $crit->getName() . ' : ' . $tabAv[$crit->getId()]['av'] . ' | ';
+                            $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
                         }
 
                         // Remarques evals
