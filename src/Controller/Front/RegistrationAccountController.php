@@ -168,6 +168,8 @@ class RegistrationAccountController extends AbstractController
                 $newsub = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newsub);
                 $newsub = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newsub);
                 $newsub = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newsub);
+                $newsub = str_replace("[session.id]", $registration->getSession()->getId(), $newsub);
+                $newsub = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newsub);
 
                 $body = $templates[0]->getBody();
                 $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
@@ -184,6 +186,8 @@ class RegistrationAccountController extends AbstractController
                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
+                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
 
                 $message = (new Email())
                     ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
@@ -265,6 +269,12 @@ class RegistrationAccountController extends AbstractController
         $newbody = str_replace("[dates]", $Texte, $newbody);
         $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
         $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+        $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+        $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
+        $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
+        $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
+        $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
+
         $newbody = str_replace("[lien]", $lien, $newbody);
 
         $message = (new Email())
@@ -380,6 +390,11 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
+                                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+                                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
+                                $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
+                                $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
+                                $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
 
                                 // Envoyer un mail au stagiaire
                                 $message = (new Email())
@@ -444,6 +459,11 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
+                                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+                                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
+                                $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
+                                $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
+                                $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
 
                                 // Envoyer un mail au stagiaire
                                 $message = (new Email())
