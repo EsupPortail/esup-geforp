@@ -10,6 +10,7 @@
 /public/build/
 !/migrations/
 /migrations/*
+/node_modules/
 ###< symfony/framework-bundle ###
 
 ###> symfony/phpunit-bridge ###
@@ -25,3 +26,4 @@
 ###> bower seulement, on garde les fichier node###
 /bower_components/
 ###< bower ###
+/node_modules/

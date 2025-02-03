@@ -177,9 +177,6 @@
     "laminas/laminas-code": {
         "version": "4.5.1"
     },
-    "mbence/opentbs-bundle": {
-        "version": "dev-master"
-    },
     "monolog/monolog": {
         "version": "2.3.5"
     },
