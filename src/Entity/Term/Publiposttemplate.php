@@ -11,26 +11,22 @@ use Symfony\Component\Validator\Context\ExecutionContext;
 /**
  * Class PublipostTemplates.
  *
- * @ORM\Table(name="publipost_template")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Table(name: 'publipost_template')]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class Publiposttemplate extends AbstractTerm implements VocabularyInterface
 {
     use UploadableTrait;
 
-    /**
-     * @ORM\Column(name="entity", type="text", nullable=false)
-     * @Assert\NotNull()
-     *
-     * @var string
-     */
-    protected $entity;
+    #[ORM\Column(name: 'entity', type: \Doctrine\DBAL\Types\Types::TEXT)]
+    #[Assert\NotNull]
+    protected ?string $entity = null;
 
     /**
      * @param string $entity
      */
-    public function setEntity($entity)
+    public function setEntity($entity): void
     {
         $this->entity = $entity;
     }
@@ -46,7 +42,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Modèles de publipostage';
     }
@@ -54,32 +50,26 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return PublipostTemplateVocabularyType::class;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }
 
-    /**
-     * @Assert\Callback()
-     */
-    public function validateFile(ExecutionContext $context)
+    #[Assert\Callback]
+    public function validateFile(ExecutionContext $executionContext): void
     {
-        if (empty($this->file)) {
-            $context->addViolationAt('file', 'Vous devez sélectionner un fichier');
+        if (!$this->file instanceof \Symfony\Component\HttpFoundation\File\File) {
+            $executionContext->addViolationAt('file', 'Vous devez sélectionner un fichier');
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getTemplatesRootDir()
+    protected function getTemplatesRootDir(): string
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
         return __DIR__.'/../../../var/Publipost';
@@ -88,7 +78,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public static function orderBy()
+    public static function orderBy(): string
     {
         return 'name';
     }

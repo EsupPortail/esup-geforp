@@ -10,39 +10,38 @@ use Doctrine\Persistence\ManagerRegistry;
 use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProviderInterface;
 use App\Entity\Core\User;
 
-class AdminShibbolethUserProvider implements AdminShibbolethUserProviderInterface
+final readonly class AdminShibbolethUserProvider implements AdminShibbolethUserProviderInterface
 {
-    private $registry;
-
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(private ManagerRegistry $managerRegistry)
     {
-        $this->registry = $registry;
     }
 
-    public function loadUserByUsername($login)
+    public function loadUserByIdentifier(string $identifier): UserInterface
     {
-        $entityManager = $this->registry->getManagerForClass(User::class);
-        $user = $entityManager->getRepository(User::class)->findOneBy(['username' => $login]);
-        return $user;
+dump($identifier);
+        $entityManager = $this->managerRegistry->getManagerForClass(User::class);
+        $us =  $entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
+	dump($us);
+        return $entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
     }
 
-    public function loadUser($credentials)
+    public function loadUser($credentials): UserInterface
     {
-        return $this->loadUserByUsername($credentials['username']);
+        return $this->loadUserByIdentifier($credentials['username']);
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): UserInterface
     {
         if (!$user instanceof User) {
             throw new UnsupportedUserException(
-                sprintf('Instances of "%s" are not supported.', get_class($user))
+                sprintf('Instances of "%s" are not supported.', $user::class)
             );
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        return $this->loadUserByIdentifier(getUserIdentifier());
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return User::class === $class;
     }

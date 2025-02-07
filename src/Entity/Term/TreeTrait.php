@@ -58,7 +58,7 @@ trait TreeTrait
     /**
      * @param null $parent
      */
-    public function setParent($parent = null)
+    public function setParent($parent = null): void
     {
         $this->parent = $parent;
     }
@@ -79,10 +79,7 @@ trait TreeTrait
         return $this->children;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return (bool) count($this->children);
     }
@@ -119,17 +116,13 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function belongTo($entity)
+    public function belongTo($entity): bool
     {
         if ($this === $entity) {
             return true;
         }
-        if ($this->getParent()) {
-            if ($this->getParent()->belongTo($entity)) {
-                return true;
-            }
-        }
 
-        return false;
+
+        return (bool) $this->getParent()->belongTo($entity);
     }
 }

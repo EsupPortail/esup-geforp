@@ -1,16 +1,5 @@
 # Geforp changelog :
 
-## 2.3.15 (2025-01-23)
-
-### Ajouts
-- Ajout éditeur HTML dans le template des modèles de mail
-- Ajout données dans les évaluations
-- Ajout affichage données stagiaires
-
-### Corrections
-- Corrections dans les exports
-- Corrections dans les modèles de mail envoyés côté stagiaire
-
 ## 2.3.14 (2024-10-09)
 
 ### Ajouts

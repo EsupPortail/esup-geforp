@@ -8,7 +8,9 @@
 
     {% for ope in operations %}
 
-        <li><a href="{{ path('sygefor_core.batch_operation',{'id':ope.id,'ids':ope.ids,options:'rr' } ) }}">{{ ope.label }}</a></li>
+        <li>
+            <a href="{{ path('sygefor_core.batch_operation',{'id':ope.id,'ids':ope.ids,options:'rr' } ) }}">{{ ope.label }}</a>
+        </li>
     {% endfor %}
 </ul>
 </body>

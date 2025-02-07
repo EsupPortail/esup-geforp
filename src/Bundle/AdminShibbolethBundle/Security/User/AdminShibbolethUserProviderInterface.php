@@ -11,7 +11,6 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 Interface AdminShibbolethUserProviderInterface extends UserProviderInterface{
 
     /**
-     * @param array $credentials
      * @return mixed
      */
     public function loadUser(array $credentials);

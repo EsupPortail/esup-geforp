@@ -18,18 +18,18 @@ trait AttachEmailPublipostAttachment
      * @param $publipostTemplates
      * @param array $publipostIdList
      */
-    protected function attachPublipostAttachment(\Swift_Message $message, $publipostTemplates, $publipostIdList)
+    protected function attachPublipostAttachment(\Swift_Message $swiftMessage, $publipostTemplates, $publipostIdList)
     {
         foreach ($publipostTemplates as $publipostTemplate) {
             // find specific publipost service suffix
             $entityType = $publipostTemplate->getEntity();
-            $entityType = explode('\\', $entityType);
+            $entityType = explode('\\', (string) $entityType);
             $entityType = $entityType[count($entityType) - 1];
             $serviceSuffix = strtolower($entityType);
 
             // call publipost action and generate pdf
             $publipostService = $this->container->get('sygefor_core.batch.publipost.'.$serviceSuffix);
-            $publipostOptions = array('template' => $publipostTemplate->getId());
+            $publipostOptions = ['template' => $publipostTemplate->getId()];
             $file = $publipostService->execute($publipostIdList, $publipostOptions);
             $fileName = $file['fileUrl'];
             $fileName = $publipostService->getTempDir().$publipostService->toPdf($fileName);
@@ -37,7 +37,7 @@ trait AttachEmailPublipostAttachment
             // attach pdf to mail
             if (file_exists($fileName)) {
                 $publipostSwiftAttachment = new \Swift_Attachment(file_get_contents($fileName), $publipostTemplate->getName().'.pdf');
-                $message->attach($publipostSwiftAttachment);
+                $swiftMessage->attach($publipostSwiftAttachment);
             }
         }
     }

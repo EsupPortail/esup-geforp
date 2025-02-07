@@ -12,33 +12,20 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 /**
  * Class AccessRightVoter.
  */
-class AccessRightVoter implements VoterInterface
+final readonly class AccessRightVoter implements VoterInterface
 {
-    /**
-     * @var AccessRightRegistry
-     */
-    private $registry;
-
-    /**
-     * @var EntityManager
-     */
-    private $entityManager;
-
     /**
      * Construct.
      */
-    function __construct(AccessRightRegistry $registry, EntityManager $entityManager = null)
+    function __construct(private AccessRightRegistry $accessRightRegistry, private ?EntityManager $entityManager = null)
     {
-        $this->registry = $registry;
-        $this->entityManager = $entityManager;
     }
 
     /**
      * @param string $attribute
      *
-     * @return bool
      */
-    public function supportsAttribute($attribute)
+    public function supportsAttribute($attribute): bool
     {
         return true;
     }
@@ -46,9 +33,8 @@ class AccessRightVoter implements VoterInterface
     /**
      * @param string $class
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return true;
     }
@@ -56,13 +42,10 @@ class AccessRightVoter implements VoterInterface
     /**
      * Vote to decide access on a particular object.
      *
-     * @param TokenInterface $token
      * @param object $object
-     * @param array $attributes
      *
-     * @return int
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         // the current token must have a User
         if (!($token->getUser() instanceof User)) {
@@ -70,8 +53,8 @@ class AccessRightVoter implements VoterInterface
         }
 
         // support of Doctrine namespace alias
-        if (is_string($object) && strpos($object, ':') && $this->entityManager) {
-            list($alias, $class) = explode(':', $object);
+        if (is_string($object) && strpos($object, ':') && $this->entityManager instanceof \Doctrine\ORM\EntityManager) {
+            [$alias, $class] = explode(':', $object);
             $namespace = $this->entityManager->getConfiguration()->getEntityNamespace($alias);
             $object = $namespace . '\\' . $class;
         }
@@ -80,14 +63,21 @@ class AccessRightVoter implements VoterInterface
         foreach ($attributes as $attribute) {
             foreach ($token->getUser()->getAccessRights() as $accessRightId) {
                 //$className = is_string($object) ? $object : get_class($object);
-                $className = is_string($object) ? $object : ClassUtils::getRealClass(get_class($object));
+                $className = is_string($object) ? $object : ClassUtils::getRealClass($object::class);
                 //$accessRight = $this->registry->getAccessRightById($accessRightId);
-                $id = $this->registry->getByName($accessRightId);
-                $accessRight = $this->registry->getAccessRightById($id);
-                if ($accessRight && $accessRight->supportsClass($className) && $accessRight->supportsAttribute($attribute)) {
-                    if ($accessRight->isGranted($token, is_object($object) ? $object : null, $attribute)) {
-                        return VoterInterface::ACCESS_GRANTED;
-                    }
+                $id = $this->accessRightRegistry->getByName($accessRightId);
+                $accessRight = $this->accessRightRegistry->getAccessRightById($id);
+                if (!$accessRight) {
+                    continue;
+                }
+                if (!$accessRight->supportsClass($className)) {
+                    continue;
+                }
+                if (!$accessRight->supportsAttribute($attribute)) {
+                    continue;
+                }
+                if ($accessRight->isGranted($token, is_object($object) ? $object : null, $attribute)) {
+                    return VoterInterface::ACCESS_GRANTED;
                 }
             }
         }

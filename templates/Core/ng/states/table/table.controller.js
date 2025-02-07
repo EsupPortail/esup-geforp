@@ -1,7 +1,6 @@
 /**
  * ListTableController
  */
-sygeforApp.controller('ListTableController', ['$scope', function($scope)
-{
+sygeforApp.controller('ListTableController', ['$scope', function ($scope) {
 
 }]);

@@ -57,10 +57,10 @@ trait ProfessionalSituationTrait
      * @param ProfessionalSituationTrait $entity
      * @param boolean $force
      */
-    public function copyProfessionalSituation($entity, $force = true)
+    public function copyProfessionalSituation($entity, $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
-        foreach (array('institution', 'publictype', 'service', 'isPaying', 'status') as $property) {
+        foreach (['institution', 'publictype', 'service', 'isPaying', 'status'] as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
             if ($force || ! $thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
@@ -71,7 +71,7 @@ trait ProfessionalSituationTrait
     /**
      * @param AbstractInstitution $institution
      */
-    public function setInstitution($institution)
+    public function setInstitution($institution): void
     {
         $this->institution = $institution;
     }
@@ -83,10 +83,7 @@ trait ProfessionalSituationTrait
         return $this->institution;
     }
 
-    /**
-     * @param mixed $Publictype
-     */
-    public function setPublictype($Publictype)
+    public function setPublictype(mixed $Publictype): void
     {
         $this->publictype = $Publictype;
     }
@@ -102,7 +99,7 @@ trait ProfessionalSituationTrait
     /**
      * @param string $service
      */
-    public function setService($service)
+    public function setService($service): void
     {
         $this->service = $service;
     }
@@ -126,7 +123,7 @@ trait ProfessionalSituationTrait
     /**
      * @param boolean $isPaying
      */
-    public function setIsPaying($isPaying)
+    public function setIsPaying($isPaying): void
     {
         $this->isPaying = $isPaying;
     }
@@ -134,7 +131,7 @@ trait ProfessionalSituationTrait
     /**
      * @param string $status
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->status = $status;
     }

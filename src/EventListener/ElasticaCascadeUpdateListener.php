@@ -15,82 +15,56 @@ use Symfony\Component\Process\ProcessBuilder;
 /**
  * Class ElasticaCascadeUpdateListener.
  */
-class ElasticaCascadeUpdateListener implements EventSubscriber
+final class ElasticaCascadeUpdateListener implements EventSubscriber
 {
-    /** @var ElasticaMappingProvider $mp */
-    private $mp;
+    private array $postFlushArguments = [];
 
-    /** @var Kernel */
-    private $kernel;
-
-    protected $postFlushArguments = array();
-
-    public function __construct(Kernel $kernel, ElasticaMappingProvider $mp)
+    public function __construct(private readonly Kernel $kernel, private readonly ElasticaMappingProvider $elasticaMappingProvider)
     {
-        $this->mp = $mp;
-        $this->kernel = $kernel;
     }
 
     /**
      * Returns an array of events this subscriber wants to listen to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::preRemove,
-            Events::postPersist,
-            Events::preUpdate,
-            Events::postFlush,
-        );
+        return [Events::preRemove, Events::postPersist, Events::preUpdate, Events::postFlush];
     }
 
-    /**
-     * @param LifecycleEventArgs $eventArgs
-     */
-    public function preRemove(LifecycleEventArgs $eventArgs)
+    public function preRemove(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $commands = $this->mp->getPostDeletionCommandLines($eventArgs->getEntity());
+        $commands = $this->elasticaMappingProvider->getPostDeletionCommandLines($lifecycleEventArgs->getEntity());
 
         foreach ($commands as $command) {
             $this->postFlushArguments[] = $command;
         }
     }
 
-    /**
-     * @param LifecycleEventArgs $eventArgs
-     */
-    public function postPersist(LifecycleEventArgs $eventArgs)
+    public function postPersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        if (method_exists($eventArgs->getEntity(), 'getId')) {
-            $this->postFlushArguments[] = array($eventArgs->getEntity()->getId(), get_class($eventArgs->getEntity()), $eventArgs->getEntity()->getId());
+        if (method_exists($lifecycleEventArgs->getEntity(), 'getId')) {
+            $this->postFlushArguments[] = [$lifecycleEventArgs->getEntity()->getId(), $lifecycleEventArgs->getEntity()::class, $lifecycleEventArgs->getEntity()->getId()];
         }
     }
 
-    /**
-     * @param \Doctrine\ORM\Event\LifecycleEventArgs|\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs
-     */
-    public function preUpdate(PreUpdateEventArgs $eventArgs)
+    public function preUpdate(\Doctrine\ORM\Event\LifecycleEventArgs|\Doctrine\ORM\Event\PreUpdateEventArgs $eventArgs): void
     {
         if (method_exists($eventArgs->getEntity(), 'getId')) {
             // @todo : list modified properties
-            $this->postFlushArguments[] = array($eventArgs->getEntity()->getId(), get_class($eventArgs->getEntity()), 'id');
+            $this->postFlushArguments[] = [$eventArgs->getEntity()->getId(), $eventArgs->getEntity()::class, 'id'];
         }
     }
 
-    /**
-     * @param PostFlushEventArgs $eventArgs
-     */
-    public function postFlush(PostFlushEventArgs $eventArgs)
+    public function postFlush(PostFlushEventArgs $postFlushEventArgs)
     {
-        $idsByClass = array();
-        $propertiesById = array();
+        $idsByClass = [];
+        $propertiesById = [];
 
         // refactor arguments to send them to console command
-        foreach ($this->postFlushArguments as $arguments) {
-            $idsByClass[$arguments[1]][] = $arguments[0];
-            $propertiesById[$arguments[0]] = $arguments[2];
+        foreach ($this->postFlushArguments as $postFlushArgument) {
+            $idsByClass[$postFlushArgument[1]][] = $postFlushArgument[0];
+            $propertiesById[$postFlushArgument[0]] = $postFlushArgument[2];
         }
 
         $appDir = $this->kernel->getRootDir();
@@ -98,7 +72,7 @@ class ElasticaCascadeUpdateListener implements EventSubscriber
         foreach ($idsByClass as $class => $ids) {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $process = new Process(
-                    'php '.$appDir."/console --env=$env sygeforelasticascade:cascade $class ".json_encode($ids).' '.json_encode($propertiesById)
+                    (array)'php '
                 );
                 $process->run();
                 if (!$process->isSuccessful()) {
@@ -107,16 +81,7 @@ class ElasticaCascadeUpdateListener implements EventSubscriber
             } else {
                 // prepare the process
                 $env = $this->kernel->getEnvironment();
-                $args = array(
-                    'nohup',
-                    'php',
-                    $appDir.'/console',
-                    '--env='.$env,
-                    'sygeforelasticascade:cascade',
-                    $class,
-                    json_encode($ids),
-                    json_encode($propertiesById),
-                );
+                $args = ['nohup', 'php', $appDir.'/console', '--env='.$env, 'sygeforelasticascade:cascade', $class, json_encode($ids, JSON_THROW_ON_ERROR), json_encode($propertiesById, JSON_THROW_ON_ERROR)];
 
                 $pb = new ProcessBuilder($args);
                 $process = $pb->getProcess();

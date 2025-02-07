@@ -9,62 +9,57 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Form\Type\InscriptionType;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- *
- * @ORM\Table(name="inscription")
- * @ORM\Entity
- */
-class Inscription extends AbstractInscription
+#[ORM\Table(name: 'inscription')]
+#[ORM\Entity]
+class Inscription extends AbstractInscription implements \Stringable
 {
 
+    public $isPaying;
     /**
-     * @var String
-     * @ORM\Column(name="motivation", type="text", nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $motivation;
+    #[ORM\Column(name: 'motivation', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $motivation = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\EvaluationNotedCriterion", mappedBy="inscription", cascade={"persist", "merge", "remove"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\EvaluationNotedCriterion>
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $criteria;
+    #[ORM\OneToMany(targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, mappedBy: 'inscription', cascade: ['persist', 'merge', 'remove'])]
+    protected \Doctrine\Common\Collections\Collection $criteria;
 
     /**
-     * @ORM\Column(name="message", type="text", nullable=true)
      * @Serializer\Groups({"Default", "inscription", "api.attendance"})
      */
-    protected $message;
+    #[ORM\Column(name: 'message', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $message = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Actiontype")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $actiontype;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Actiontype::class)]
+    #[ORM\JoinColumn]
+    protected ?\App\Entity\Term\Actiontype $actiontype = null;
 
     /**
-     * @var String
-     * @ORM\Column(name="refuse", type="text", nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $refuse;
+    #[ORM\Column(name: 'refuse', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $refuse = null;
 
     /**
-     * @var ArrayCollection $presences
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\Presence", mappedBy="inscription", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"datebegin" = "ASC"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Presence> $presences
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $presences;
+    #[ORM\OneToMany(targetEntity: \App\Entity\Back\Presence::class, mappedBy: 'inscription', cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['datebegin' => 'ASC'])]
+    protected \Doctrine\Common\Collections\Collection $presences;
 
     /**
-     * @var Boolean
-     * @ORM\Column(name="dif", type="boolean", options={"default":false})
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $dif;
+    #[ORM\Column(name: 'dif', type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $dif = null;
 
 
     /**
@@ -93,10 +88,7 @@ class Inscription extends AbstractInscription
         return $this->motivation;
     }
 
-    /**
-     * @param mixed $motivation
-     */
-    public function setMotivation($motivation)
+    public function setMotivation(mixed $motivation): void
     {
         $this->motivation = $motivation;
     }
@@ -112,7 +104,7 @@ class Inscription extends AbstractInscription
     /**
      * @param mixed refuse
      */
-    public function setRefuse($refuse)
+    public function setRefuse($refuse): void
     {
         $this->refuse = $refuse;
     }
@@ -125,10 +117,7 @@ class Inscription extends AbstractInscription
         return $this->criteria;
     }
 
-    /**
-     * @param mixed $criteria
-     */
-    public function setCriteria($criteria)
+    public function setCriteria(mixed $criteria): void
     {
         $this->criteria = $criteria;
     }
@@ -141,10 +130,7 @@ class Inscription extends AbstractInscription
         return $this->message;
     }
 
-    /**
-     * @param mixed $message
-     */
-    public function setMessage($message)
+    public function setMessage(mixed $message): void
     {
         $this->message = $message;
     }
@@ -157,10 +143,7 @@ class Inscription extends AbstractInscription
         return $this->actiontype;
     }
 
-    /**
-     * @param mixed $actiontype
-     */
-    public function setActiontype($actiontype)
+    public function setActiontype(mixed $actiontype): void
     {
         $this->actiontype = $actiontype;
     }
@@ -176,7 +159,7 @@ class Inscription extends AbstractInscription
     /**
      * @param mixed presences
      */
-    public function setPresences($presences)
+    public function setPresences($presences): void
     {
         $this->presences = $presences;
     }
@@ -189,40 +172,35 @@ class Inscription extends AbstractInscription
         return $this->dif;
     }
 
-    /**
-     * @param mixed $dif
-     */
-    public function setDif($dif)
+    public function setDif(mixed $dif): void
     {
         $this->dif = $dif;
     }
 
     /**
      * Add a noted criterion
-     * @param EvaluationNotedCriterion $criterion
      */
-    public function addCriterion(EvaluationNotedCriterion $criterion)
+    public function addCriterion(EvaluationNotedCriterion $evaluationNotedCriterion): void
     {
-        $this->criteria->add($criterion);
+        $this->criteria->add($evaluationNotedCriterion);
     }
 
     /**
      * Add a presence
-     * @param Presence $presence
      */
-    public function addPresence(Presence $presence)
+    public function addPresence(Presence $presence): void
     {
         $this->presences->add($presence);
     }
 
 
-    static public function getFormType()
+    static public function getFormType(): string
     {
         return InscriptionType::class;
     }
 
-    function __toString()
+    function __toString(): string
     {
-        return strval($this->getId());
+        return (string) $this->getId();
     }
 }

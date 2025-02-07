@@ -13,14 +13,17 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class InstitutionRepository extends ServiceEntityRepository
+final class InstitutionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Institution::class);
+        parent::__construct($managerRegistry, Institution::class);
     }
 
-    public function getInstitutionsList($keyword, $filters, $page, $pageSize)
+    /**
+     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     */
+    public function getInstitutionsList($keyword, $filters, $page, $pageSize): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -29,7 +32,7 @@ class InstitutionRepository extends ServiceEntityRepository
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE VILLE
         if (isset($filters['city.source'])) {
@@ -52,18 +55,14 @@ class InstitutionRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabInst = array();
+        $tabInst = [];
         foreach($paginator as $inst)
             $tabInst[] = $inst;
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabInst);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabInst];
     }
 
-    public function getNbInstitutions($query_filters, $keyword, $aggs, $name)
+    public function getNbInstitutions($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -72,7 +71,7 @@ class InstitutionRepository extends ServiceEntityRepository
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE ANNEE
         if (isset($aggs['city.source'])) {
@@ -87,12 +86,14 @@ class InstitutionRepository extends ServiceEntityRepository
 
         // On compte le nb de sessions en résultat
         $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 
-    public function getAllCities()
+    /**
+     * @return mixed[]
+     */
+    public function getAllCities(): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -102,8 +103,9 @@ class InstitutionRepository extends ServiceEntityRepository
         $query = $qb->getQuery();
         $result = $query->getResult();
 
-        $tabCities = array();
-        for ($i=0; $i<count($result); $i++){
+        $tabCities = [];
+        $resultCount = count($result);
+        for ($i=0; $i<(is_countable($result) ? $resultCount : 0); ++$i){
             $tabCities[] = $result[$i]["city"];
         }
 

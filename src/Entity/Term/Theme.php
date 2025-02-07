@@ -9,9 +9,9 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Theme.
  *
- * @ORM\Table(name="theme")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'theme')]
+#[ORM\Entity]
 class Theme extends AbstractTerm implements VocabularyInterface
 {
     /**
@@ -24,12 +24,12 @@ class Theme extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Thématiques de formation';
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }

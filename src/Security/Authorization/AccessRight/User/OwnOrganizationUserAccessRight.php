@@ -1,22 +1,13 @@
 <?php
 
-/**
- * Created by PhpStorm.
- * User: maxime
- * Date: 20/03/14
- * Time: 15:42.
- */
 namespace App\Security\Authorization\AccessRight\User;
 
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class OwnOrganizationUserAccessRight extends AbstractAccessRight
+final class OwnOrganizationUserAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Gestion des utilisateurs de son propre centre';
     }
@@ -26,23 +17,26 @@ class OwnOrganizationUserAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        return 'App\Entity\Core\User' === $class;
+        return \App\Entity\Core\User::class === $class;
     }
 
     /**
      * Returns the vote for the given parameters.
+     *
+     * La signature de la méthode doit respecter l'ordre des paramètres :
+     * TokenInterface $token, $object (optionnel), $attribute
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
         if ($object) {
+            // Vérifie si l'organisation de l'objet correspond à celle de l'utilisateur authentifié
             return $object->getOrganization() === $token->getUser()->getOrganization();
         }
-        else {
-            return true;
-        }
+
+        // Si aucun objet n'est fourni, l'accès est accordé par défaut
+        return true;
     }
 }

@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Trainee;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class OwnTraineeViewAccessRight extends AbstractAccessRight
+final class OwnTraineeViewAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Voir les stagiaires de son propre établissement';
     }
@@ -26,19 +23,20 @@ class OwnTraineeViewAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Trainee') {
+        if ($class === \App\Entity\Back\Trainee::class) {
             return true;
         }
+
+        return false;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
         if ($attribute !== 'VIEW') return false;
 
@@ -48,14 +46,8 @@ class OwnTraineeViewAccessRight extends AbstractAccessRight
                 return true;
 
             $visuInst = $token->getUser()->getOrganization()->getInstitution()->getVisuinstitutions();
-            foreach($visuInst as $inst) {
-                if ($object->getInstitution() === $inst)
-                    return true;
-            }
-
-            return false;
-        } else {
-            return true;
+            return in_array($object->getInstitution(), $visuInst, true);
         }
+        return true;
     }
 }

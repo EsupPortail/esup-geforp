@@ -18,62 +18,37 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class BaseInscriptionType.
  */
-class BaseInscriptionType extends AbstractType
+final class BaseInscriptionType extends AbstractType
 {
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        /** @var AbstractSession $session */
-        $session = $options['data']->getSession();
+        $options['data']->getSession();
 
         /** @var AbstractOrganization $organization */
         $organization = $options['attr']['organization'];
 
-        $builder
-            ->add('trainee', EntityHiddenType::class, array(
-                'label'           => 'Stagiaire',
-                'class'           => AbstractTrainee::class,
-                'invalid_message' => '',
-            ))
-            ->add('session', EntityHiddenType::class, array(
-                'label'           => 'Session',
-                'class'           => AbstractSession::class,
-                'invalid_message' => 'Session non reconnue',
-            ))
-            ->add('inscriptionstatus', EntityType::class, array(
-                'label'         => 'Status d\'inscription',
-                'class'         => Inscriptionstatus::class,
-                'query_builder' => function (EntityRepository $repository) use ($organization) {
-                    $qb = $repository->createQueryBuilder('i');
-                    $qb->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null');
-
-                    return $qb;
-                },
-            ))
-            ->add('presencestatus', EntityType::class, array(
-                'label'         => 'Status de présence',
-                'class'         => Presencestatus::class,
-                'query_builder' => function (EntityRepository $repository) use ($organization) {
-                    $qb = $repository->createQueryBuilder('i');
-                    $qb->where('i.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('i.organization is null');
-
-                    return $qb;
-                },
-            ));
+        $formBuilder
+            ->add('trainee', EntityHiddenType::class, ['label'           => 'Stagiaire', 'class'           => AbstractTrainee::class, 'invalid_message' => ''])
+            ->add('session', EntityHiddenType::class, ['label'           => 'Session', 'class'           => AbstractSession::class, 'invalid_message' => 'Session non reconnue'])
+            ->add('inscriptionstatus', EntityType::class, ['label'         => "Status d'inscription", 'class'         => Inscriptionstatus::class, 'query_builder' => static function (EntityRepository $entityRepository) use ($organization) : \Doctrine\ORM\QueryBuilder {
+                $queryBuilder = $entityRepository->createQueryBuilder('i');
+                $queryBuilder->where('i.organization = :organization')
+                    ->setParameter('organization', $organization)
+                    ->orWhere('i.organization is null');
+                return $queryBuilder;
+            }])
+            ->add('presencestatus', EntityType::class, ['label'         => 'Status de présence', 'class'         => Presencestatus::class, 'query_builder' => static function (EntityRepository $entityRepository) use ($organization) : \Doctrine\ORM\QueryBuilder {
+                $queryBuilder = $entityRepository->createQueryBuilder('i');
+                $queryBuilder->where('i.organization = :organization')
+                    ->setParameter('organization', $organization)
+                    ->orWhere('i.organization is null');
+                return $queryBuilder;
+            }]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => AbstractInscription::class,
-        ));
+        $optionsResolver->setDefaults(['data_class' => AbstractInscription::class]);
     }
 }

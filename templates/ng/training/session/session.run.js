@@ -1,24 +1,24 @@
 /**
  * Application run
  */
-sygeforApp.run(['$rootScope', function($rootScope) {
+sygeforApp.run(['$rootScope', function ($rootScope) {
 
     /**
      * This helper could be used in ng-class to colorize inscription status label
      *
      * @param statusId
      */
-    $rootScope.sessionInscriptionStatsClass = function(count, max, prefix) {
-        if(!prefix) {
+    $rootScope.sessionInscriptionStatsClass = function (count, max, prefix) {
+        if (!prefix) {
             prefix = 'label';
         }
         prefix = prefix ? prefix + '-' : '';
 
-        if(count > max) {
+        if (count > max) {
             return prefix + 'danger';
-        } else if(count == max || count == 0) {
+        } else if (count == max || count == 0) {
             return prefix + 'default';
-        } else if(count + 2 >= max) {
+        } else if (count + 2 >= max) {
             return prefix + 'warning';
         } else {
             return prefix + 'success';

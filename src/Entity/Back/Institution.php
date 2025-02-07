@@ -15,14 +15,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\Type\InstitutionType;
 
-/**
- *
- * @ORM\Table(name="institution")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'institution')]
+#[ORM\Entity]
 class Institution extends AbstractInstitution
 {
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return InstitutionType::class;
     }
@@ -30,15 +27,10 @@ class Institution extends AbstractInstitution
     /**
      * loadValidatorMetadata.
      *
-     * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $classMetadata): void
     {
-        $metadata->addPropertyConstraint('zip', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner un code postal.',
-        )));
-        $metadata->addPropertyConstraint('city', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner une ville.',
-        )));
+        $classMetadata->addPropertyConstraint('zip', new Assert\NotBlank(['message' => 'Vous devez renseigner un code postal.']));
+        $classMetadata->addPropertyConstraint('city', new Assert\NotBlank(['message' => 'Vous devez renseigner une ville.']));
     }
 }

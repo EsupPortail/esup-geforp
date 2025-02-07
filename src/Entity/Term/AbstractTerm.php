@@ -10,9 +10,9 @@ use App\Entity\Core\AbstractOrganization;
 /**
  * Class AbstractTerm.
  *
- * @ORM\MappedSuperclass()
  */
-abstract class AbstractTerm implements VocabularyInterface
+#[ORM\MappedSuperclass]
+abstract class AbstractTerm implements VocabularyInterface, \Stringable
 {
     use SortableTrait;
 
@@ -24,42 +24,41 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
     private $id;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
-     * @Assert\NotBlank()
      * @Serializer\Groups({"Default", "api"})
      */
+    #[ORM\Column(name: 'name', type: 'string', length: 255)]
+    #[Assert\NotBlank]
     private $name;
 
     /**
-     * @var bool
-     * @ORM\Column(name="private", type="boolean")
      * @Serializer\Groups({"Default", "api"})
      */
-    private $private = false;
+    #[ORM\Column(name: 'private', type: 'boolean')]
+    private bool $private = false;
 
     private $label = null;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractOrganization")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractOrganization::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     protected $organization;
 
     /**
      * @var string
-     * @ORM\Column(name="machine_name", type="string", length=255, nullable=true)
      */
+
     protected $machinename;
 
     /**
@@ -70,7 +69,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param $label
      */
-    public function setVocabularyLabel($label)
+    public function setVocabularyLabel($label): void
     {
         $this->label = $label;
     }
@@ -80,13 +79,13 @@ abstract class AbstractTerm implements VocabularyInterface
      */
     public function getVocabularyLabel()
     {
-        return $this->label ? $this->label : $this->getVocabularyName();
+        return $this->label ?: $this->getVocabularyName();
     }
 
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->getName();
     }
@@ -94,7 +93,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -110,7 +109,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -131,10 +130,7 @@ abstract class AbstractTerm implements VocabularyInterface
         return $this->private;
     }
 
-    /**
-     * @param mixed $private
-     */
-    public function setPrivate($private)
+    public function setPrivate(mixed $private): void
     {
         $this->private = $private;
     }
@@ -142,7 +138,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param AbstractOrganization $organization
      */
-    public function setOrganization($organization)
+    public function setOrganization($organization): void
     {
         $this->organization = $organization;
     }
@@ -179,7 +175,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param string
      */
-    public function setMachinename($machineName)
+    public function setMachinename($machineName): void
     {
         $this->machinename = $machineName;
     }
@@ -217,7 +213,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @param string $id
      */
-    public function setVocabularyId($id)
+    public function setVocabularyId($id): void
     {
         $this->vocabularyId = $id;
     }

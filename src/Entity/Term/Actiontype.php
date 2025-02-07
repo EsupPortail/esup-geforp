@@ -15,20 +15,17 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Type de personnel.
  *
- * @ORM\Table(name="action_type")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'action_type')]
+#[ORM\Entity]
 class Actiontype extends AbstractTerm implements VocabularyInterface
 {
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Type d\'action de formation';
     }

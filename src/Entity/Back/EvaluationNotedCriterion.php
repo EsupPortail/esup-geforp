@@ -7,40 +7,36 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use JMS\Serializer\Annotation as Serializer;
 
-/**
- * @ORM\Table(name="evaluation_noted_criterion")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'evaluation_noted_criterion')]
+#[ORM\Entity]
 class EvaluationNotedCriterion
 {
     /**
-     * @var int id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @var Inscription
-     * @ORM\ManyToOne(targetEntity="App\Entity\Back\Inscription", inversedBy="criteria")
      * @Serializer\Exclude
      */
-    protected $inscription;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Back\Inscription::class, inversedBy: 'criteria')]
+    protected ?\App\Entity\Back\Inscription $inscription = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Evaluationcriterion")
-     * @ORM\JoinColumn(name="criterion_id", referencedColumnName="id", onDelete="CASCADE")
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $criterion;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Evaluationcriterion::class)]
+    #[ORM\JoinColumn(name: 'criterion_id', onDelete: 'CASCADE')]
+    protected ?\App\Entity\Term\Evaluationcriterion $criterion = null;
 
     /**
-     * @ORM\Column(name="note", type="integer")
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $note;
+    #[ORM\Column(name: 'note', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $note = null;
 
     /**
      * @return mixed
@@ -50,10 +46,7 @@ class EvaluationNotedCriterion
         return $this->id;
     }
 
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
+    public function setId(mixed $id): void
     {
         $this->id = $id;
     }
@@ -66,10 +59,7 @@ class EvaluationNotedCriterion
         return $this->inscription;
     }
 
-    /**
-     * @param mixed $inscription
-     */
-    public function setInscription($inscription)
+    public function setInscription(mixed $inscription): void
     {
         $this->inscription = $inscription;
     }
@@ -82,10 +72,7 @@ class EvaluationNotedCriterion
         return $this->criterion;
     }
 
-    /**
-     * @param mixed $criterion
-     */
-    public function setCriterion($criterion)
+    public function setCriterion(mixed $criterion): void
     {
         $this->criterion = $criterion;
     }
@@ -98,10 +85,7 @@ class EvaluationNotedCriterion
         return $this->note;
     }
 
-    /**
-     * @param mixed $note
-     */
-    public function setNote($note)
+    public function setNote(mixed $note): void
     {
         $this->note = $note;
     }

@@ -11,55 +11,53 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Participation.
  *
- * @ORM\Entity
- * @ORM\Table(name="participation")
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @UniqueEntity(fields={"session", "trainer"}, message="Cet intervenant est déjà associé à cet évènement.")
  */
+#[ORM\Table(name: 'participation')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[UniqueEntity(fields: ['session', 'trainer'], message: 'Cet intervenant est déjà associé à cet évènement.')]
 abstract class AbstractParticipation
 {
     /**
-     * @var int id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api", "session", "participation"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var AbstractTrainer
-     * @ORM\ManyToOne(targetEntity="AbstractTrainer", inversedBy="participations")
-     * @ORM\JoinColumn(name="trainer_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez sélectionner un intervenant")
      * @Serializer\Groups({"participation", "session", "api.training", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractTrainer', inversedBy: 'participations')]
+    #[ORM\JoinColumn(name: 'trainer_id')]
+    #[Assert\NotNull(message: 'Vous devez sélectionner un intervenant')]
     protected $trainer;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession", inversedBy="participations")
-     * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
-     * @Assert\NotNull()
      * @Serializer\Groups({"participation", "session", "trainer", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'participations')]
+    #[ORM\JoinColumn(name: 'session_id')]
+    #[Assert\NotNull]
     protected $session;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_organization", type="boolean", nullable=true)
      * @Serializer\Groups({"participation"})
      */
-    protected $isOrganization;
+    #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $isOrganization = null;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="AbstractOrganization")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      * @Serializer\Groups({"participation"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
+    #[ORM\JoinColumn]
     protected $organization;
 
     /**
@@ -81,7 +79,7 @@ abstract class AbstractParticipation
     /**
      * @param AbstractTrainer
      */
-    public function setTrainer($trainer)
+    public function setTrainer($trainer): void
     {
         $this->trainer = $trainer;
     }
@@ -97,7 +95,7 @@ abstract class AbstractParticipation
     /**
      * @param AbstractSession
      */
-    public function setSession($session)
+    public function setSession($session): void
     {
         $this->session = $session;
     }
@@ -110,10 +108,7 @@ abstract class AbstractParticipation
         return $this->isOrganization;
     }
 
-    /**
-     * @param mixed $isOrganization
-     */
-    public function setIsOrganization($isOrganization)
+    public function setIsOrganization(mixed $isOrganization): void
     {
         $this->isOrganization = $isOrganization;
     }
@@ -126,10 +121,7 @@ abstract class AbstractParticipation
         return $this->organization;
     }
 
-    /**
-     * @param mixed $organization
-     */
-    public function setOrganization($organization)
+    public function setOrganization(mixed $organization): void
     {
         $this->organization = $organization;
     }

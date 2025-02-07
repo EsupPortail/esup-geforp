@@ -10,32 +10,22 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class AbstractOrganizationType.
  */
-class AbstractOrganizationType extends AbstractType
+final class AbstractOrganizationType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder
-            ->add('name', null, array(
-                'label' => 'Nom',
-            ))
-            ->add('code', null, array(
-                'label' => 'Code',
-            ))
-            ->add('traineeRegistrable', null, array(
-                'label' => 'Les stagiaires peuvent s\'y inscrire',
-            ))
+        $formBuilder
+            ->add('name', null, ['label' => 'Nom'])
+            ->add('code', null, ['label' => 'Code'])
+            ->add('traineeRegistrable', null, ['label' => "Les stagiaires peuvent s'y inscrire"])
         ;
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array('data_class' => AbstractOrganization::class)
+        $optionsResolver->setDefaults(['data_class' => AbstractOrganization::class]
         );
     }
 

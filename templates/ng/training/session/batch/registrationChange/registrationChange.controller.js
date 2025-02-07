@@ -4,8 +4,7 @@
 /**
  * BatchMailingController
  */
-sygeforApp.controller('SessionRegistrationChange', ['$scope', '$http', '$window','$modalInstance', '$dialogParams', function($scope, $http, $window, $modalInstance, $dialogParams)
-{
+sygeforApp.controller('SessionRegistrationChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', function ($scope, $http, $window, $modalInstance, $dialogParams) {
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
     $scope.registration = $dialogParams.registration;
@@ -28,10 +27,11 @@ sygeforApp.controller('SessionRegistrationChange', ['$scope', '$http', '$window'
             },
             ids: $scope.items.join(",")
         };
-        $http({method: 'POST',
-                url: url,
-                data: data
-            }).success(
+        $http({
+            method: 'POST',
+            url: url,
+            data: data
+        }).success(
             function () { //no response expected...
                 $scope.dialog.close();
             }

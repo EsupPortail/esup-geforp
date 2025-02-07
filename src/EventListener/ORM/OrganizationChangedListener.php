@@ -10,29 +10,24 @@ use Doctrine\ORM\PersistentCollection;
 use App\Entity\Core\AbstractTrainer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 
-class OrganizationChangedListener implements EventSubscriber
+final class OrganizationChangedListener implements EventSubscriber
 {
-    private $entities = array();
+    private array $entities = [];
 
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::postUpdate,
-            Events::postFlush,
-        );
+        return [Events::postUpdate, Events::postFlush];
     }
 
     /**
      * @param $entity
      *
-     * @return bool
      */
-    protected function containsOrganization($entity)
+    private function containsOrganization($entity): bool
     {
         return method_exists($entity, 'getOrganization');
     }
@@ -41,19 +36,19 @@ class OrganizationChangedListener implements EventSubscriber
      * When a entity is updated, we keep it in mind for an update on postflush event if organization has changed
      * for future sessions.
      */
-    public function postUpdate(LifecycleEventArgs $eventArgs)
+    public function postUpdate(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $entity = $eventArgs->getEntity();
+        $entity = $lifecycleEventArgs->getEntity();
         if ($this->containsOrganization($entity)) {
-            $em = $eventArgs->getEntityManager();
+            $entityManager = $lifecycleEventArgs->getEntityManager();
             // get the update field list
-            $uow = $em->getUnitOfWork();
-            $uow->computeChangeSets();
-            $changes = array_keys($uow->getEntityChangeSet($entity));
+            $unitOfWork = $entityManager->getUnitOfWork();
+            $unitOfWork->computeChangeSets();
+            $changes = array_keys($unitOfWork->getEntityChangeSet($entity));
 
             // check any organization or is_organization field changed
-            foreach ($changes as $property) {
-                if ($property === 'organization' && !in_array($entity, $this->entities, true)) {
+            foreach ($changes as $change) {
+                if ($change === 'organization' && !in_array($entity, $this->entities, true)) {
                     $this->entities[] = $entity;
 
                     return;
@@ -65,18 +60,17 @@ class OrganizationChangedListener implements EventSubscriber
     /**
      * For all entities with an organization changed, we remove entities related to this organization.
      *
-     * @param PostFlushEventArgs $eventArgs
      */
-    public function postFlush(PostFlushEventArgs $eventArgs)
+    public function postFlush(PostFlushEventArgs $postFlushEventArgs): void
     {
-        if (!empty($this->entities)) {
-            $em = $eventArgs->getEntityManager();
+        if ($this->entities !== []) {
+            $em = $postFlushEventArgs->getEntityManager();
             $propertyAccessor = new PropertyAccessor();
             foreach ($this->entities as $entity) {
-                $metadata = $em->getClassMetadata(get_class($entity));
+                $metadata = $em->getClassMetadata($entity::class);
                 // read entity properties metadata to find related object attached to an organization
                 foreach ($metadata->associationMappings as $fieldName => $fieldMD) {
-                    if (!empty($fieldMD['targetEntity']) && !in_array($fieldName, $this->getExcludedProperties(get_class($entity)), true)) {
+                    if (!empty($fieldMD['targetEntity']) && !in_array($fieldName, $this->getExcludedProperties($entity::class), true)) {
                         $propertyMetadata = $em->getClassMetadata($fieldMD['targetEntity']);
                         // we check if property is related to an organization
                         if (isset($propertyMetadata->associationMappings['organization'])) {
@@ -85,13 +79,22 @@ class OrganizationChangedListener implements EventSubscriber
                             // remove array collection items not related to the new organization
                             if ($value instanceof PersistentCollection) {
                                 foreach ($value as $item) {
-                                    if (is_object($item) && method_exists($item, 'getOrganization')) {
-                                        if ($item->getOrganization() !== null && $item->getOrganization() !== $entity->getOrganization()) {
-                                            $value->removeElement($item);
-                                        }
+                                    if (!is_object($item)) {
+                                        continue;
                                     }
+                                    if (!method_exists($item, 'getOrganization')) {
+                                        continue;
+                                    }
+                                    if ($item->getOrganization() === null) {
+                                        continue;
+                                    }
+                                    if ($item->getOrganization() === $entity->getOrganization()) {
+                                        continue;
+                                    }
+                                    $value->removeElement($item);
                                 }
                             }
+
                             // remove properties related to another organization
 //                            elseif (method_exists($value, 'getOrganization')) {
 //                                if ($value->getOrganization() !== null && $value->getOrganization() !== $entity->getOrganization()) {
@@ -102,7 +105,8 @@ class OrganizationChangedListener implements EventSubscriber
                     }
                 }
             }
-            $this->entities = array();
+
+            $this->entities = [];
             $em->flush();
         }
     }
@@ -114,18 +118,14 @@ class OrganizationChangedListener implements EventSubscriber
      *
      * @return array
      */
-    protected function getExcludedProperties($class)
+    private function getExcludedProperties($class)
     {
-        $excludedProperties = array(
-          AbstractTrainer::class => array(
-              'participations',
-          ),
-        );
+        $excludedProperties = [AbstractTrainer::class => ['participations']];
 
         if (isset($excludedProperties[$class])) {
             return $excludedProperties[$class];
         }
 
-        return array();
+        return [];
     }
 }

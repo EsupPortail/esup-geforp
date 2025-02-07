@@ -17,12 +17,13 @@ use App\Form\Type\BaseInstitutionType as FormType;
 /**
  * Institution.
  *
- * @ORM\Table(name="institution")
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class AbstractInstitution implements SerializedAccessRights
+#[ORM\Table(name: 'institution')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\MappedSuperclass]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+abstract class AbstractInstitution implements SerializedAccessRights, \Stringable
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
@@ -30,51 +31,46 @@ abstract class AbstractInstitution implements SerializedAccessRights
     use CoordinatesTrait;
 
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @var string name
-     * @ORM\Column(name="name", type="string", length=512)
-     * @Assert\NotBlank(message="Vous devez renseigner un nom d'établissement.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $name;
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 512)]
+    #[Assert\NotBlank(message: "Vous devez renseigner un nom d'établissement.")]
+    protected ?string $name = null;
 
     /**
-     * @var string idp
-     * @ORM\Column(name="idp", type="string", length=512, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $idp;
+    #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $idp = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Domain")
-     * @ORM\JoinTable(name="institution__institution_domain",
-     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="cascade")}
-     * )
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Domain>
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $domains;
+    #[ORM\JoinTable(name: 'institution__institution_domain')]
+    #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
+    #[ORM\InverseJoinColumn(name: 'domain_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Domain::class)]
+    protected \Doctrine\Common\Collections\Collection $domains;
 
     /**
-     * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinTable(name="institution__visuinstitutions",
-     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="visu_institution_id", referencedColumnName="id", onDelete="cascade")}
-     * )
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractInstitution>
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $visuinstitutions;
+    #[ORM\JoinTable(name: 'institution__visuinstitutions')]
+    #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
+    #[ORM\InverseJoinColumn(name: 'visu_institution_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
+    protected \Doctrine\Common\Collections\Collection $visuinstitutions;
 
     public function __construct()
     {
@@ -102,7 +98,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -118,7 +114,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
     /**
      * @param string $idp
      */
-    public function setIdp($idp)
+    public function setIdp($idp): void
     {
         $this->idp = $idp;
     }
@@ -131,10 +127,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
         return $this->domains;
     }
 
-    /**
-     * @param mixed $domains
-     */
-    public function setDomains($domains)
+    public function setDomains(mixed $domains): void
     {
         $this->domains = $domains;
     }
@@ -179,10 +172,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
         return $this->visuinstitutions;
     }
 
-    /**
-     * @param mixed $visuinstitutions
-     */
-    public function setVisuinstitutions($visuinstitutions)
+    public function setVisuinstitutions(mixed $visuinstitutions): void
     {
         $this->visuinstitutions = $visuinstitutions;
     }
@@ -219,9 +209,9 @@ abstract class AbstractInstitution implements SerializedAccessRights
         return false;
     }
 
-    function __toString()
+    function __toString(): string
     {
-        return $this->getName();
+        return $this->name;
     }
 
     public static function getFormType()

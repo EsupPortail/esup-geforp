@@ -2,7 +2,7 @@
  * Include a inscription table block for a given session
  * Usage : <span registration-label="session"></span>
  */
-sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
+sygeforApp.directive('registrationStatsLabel', ['$compile', function ($compile) {
     return {
         restrict: 'EA',
         terminal: true,
@@ -16,12 +16,12 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
             element.removeAttr("registration-stats-label");
             scope.classes = [];
 
-            if(element[0].tagName == 'A' && !attrs.uiSref) {
+            if (element[0].tagName == 'A' && !attrs.uiSref) {
                 element.attr('ui-sref', 'inscription.table({session: session.id})');
             }
 
-            scope.$watch('session', function(session) {
-               update(session, element, scope);
+            scope.$watch('session', function (session) {
+                update(session, element, scope);
             });
             $compile(element)(scope);
         },
@@ -36,14 +36,14 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
     function update(session, element, scope) {
 
         // remove old classes
-        for(var i=0; i<scope.classes.length; i++) {
+        for (var i = 0; i < scope.classes.length; i++) {
             element.removeClass(scope.classes[i]);
         }
         scope.classes = [];
 
-        if(!moment().isAfter(session.datebegin)) {
+        if (!moment().isAfter(session.datebegin)) {
             // future session
-            if(session.registration) {
+            if (session.registration) {
                 // inscription gérée individuellement
                 scope.label = session.numberofacceptedregistrations + ' / ' + session.maximumnumberofregistrations;
                 scope.tooltip = session.numberofacceptedregistrations + ' acceptés sur ' + session.maximumnumberofregistrations + ' places';
@@ -58,15 +58,15 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function($compile) {
             // past session
             scope.label = session.numberofparticipants;
             scope.tooltip = session.numberofparticipants + ' participants';
-            if(session.numberofregistrations) {
+            if (session.numberofregistrations) {
                 scope.label += ' / ' + session.numberofregistrations;
-                scope.tooltip += ' sur ' +  session.numberofregistrations + ' inscrits';
+                scope.tooltip += ' sur ' + session.numberofregistrations + ' inscrits';
             }
             scope.classes.push('label-transparent');
         }
 
         // apply new classes
-        for(var i=0; i<scope.classes.length; i++) {
+        for (var i = 0; i < scope.classes.length; i++) {
             element.addClass(scope.classes[i]);
         }
     }

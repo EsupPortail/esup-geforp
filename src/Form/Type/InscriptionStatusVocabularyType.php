@@ -11,50 +11,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class InscriptionStatusVocabularyType.
  */
-class InscriptionStatusVocabularyType extends VocabularyType
+final class InscriptionStatusVocabularyType extends VocabularyType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder->add('notify', CheckboxType::class, array('label' => "Pour les gestionnaires : notification de changement de statut", 'required' => false));
-        $builder->add('status', ChoiceType::class, array(
-            'label' => 'Statut élémentaire',
-            'expanded' => true,
-            'multiple' => false,
-            'required' => true,
-            'choices' => array(
-                'Convoqué' => Inscriptionstatus::STATUS_CONVOKED,
-                'Accepté' => Inscriptionstatus::STATUS_ACCEPTED,
-                'En attente' => Inscriptionstatus::STATUS_WAITING,
-                'En attente de traitement' => Inscriptionstatus::STATUS_PENDING,
-                'Rejeté' => Inscriptionstatus::STATUS_REJECTED,
-            ),
-        ));
-        $builder->add('machinename', null, array(
-            'label' => 'Libellé court',
-        ));
+        $formBuilder->add('notify', CheckboxType::class, ['label' => "Pour les gestionnaires : notification de changement de statut", 'required' => false]);
+        $formBuilder->add('status', ChoiceType::class, ['label' => 'Statut élémentaire', 'expanded' => true, 'multiple' => false, 'required' => true, 'choices' => ['Convoqué' => Inscriptionstatus::STATUS_CONVOKED, 'Accepté' => Inscriptionstatus::STATUS_ACCEPTED, 'En attente' => Inscriptionstatus::STATUS_WAITING, 'En attente de traitement' => Inscriptionstatus::STATUS_PENDING, 'Rejeté' => Inscriptionstatus::STATUS_REJECTED]]);
+        $formBuilder->add('machinename', null, ['label' => 'Libellé court']);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return VocabularyType::class;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => Inscriptionstatus::class,
-        ));
+        $optionsResolver->setDefaults(['data_class' => Inscriptionstatus::class]);
     }
 }

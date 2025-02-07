@@ -12,7 +12,8 @@
             {% endif %}
             {% if page > 1 %}
                 <li>
-                    <a href="{{ path(app.request.attributes.get('_route'), {page: page  - 1}) }}" aria-label="Précédent">
+                    <a href="{{ path(app.request.attributes.get('_route'), {page: page  - 1}) }}"
+                       aria-label="Précédent">
                         <span aria-hidden="true">Précédent</span>
                     </a>
                 </li>
@@ -24,7 +25,8 @@
 
             {% for i in page - 1..page + 3 %}
                 {% if i > 0 and i <= nbrPage %}
-                    <li><a class="{{ i == page ? "active" : "" }}" href="{{ path(app.request.attributes.get('_route'), {page: i}) }}">{{ i }}</a></li>
+                    <li><a class="{{ i == page ? "active" : "" }}"
+                           href="{{ path(app.request.attributes.get('_route'), {page: i}) }}">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
 
@@ -38,7 +40,8 @@
 
             {% for i in nbrPage - 4..nbrPage %}
                 {% if i > 5 and i > page + 2 and page + 3 != i %}
-                    <li><a class="{{ i == page ? "active" : "" }}" href="{{ path(app.request.attributes.get('_route'), {page: i}) }}">{{ i }}</a></li>
+                    <li><a class="{{ i == page ? "active" : "" }}"
+                           href="{{ path(app.request.attributes.get('_route'), {page: i}) }}">{{ i }}</a></li>
                 {% endif %}
             {% endfor %}
             {% if page < nbrPage %}

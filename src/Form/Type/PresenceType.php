@@ -23,35 +23,19 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class PresenceType.
  */
-class PresenceType extends AbstractType
+final class PresenceType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-            ->add('morning', ChoiceType::class, array(
-                'label' => "Matin",
-                'required' => false,
-                'choices' => array(
-                    'Absent' => 'Absent',
-                    'Présent' => 'Présent')
-                ))
-            ->add('afternoon', ChoiceType::class, array(
-                'label' => "Après-midi",
-                'required' => false,
-                'choices' => array(
-                    'Absent' => 'Absent',
-                    'Présent' => 'Présent')
-            ));
+        $formBuilder
+            ->add('morning', ChoiceType::class, ['label' => "Matin", 'required' => false, 'choices' => ['Absent' => 'Absent', 'Présent' => 'Présent']])
+            ->add('afternoon', ChoiceType::class, ['label' => "Après-midi", 'required' => false, 'choices' => ['Absent' => 'Absent', 'Présent' => 'Présent']]);
 
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array('data_class' => Presence::class)
+        $optionsResolver->setDefaults(['data_class' => Presence::class]
         );
     }
 }

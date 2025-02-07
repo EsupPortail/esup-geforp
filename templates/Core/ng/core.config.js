@@ -1,13 +1,13 @@
 /**
  * TrainingBundle
  */
-sygeforApp.config(['$listStateProvider', '$tooltipProvider', function($listStateProvider, $tooltipProvider) {
+sygeforApp.config(['$listStateProvider', '$tooltipProvider', function ($listStateProvider, $tooltipProvider) {
 
     // dashboard
     $listStateProvider.state('dashboard', {
         url: "/dashboard",
         templateUrl: "dashboard/dashboard.html",
-        controller: function($scope) {
+        controller: function ($scope) {
             $scope.options = {
                 title: "Inscriptions en attente de traitement",
                 size: 5,

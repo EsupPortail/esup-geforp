@@ -11,14 +11,14 @@ namespace App\BatchOperations\SemesteredTraining;
 use App\BatchOperations\Generic\CSVBatchOperation as BaseCSVBatchOperation;
 use App\Model\SemesteredTraining;
 
-class SemesteredTrainingCSVBatchOperation extends BaseCSVBatchOperation
+final class SemesteredTrainingCSVBatchOperation extends BaseCSVBatchOperation
 {
     /**
      * @param $idList
      *
      * @return App\Model\SemesteredTraining[]
      */
-    protected function getObjectList($idList)
+    protected function getObjectList($idList): array
     {
         return SemesteredTraining::getSemesteredTrainingsByIds($idList, $this->doctrine->getManager());
     }

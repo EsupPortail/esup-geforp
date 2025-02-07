@@ -7,16 +7,13 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class EmailCCRegistryPass implements CompilerPassInterface
 {
-    /**
-     * @param ContainerBuilder $container
-     */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('sygefor_core.registry.email_cc_resolver')) {
             return;
         }
 
-        $resolvers = array();
+        $resolvers = [];
         $definition = $container->getDefinition('sygefor_core.registry.email_cc_resolver');
         foreach ($container->findTaggedServiceIds('sygefor_core.email_resolver') as $serviceId => $tag) {
             $def = $container->getDefinition($serviceId);

@@ -1,7 +1,7 @@
 /**
  * Dialog provider
  */
-sygeforApp.provider('$dialog', [function() {
+sygeforApp.provider('$dialog', [function () {
 
     var profiles = {};
 
@@ -10,14 +10,14 @@ sygeforApp.provider('$dialog', [function() {
      * @param name
      * @param params
      */
-    this.dialog = function(name, params) {
+    this.dialog = function (name, params) {
         profiles[name] = params;
     };
 
     /**
      * this.$get
      */
-    this.$get = function($modal, $dialogParams) {
+    this.$get = function ($modal, $dialogParams) {
         return {
             /**
              * Open a dialog
@@ -26,7 +26,7 @@ sygeforApp.provider('$dialog', [function() {
              * @param params
              * @param options
              */
-            open: function(name, params, options) {
+            open: function (name, params, options) {
                 // get the profil
                 var profile = profiles[name];
                 if (!profile) {

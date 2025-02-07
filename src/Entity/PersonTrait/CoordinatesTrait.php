@@ -45,10 +45,10 @@ trait CoordinatesTrait
 
     /**
      * @var string
-     * @Assert\Email(message="Vous devez renseigner un email valide.")
      * @ORM\Column(name="email", type="string", length=128, nullable=true)
      * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "session", "api.profile", "api.inscription", "api.token"})
      */
+    #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
     protected $email;
 
     /**
@@ -80,10 +80,10 @@ trait CoordinatesTrait
      * @param CoordinatesTrait $entity
      * @param bool             $force  override existing data
      */
-    public function copyCoordinates($entity, $force = true)
+    public function copyCoordinates($entity, $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
-        foreach (array('addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website') as $property) {
+        foreach (['addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website'] as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
             if ($force || ! $thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
@@ -95,7 +95,7 @@ trait CoordinatesTrait
     /*
      * @param boolean $addressType
      */
-    public function setAddresstype($addressType)
+    public function setAddresstype($addressType): void
     {
         $this->addresstype = $addressType;
     }
@@ -111,7 +111,7 @@ trait CoordinatesTrait
     /**
      * @param string $address
      */
-    public function setAddress($address)
+    public function setAddress($address): void
     {
         $this->address = $address;
     }
@@ -127,7 +127,7 @@ trait CoordinatesTrait
     /**
      * @param string $zip
      */
-    public function setZip($zip)
+    public function setZip($zip): void
     {
         $this->zip = $zip;
     }
@@ -143,7 +143,7 @@ trait CoordinatesTrait
     /**
      * @param string $city
      */
-    public function setCity($city)
+    public function setCity($city): void
     {
         $this->city = $city;
     }
@@ -164,10 +164,7 @@ trait CoordinatesTrait
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail($email)
+    public function setEmail(mixed $email): void
     {
         $this->email = $email;
     }
@@ -175,7 +172,7 @@ trait CoordinatesTrait
     /**
      * @param string $phoneNumber
      */
-    public function setPhonenumber($phoneNumber)
+    public function setPhonenumber($phoneNumber): void
     {
         $this->phonenumber = $phoneNumber;
     }
@@ -199,7 +196,7 @@ trait CoordinatesTrait
     /**
      * @param string $faxNumber
      */
-    public function setFaxnumber($faxNumber)
+    public function setFaxnumber($faxNumber): void
     {
         $this->faxnumber = $faxNumber;
     }
@@ -207,7 +204,7 @@ trait CoordinatesTrait
     /**
      * @param string $website
      */
-    public function setWebsite($website)
+    public function setWebsite($website): void
     {
         $this->website = $website;
     }
@@ -223,11 +220,10 @@ trait CoordinatesTrait
     /**
      * Return the full address.
      *
-     * @return string
      */
-    public function getFullAddress()
+    public function getFullAddress(): string
     {
-        $lines = array();
+        $lines = [];
         if ($this->getAddress()) {
             $lines[] = $this->getAddress();
         }

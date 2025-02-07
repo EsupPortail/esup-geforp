@@ -10,10 +10,14 @@
                 </div>
             </div><!-- /row -->
             <ul class="nav nav-tabs">
-                <li><a href="{{ path('front.program.myprogram') }}" title="Accès aux formations de mon établissement" class="button secondary">L'offre de formation de mon établissement</a></li>
-                <li class="active"><a href="{{ path('front.program.search') }}" title="Rechercher une formation" class="button secondary" >Rechercher une formation</a></li>
+                <li><a href="{{ path('front.program.myprogram') }}" title="Accès aux formations de mon établissement"
+                       class="button secondary">L'offre de formation de mon établissement</a></li>
+                <li class="active"><a href="{{ path('front.program.search') }}" title="Rechercher une formation"
+                                      class="button secondary">Rechercher une formation</a></li>
                 {% if multiEtab == true %}
-                <li><a href="{{ path('front.program.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
+                    <li><a href="{{ path('front.program.allprogram') }}"
+                           title="Accès aux formations de tous les établissements et pour tous les publics">Toutes les
+                            formations</a></li>
                 {% endif %}
             </ul>
 
@@ -25,10 +29,11 @@
     <div class="container">
         <section>
             <h1>Résultat(s) de recherche
-                        <a class="col-md-offset-1 btn btn-primary btn-lg" href="{{ path('front.program.search') }}" title="Nouvelle recherche" >
-                            <i class="glyphicon glyphicon-search"></i>
-                            &nbsp;Nouvelle recherche
-                        </a>
+                <a class="col-md-offset-1 btn btn-primary btn-lg" href="{{ path('front.program.search') }}"
+                   title="Nouvelle recherche">
+                    <i class="glyphicon glyphicon-search"></i>
+                    &nbsp;Nouvelle recherche
+                </a>
             </h1>
             <div class="outer-wrap">
                 <div class="inner-wrap">
@@ -38,16 +43,16 @@
                             <div class="row">
                                 <div class="col-xs-12 col-md-9">
                                     {% if search.items is not defined or search.items | length == 0 %}
-                                    <div class="row">
-                                        <div class="col-xs-12">
-                                            <h3 class="no-session">
-                                                Aucune session n'est disponible pour le moment.
-                                            </h3>
+                                        <div class="row">
+                                            <div class="col-xs-12">
+                                                <h3 class="no-session">
+                                                    Aucune session n'est disponible pour le moment.
+                                                </h3>
+                                            </div>
                                         </div>
-                                    </div>
                                     {% else %}
                                         <div class="session session--list">
-{#                                            {{ form_start(form) }}     #}
+                                            {#                                            {{ form_start(form) }}     #}
                                             {% set counter = 0 %}
                                             {% for session in search.items %}
                                                 {% if session.displayOnline == true %}
@@ -56,7 +61,7 @@
                                                     <div class="panel-body">
                                                         {% include 'Front/Public/program/session-list-item.html.twig' %}
                                                     </div>
-                                                {%  endif %}
+                                                {% endif %}
                                                 {% if session.sessionType == 'A venir' %}
                                                     {% set counter = counter + 1 %}
                                                 {% endif %}
@@ -69,7 +74,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary"> Valider les inscriptions aux alertes </button>
+                            <button type="submit" class="btn btn-primary"> Valider les inscriptions aux alertes</button>
                         </div>
                     </div>
                     <div style="display: none">

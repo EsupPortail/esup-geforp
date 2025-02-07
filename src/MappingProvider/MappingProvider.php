@@ -18,36 +18,30 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  *
  * @todo : HANDLE COMPOSITE OR CUSTOM ID CONFIGURATION
  */
-class MappingProvider
+final class MappingProvider
 {
-    /** @var  array mapping elastica mapping */
-    protected $mapping;
+    /**
+     * @var
+     */
+    private array $entities = [];
 
     /**
      * @var
      */
-    private $entities = array();
-
-    /**
-     * @var
-     */
-    private $visitedEntities = array();
-
-    /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    private $container;
+    private array $visitedEntities = [];
 
     /**
      * @param $mapping
-     * @param \Symfony\Component\DependencyInjection\Container $container
      *
      * @internal param $em
+     * @param mixed[] $mapping
      */
-    public function __construct($mapping, Container $container)
+    public function __construct(
+        /** @var  array mapping elastica mapping */
+        protected $mapping,
+        private readonly Container $container
+    )
     {
-        $this->mapping   = $mapping;
-        $this->container = $container;
     }
 
     /**
@@ -58,34 +52,39 @@ class MappingProvider
     public function getMappingByClass($class)
     {
         $class = $this->aliasToClass($class);
-        foreach ($this->mapping as $index => $indexMapping) {
+        foreach ($this->mapping as $indexMapping) {
             foreach ($indexMapping['types'] as $mapElt) {
-                if ( ! empty($mapElt['config']['persistence']) && ($class === $mapElt['config']['persistence']['model'])) {
-                    return $mapElt['mapping']['properties'];
+                if (empty($mapElt['config']['persistence'])) {
+                    continue;
                 }
+                if ($class !== $mapElt['config']['persistence']['model']) {
+                    continue;
+                }
+                return $mapElt['mapping']['properties'];
             }
         }
-
-        return;
     }
 
     /**
      * @param $class
      *
-     * @return int|null|string
      */
-    public function getMappingNameByClass($class)
+    public function getMappingNameByClass($class): int|null|string
     {
         $class = $this->aliasToClass($class);
         foreach ($this->mapping as $index => $indexMapping) {
             foreach ($indexMapping['types'] as $key => $mapElt) {
-                if ( ! empty($mapElt['config']['persistence']) && ($class === $mapElt['config']['persistence']['model'])) {
-                    return array($index, $key);
+                if (empty($mapElt['config']['persistence'])) {
+                    continue;
                 }
+                if ($class !== $mapElt['config']['persistence']['model']) {
+                    continue;
+                }
+                return [$index, $key];
             }
         }
 
-        return;
+        return $this->getMappingNameByClass($class);
     }
 
     /**
@@ -99,18 +98,15 @@ class MappingProvider
         $class = $this->aliasToClass($entityClass);
 
         //if no dots are present in path, checking properties
-        if(strpos($path, '.') <= 0){
+        if(strpos((string) $path, '.') <= 0){
             $tmp = $this->getMappingByClass($class);
 
             return ! empty($tmp[$path]);
         }
-        else {
-            $steps = explode('.', $path);
-            $tmp   = $this->getMappingByClass($class);
-            array_shift($steps);
-
-            return $this->classMappingArrayContainsPath($tmp, $steps);
-        }
+        $steps = explode('.', (string) $path);
+        $tmp   = $this->getMappingByClass($class);
+        array_shift($steps);
+        return $this->classMappingArrayContainsPath($tmp, $steps);
     }
 
     /**
@@ -137,10 +133,11 @@ class MappingProvider
     {
         $str = '';
         foreach ($this->entities as $key => $class) {
-            $str .= $key . ': [' . count($class) . '] ';
+            $str .= $key . ': [' . (is_countable($class) ? count($class) : 0) . '] ';
             foreach ($class as $ent) {
                 $str .= $ent->getId() . ' ';
             }
+
             $str .= "\n";
         }
 
@@ -153,19 +150,18 @@ class MappingProvider
      *
      * @return bool
      */
-    private function classMappingArrayContainsPath($mappingArray, $pathArray)
+    private function classMappingArrayContainsPath($mappingArray, array $pathArray)
     {
         if (empty($mappingArray[$pathArray[0]])) {
             return false;
         }
-        //from now on, we can say an entry exists in mapping for current path.
-        if ( count($pathArray) === 1 ){
-            return true;
-        } else {
-            array_pop($pathArray);
 
-            return $this->classMappingArrayContainsPath($mappingArray[$pathArray[0]]['properties'], $pathArray);
+        //from now on, we can say an entry exists in mapping for current path.
+        if ( (is_countable($pathArray) ? count($pathArray) : 0) === 1 ){
+            return true;
         }
+        array_pop($pathArray);
+        return $this->classMappingArrayContainsPath($mappingArray[$pathArray[0]]['properties'], $pathArray);
     }
 
     /**
@@ -175,7 +171,7 @@ class MappingProvider
      */
     private function aliasToClass($class)
     {
-        if (strpos($class, ':') > 0) {
+        if (strpos((string) $class, ':') > 0) {
             return $this->container->get('doctrine.orm.entity_manager')->getClassMetadata($class)->getName();
         }
 
@@ -189,7 +185,7 @@ class MappingProvider
      * @param bool  $onlyManyToMany
      * @param array $path
      */
-    public function findLinkedEntities($entityClass, $entityProperty, $entityId, $onlyManyToMany = false, $path = array())
+    public function findLinkedEntities($entityClass, $entityProperty, $entityId, $onlyManyToMany = false, $path = []): void
     {
         /** @var ClassMetaData $metadata */
         $metadata                = $this->container->get('doctrine.orm.entity_manager')->getClassMetadata($entityClass);
@@ -197,22 +193,22 @@ class MappingProvider
 
         //@todo hm: filter using input properties :
         // a targetentity whose mapping doesnt include any of the entityproperties has no interest to be inspected
-        foreach ($metadata->associationMappings as $fieldName => $fieldMD) {
+        foreach ($metadata->associationMappings as $fieldMD) {
             //if already visited, we stop
             if ( ! empty($fieldMD['targetEntity']) && ! in_array($fieldMD['targetEntity'], $this->visitedEntities, true)) {
                 //for relations of the type "many to many" OR any relation
                 $tmpArr = $path;
 
                 //getting next entity field that targets current entity
-                $invPath = ( ! empty($fieldMD['inversedBy'])) ? $fieldMD['inversedBy'] : $fieldMD['mappedBy'];
+                $invPath = ( empty($fieldMD['inversedBy'])) ? $fieldMD['mappedBy'] : $fieldMD['inversedBy'];
 
                 if ( ! empty($invPath)) {
-                    array_push($tmpArr, $invPath);
+                    $tmpArr[] = $invPath;
 
                     // we can continue exploration if next entity refers to current entity/field AND
                     if ($this->classMappingContainsPath($fieldMD['targetEntity'], implode('.', $tmpArr))) {
                         $vIds = $this->getConcernedEntities($fieldMD, $entityId);
-                        $this->findLinkedEntities($fieldMD['targetEntity'], array($invPath), $vIds, false, $tmpArr);
+                        $this->findLinkedEntities($fieldMD['targetEntity'], [$invPath], $vIds, false, $tmpArr);
                     }
                 }
             }
@@ -222,31 +218,29 @@ class MappingProvider
     /**
      * @param $entity
      *
-     * @return array
+     * @return array<int, mixed[]>
      *
      * @todo : HANDLE COMPOSITE OR CUSTOM ID CONFIGURATION
      */
-    public function getPostDeletionCommandLines($entity)
+    public function getPostDeletionCommandLines($entity): array
     {
-        $metaData = $this->container->get('doctrine.orm.entity_manager')->getClassMetadata(get_class($entity));
-        $commands = array();
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $metaData = $this->container->get('doctrine.orm.entity_manager')->getClassMetadata($entity::class);
+        $commands = [];
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         foreach($metaData->associationMappings as $fieldName => $fieldMD) {
-            $invPath = ( ! empty($fieldMD['inversedBy']) ) ? $fieldMD['inversedBy']  : $fieldMD['mappedBy'];
+            $invPath = ( empty($fieldMD['inversedBy']) ) ? $fieldMD['mappedBy']  : $fieldMD['inversedBy'];
             if ( ! empty($invPath)) {
-                $value = $accessor->getValue($entity, $fieldName);
+                $value = $propertyAccessor->getValue($entity, $fieldName);
                 if($value) {
-                    if($value instanceof \Traversable) {
+                    if ($value instanceof \Traversable) {
                         foreach($value as $tEntity) {
                             if(method_exists($tEntity, 'getId')) {
-                                $commands[] = array($tEntity->getId(), get_class($tEntity), $invPath);
+                                $commands[] = [$tEntity->getId(), $tEntity::class, $invPath];
                             }
                         }
-                    } else {
-                        if(method_exists($value, 'getId')) {
-                            $commands[] = array($value->getId(), get_class($value), $invPath);
-                        }
+                    } elseif (method_exists($value, 'getId')) {
+                        $commands[] = [$value->getId(), $value::class, $invPath];
                     }
                 }
             }
@@ -259,16 +253,13 @@ class MappingProvider
      * @param $fieldMD
      * @param $id
      *
-     * @return array
      *
      * @todo : HANDLE COMPOSITE OR CUSTOM ID CONFIGURATION
      */
-    private function getConcernedEntities($fieldMD, $id)
+    private function getConcernedEntities(array $fieldMD, $id): array
     {
         $type    = $fieldMD['targetEntity'];
-        $invPath = ( ! empty($fieldMD['inversedBy'])) ? $fieldMD['inversedBy']  : $fieldMD['mappedBy'];
-        /** @var Query $query */
-        $query = null;
+        $invPath = ( empty($fieldMD['inversedBy'])) ? $fieldMD['mappedBy']  : $fieldMD['inversedBy'];
         if ( ! empty($invPath)) {
             $property = $invPath;
             $query    = $this->container->get('doctrine.orm.entity_manager')->getRepository($type)->createQueryBuilder('e')
@@ -285,15 +276,15 @@ class MappingProvider
         }
 
         if (empty($this->entities[$type])) {
-            $this->entities[$type] = array();
+            $this->entities[$type] = [];
         }
 
         $res = $query->getResult();
 
-        $returnedIds = array();
-        foreach ($res as $r) {
-            if (method_exists($r, 'getId')) {
-                $returnedIds [] = $r->getId();
+        $returnedIds = [];
+        foreach ($res as $re) {
+            if (method_exists($re, 'getId')) {
+                $returnedIds [] = $re->getId();
             }
         }
 

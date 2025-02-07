@@ -2,9 +2,11 @@
 
     <div class="block-title">
         <div class="full-width">
-            <a ui-sref="session.table({training: training.id})" class="btn btn-link h4"><span class="fa fa-calendar-o"></span>Sessions</a>
+            <a ui-sref="session.table({training: training.id})" class="btn btn-link h4"><span
+                    class="fa fa-calendar-o"></span>Sessions</a>
             <div class="pull-right">
-                <a ng-if="training._accessRights.edit" class="btn btn-fa btn-sm" href="" tooltip="Ajouter une session" ng-click="addSession()"><span class="fa fa-plus"></span></a>
+                <a ng-if="training._accessRights.edit" class="btn btn-fa btn-sm" href="" tooltip="Ajouter une session"
+                   ng-click="addSession()"><span class="fa fa-plus"></span></a>
                 <span class="badge">{{ training.sessions.length}}</span>
             </div>
         </div>
@@ -14,8 +16,10 @@
             Il n'y a aucune session passée ou à venir.
         </div>
         <ul class="list-unstyled list-padded">
-            <li ng-repeat="session in training.sessions | orderBy:'datebegin':true" ng-class="{past: $moment(session.datebegin) < $moment()}">
-                <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.datebegin | date:'EEEE d MMMM y' }} - {{ session.name }}</a>
+            <li ng-repeat="session in training.sessions | orderBy:'datebegin':true"
+                ng-class="{past: $moment(session.datebegin) < $moment()}">
+                <a ui-sref="session.detail.view({training: training.id, id: session.id})">{{ session.datebegin |
+                    date:'EEEE d MMMM y' }} - {{ session.name }}</a>
 
                 <!-- stats -->
                 &nbsp;&nbsp;

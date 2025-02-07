@@ -78,7 +78,7 @@ trait AccountTrait
     /**
      * {@inheritdoc}
      */
-    public function setUsername($username)
+    public function setUsername($username): void
     {
         $this->email = $username;
     }
@@ -91,10 +91,7 @@ trait AccountTrait
         return $this->salt;
     }
 
-    /**
-     * @param mixed $salt
-     */
-    public function setSalt($salt)
+    public function setSalt(mixed $salt): void
     {
         $this->salt = $salt;
     }
@@ -107,10 +104,7 @@ trait AccountTrait
         return $this->plainPassword;
     }
 
-    /**
-     * @param mixed $plainPassword
-     */
-    public function setPlainPassword($plainPassword)
+    public function setPlainPassword(mixed $plainPassword): void
     {
         $this->plainPassword = $plainPassword;
     }
@@ -123,10 +117,7 @@ trait AccountTrait
         return $this->password;
     }
 
-    /**
-     * @param mixed $password
-     */
-    public function setPassword($password)
+    public function setPassword(mixed $password): void
     {
         $this->password = $password;
     }
@@ -139,10 +130,7 @@ trait AccountTrait
         return $this->isactive;
     }
 
-    /**
-     * @param mixed $isActive
-     */
-    public function setIsactive($isActive)
+    public function setIsactive(mixed $isActive): void
     {
         $this->isactive = $isActive;
     }
@@ -155,10 +143,7 @@ trait AccountTrait
         return $this->shibbolethpersistentid;
     }
 
-    /**
-     * @param mixed $shibbolethPersistentId
-     */
-    public function setShibbolethpersistentid($shibbolethPersistentId)
+    public function setShibbolethpersistentid(mixed $shibbolethPersistentId): void
     {
         $this->shibbolethpersistentid = $shibbolethPersistentId;
     }
@@ -171,10 +156,7 @@ trait AccountTrait
         return $this->data;
     }
 
-    /**
-     * @param mixed $data
-     */
-    public function setData($data)
+    public function setData(mixed $data): void
     {
         $this->data = $data;
     }
@@ -190,7 +172,7 @@ trait AccountTrait
     /**
      * @param bool $sendCredentialsMail
      */
-    public function setSendCredentialsMail($sendCredentialsMail)
+    public function setSendCredentialsMail($sendCredentialsMail): void
     {
         $this->sendCredentialsMail = $sendCredentialsMail;
     }
@@ -203,10 +185,7 @@ trait AccountTrait
         return $this->sendActivationMail;
     }
 
-    /**
-     * @param mixed $sendActivationMail
-     */
-    public function setSendActivationMail($sendActivationMail)
+    public function setSendActivationMail(mixed $sendActivationMail): void
     {
         $this->sendActivationMail = $sendActivationMail;
     }
@@ -214,7 +193,7 @@ trait AccountTrait
     /**
      * {@inheritdoc}
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
 
     }
@@ -222,19 +201,8 @@ trait AccountTrait
     /**
      * @see Symfony\Component\Security\Core\User\AdvancedUserInterface
      *
-     * @return bool
      */
-    public function isAccountNonExpired()
-    {
-        return true;
-    }
-
-    /**
-     * @see Symfony\Component\Security\Core\User\AdvancedUserInterface
-     *
-     * @return bool
-     */
-    public function isAccountNonLocked()
+    public function isAccountNonExpired(): bool
     {
         return true;
     }
@@ -242,9 +210,17 @@ trait AccountTrait
     /**
      * @see Symfony\Component\Security\Core\User\AdvancedUserInterface
      *
-     * @return bool
      */
-    public function isCredentialsNonExpired()
+    public function isAccountNonLocked(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @see Symfony\Component\Security\Core\User\AdvancedUserInterface
+     *
+     */
+    public function isCredentialsNonExpired(): bool
     {
         return true;
     }

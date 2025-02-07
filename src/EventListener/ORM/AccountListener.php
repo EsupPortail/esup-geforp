@@ -15,38 +15,26 @@ use Symfony\Component\DependencyInjection\Container;
  *  - encode and save the password if a new plain password has been set
  *  - generate new password and send credentials to the trainee if the property sendCredentialsEmail has been set to true.
  */
-class AccountListener implements EventSubscriber
+final class AccountListener implements EventSubscriber
 {
-    protected $container;
-
-    /**
-     * @param Container $container
-     */
-    public function __construct(Container $container)
+    public function __construct(protected Container $container)
     {
-        $this->container = $container;
     }
 
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-          Events::prePersist,
-          Events::preUpdate,
-          Events::postPersist,
-          Events::postUpdate,
-        );
+        return [Events::prePersist, Events::preUpdate, Events::postPersist, Events::postUpdate];
     }
 
     /**
      * preProcess
      * Encode the new password.
      */
-    public function preProcess($trainee, $new = false)
+    public function preProcess($trainee, $new = false): void
     {
         if ($trainee instanceof AbstractTrainee && $trainee->getPlainPassword()) {
             $factory = $this->container->get('security.encoder_factory');
@@ -62,13 +50,14 @@ class AccountListener implements EventSubscriber
      * postProcess
      * Send credentials to the trainee
      */
-    public function postProcess($trainee, $new = false)
+    public function postProcess($trainee, $new = false): void
     {
         if (get_parent_class($trainee) == AbstractTrainee::class) {
             // send some mails to the trainee
             if ($trainee->isSendCredentialsMail()) {
                 $this->sendCredentialsMail($trainee, $new);
             }
+
             if ($trainee->getSendActivationMail()) {
                 $this->sendActivationMail($trainee, $new);
             }
@@ -78,47 +67,42 @@ class AccountListener implements EventSubscriber
     /**
      * prePersist.
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $this->preProcess($eventArgs->getEntity(), true);
+        $this->preProcess($lifecycleEventArgs->getEntity(), true);
     }
 
     /**
      * preUpdate.
      */
-    public function preUpdate(LifecycleEventArgs $eventArgs)
+    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $this->preProcess($eventArgs->getEntity(), false);
+        $this->preProcess($lifecycleEventArgs->getEntity(), false);
     }
 
     /**
      * postPersist.
      */
-    public function postPersist(LifecycleEventArgs $eventArgs)
+    public function postPersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $this->postProcess($eventArgs->getEntity(), true);
+        $this->postProcess($lifecycleEventArgs->getEntity(), true);
     }
 
     /**
      * postUpdate.
      */
-    public function postUpdate(LifecycleEventArgs $eventArgs)
+    public function postUpdate(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $this->postProcess($eventArgs->getEntity(), false);
+        $this->postProcess($lifecycleEventArgs->getEntity(), false);
     }
 
     /**
      * sendMail.
      */
-    protected function sendCredentialsMail(AbstractTrainee $trainee, $new)
+    private function sendCredentialsMail(AbstractTrainee $trainee, $new): void
     {
         // prepare the body
-        $parameters = array(
-          'trainee' => $trainee,
-          'password' => $trainee->getPlainPassword(),
-          'new' => $new,
-          'url' => $this->container->getParameter('front_url'),
-        );
+        $parameters = ['trainee' => $trainee, 'password' => $trainee->getPlainPassword(), 'new' => $new, 'url' => $this->container->getParameter('front_url')];
 
         $template = 'welcome.html.twig';
         if ($trainee->getShibbolethPersistentId()) {
@@ -143,28 +127,21 @@ class AccountListener implements EventSubscriber
     /**
      * sendMail.
      */
-    protected function sendActivationMail(AbstractTrainee $trainee, $new)
+    private function sendActivationMail(AbstractTrainee $trainee, $new): void
     {
         $options = $trainee->getSendActivationMail();
 
         // generate token & url
         $token = hash('sha256', $trainee->getId());
-        $params = array(
-          'id' => $trainee->getId(),
-          'token' => $token,
-          'email' => $trainee->getEmail(),
-        );
+        $params = ['id' => $trainee->getId(), 'token' => $token, 'email' => $trainee->getEmail()];
         if (!empty($options['redirect'])) {
             $params['redirect'] = $options['redirect'];
         }
+
         $url = $this->container->get('router')->generate('api.account.activate', $params, true);
 
         // prepare the body
-        $parameters = array(
-          'trainee' => $trainee,
-          'new' => $new,
-          'url' => $url,
-        );
+        $parameters = ['trainee' => $trainee, 'new' => $new, 'url' => $url];
 
         // generate body
         $body = $this->container->get('templating')->render('trainee/activation.html.twig', $parameters);

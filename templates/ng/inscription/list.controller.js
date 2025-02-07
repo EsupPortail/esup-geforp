@@ -1,7 +1,7 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injector', 'BaseListController', 'search', '$state', '$timeout', '$dialog', 'session', 'inscriptionStatusList', 'presenceStatusList', function($scope, $user, $injector, BaseListController, search, $state, $timeout, $dialog, session, inscriptionStatusList, presenceStatusList) {
+sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injector', 'BaseListController', 'search', '$state', '$timeout', '$dialog', 'session', 'inscriptionStatusList', 'presenceStatusList', function ($scope, $user, $injector, BaseListController, search, $state, $timeout, $dialog, session, inscriptionStatusList, presenceStatusList) {
     $injector.invoke(BaseListController, this, {key: 'inscription', $scope: $scope, $search: search});
 
     /**
@@ -25,7 +25,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                                     items: items,
                                     inscriptionstatus: item,
                                     presencestatus: undefined,
-                                    session: ( session ) ? session.id : 0
+                                    session: (session) ? session.id : 0
                                 })
                                 .then(function () {
                                     // on success, reload the search page
@@ -62,7 +62,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                                     items: items,
                                     presencestatus: item,
                                     inscriptionstatus: undefined,
-                                    session: ( session ) ? session.id : 0
+                                    session: (session) ? session.id : 0
                                 })
                                 .then(function () {
                                     // on success, reload the search page
@@ -86,7 +86,10 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
             icon: 'fa-envelope-o',
             label: 'Envoyer un Email',
             execute: function (items, $dialog) {
-                return $dialog.open('batch.email', {items: items, targetClass: 'App\\Entity\\Core\\AbstractInscription'})
+                return $dialog.open('batch.email', {
+                    items: items,
+                    targetClass: 'App\\Entity\\Core\\AbstractInscription'
+                })
             }
         },
         {
@@ -134,7 +137,7 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
     $scope.addOperations = [{
         label: 'Ajouter une inscription',
         execute: function () {
-            $dialog.open('inscription.create',{session: session}).then(function(data) {
+            $dialog.open('inscription.create', {session: session}).then(function (data) {
                 $scope.search.search();
             });
         },
@@ -147,46 +150,46 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
      * Facets
      */
     $scope.facets = {
-        'session.training.organization.name.source' : {
+        'session.training.organization.name.source': {
             label: 'Centre'
         },
-        'inscriptionStatus.name.source' : {
+        'inscriptionStatus.name.source': {
             label: 'Statut inscription'
         },
-        'presenceStatus.name.source' : {
+        'presenceStatus.name.source': {
             label: 'Statut présence'
         },
-        'institution.name.source' : {
+        'institution.name.source': {
             label: 'Etablissement',
             size: 10
         },
-        'trainee.institution.name.source' : {
+        'trainee.institution.name.source': {
             label: 'Etablissement actuel',
             size: 10
         },
-        'publicType.source' : {
+        'publicType.source': {
             label: 'Catégorie de personnel'
         },
-        'trainee.fullName.source' : {
+        'trainee.fullName.source': {
             label: 'Stagiaire'
         },
-        'session.datebegin' : {
+        'session.datebegin': {
             label: 'Date de session',
             type: 'range'
         },
-        'session.year' : {
+        'session.year': {
             label: 'Année de session'
         },
-        'session.semester' : {
+        'session.semester': {
             label: 'Semestre de session'
         },
-        'session.training.typeLabel.source' : {
+        'session.training.typeLabel.source': {
             label: 'Type'
         },
-        'session.training.name.source' : {
+        'session.training.name.source': {
             label: 'Formation'
         },
-        'session.training.theme.name' : {
+        'session.training.theme.name': {
             label: 'Domaine de formation'
         }
     };

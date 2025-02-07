@@ -20,17 +20,20 @@ use Doctrine\ORM\Tools\Pagination\Paginator;
  *
  * @see http://symfony.com/fr/doc/current/cookbook/security/entity_provider.html
  */
-class TraineeSearchRepository extends ServiceEntityRepository
+final class TraineeSearchRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Trainee::class);
+        parent::__construct($managerRegistry, Trainee::class);
     }
 
-    public function getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields)
+    /**
+     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     */
+    public function getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields): array
     {
         // Mise en forme en cas de recherche nom + prénom
-        $tabKey = explode(" ", $keyword, 2);
+        $tabKey = explode(" ", (string) $keyword, 2);
 
         $qb = $this->createQueryBuilder('trainee');
 
@@ -43,7 +46,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 /* addcslashes empêchera des manipulations malveillantes éventuelles */
                 ->setParameter('keyword1', '%' . addcslashes($tabKey[0], '%_') . '%')
                 ->setParameter('keyword2', '%' . addcslashes($tabKey[1], '%_') . '%')
-                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+                ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
         } else {
             $qb
                 ->select(' trainee')
@@ -53,14 +56,14 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 ->orWhere('trainee.lastname LIKE :keyword')
                 ->orWhere('trainee.email LIKE :keyword')
                 /* addcslashes empêchera des manipulations malveillantes éventuelles */
-                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+                ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
         }
 
 
         //FILTRE DATE DE CREATION
         if( isset($filters['createdAt']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["createdAt"]);
+            $dates = explode('-', (string) $filters["createdAt"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -98,6 +101,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
                 ->andWhere('pt.name in (:publictype)')
                 ->setParameter('publictype', $filters['publicType.source']);
         }
+
                 $query = $qb->getQuery();
 
         // TRI DES RESULTATS
@@ -106,14 +110,17 @@ class TraineeSearchRepository extends ServiceEntityRepository
         elseif ((is_array($sort)) && (array_key_exists('title', $sort))) {
             if(!isset($filters['title']))
                 $qb->innerJoin('trainee.title', 'title', 'WITH', 'trainee.title = title');
+
             $qb->addOrderBy('title.name', $sort['title']);
         } elseif ((is_array($sort)) && (array_key_exists('publicType.source', $sort))) {
             if(!isset($filters['publicType.source']))
                 $qb->innerJoin('trainee.publictype', 'pt', 'WITH', 'trainee.publictype = pt');
+
             $qb->addOrderBy('pt.name', $sort['publicType.source']);
         } elseif ((is_array($sort)) && (array_key_exists('institution.name.source', $sort))) {
             if(!isset($filters['institution.name.source']))
                 $qb->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution');
+
             $qb->addOrderBy('institution.name', $sort['institution.name.source']);
         } elseif ((is_array($sort)) && (array_key_exists('createdAt', $sort)))
             $qb->addOrderBy('trainee.createdat', $sort['createdAt']);
@@ -126,6 +133,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
             $page = 1;
             $pageSize = 50;
         }
+
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
@@ -135,7 +143,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabTrainees = array();
+        $tabTrainees = [];
         foreach($paginator as $tr) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainees[]['id'] = $tr->getId();
@@ -144,14 +152,10 @@ class TraineeSearchRepository extends ServiceEntityRepository
             }
         }
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabTrainees);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainees];
     }
 
-    public function getNbTrainees($query_filters, $keyword, $aggs, $name)
+    public function getNbTrainees($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('trainee');
         $qb
@@ -161,7 +165,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
             ->where('trainee.firstname LIKE :keyword')
             ->orWhere('trainee.lastname LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE CIVILITE
         if (isset($aggs['title'])) {
@@ -204,8 +208,7 @@ class TraineeSearchRepository extends ServiceEntityRepository
 
         // On compte le nb de stagiaires en résultat
         $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 }

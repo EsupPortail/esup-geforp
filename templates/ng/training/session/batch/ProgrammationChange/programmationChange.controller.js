@@ -1,8 +1,7 @@
 /**
  * BatchMailingController
  */
-sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config)
-{
+sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config) {
     $scope.service = 'sygefor_mycompany.batch.alert';
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
@@ -51,7 +50,7 @@ sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$mo
         var attTemplates = [];
         if (typeof $scope.attCheckList != 'undefined') {
             angular.forEach($scope.attCheckList, function (tpl) {
-                if (( typeof tpl.selected != 'undefined' ) && tpl.selected) {
+                if ((typeof tpl.selected != 'undefined') && tpl.selected) {
                     attTemplates.push(tpl.id);
                 }
             });
@@ -78,7 +77,7 @@ sygeforApp.controller('ProgrammationChange', ['$scope', '$http', '$window', '$mo
             data['options']['presenceStatus'] = $scope.presenceStatus.id
         }
 
-        $http.post(url, data).success(function() {
+        $http.post(url, data).success(function () {
             $scope.dialog.close();
         });
     };

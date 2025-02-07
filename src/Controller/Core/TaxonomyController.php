@@ -22,10 +22,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\Publiposttemplate;
@@ -43,46 +40,35 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 /**
  * Class TaxonomyController.
  *
- * @Route("/admin/taxonomy")
  */
-class TaxonomyController extends AbstractController
+#[Route(path: '/admin/taxonomy')]final class TaxonomyController extends AbstractController
 {
-    /**
-     * @Route("/", name="taxonomy.index")
-     */
-    public function indexAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry)
+    #[Route(path: '/', name: 'taxonomy.index')]
+    public function index(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->isGranted('VIEW', VocabularyInterface::class)) {
             throw new AccessDeniedException();
         }
 
-        return $this->render('Core/views/Taxonomy/index.html.twig', array(
-            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
-            'organization' => $this->getUser()->getOrganization()
-        ));
+        return $this->render('Core/views/Taxonomy/index.html.twig', ['vocabularies' => $this->getVocabulariesList($vocabularyRegistry), 'organization' => $this->getUser()->getOrganization()]);
     }
 
-    /**
-     * @param AbstractTerm         $term
-     * @param AbstractOrganization $organization
-     *
-     * @Route("/{vocabularyId}/view/{organizationId}", name="taxonomy.view", defaults={"organizationId" = null})
-     * @ParamConverter("organization", class="App\Entity\Core\AbstractOrganization", options={"id" = "organizationId"}, isOptional="true")
-     * @Security("is_granted('VIEW', 'App\\Vocabulary\\VocabularyInterface')")
-     * @throws EntityNotFoundException
-     *
-     * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
-     */
-    public function viewVocabularyAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organization = null)
+
+    #[Route(path: '/{vocabularyId}/view/{organizationId}', name: 'taxonomy.view', defaults: ['organizationId' => null])]
+    public function viewVocabulary(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId, int $id, AbstractOrganization $organization = null): \Symfony\Component\HttpFoundation\Response
     {
+        $organization = $managerRegistry->getRepository(AbstractOrganization::class)->find($id);
+        if (!$organization) {
+            throw new NotFoundHttpException();
+        }
         /** @var AbstractTerm $abstractVocabulary */
-        $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
+        $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
         // for mixed vocabularies
         $canEditNationalTerms = $this->isGranted('VIEW', $abstractVocabulary);
 
         if ($abstractVocabulary->getVocabularyStatus() === VocabularyInterface::VOCABULARY_LOCAL && !$organization) {
-            return $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $this->getUser()->getOrganization()->getId())));
+            return $this->redirectToRoute('taxonomy.view', ['vocabularyId' => $vocabularyId, 'organizationId' => $this->getUser()->getOrganization()->getId()]);
         }
 
         // set organization to abstract vocabulary to check access rights
@@ -93,19 +79,18 @@ class TaxonomyController extends AbstractController
         }
 
         // needed for template organization tabs
-        $organizations = array();
-        if ($abstractVocabulary->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL) {
-            $alterOrganizations = $doctrine->getManager()->getRepository(AbstractOrganization::class)->findAll();
-            $alterAbstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
-            foreach ($alterOrganizations as $alterOrganization) {
-                $alterAbstractVocabulary->setOrganization($alterOrganization);
-                if ($this->isGranted('VIEW', $alterAbstractVocabulary)) {
-                    $organizations[$alterOrganization->getId()] = $alterOrganization;
-                }
+        $organizations = [];
+        $alterOrganizations = $managerRegistry->getManager()->getRepository(AbstractOrganization::class)->findAll();
+        $alterAbstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
+        foreach ($alterOrganizations as $alterOrganization) {
+            $alterAbstractVocabulary->setOrganization($alterOrganization);
+            if ($this->isGranted('VIEW', $alterAbstractVocabulary)) {
+                $organizations[$alterOrganization->getId()] = $alterOrganization;
             }
         }
-        $terms = $this->getRootTerms($doctrine, $abstractVocabulary, $organization);
-        if ($organization) {
+
+        $terms = $this->getRootTerms($managerRegistry, $abstractVocabulary, $organization);
+        if ($organization instanceof \App\Entity\Core\AbstractOrganization) {
             foreach ($terms as $key => $term) {
                 if (!$term->getOrganization()) {
                     unset($terms[$key]);
@@ -113,41 +98,31 @@ class TaxonomyController extends AbstractController
             }
         }
 
-        return $this->render('Core/views/Taxonomy/view.html.twig', array(
-            'organization' => $organization,
-            'organizations' => $organizations,
-            'canEditNationalTerms' => $canEditNationalTerms,
-            'terms' => $terms,
-            'vocabulary' => $abstractVocabulary,
-            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
-            'sortable' => $abstractVocabulary::orderBy() === 'position',
-            'depth' => method_exists($abstractVocabulary, 'getChildren') ? 2 : 1,
-        ));
+        return $this->render('Core/views/Taxonomy/view.html.twig', ['organization' => $organization, 'organizations' => $organizations, 'canEditNationalTerms' => $canEditNationalTerms, 'terms' => $terms, 'vocabulary' => $abstractVocabulary, 'vocabularies' => $this->getVocabulariesList($vocabularyRegistry), 'sortable' => $abstractVocabulary::orderBy() === 'position', 'depth' => method_exists($abstractVocabulary, 'getChildren') ? 2 : 1]);
     }
 
-    /**
-     * @Route("/{vocabularyId}/edit/{id}/{organizationId}", name="taxonomy.edit", defaults={"id" = null, "organizationId" = null})
-     * @Security("is_granted('EDIT', 'App\\Vocabulary\\VocabularyInterface')")
-     */
-    public function editVocabularyTermAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $organizationId, $id = null)
+    #[Route(path: '/{vocabularyId}/edit/{id}/{organizationId}', name: 'taxonomy.edit', defaults: ['id' => null, 'organizationId' => null])]
+    public function editVocabularyTerm(Request $request, ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId, $organizationId, $id = null): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $organization = null;
         if ($organizationId) {
-            $organization = $doctrine->getManager()->getRepository(AbstractOrganization::class)->find($organizationId);
+            $organization = $managerRegistry->getManager()->getRepository(AbstractOrganization::class)->find($organizationId);
         }
+
         $term = null;
-        $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
+        $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
-        $termClass = get_class($abstractVocabulary);
-        $em = $doctrine->getManager();
+
+        $termClass = $abstractVocabulary::class;
+        $objectManager = $managerRegistry->getManager();
 
         // find term
         if ($id) {
-            $term = $em->find($termClass, $id);
+            $term = $objectManager->find($termClass, $id);
         }
 
         // create term if not found
-        if (!$term) {
+        if (!$term instanceof \App\Vocabulary\VocabularyInterface) {
             $term = new $termClass();
             $term->setOrganization($organization);
         }
@@ -168,156 +143,132 @@ class TaxonomyController extends AbstractController
             $form->handleRequest($request);
             if (($form->isSubmitted()) && ($form->isValid())) {
                 $term->setOrganization($organization);
-                $em->persist($term);
-                $em->flush();
+                $objectManager->persist($term);
+                $objectManager->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Le terme a bien été enregistré.');
 
                 $organization_id = null;
-                if ($organization) {
+                if ($organization instanceof \App\Entity\Core\AbstractOrganization) {
                     $organization_id = $organization->getId();
                 }
 
-                return $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $organization_id)));
+                return $this->redirectToRoute('taxonomy.view', ['vocabularyId' => $vocabularyId, 'organizationId' => $organization_id]);
             }
         }
 
-        return $this->render('Core/views/Taxonomy/edit.html.twig', array(
-            'vocabulary' => $abstractVocabulary,
-            'organization' => $organization,
-            'term' => $term,
-            'id' => $id,
-            'form' => $form->createView(),
-            'vocabularies' => $this->getVocabulariesList($doctrine,  $vocRegistry),
-        ));
+        return $this->render('Core/views/Taxonomy/edit.html.twig', ['vocabulary' => $abstractVocabulary, 'organization' => $organization, 'term' => $term, 'id' => $id, 'form' => $form->createView(), 'vocabularies' => $this->getVocabulariesList($vocabularyRegistry)]);
     }
 
-    /**
-     * @Route("/{vocabularyId}/remove/{id}", name="taxonomy.remove")
-     * @Security("is_granted('REMOVE', 'App\\Vocabulary\\VocabularyInterface')")
-     */
-    public function removeAction(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId, $id)
+    #[Route(path: '/{vocabularyId}/remove/{id}', name: 'taxonomy.remove')]
+    public function remove(Request $request, ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId, $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
-        $abstractVocabulary = $vocRegistry->getVocabularyById($vocabularyId);
+        $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
-        $termClass = get_class($abstractVocabulary);
-        $em = $doctrine->getManager();
+
+        $termClass = $abstractVocabulary::class;
+        $objectManager = $managerRegistry->getManager();
 
         // find term
-        $term = $em->find($termClass, $id);
-        if (!$term) {
+        $vocabulary = $objectManager->find($termClass, $id);
+        if (!$vocabulary instanceof \App\Vocabulary\VocabularyInterface) {
             throw new NotFoundHttpException();
         }
 
         // protected term because needed for special system operations
-        if ($term->isLocked()) {
+        if ($vocabulary->isLocked()) {
             throw new AccessDeniedException("This term can't be removed");
         }
 
-        if (!$this->isGranted('REMOVE', $term)) {
+        if (!$this->isGranted('REMOVE', $vocabulary)) {
             throw new AccessDeniedException();
         }
 
         // get term usage
-        $count = $vocRegistry->getTermUsages($em, $term);
+        $count = $vocabularyRegistry->getTermUsages($objectManager, $vocabulary);
 
-        $formB = $this->createFormBuilder(null, array('validation_groups' => array('taxonomy_term_remove')));
-        $constraint = new NotBlank(array('message' => 'Vous devez sélectionner un terme de substitution'));
-        $constraint->addImplicitGroupName('taxonomy_term_remove');
+        $formBuilder = $this->createFormBuilder(null, ['validation_groups' => ['taxonomy_term_remove']]);
+        $notBlank = new NotBlank(['message' => 'Vous devez sélectionner un terme de substitution']);
+        $notBlank->addImplicitGroupName('taxonomy_term_remove');
 
         // build query
-        $queryBuilder = $em->createQueryBuilder('s')
+        $queryBuilder = $objectManager->createQueryBuilder('s')
             ->select('t')
             ->from($termClass, 't')
             ->where('t.id != :id')->setParameter('id', $id)
             ->orderBy('t.'.$abstractVocabulary::orderBy());
-        if ($term->getOrganization()) {
+        if ($vocabulary->getOrganization() instanceof \App\Entity\Back\Organization) {
             $queryBuilder
                 ->andWhere('t.organization = :organization')
-                ->setParameter('organization', $term->getOrganization());
+                ->setParameter('organization', $vocabulary->getOrganization());
         }
+
         $queryBuilder->orWhere('t.organization is null');
 
         //if entities are linked to current
         if ($count > 0) {
             $required = !empty($abstractVocabulary::$replacementRequired);
-            $formB
+            $formBuilder
                 ->add('term', 'entity',
-                    array(
-                        'class' => $termClass,
-                        'expanded' => true,
-                        'label' => 'Terme de substitution',
-                        'required' => $required,
-                        'constraints' => $required ? $constraint : null,
-                        'query_builder' => $queryBuilder,
-                        'empty_value' => $required ? null : '- Aucun -',
-                    )
+                    ['class' => $termClass, 'expanded' => true, 'label' => 'Terme de substitution', 'required' => $required, 'constraints' => $required ? $notBlank : null, 'query_builder' => $queryBuilder, 'empty_value' => $required ? null : '- Aucun -']
                 );
         }
 
         $organization_id = null;
-        if ($term->getOrganization()) {
-            $organization_id = $term->getOrganization()->getId();
+        if ($vocabulary->getOrganization() instanceof \App\Entity\Back\Organization) {
+            $organization_id = $vocabulary->getOrganization()->getId();
         }
 
-        $form = $formB->getForm();
+        $form = $formBuilder->getForm();
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 if ($form->has('term')) {
                     $newTerm = $form->get('term')->getData();
                     if ($newTerm) {
-                        $vocRegistry->replaceTermInUsages(
-                            $em,
-                            $term,
+                        $vocabularyRegistry->replaceTermInUsages(
+                            $objectManager,
+                            $vocabulary,
                             $newTerm);
                     }
                 }
-                $em->remove($term);
-                $em->flush();
+
+                $objectManager->remove($vocabulary);
+                $objectManager->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Le terme a bien été supprimé.');
 
-                return $this->redirect($this->generateUrl('taxonomy.view', array('vocabularyId' => $vocabularyId, 'organizationId' => $organization_id)));
+                return $this->redirectToRoute('taxonomy.view', ['vocabularyId' => $vocabularyId, 'organizationId' => $organization_id]);
             }
         }
 
-        return $this->render('Core/views/Taxonomy/remove.html.twig', array(
-            'vocabulary' => $abstractVocabulary,
-            'organization' => $term->getOrganization(),
-            'organization_id' => $organization_id,
-            'term' => $term,
-            'vocabularies' => $this->getVocabulariesList($doctrine, $vocRegistry),
-            'count' => $count,
-            'form' => $form->createView(),
-        ));
+        return $this->render('Core/views/Taxonomy/remove.html.twig', ['vocabulary' => $abstractVocabulary, 'organization' => $vocabulary->getOrganization(), 'organization_id' => $organization_id, 'term' => $vocabulary, 'vocabularies' => $this->getVocabulariesList($vocabularyRegistry), 'count' => $count, 'form' => $form->createView()]);
     }
 
-    /**
-     * @Route("/{vocabulary}/terms/order", name="taxonomy.terms_order", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Method({"POST"})
-     * @Rest\View
-     */
-    public function termsOrderAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabulary, Request $request)
+    #[Route(path: '/{vocabulary}/terms/order', name: 'taxonomy.terms_order', options: ['expose' => true], defaults: ['_format' => 'json'], methods: 'POST')]
+    public function termsOrder(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabulary, Request $request): void
     {
-        $abstractVocabulary = $$vocRegistry->getVocabularyById($vocabulary);
+        $abstractVocabulary = ${$vocabularyRegistry}->getVocabularyById($vocabulary);
         $abstractVocabulary->setVocabularyId($vocabulary);
-        $termClass = get_class($abstractVocabulary);
 
-        $em = $doctrine->getManager();
-        $repository = $em->getRepository($termClass);
+        $termClass = $abstractVocabulary::class;
+
+        $objectManager = $managerRegistry->getManager();
+        $objectRepository = $objectManager->getRepository($termClass);
         $serialized = $request->get('serialized');
-        $process = function ($objects, $parent = null) use ($em, $repository, &$process) {
+        $process = static function ($objects, $parent = null) use ($objectManager, $objectRepository, &$process) : void {
             $pos = 0;
             foreach ($objects as $object) {
                 /** @var TreeTrait $entity */
-                $entity = $repository->find($object['id']);
+                $entity = $objectRepository->find($object['id']);
                 if (method_exists($entity, 'setParent')) {
                     $entity->setParent($parent);
                 }
+
                 if (method_exists($entity, 'setPosition')) {
                     $entity->setPosition($pos++);
                 }
+
                 //$entity->setParent($parent);
-                $em->persist($entity);
+                $objectManager->persist($entity);
                 if (isset($object['children'])) {
                     $process($object['children'], $entity);
                 }
@@ -325,122 +276,94 @@ class TaxonomyController extends AbstractController
         };
 
         $process($serialized);
-        $em->flush();
+        $objectManager->flush();
     }
 
-    /**
-     * Return the terms for a specified vocabulary, filter by an organization
-     * For tree vocabulary, only root ones.
-     *
-     * @param $vocabulary
-     * @param null $organization
-     * @param null $isAdmin
-     *
-     * @return mixed
-     */
-    private function getRootTerms(ManagerRegistry $doctrine, $vocabulary, $organization, $isAdmin=null)
+    private function getRootTerms(ManagerRegistry $managerRegistry, $vocabulary, null $organization, $isAdmin=null)
     {
-        $class = get_class($vocabulary);
-        $repository = $doctrine->getManager()->getRepository($class);
+        $class = $vocabulary::class;
+        $objectRepository = $managerRegistry->getManager()->getRepository($class);
 
-        if ($repository instanceof NestedTreeRepository) {
-            $qb = $repository->getRootNodesQueryBuilder('position');
+        if ($objectRepository instanceof NestedTreeRepository) {
+            $qb = $objectRepository->getRootNodesQueryBuilder('position');
         } else {
-            $qb = $repository->createQueryBuilder('node');
+            $qb = $objectRepository->createQueryBuilder('node');
             $qb->orderBy('node.'.$vocabulary::orderBy(), 'ASC');
         }
 
-        if ($vocabulary->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL) {
-            if (!$isAdmin) {
-                if ($organization) {
-                    $qb->where('node.organization = :organization')
-                        ->setParameter('organization', $organization)
-                        ->orWhere('node.organization is null');
-                } else {
-                    $qb->where('node.organization is null');
-                }
+        if ($vocabulary->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && !$isAdmin) {
+            if ($organization) {
+                $qb->where('node.organization = :organization')
+                    ->setParameter('organization', $organization)
+                    ->orWhere('node.organization is null');
+            } else {
+                $qb->where('node.organization is null');
             }
         }
 
         return $qb->getQuery()->getResult();
     }
 
-    /**
-     * @return array list of allowed vocabularies, grouped by existing groups
-     */
-    private function getVocabulariesList(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry)
+    private function getVocabulariesList(VocabularyRegistry $vocabularyRegistry): array
     {
-        $vocsGroups = $vocRegistry->getGroups();
+        $vocsGroups = $vocabularyRegistry->getGroups();
         $userOrg = $this->getUser()->getOrganization();
 
         //getting vocabularies list, grouped by vocabularies groups
-        $vocNames = array();
-        foreach ($vocsGroups as $group => $vocs) {
-            foreach ($vocs as $vid => $voc) {
+        $vocNames = [];
+        foreach ($vocsGroups as $vocGroup) {
+            foreach ($vocGroup as $vid => $voc) {
                 if ($voc->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && !empty($userOrg)) {
                     $voc->setOrganization($userOrg);
                 }
+
                 if ($this->isGranted('VIEW', $voc)) {
-                    $label = $vocRegistry->getVocabularyLabel($vid);
+                    $label = $vocabularyRegistry->getVocabularyLabel($vid);
                     $voc->setVocabularyLabel($label);
-                    $vocNames[] = array('id' => $vid, 'vocabulary' => $voc, 'name' => $voc->getVocabularyLabel(), 'scope' => $voc->getVocabularyStatus());
+                    $vocNames[] = ['id' => $vid, 'vocabulary' => $voc, 'name' => $voc->getVocabularyLabel(), 'scope' => $voc->getVocabularyStatus()];
                 }
             }
         }
 
 
         //ordering list
-        usort($vocNames, function ($a, $b) {
-            return $a['vocabulary']->getVocabularyLabel() > $b['vocabulary']->getVocabularyLabel();
-        });
+        usort($vocNames, static fn($a, $b): bool => $a['vocabulary']->getVocabularyLabel() > $b['vocabulary']->getVocabularyLabel());
 
         return $vocNames;
     }
 
-	/**
-	 * @Route(
-	 *     "/download/template/{id}",
-	 *     name="taxonomy.download.template",
-	 *     requirements={"id"="\d+"}
-	 * )
-	 * @Method("GET")
-	 * @Security("is_granted('VIEW', 'Vocabulary\\VocabularyInterface')")
-	 *
-	 * @param Publiposttemplate $template
-	 *
-	 * @return BinaryFileResponse
-	 */
-	public function downloadTemplateAction(Publiposttemplate $template)
+ #[Route(path: '/download/template/{id}', name: 'taxonomy.download.template', requirements: ['id' => '\d+'], methods: 'GET')]
+ public function downloadTemplate(Publiposttemplate $publiposttemplate): \Symfony\Component\HttpFoundation\BinaryFileResponse
 	{
-		$file = $template->getFile();
+		$file = $publiposttemplate->getFile();
 		if (!$file) {
-			throw $this->createNotFoundException("No file found for template \"{$template->getName()}\".");
+			throw $this->createNotFoundException(sprintf('No file found for template "%s".', $publiposttemplate->getName()));
 		}
+        if (!$this->isGranted('VIEW', VocabularyInterface::class)) {
+            // Si l'utilisateur n'a pas la permission, on lance une exception d'accès refusé
+            throw new AccessDeniedException('Vous n\'avez pas les droits nécessaires pour voir ce vocabulaire.');
+        }
 
-		$response = new BinaryFileResponse($file);
-		$response->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $template->getFileName());
+		$binaryFileResponse = new BinaryFileResponse($file);
+		$binaryFileResponse->setContentDisposition(ResponseHeaderBag::DISPOSITION_ATTACHMENT, $publiposttemplate->getFileName());
 
-		return $response;
+		return $binaryFileResponse;
 	}
 
-    /**
-     * @Route("/get_terms/{vocabularyId}", name="taxonomy.get", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View
-     */
-    public function getTermsAction(ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, $vocabularyId)
+    #[Route(path: '/get_terms/{vocabularyId}', name: 'taxonomy.get', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function getTerms(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId)
     {
         /*
          * @var AbstractTerm
          */
-        $vocabulary = $vocRegistry->getVocabularyById($vocabularyId);
+        $vocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         if (!$vocabulary) {
             throw new \InvalidArgumentException('This vocabulary does not exists.');
         }
 
         $userOrg = $this->getUser()->getOrganization();
         $isAdmin = $this->getUser()->isAdmin();
-        $terms = $this->getRootTerms($doctrine, $vocabulary, $userOrg, $isAdmin);
 
-        return $terms;
+        return $this->getRootTerms($managerRegistry, $vocabulary, $userOrg, $isAdmin);
     }
 }

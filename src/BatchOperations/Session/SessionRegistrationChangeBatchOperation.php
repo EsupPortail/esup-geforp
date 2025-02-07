@@ -11,49 +11,47 @@ namespace App\BatchOperations\Session;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractSession;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class InscriptionStatusChangeBatchOperation.
  */
-class SessionRegistrationChangeBatchOperation extends AbstractBatchOperation
+final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperation
 {
-    /** @var ContainerBuilder $container */
-    private $container;
 
     /**
      * @var string
      */
-    protected $targetClass = 'App\Entity\Core\AbstractSession';
+    protected $targetClass = AbstractSession::class;
+    private ManagerRegistry $managerRegistry;
+    private Security $security;
 
-    /**
-     * @param ContainerInterface $container
-     */
-    public function setContainer(ContainerInterface $container)
+    public function __construct(ManagerRegistry $managerRegistry, Security $security)
     {
-        $this->container = $container;
+        $this->managerRegistry = $managerRegistry;
+        $this->security = $security;
     }
 
     /**
-     * @param array $idList
-     * @param array $options
      *
      * @return mixed
      */
-    public function execute(array $idList = array(), array $options = array())
+    public function execute(array $idList = [], array $options = []): mixed
     {
-        $em = $this->container->get('doctrine.orm.entity_manager');
+        $em = $this->managerRegistry->getManager();
         /* @var AbstractInscription[] $inscriptions */
         $sessions     = $this->getObjectList($idList);
         $registration = $options['registration'];
         //changing status
         /** @var AbstractSession $session */
         foreach ($sessions as $session) {
-            if($this->container->get('security.context')->isGranted('EDIT', $session->getTraining())) {
+            if($this->security->isGranted('EDIT', $session->getTraining())) {
                 $session->setRegistration($registration);
             }
         }
+
         $em->flush();
     }
 }

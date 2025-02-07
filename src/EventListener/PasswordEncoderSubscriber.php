@@ -6,24 +6,24 @@ use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface;
 
 /**
  * Class TraineeListener.
  */
-class PasswordEncoderSubscriber implements EventSubscriber
+final class PasswordEncoderSubscriber implements EventSubscriber
 {
     /**
-     * @var EncoderFactoryInterface
+     * @var PasswordHasherFactoryInterface
      */
-    protected $encoderFactory;
+    private PasswordHasherFactoryInterface $encoderFactory;
 
     /**
      * TraineeListener constructor.
      *
-     * @param EncoderFactoryInterface $encoderFactory
+     * @param PasswordHasherFactoryInterface $encoderFactory
      */
-    public function __construct(EncoderFactoryInterface $encoderFactory)
+    public function __construct(PasswordHasherFactoryInterface $encoderFactory)
     {
         $this->encoderFactory = $encoderFactory;
     }
@@ -31,39 +31,29 @@ class PasswordEncoderSubscriber implements EventSubscriber
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::prePersist,
-            Events::preUpdate,
-        );
+        return [Events::prePersist, Events::preUpdate];
     }
 
-    /**
-     * @param LifecycleEventArgs $eventArgs
-     */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $this->preUpdate($eventArgs);
+        $this->preUpdate($lifecycleEventArgs);
     }
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function preUpdate(LifecycleEventArgs $args)
+    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $user = $args->getObject();
-        if (!($user instanceof UserInterface)) {
+        $object = $lifecycleEventArgs->getObject();
+        if (!($object instanceof UserInterface)) {
             return;
         }
 
-        $plainPassword = $user->getPlainPassword();
+        $plainPassword = $object->getPlainPassword();
         if (!empty($plainPassword)) {
-            $encoder = $this->encoderFactory->getEncoder($user);
-            $user->setPassword($encoder->encodePassword($plainPassword, $user->getSalt()));
-            $user->eraseCredentials();
+            $encoder = $this->encoderFactory->getEncoder($object);
+            $object->setPassword($encoder->encodePassword($plainPassword, $object->getSalt()));
+            $object->eraseCredentials();
         }
     }
 }

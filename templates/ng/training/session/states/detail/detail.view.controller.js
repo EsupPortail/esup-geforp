@@ -1,8 +1,7 @@
 /**
  * SessionDetailViewController
  */
-sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$dialog', '$trainingBundle', '$user', '$state', '$window','search', 'data', function($scope, $taxonomy, $dialog, $trainingBundle, $user, $state, $window, search, data)
-{
+sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$dialog', '$trainingBundle', '$user', '$state', '$window', 'search', 'data', function ($scope, $taxonomy, $dialog, $trainingBundle, $user, $state, $window, search, data) {
     $scope.session = data.session;
     $scope.front_url = data.front_url;
     $scope.$trainingBundle = $trainingBundle;
@@ -24,9 +23,9 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
     /**
      * @param data
      */
-    $scope.onSuccess = function(data) {
+    $scope.onSuccess = function (data) {
         $scope.session = data.session;
-	    $scope.updateActiveItem($scope.session);
+        $scope.updateActiveItem($scope.session);
     };
 
     /**
@@ -40,25 +39,25 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
     /**
      * Get nbr of email from entityEmails controller
      */
-    $scope.$on('nbrEmails', function(event, value) {
-        $scope.session.messages = { length: value };
+    $scope.$on('nbrEmails', function (event, value) {
+        $scope.session.messages = {length: value};
     });
 
     /**
      * delete
      */
-    $scope.delete = function (){
-        $dialog.open('session.delete', {session: $scope.session}).then(function() {
-            $state.go('session.table', {training: $scope.session.training.id}, {reload:true});
+    $scope.delete = function () {
+        $dialog.open('session.delete', {session: $scope.session}).then(function () {
+            $state.go('session.table', {training: $scope.session.training.id}, {reload: true});
         });
     };
 
     /**
      * duplicate
      */
-    $scope.duplicate = function() {
-        $dialog.open('session.duplicate', {session: $scope.session}).then(function(result){
-            $state.go('session.detail.view', {id: result.id}, {reload:true});
+    $scope.duplicate = function () {
+        $dialog.open('session.duplicate', {session: $scope.session}).then(function (result) {
+            $state.go('session.detail.view', {id: result.id}, {reload: true});
         });
     };
 
@@ -67,7 +66,7 @@ sygeforApp.controller('SessionDetailViewController', ['$scope', '$taxonomy', '$d
      */
     $scope.sendAlerts = function () {
         var items = [];
-        for (var i=0; i < $scope.session.alerts.length; i++) {
+        for (var i = 0; i < $scope.session.alerts.length; i++) {
             items.push($scope.session.alerts[i].id);
         }
 

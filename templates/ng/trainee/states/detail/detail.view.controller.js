@@ -1,12 +1,12 @@
-sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function($scope, $taxonomy, $dialog, $http, $window, $user, $state, search, data) {
+sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function ($scope, $taxonomy, $dialog, $http, $window, $user, $state, search, data) {
     $scope.trainee = data.trainee;
     $scope.form = data.form ? data.form : false;
     $scope.$moment = moment;
     $scope.$user = $user;
 
-    $scope.onSuccess = function(data) {
-	    $scope.trainee = data.trainee;
-	    $scope.updateActiveItem($scope.trainee);
+    $scope.onSuccess = function (data) {
+        $scope.trainee = data.trainee;
+        $scope.updateActiveItem($scope.trainee);
     };
 
     /**
@@ -20,8 +20,8 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
     /**
      * Get nbr of email from entityEmails controller
      */
-    $scope.$on('nbrEmails', function(event, value) {
-       $scope.trainee.messages = { length: value };
+    $scope.$on('nbrEmails', function (event, value) {
+        $scope.trainee.messages = {length: value};
     });
 
     /**
@@ -31,7 +31,7 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
         $dialog.open('trainee.toggleActivation', {trainee: $scope.trainee}).then(function (data) {
             $scope.trainee = data.trainee;
 
-            angular.forEach($scope.search.result.items, function(result) {
+            angular.forEach($scope.search.result.items, function (result) {
                 if ($scope.trainee.id == result.id) {
                     result.isactive = $scope.trainee.isactive;
                     result.class = $scope.trainee.isactive ? '' : 'alert-danger';
@@ -44,8 +44,8 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
      * Delete the trainee
      */
     $scope.delete = function () {
-        $dialog.open('trainee.delete', {trainee: $scope.trainee}).then(function (){
-            $state.go('trainee.table', null, { reload:true });
+        $dialog.open('trainee.delete', {trainee: $scope.trainee}).then(function () {
+            $state.go('trainee.table', null, {reload: true});
         });
     };
 

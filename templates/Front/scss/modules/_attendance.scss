@@ -1,5 +1,5 @@
 .attendances {
-  i, span ~label {
+  i, span ~ label {
     line-height: 22px;
   }
 
@@ -8,7 +8,7 @@
   }
 
   blockquote small:before {
-    content : none !important;
+    content: none !important;
   }
 
   .glyphicon.glyphicon-star {

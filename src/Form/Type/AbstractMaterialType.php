@@ -19,19 +19,13 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AbstractMaterialType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-                'data_class' => Material::class,
-                'csrf_protection' => false)
+        $optionsResolver->setDefaults(['data_class' => Material::class, 'csrf_protection' => false]
         );
     }
 

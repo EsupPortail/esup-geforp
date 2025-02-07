@@ -13,21 +13,19 @@ use Gedmo\Mapping\Annotation as Gedmo;
 trait TimestampableTrait
 {
     /**
-     * @var \DateTime
-     * @Gedmo\Timestampable(on="create")
-     * @ORM\Column(name="created_at", type="datetime")
+     * @var \DateTimeInterface
+     *
      */
     #[Gedmo\Timestampable(on: 'create')]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     protected $createdat;
 
     /**
-     * @var \DateTime
-     * @Gedmo\Timestampable(on="update")
-     * @ORM\Column(name="updated_at", type="datetime")
+     * @var \DateTimeInterface
+     *
      */
     #[Gedmo\Timestampable(on: 'update')]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(name: 'updated_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     protected $updatedat;
 
     /**

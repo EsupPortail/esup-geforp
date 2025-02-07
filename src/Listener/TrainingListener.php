@@ -3,6 +3,7 @@
 namespace App\Listener;
 
 use App\Entity\Back\Internship;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\Common\EventSubscriber;
 //use Doctrine\ORM\Event\LifecycleEventArgs;
 //use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
@@ -15,36 +16,33 @@ use App\Entity\Core\AbstractTraining;
  * Populate the Training discriminator map
  * + auto-increment local number.
  */
-class TrainingListener implements EventSubscriber
+#[AsDoctrineListener(event: Events::loadClassMetadata)]
+#[AsDoctrineListener(event: Events::prePersist)]final class TrainingListener implements EventSubscriber
 {
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::loadClassMetadata,
-            Events::prePersist,
-        );
+        return [Events::loadClassMetadata, Events::prePersist];
     }
 
     /**
      * Populate the Training discriminator map.
      *
-     * @param LoadClassMetadataEventArgs $eventArgs The event arguments
+     * @param LoadClassMetadataEventArgs $loadClassMetadataEventArgs The event arguments
      */
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $loadClassMetadataEventArgs): void
     {
-        $classMetadata = $eventArgs->getClassMetadata();
+        $classMetadata = $loadClassMetadataEventArgs->getClassMetadata();
         if (null === $classMetadata->reflClass) {
             return;
         }
 
-        if($classMetadata->getName() === 'App\Entity\Core\AbstractTraining') {
+        if($classMetadata->getName() === \App\Entity\Core\AbstractTraining::class) {
             // fill the discriminator map with types from the registry
-            $map = array();
+            $map = [];
 
                 $map['internship'] = Internship::class;
 
@@ -55,13 +53,13 @@ class TrainingListener implements EventSubscriber
     /**
      * Increment the local training number.
      *
-     * @param LifecycleEventArgs $eventArgs The event arguments
+     * @param LifecycleEventArgs $lifecycleEventArgs The event arguments
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $training = $eventArgs->getEntity();
+        $training = $lifecycleEventArgs->getEntity();
         if($training instanceof AbstractTraining && ! $training->getNumber()) {
-            $em    = $eventArgs->getEntityManager();
+            $em    = $lifecycleEventArgs->getEntityManager();
             $query = $em->createQuery("SELECT MAX(t.number) FROM App\Entity\Core\AbstractTraining t WHERE t.organization = :organization")
               ->setParameter('organization', $training->getOrganization());
             $max = (int) $query->getSingleScalarResult();

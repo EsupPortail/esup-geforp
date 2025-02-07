@@ -14,7 +14,7 @@ sygeforApp.controller('PresenceEditController', ['$scope', '$modalInstance', '$d
      * @param presence
      */
     $scope.editPresence = function (presence) {
-        $dialog.open('presence.edit', {presence: presence}).then(function (data){
+        $dialog.open('presence.edit', {presence: presence}).then(function (data) {
             presence = data.presence;
         });
     };

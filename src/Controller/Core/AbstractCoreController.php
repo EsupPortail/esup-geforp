@@ -5,7 +5,8 @@ namespace App\Controller\Core;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
 use FOS\RestBundle\Context\Context;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractTraining;
 use App\Entity\Back\Organization;
 use App\Form\Type\OrganizationType;
@@ -13,28 +14,26 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use JMS\SecurityExtraBundle\Annotation\Secure;
 
 abstract class AbstractCoreController extends AbstractController
 {
-    /**
-     * @Route("/", name="core.index")
-     * @Template("Core/index.html.twig")
-     */
-    public function indexAction()
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
-        return array();
+    }
+
+    #[Route(path: '/', name: 'core.index')]
+    public function index(): Response
+    {
+        return $this->render('core/index.html.twig');
     }
 
     /**
-     * @Route("/search", name="core.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerEnableMaxDepthChecks=true)
      *
      * @todo : blaise, security
      */
-    public function searchAction(Request $request)
+    #[Route(path: '/search', name: 'core.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(Request $request)
     {
         $search = $this->get('sygefor.search');
         $search->handleRequest($request);
@@ -43,17 +42,17 @@ abstract class AbstractCoreController extends AbstractController
     }
 
     /**
-     * @Route("/entity", name="core.entity", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerEnableMaxDepthChecks=true)
      */
-    public function entityAction(Request $request)
+    #[Route(path: '/entity', name: 'core.entity', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function entity(Request $request): View
     {
         // retrieve the entity
-        $em = $this->getDoctrine()->getManager();
+        $objectManager = $this->managerRegistry->getManager();
         $class = $request->get('class');
         $id = $request->get('id');
-        $entity = $em->getRepository($class)->find($id);
-        if (!$entity) {
+        $entity = $objectManager->getRepository($class)->find($id);
+        if ($entity === null) {
             throw new NotFoundHttpException();
         }
 
@@ -64,18 +63,20 @@ abstract class AbstractCoreController extends AbstractController
         }*/
 
         // determine the serialization groups
-        $groups = array('Default');
+        $groups = ['Default'];
         if ($entity instanceof AbstractTraining) {
             $groups[] = 'training';
         }
-        $reflect = new \ReflectionClass($entity);
-        $groups[] = strtolower($reflect->getShortName());
+
+        $reflectionClass = new \ReflectionClass($entity);
+        $groups[] = strtolower($reflectionClass->getShortName());
 
         // return the view
         $view = new View($entity);
 //        $view->setSerializationContext(SerializationContext::create()->setGroups($groups));
         $context = new Context();
         $context->setGroups($groups);
+
         $view->setContext($context);
 
 

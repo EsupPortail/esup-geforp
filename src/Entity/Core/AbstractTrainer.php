@@ -18,12 +18,12 @@ use Symfony\Component\Validator\Mapping\ClassMetadata;
 /**
  * Trainer.
  *
- * @ORM\Table(name="trainer")
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @UniqueEntity(fields={"email", "organization"}, message="Cette adresse email est déjà utilisée.", ignoreNull=true, groups={"Default", "trainer"})
  */
+#[ORM\Table(name: 'trainer')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[UniqueEntity(fields: ['email', 'organization'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainer'])]
 abstract class AbstractTrainer implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
@@ -34,72 +34,65 @@ abstract class AbstractTrainer implements SerializedAccessRights
     use ProfessionalSituationTrait;
 
     /**
-     * @var int id
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "trainer", "session", "api.training"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="AbstractOrganization")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"trainer"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
+    #[ORM\JoinColumn]
     protected $organization;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="AbstractParticipation", mappedBy="trainer", cascade={"remove"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractParticipation>
      * @Serializer\Exclude
      */
-    protected $participations;
+    #[ORM\OneToMany(targetEntity: 'AbstractParticipation', mappedBy: 'trainer', cascade: ['remove'])]
+    protected \Doctrine\Common\Collections\Collection $participations;
 
     /**
-     * @var Trainertype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Trainertype")
-     * @ORM\JoinColumn(name="trainer_type_id", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $trainertype;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Trainertype::class)]
+    #[ORM\JoinColumn(name: 'trainer_type_id')]
+    protected ?\App\Entity\Term\Trainertype $trainertype = null;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_archived", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $isarchived;
+    #[ORM\Column(name: 'is_archived', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $isarchived = null;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_allow_send_mail", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer", "api.training", "api.trainer"})
      */
-    protected $isallowsendmail = false;
+    #[ORM\Column(name: 'is_allow_send_mail', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $isallowsendmail = false;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_organization", type="boolean", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $isorganization;
+    #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $isorganization = null;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_public", type="boolean")
      * @Serializer\Groups({"trainer"})
      */
-    protected $ispublic;
+    #[ORM\Column(name: 'is_public', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    protected ?bool $ispublic = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="comments", type="text", nullable=true)
      * @Serializer\Groups({"trainer"})
      */
-    protected $comments;
+    #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $comments = null;
 
     public function __construct()
     {
@@ -109,7 +102,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * Remove properties related to another organization, except excluded ones.
      */
-    public function changePropertiesOrganization()
+    public function changePropertiesOrganization(): void
     {
     }
 
@@ -132,7 +125,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param AbstractOrganization
      */
-    public function setOrganization($organization)
+    public function setOrganization($organization): void
     {
         $this->organization = $organization;
     }
@@ -148,7 +141,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param ArrayCollection $participations
      */
-    public function setParticipations($participations)
+    public function setParticipations($participations): void
     {
         $this->participations = $participations;
     }
@@ -162,7 +155,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     public function getSessions()
     {
         $sessions = new ArrayCollection();
-        foreach ($this->getParticipations() as $participation) {
+        foreach ($this->participations as $participation) {
             $sessions->add($participation->getSession());
         }
 
@@ -180,7 +173,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param Trainertype $trainerType
      */
-    public function setTrainertype($trainerType)
+    public function setTrainertype($trainerType): void
     {
         $this->trainertype = $trainerType;
     }
@@ -196,7 +189,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isArchived
      */
-    public function setIsarchived($isArchived)
+    public function setIsarchived($isArchived): void
     {
         $this->isarchived = $isArchived;
     }
@@ -212,7 +205,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isAllowSendMail
      */
-    public function setIsallowsendmail($isAllowSendMail)
+    public function setIsallowsendmail($isAllowSendMail): void
     {
         $this->isallowsendmail = $isAllowSendMail;
     }
@@ -228,7 +221,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isOrganization
      */
-    public function setIsorganization($isOrganization)
+    public function setIsorganization($isOrganization): void
     {
         $this->isorganization = $isOrganization;
     }
@@ -244,7 +237,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isPublic
      */
-    public function setIspublic($isPublic)
+    public function setIspublic($isPublic): void
     {
         $this->ispublic = $isPublic;
     }
@@ -260,7 +253,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param string $comments
      */
-    public function setComments($comments)
+    public function setComments($comments): void
     {
         $this->comments = $comments;
     }
@@ -276,23 +269,14 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * loadValidatorMetadata.
      *
-     * @param ClassMetadata $metadata
      */
-    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    public static function loadValidatorMetadata(ClassMetadata $classMetadata): void
     {
         // PersonTrait
-        $metadata->addPropertyConstraint('title', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner une civilité.',
-        )));
-        $metadata->addPropertyConstraint('firstname', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner un prénom.',
-        )));
-        $metadata->addPropertyConstraint('lastname', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner un nom de famille.',
-        )));
-        $metadata->addPropertyConstraint('email', new Assert\NotBlank(array(
-            'message' => 'Vous devez renseigner un email.',
-        )));
+        $classMetadata->addPropertyConstraint('title', new Assert\NotBlank(['message' => 'Vous devez renseigner une civilité.']));
+        $classMetadata->addPropertyConstraint('firstname', new Assert\NotBlank(['message' => 'Vous devez renseigner un prénom.']));
+        $classMetadata->addPropertyConstraint('lastname', new Assert\NotBlank(['message' => 'Vous devez renseigner un nom de famille.']));
+        $classMetadata->addPropertyConstraint('email', new Assert\NotBlank(['message' => 'Vous devez renseigner un email.']));
 
     }
 

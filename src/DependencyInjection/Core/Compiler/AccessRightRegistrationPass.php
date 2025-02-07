@@ -19,7 +19,6 @@ class AccessRightRegistrationPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -37,7 +36,7 @@ class AccessRightRegistrationPass implements CompilerPassInterface
                     throw new \InvalidArgumentException(sprintf('Access Right Registration : %s must implement AccessRightInterface', $class));
                 }
                 $definition->addMethodCall(
-                    'addAccessRight', array($id, new Reference($id), isset($attributes['group']) ? $attributes['group'] : 'Misc')
+                    'addAccessRight', [$id, new Reference($id), $attributes['group'] ?? 'Misc']
                 );
             }
         }
@@ -46,11 +45,9 @@ class AccessRightRegistrationPass implements CompilerPassInterface
     /**
      * Returns whether the class implements AccessRightProviderInterface.
      *
-     * @param string $class
      *
-     * @return bool
      */
-    private function isAccessRightImplementation($class)
+    private function isAccessRightImplementation(string $class): bool
     {
         $refl = new \ReflectionClass($class);
 

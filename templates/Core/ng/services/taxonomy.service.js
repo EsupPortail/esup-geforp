@@ -7,13 +7,13 @@
 /**
  * CoreBundle Provider
  */
-sygeforApp.provider('$taxonomy', [function() {
+sygeforApp.provider('$taxonomy', [function () {
 
     /**
      *
      * @returns {}
      */
-    this.$get = function($http) {
+    this.$get = function ($http) {
 
         return {
             /**
@@ -23,7 +23,7 @@ sygeforApp.provider('$taxonomy', [function() {
              */
             getTerms: function (vocabulary) {
                 var url = Routing.generate('taxonomy.get', {vocabularyId: vocabulary});
-                return $http({ cache: true, url: url, method: 'GET'}).then(function (result) {
+                return $http({cache: true, url: url, method: 'GET'}).then(function (result) {
                     return result.data;
                 });
             },
@@ -35,7 +35,7 @@ sygeforApp.provider('$taxonomy', [function() {
              */
             getIndexedTerms: function (vocabulary) {
                 var url = Routing.generate('taxonomy.get', {vocabularyId: vocabulary});
-                return $http({ cache: true, url: url, method: 'GET'}).then(function (result) {
+                return $http({cache: true, url: url, method: 'GET'}).then(function (result) {
                     var terms = {};
                     angular.forEach(result.data, function (term) {
                         terms[term.id] = term;

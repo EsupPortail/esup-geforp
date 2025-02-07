@@ -4,20 +4,14 @@ namespace App\Controller\Back;
 
 use App\Entity\Back\Institution;
 use App\Controller\Core\AbstractInstitutionController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormError;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Routing\Attribute\Route;
 
 
 
-/**
- * @Route("/institution")
- */
-class InstitutionController extends AbstractInstitutionController
+
+
+#[Route("/institution")]
+final class InstitutionController extends AbstractInstitutionController
 {
-    protected $institutionClass = Institution::class;
+    protected string $institutionClass = Institution::class;
 }

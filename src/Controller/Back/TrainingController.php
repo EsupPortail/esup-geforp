@@ -6,27 +6,30 @@ namespace App\Controller\Back;
 use App\Entity\Back\Session;
 use App\Controller\Core\AbstractTrainingController;
 use App\Entity\Core\AbstractTraining;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\Finder\Exception\AccessDeniedException;
-use Symfony\Component\HttpFoundation\Request;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 
-/**
- * @Route("/training")
- */
-class TrainingController extends AbstractTrainingController
+
+#[Route(path: '/training')]final class TrainingController extends AbstractTrainingController
 {
     protected $sessionClass = Session::class;
 
+    private readonly ManagerRegistry $managerRegistry;
+
+    public function __construct(ManagerRegistry $managerRegistry)
+    {
+        parent::__construct($managerRegistry);
+        $this->managerRegistry = $managerRegistry;
+    }
+
 
     /**
-     * @param AbstractTraining $dest
-     * @param AbstractTraining $source
-     */
-    protected function mergeArrayCollectionsAndFlush($dest, $source)
+ * @param AbstractTraining $dest
+ * @param AbstractTraining $source
+ */
+    protected function mergeArrayCollectionsAndFlush($dest, $source): void
     {
-        $em = $this->getDoctrine()->getManager();
+        $objectManager = $this->managerRegistry->getManager();
 
         // clone common arrayCollections
         if (method_exists($source, 'getTags')) {
@@ -36,13 +39,13 @@ class TrainingController extends AbstractTrainingController
         // clone duplicate materials
         $tmpMaterials = $source->getMaterials();
         if (!empty($tmpMaterials)) {
-            foreach ($tmpMaterials as $material) {
-                $newMat = clone $material;
+            foreach ($tmpMaterials as $tmpMaterial) {
+                $newMat = clone $tmpMaterial;
                 $dest->addMaterial($newMat);
             }
         }
 
-        $em->persist($dest);
-        $em->flush();
+        $objectManager->persist($dest);
+        $objectManager->flush();
     }
 }

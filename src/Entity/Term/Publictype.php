@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: erwan
- * Date: 5/25/16
- * Time: 10:14 AM.
- */
 namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -14,59 +7,51 @@ use App\Entity\Term\VocabularyInterface;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\PublictypeVocabularyType;
 
-
 /**
  * Type de personnel.
- *
- * @ORM\Table(name="publictype")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'publictype')]
+#[ORM\Entity]
 class Publictype extends AbstractTerm implements VocabularyInterface
 {
     /**
-     * @var int
-     * @ORM\Column(name="machine_name", type="string", length=255)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $machinename;
+    #[ORM\Column(name: 'machine_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected $machinename = null;
 
     /**
-     * @param int $machinename
+     * @param string $machinename
      */
-    public function setMachinename($machinename)
+    public function setMachinename($machinename): void
     {
         $this->machinename = $machinename;
     }
 
     /**
-     * @return int
+     * @return string
      */
     public function getMachinename()
     {
         return $this->machinename;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Type de personnel';
     }
 
     /**
      * returns the form type name for template edition.
-     *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return PublictypeVocabularyType::class;
     }
-
 }
+

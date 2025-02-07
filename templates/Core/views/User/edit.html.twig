@@ -10,7 +10,7 @@
     {% if form.organization is defined %}
         {{ form_row(form.organization) }}
     {% endif %}
-    {%  if curUserAdmin == true %}
+    {% if curUserAdmin == true %}
         {{ form_row(form.isAdmin) }}
     {% endif %}
 
@@ -18,9 +18,11 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit" class="btn btn-primary">Enregistrer</button>
             {% if user.id and isAdmin == false %}
-                <a href="{{ path('user.remove', { 'id': user.id }) }}" class="btn btn-default btn-sm btn-danger pull-right"><i class="fa fa-times-circle"></i> Supprimer</a>
+                <a href="{{ path('user.remove', { 'id': user.id }) }}"
+                   class="btn btn-default btn-sm btn-danger pull-right"><i class="fa fa-times-circle"></i> Supprimer</a>
             {% elseif user.id and isAdmin %}
-                <a href="#" title="L'utilisateur est un administrateur et ne peut pas être supprimé" class="btn btn-default btn-sm pull-right"><i class="fa fa-times-circle"></i> Supprimer</a>
+                <a href="#" title="L'utilisateur est un administrateur et ne peut pas être supprimé"
+                   class="btn btn-default btn-sm pull-right"><i class="fa fa-times-circle"></i> Supprimer</a>
             {% endif %}
         </div>
     </div>

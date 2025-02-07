@@ -1,8 +1,7 @@
 /**
  * BatchPublipostController
  */
-sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window','$modalInstance', '$timeout', '$dialogParams', 'config', function($scope, $http, $window, $modalInstance, $timeout, $dialogParams, config)
-{
+sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window', '$modalInstance', '$timeout', '$dialogParams', 'config', function ($scope, $http, $window, $modalInstance, $timeout, $dialogParams, config) {
     var service = 'sygefor_core.batch.publipost.' + $dialogParams.service;
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
@@ -25,12 +24,12 @@ sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window',
      */
     $scope.ok = function () {
 
-        if(!($scope.options.template || $scope.options.templateFile)) {
-            $scope.chooseError = 'Pas de modèle sélectionné' ;
+        if (!($scope.options.template || $scope.options.templateFile)) {
+            $scope.chooseError = 'Pas de modèle sélectionné';
             return;
         }
 
-        $scope.chooseError = '' ;
+        $scope.chooseError = '';
         var url = Routing.generate('sygefor_core.batch_operation.execute', {id: service});
         var data = {
             options: {
@@ -42,7 +41,8 @@ sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window',
         };
 
         $http(
-            {method: 'POST',
+            {
+                method: 'POST',
                 url: url,
                 transformRequest: function (data) {
                     var formData = new FormData();
@@ -64,14 +64,19 @@ sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window',
                 if (data.fileUrl) {
 
                     var fn = '';
-                    if ($scope.options.templateFile != '' ) {
+                    if ($scope.options.templateFile != '') {
                         fn = $scope.options.templateFile.name;
                     }
-                    if (!fn && $scope.options.template != '' ){
+                    if (!fn && $scope.options.template != '') {
                         fn = $scope.options.template.fileName;
                     }
 
-                    var url = Routing.generate('sygefor_core.batch_operation.get_file', {service: service, filename: fn, file: data.fileUrl, pdf: $scope.options.sendPdf });
+                    var url = Routing.generate('sygefor_core.batch_operation.get_file', {
+                        service: service,
+                        filename: fn,
+                        file: data.fileUrl,
+                        pdf: $scope.options.sendPdf
+                    });
                     // changin location :
                     $window.location = url;
                 }
@@ -83,8 +88,8 @@ sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window',
     /**
      * watches file upload model, and updates the form accordingly
      */
-    $scope.fileChanged = function(element, $scope) {
-        $scope.$apply(function(scope) {
+    $scope.fileChanged = function (element, $scope) {
+        $scope.$apply(function (scope) {
             $scope.options.templateFile = element.files[0];
         });
     };
@@ -94,6 +99,6 @@ sygeforApp.controller('BatchPublipostController', ['$scope', '$http', '$window',
      */
     $scope.resetUpload = function () {
         $scope.options.templateFile = null;
-        angular.element( $('#inputTplFile')).val(null);
+        angular.element($('#inputTplFile')).val(null);
     };
 }]);

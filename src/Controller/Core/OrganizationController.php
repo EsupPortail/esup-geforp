@@ -9,9 +9,8 @@
 
 namespace App\Controller\Core;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Entity\Back\Organization;
 use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,82 +20,70 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class OrganizationController.
  *
- * @Route("/admin/organizations")
  */
-class OrganizationController extends AbstractController
+#[Route(path: '/admin/organizations')]final class OrganizationController extends AbstractController
 {
-    protected $organizationClass = Organization::class;
+    private static string $ORGANIZATION_CLASS = Organization::class;
 
-    /**
-     * @Route("/", name="organization.index")
-     */
-    public function indexAction()
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
-        $organizations = $this->get('doctrine')->getManager()
-            ->getRepository($this->organizationClass)->findBy(array(), array('name' => 'ASC'))
-        ;
-
-        return $this->render('Core/views/Organization/index.html.twig', array(
-            'organizations' => $organizations,
-        ));
     }
 
-    /**
-     * @param Request $request
-     *
-     * @Route("/add", name="organization.add")
-     *
-     * @return array|RedirectResponse
-     */
-    public function addAction(Request $request)
+    #[Route(path: '/', name: 'organization.index')]
+    public function index(): \Symfony\Component\HttpFoundation\Response
     {
-        $organization = new $this->organizationClass();
+        $organizations = $this->get('doctrine')->getManager()
+            ->getRepository(self::$ORGANIZATION_CLASS)->findBy([], ['name' => 'ASC'])
+        ;
+
+        return $this->render('Core/views/Organization/index.html.twig', ['organizations' => $organizations]);
+    }
+
+    #[Route(path: '/add', name: 'organization.add')]
+    public function add(Request $request): \Symfony\Component\HttpFoundation\Response
+    {
+        $organization = new self::$ORGANIZATION_CLASS();
         $form = $this->createForm(OrganizationType::class, $organization);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $em = $this->getDoctrine()->getManager();
+                $em = $this->managerRegistry->getManager();
                 $em->persist($organization);
                 $em->flush();
 
                 $this->get('session')->getFlashBag()->add('success', 'Le centre a bien été ajouté.');
 
-                return $this->redirect($this->generateUrl('organization.index'));
+                return $this->redirectToRoute('organization.index');
             }
         }
 
-        return $this->render('Core/views/Organization/edit.html.twig', array(
-            'form' => $form->createView(),
-            'organization' => $organization,
-        ));
+        return $this->render('Core/views/Organization/edit.html.twig', ['form' => $form->createView(), 'organization' => $organization]);
     }
 
     /**
-     * @param Request              $request
      * @param AbstractOrganization $organization
      *
-     * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="organization.edit", options={"expose"=true})
-     * @ParamConverter("organization", class="App\Entity\Back\Organization", options={"id" = "id"})
      *
-     * @return array|RedirectResponse
      */
-    public function editAction(Request $request, Organization $organization)
+    #[Route(path: '/{id}/edit', name: 'organization.edit', requirements: ['id' => '\d+'], options: ['expose' => true])]
+    public function edit(Request $request, Organization $organization, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\Response
     {
+        $organization = $managerRegistry->getRepository(Organization::class)->find($id);
+        if (!$organization){
+            throw $this->createNotFoundException();
+        }
         $form = $this->createForm(OrganizationType::class, $organization);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $this->getDoctrine()->getManager()->flush();
+                $this->managerRegistry->getManager()->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Le centre a bien été mis à jour.');
 
-                return $this->redirect($this->generateUrl('organization.index'));
+                return $this->redirectToRoute('organization.index');
             }
         }
 
-        return $this->render('Core/views/Organization/edit.html.twig', array(
-            'form' => $form->createView(),
-            'organization' => $organization,
-        ));
+        return $this->render('Core/views/Organization/edit.html.twig', ['form' => $form->createView(), 'organization' => $organization]);
     }
 }

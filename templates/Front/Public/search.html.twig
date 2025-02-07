@@ -10,10 +10,14 @@
                 </div>
             </div><!-- /row -->
             <ul class="nav nav-tabs">
-                <li><a href="{{ path('front.program.myprogram') }}" title="Accès aux formations de mon établissement" >L'offre de formation de mon établissement</a></li>
-                <li class="active"><a href="{{ path('front.program.search') }}" title="Rechercher une formation" class="button secondary" >Rechercher une formation</a></li>
+                <li><a href="{{ path('front.program.myprogram') }}" title="Accès aux formations de mon établissement">L'offre
+                        de formation de mon établissement</a></li>
+                <li class="active"><a href="{{ path('front.program.search') }}" title="Rechercher une formation"
+                                      class="button secondary">Rechercher une formation</a></li>
                 {% if multiEtab == true %}
-                    <li><a href="{{ path('front.program.allprogram') }}" title="Accès aux formations de tous les établissements et pour tous les publics" >Toutes les formations</a></li>
+                    <li><a href="{{ path('front.program.allprogram') }}"
+                           title="Accès aux formations de tous les établissements et pour tous les publics">Toutes les
+                            formations</a></li>
                 {% endif %}
             </ul>
 
@@ -24,7 +28,7 @@
 {% block body %}
     <script type="text/javascript" charset="utf8" src="{{ asset('js/jquery-1.11.3.min.js') }}"></script>
     <script type="text/javascript" charset="utf8" src="{{ asset('js/jquery-ui.min.js') }}"></script>
-    <link rel="Stylesheet" href="{{ asset('css/jquery-ui.min.css') }}" /> <!-- jquery_ui_theme -->
+    <link rel="Stylesheet" href="{{ asset('css/jquery-ui.min.css') }}"/> <!-- jquery_ui_theme -->
 
     <div class="container">
         <section>
@@ -46,7 +50,8 @@
                                         <br>
                                         <div class="form-group">
                                             <div class="col-sm-offset-2 col-sm-10">
-                                                <button type="submit" class="btn btn-primary btn-block">Rechercher</button>
+                                                <button type="submit" class="btn btn-primary btn-block">Rechercher
+                                                </button>
                                             </div>
                                         </div>
 

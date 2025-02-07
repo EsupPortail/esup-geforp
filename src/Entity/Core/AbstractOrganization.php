@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\PersonTrait\CoordinatesTrait;
 use App\Form\Type\AbstractOrganizationType;
@@ -21,75 +22,67 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  * @see Resources/config/serializer/Entity.Organization.yml
  * NO SERIALIZATION INFO IN ANNOTATIONS !!!
  *
- * @ORM\Table(name="organization")
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class AbstractOrganization
+#[ORM\Table(name: 'organization')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+abstract class AbstractOrganization implements \Stringable
 {
     /**
-     * @var boolean addressType
      *
-     * @ORM\Column(name="address_type", type="integer", nullable=true)
      * @Serializer\Exclude
      */
-    protected $addresstype;
+    #[ORM\Column(name: 'address_type', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
+    protected ?int $addresstype = null;
 
     /**
-     * @var string address
      *
-     * @ORM\Column(name="address", type="string", length=512, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $address;
+    #[ORM\Column(name: 'address', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $address = null;
 
     /**
-     * @var string zip
      *
-     * @ORM\Column(name="zip", type="string", length=32, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $zip;
+    #[ORM\Column(name: 'zip', type: \Doctrine\DBAL\Types\Types::STRING, length: 32, nullable: true)]
+    protected ?string $zip = null;
 
     /**
-     * @var string city
      *
-     * @ORM\Column(name="city", type="string", length=128, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $city;
+    #[ORM\Column(name: 'city', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
+    protected ?string $city = null;
 
     /**
-     * @var string
-     * @Assert\Email(message="Vous devez renseigner un email valide.")
-     * @ORM\Column(name="email", type="string", length=128, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $email;
+    #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
+    #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
+    protected ?string $email = null;
 
     /**
-     * @var string
      *
-     * @ORM\Column(name="phone_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $phonenumber;
+    #[ORM\Column(name: 'phone_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $phonenumber = null;
 
     /**
-     * @var string
      *
-     * @ORM\Column(name="fax_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $faxnumber;
+    #[ORM\Column(name: 'fax_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $faxnumber = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="website", type="string", length=512, nullable=true)
      * @Serializer\Groups({"api"})
      */
-    protected $website;
+    #[ORM\Column(name: 'website', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $website = null;
 
     /**
      * Copy coordinates from another entity.
@@ -97,10 +90,10 @@ abstract class AbstractOrganization
      * @param CoordinatesTrait $entity
      * @param bool             $force  override existing data
      */
-    public function copyCoordinates($entity, $force = true)
+    public function copyCoordinates($entity, $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
-        foreach (array('addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website') as $property) {
+        foreach (['addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website'] as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
             if ($force || ! $thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
@@ -112,7 +105,7 @@ abstract class AbstractOrganization
     /*
      * @param boolean $addressType
      */
-    public function setAddresstype($addressType)
+    public function setAddresstype($addressType): void
     {
         $this->addresstype = $addressType;
     }
@@ -128,7 +121,7 @@ abstract class AbstractOrganization
     /**
      * @param string $address
      */
-    public function setAddress($address)
+    public function setAddress($address): void
     {
         $this->address = $address;
     }
@@ -144,7 +137,7 @@ abstract class AbstractOrganization
     /**
      * @param string $zip
      */
-    public function setZip($zip)
+    public function setZip($zip): void
     {
         $this->zip = $zip;
     }
@@ -160,7 +153,7 @@ abstract class AbstractOrganization
     /**
      * @param string $city
      */
-    public function setCity($city)
+    public function setCity($city): void
     {
         $this->city = $city;
     }
@@ -181,10 +174,7 @@ abstract class AbstractOrganization
         return $this->email;
     }
 
-    /**
-     * @param mixed $email
-     */
-    public function setEmail($email)
+    public function setEmail(mixed $email): void
     {
         $this->email = $email;
     }
@@ -192,7 +182,7 @@ abstract class AbstractOrganization
     /**
      * @param string $phoneNumber
      */
-    public function setPhonenumber($phoneNumber)
+    public function setPhonenumber($phoneNumber): void
     {
         $this->phonenumber = $phoneNumber;
     }
@@ -216,7 +206,7 @@ abstract class AbstractOrganization
     /**
      * @param string $faxNumber
      */
-    public function setFaxnumber($faxNumber)
+    public function setFaxnumber($faxNumber): void
     {
         $this->faxnumber = $faxNumber;
     }
@@ -224,7 +214,7 @@ abstract class AbstractOrganization
     /**
      * @param string $website
      */
-    public function setWebsite($website)
+    public function setWebsite($website): void
     {
         $this->website = $website;
     }
@@ -244,64 +234,59 @@ abstract class AbstractOrganization
      */
     public function getFullAddress()
     {
-        $lines = array();
-        if ($this->getAddress()) {
-            $lines[] = $this->getAddress();
+        $lines = [];
+        if ($this->address !== '' && $this->getAddress() !== '0') {
+            $lines[] = $this->address;
         }
-        if ($this->getCity()) {
-            $lines[] = ($this->getZip() ? $this->getZip() . ' ' : '') . $this->getCity();
+
+        if ($this->city !== '' && $this->getCity() !== '0') {
+            $lines[] = ($this->zip !== '' && $this->getZip() !== '0' ? $this->zip . ' ' : '') . $this->city;
         }
 
         return implode("\n", $lines);
     }
 
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $name;
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected string $name;
 
     /**
-     * @var string
      *
-     * @ORM\Column(name="code", type="string", length=32)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $code;
+    #[ORM\Column(name: 'code', type: \Doctrine\DBAL\Types\Types::STRING, length: 32)]
+    protected ?string $code = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="User", mappedBy="organization", cascade={"persist", "merge"})
      * @Serializer\Exclude
      */
-    private $users;
+    #[ORM\OneToMany(targetEntity: 'User', mappedBy: 'organization', cascade: ['persist', 'merge'])]
+    private \Doctrine\Common\Collections\Collection $users;
 
     /**
-     * @var bool
-     * @ORM\Column(name="trainee_registrable", type="boolean")
      * @Serializer\Groups({"api"})
      */
-    protected $traineeRegistrable = true;
+    #[ORM\Column(name: 'trainee_registrable', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    protected ?bool $traineeRegistrable = true;
 
     /**
-     * @var AbstractInstitution
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinColumn(nullable=false)
      * @Serializer\Groups({"Default", "api"})
      */
-    private $institution;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?\App\Entity\Core\AbstractInstitution $institution = null;
 
 
     /**
@@ -312,7 +297,7 @@ abstract class AbstractOrganization
         $this->users = new ArrayCollection();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return $this->name;
     }
@@ -320,7 +305,7 @@ abstract class AbstractOrganization
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -336,7 +321,7 @@ abstract class AbstractOrganization
     /**
      * @param string $code
      */
-    public function setCode($code)
+    public function setCode($code): void
     {
         $this->code = $code;
     }
@@ -349,10 +334,7 @@ abstract class AbstractOrganization
         return $this->code;
     }
 
-    /**
-     * @param string $name
-     */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -365,10 +347,7 @@ abstract class AbstractOrganization
         return $this->name;
     }
 
-    /**
-     * @param ArrayCollection $users
-     */
-    public function setUsers($users)
+    public function setUsers(\Doctrine\Common\Collections\ArrayCollection $users): void
     {
         $this->users = $users;
     }
@@ -376,7 +355,7 @@ abstract class AbstractOrganization
     /**
      * @return ArrayCollection
      */
-    public function getUsers()
+    public function getUsers(): ArrayCollection
     {
         return $this->users;
     }
@@ -392,7 +371,7 @@ abstract class AbstractOrganization
     /**
      * @param bool $traineeRegistrable
      */
-    public function setTraineeRegistrable($traineeRegistrable)
+    public function setTraineeRegistrable($traineeRegistrable): void
     {
         $this->traineeRegistrable = $traineeRegistrable;
     }
@@ -421,7 +400,7 @@ abstract class AbstractOrganization
     /**
      * @param AbstractInstitution $institution
      */
-    public function setInstitution($institution)
+    public function setInstitution($institution): void
     {
         $this->institution = $institution;
     }

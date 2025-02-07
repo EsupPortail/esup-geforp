@@ -12,51 +12,45 @@ use App\Entity\Core\AbstractTraining;
 /**
  * Training serialization event subscriber.
  */
-class TrainingEventSubscriber implements EventSubscriberInterface
+final class TrainingEventSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array(
-                'event' => 'serializer.pre_serialize',
-                'method' => 'onPreSerialize',
-            ),
-        );
+        return [['event' => 'serializer.pre_serialize', 'method' => 'onPreSerialize']];
     }
 
     /**
      * On API pre serialize, remove unwanted sessions from the training.
      *
-     * @param PreSerializeEvent $event
      */
-    public function onPreSerialize(PreSerializeEvent $event)
+    public function onPreSerialize(PreSerializeEvent $preSerializeEvent): void
     {
-        $training = $event->getObject();
-        if ($training instanceof AbstractTraining && self::isApiGroup($event->getContext())) {
+        $training = $preSerializeEvent->getObject();
+        if ($training instanceof AbstractTraining && self::isApiGroup($preSerializeEvent->getContext())) {
             $sessions = $training->getSessions();
             foreach ($sessions as $key => $session) {
                 if ($session->isDisplayOnline() === false && $session->getRegistration() !== AbstractSession::REGISTRATION_PRIVATE) {
                     unset($sessions[$key]);
                 }
             }
+
             $training->setSessions(new ArrayCollection(array_values($sessions->toArray())));
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return bool
-     */
-    public static function isApiGroup(Context $context)
+    public static function isApiGroup(Context $context): bool
     {
         $groups = $context->getAttribute('groups');
         foreach ($groups as $group) {
-        //foreach ($groups->getOrElse(array()) as $group) {
-            if ($group === 'api' || strpos($group, 'api.') === 0) {
+            //foreach ($groups->getOrElse(array()) as $group) {
+            //Changement de conditionnel et ajout de la méthode pour vérifier si la chaine commence par une sous-chaine,
+            if ($group === 'api') {
+                return true;
+            }
+            if (str_starts_with((string) $group, 'api.')) {
                 return true;
             }
         }

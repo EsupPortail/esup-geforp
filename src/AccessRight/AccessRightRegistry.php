@@ -56,215 +56,188 @@ use App\Security\Authorization\AccessRight\User\OwnOrganizationUserAccessRight;
 use App\Security\Authorization\AccessRight\Vocabulary\AllOrganizationVocabularyAccessRight;
 use App\Security\Authorization\AccessRight\Vocabulary\NationalVocabularyAccessRight;
 use App\Security\Authorization\AccessRight\Vocabulary\OwnOrganizationVocabularyAccessRight;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * Class AccessRightRegistry.
  */
-class AccessRightRegistry
+final class AccessRightRegistry
 {
-    /**
-     * @var array
-     */
-    private $rights;
+    private array $rights = [];
+
+    private array $groups = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    private $groups;
-
-    /**
-     * @var Security
-     */
-    private $security;
-
-    const RIGHT_NAMES =  array(
-        0 => "sygefor_core.rights.user.own", 1 => "sygefor_core.rights.user.all",
-        2 => "sygefor_core.rights.vocabulary.own", 3 => "sygefor_core.rights.vocabulary.national", 4 => "sygefor_core.rights.vocabulary.all",
-        5 => 'sygefor_training.rights.training.own.view', 6 => 'sygefor_training.rights.training.own.create', 7=> 'sygefor_training.rights.training.own.update', 8 => 'sygefor_training.rights.training.own.delete',
-        9 => 'sygefor_training.rights.training.all.view', 10 => 'sygefor_training.rights.training.all.create', 11 => 'sygefor_training.rights.training.all.update', 12 => 'sygefor_training.rights.training.all.delete',
-        13 => 'sygefor_trainee.rights.trainee.own.view', 14 => 'sygefor_trainee.rights.trainee.own.create', 15 => 'sygefor_trainee.rights.trainee.own.update', 16 => 'sygefor_trainee.rights.trainee.own.delete',
-        17 => 'sygefor_trainee.rights.trainee.all.view', 18 => 'sygefor_trainee.rights.trainee.all.create', 19 => 'sygefor_trainee.rights.trainee.all.update', 20 => 'sygefor_trainee.rights.trainee.all.delete',
-        21 => 'sygefor_inscription.rights.inscription.own.view', 22 => 'sygefor_inscription.rights.inscription.own.create', 23 => 'sygefor_inscription.rights.inscription.own.update', 24 => 'sygefor_inscription.rights.inscription.own.delete',
-        25 => 'sygefor_inscription.rights.inscription.all.view', 26 => 'sygefor_inscription.rights.inscription.all.create', 27 => 'sygefor_inscription.rights.inscription.all.update', 28 => 'sygefor_inscription.rights.inscription.all.delete',
-        29 => 'sygefor_trainer.rights.trainer.own.view', 30 => 'sygefor_trainer.rights.trainer.own.create', 31 => 'sygefor_trainer.rights.trainer.own.update', 32 => 'sygefor_trainer.rights.trainer.own.delete',
-        33 => 'sygefor_trainer.rights.trainer.all.view', 34 => 'sygefor_trainer.rights.trainer.all.create', 35 => 'sygefor_trainer.rights.trainer.all.update', 36 => 'sygefor_trainer.rights.trainer.all.delete'
-    );
+    public const RIGHT_NAMES =  [0 => "sygefor_core.rights.user.own", 1 => "sygefor_core.rights.user.all", 2 => "sygefor_core.rights.vocabulary.own", 3 => "sygefor_core.rights.vocabulary.national", 4 => "sygefor_core.rights.vocabulary.all", 5 => 'sygefor_training.rights.training.own.view', 6 => 'sygefor_training.rights.training.own.create', 7=> 'sygefor_training.rights.training.own.update', 8 => 'sygefor_training.rights.training.own.delete', 9 => 'sygefor_training.rights.training.all.view', 10 => 'sygefor_training.rights.training.all.create', 11 => 'sygefor_training.rights.training.all.update', 12 => 'sygefor_training.rights.training.all.delete', 13 => 'sygefor_trainee.rights.trainee.own.view', 14 => 'sygefor_trainee.rights.trainee.own.create', 15 => 'sygefor_trainee.rights.trainee.own.update', 16 => 'sygefor_trainee.rights.trainee.own.delete', 17 => 'sygefor_trainee.rights.trainee.all.view', 18 => 'sygefor_trainee.rights.trainee.all.create', 19 => 'sygefor_trainee.rights.trainee.all.update', 20 => 'sygefor_trainee.rights.trainee.all.delete', 21 => 'sygefor_inscription.rights.inscription.own.view', 22 => 'sygefor_inscription.rights.inscription.own.create', 23 => 'sygefor_inscription.rights.inscription.own.update', 24 => 'sygefor_inscription.rights.inscription.own.delete', 25 => 'sygefor_inscription.rights.inscription.all.view', 26 => 'sygefor_inscription.rights.inscription.all.create', 27 => 'sygefor_inscription.rights.inscription.all.update', 28 => 'sygefor_inscription.rights.inscription.all.delete', 29 => 'sygefor_trainer.rights.trainer.own.view', 30 => 'sygefor_trainer.rights.trainer.own.create', 31 => 'sygefor_trainer.rights.trainer.own.update', 32 => 'sygefor_trainer.rights.trainer.own.delete', 33 => 'sygefor_trainer.rights.trainer.all.view', 34 => 'sygefor_trainer.rights.trainer.all.create', 35 => 'sygefor_trainer.rights.trainer.all.update', 36 => 'sygefor_trainer.rights.trainer.all.delete'];
 
 
     /**
      * class constructor.
      */
-    public function __construct(Security $security)
+    public function __construct(private Security $security)
     {
-        $this->rights = array();
-        $this->groups = array();
-        $this->security = $security;
-
         // Construction de la liste des access right 'en dur'
         $i=0;
         $group = "Utilisateurs";
         $accessRight = new OwnOrganizationUserAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllOrganizationUserAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $group = "Vocabulaires";
         $accessRight = new OwnOrganizationVocabularyAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new NationalVocabularyAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllOrganizationVocabularyAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $group = "Formations";
         $accessRight = new OwnTrainingViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainingCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainingUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainingDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainingViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainingCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainingUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainingDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $group = "Stagiaires";
         $accessRight = new OwnTraineeViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTraineeCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTraineeUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTraineeDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTraineeViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTraineeCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTraineeUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTraineeDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $group = "Inscriptions";
         $accessRight = new OwnInscriptionViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnInscriptionCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnInscriptionUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnInscriptionDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllInscriptionViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllInscriptionCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllInscriptionUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllInscriptionDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $group = "Formateurs";
         $accessRight = new OwnTrainerViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainerCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainerUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new OwnTrainerDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainerViewAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainerCreateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainerUpdateAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
         $accessRight = new AllTrainerDeleteAccessRight();
         $this->addAccessRight($i, $accessRight, $group);
-        $i++;
+        ++$i;
     }
 
     /**
      * Add right.
      *
      * @param $id
-     * @param AbstractAccessRight $accessRight
      * @param string $group
      */
-    public function addAccessRight($id, AbstractAccessRight $accessRight, $group = 'Misc')
+    public function addAccessRight(int $id, AbstractAccessRight $accessRight, $group = 'Misc'): void
     {
         $accessRight->setId($id);
         $this->rights[$id] = $accessRight;
         if (!isset($this->groups[$group])) {
-            $this->groups[$group] = array();
+            $this->groups[$group] = [];
         }
+
         $this->groups[$group][] = $id;
     }
 
     /**
      * @param $id
      *
-     * @return null|AccessRightInterface
      */
-    public function getAccessRightById($id)
+    public function getAccessRightById($id): ?\App\AccessRight\AccessRightInterface
     {
-        return isset($this->rights[$id]) ? $this->rights[$id] : null;
+        return $this->rights[$id] ?? null;
     }
 
     /**
      * Check if a user and not just a group have a special right.
      *
      * @param $id
-     * @param User $user
      *
-     * @return bool
      */
-    public function hasAccessRight($id, User $user = null)
+    public function hasAccessRight($id, User $user = null): bool
     {
 /*        if ($this->security === null) {
             $this->security = $this->container->get('security.context');
         }*/
 
-        if ($user === null) {
+        if (!$user instanceof \App\Entity\Core\User) {
             $user = $this->security->getToken()->getUser();
         }
 
@@ -274,9 +247,9 @@ class AccessRightRegistry
 
         $userAccessRights = $user->getAccessRights();
         $userRoles = $user->getRoles();
-        $idRights = array();
-        foreach ($userAccessRights as $right) {
-            $idRights[] = $this->getByName($right);
+        $idRights = [];
+        foreach ($userAccessRights as $userAccessRight) {
+            $idRights[] = $this->getByName($userAccessRight);
         }
 
         return in_array($id, $idRights) || in_array('ROLE_ADMIN', $userRoles, true);
@@ -285,9 +258,8 @@ class AccessRightRegistry
     /**
      * returns known rigths.
      *
-     * @return array
      */
-    public function getAccessRights()
+    public function getAccessRights(): array
     {
         return $this->rights;
     }
@@ -295,42 +267,35 @@ class AccessRightRegistry
     /**
      * returns known groups.
      *
-     * @return array
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }
 
 
-    /**
-     * @param array $rights
-     */
-    public function setRights($rights)
+    public function setRights(array $rights): void
     {
         $this->rights = $rights;
     }
 
-    /**
-     * @return array
-     */
-    public function getRights()
+    public function getRights(): array
     {
         return $this->rights;
     }
 
     /**
-     * @param \Symfony\Component\Security\Core\Security $security
+     * @param Symfony\Bundle\SecurityBundle\Security $security
      */
-    public function setSecurity($security)
+    public function setSecurity(Security $security): void
     {
         $this->security = $security;
     }
 
     /**
-     * @return \Symfony\Component\Security\Core\Security
+     * @return Security;
      */
-    public function getSecurity()
+    public function getSecurity(): Security
     {
         return $this->security;
     }
@@ -340,26 +305,21 @@ class AccessRightRegistry
      *
      * @return array|void
      */
-    public function getByName($accessRightName)
+    public function getByName($accessRightName): string
     {
-        $id = 100000;
-        $id = array_search($accessRightName, self::RIGHT_NAMES);
+        $id = array_search($accessRightName, self::RIGHT_NAMES, true);
         if ($id === false) {
-        } else {
-            if (isset($this->rights[$id])) {
-                return $id;
-            }
+        } elseif (isset($this->rights[$id])) {
+            return $id;
         }
-
-        return;
     }
 
     /**
      * @param $id
      *
-     * @return array|void
+     * @return string
      */
-    public function getNameById($id)
+    public function getNameById($id): string
     {
         $name = "sygefor";
         if (isset (self::RIGHT_NAMES[$id])) {
@@ -368,7 +328,6 @@ class AccessRightRegistry
                 return $name;
             }
         }
-
-        return;
+        return $name;
     }
 }

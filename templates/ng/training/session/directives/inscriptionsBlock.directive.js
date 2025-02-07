@@ -2,15 +2,15 @@
  * Include a inscription table block for a given session
  * Usage : <div inscriptions-block="session"></div>
  */
-sygeforApp.directive('inscriptionsBlock', ['$dialog', '$filter', function($dialog, $filter) {
+sygeforApp.directive('inscriptionsBlock', ['$dialog', '$filter', function ($dialog, $filter) {
     return {
         restrict: 'EA',
         scope: {
             session: '=inscriptionsBlock'
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             // custum empty message
-            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucune inscription pour cette session.";
+            scope.emptyMsg = attrs.emptyMsg ? attrs.emptyMsg : "Il n'y a aucune inscription pour cette session.";
             scope.$dialog = $dialog;
         },
         controller: 'SessionInscriptionsController',

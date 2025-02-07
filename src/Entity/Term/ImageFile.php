@@ -11,10 +11,10 @@ use App\Form\Type\ImageFileVocabularyType;
 /**
  * Class ImageFile.
  *
- * @ORM\Table(name="image_file")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Table(name: 'image_file')]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class ImageFile extends AbstractTerm implements VocabularyInterface
 {
     use UploadableTrait;
@@ -23,7 +23,7 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Fichiers images';
     }
@@ -31,32 +31,26 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return ImageFileVocabularyType::class;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }
 
-    /**
-     * @Assert\Callback()
-     */
-    public function validateFile(ExecutionContext $context)
+    #[Assert\Callback]
+    public function validateFile(ExecutionContext $executionContext): void
     {
-        if (empty($this->file)) {
-            $context->addViolationAt('file', 'Vous devez sélectionner un fichier');
+        if (!$this->file instanceof \Symfony\Component\HttpFoundation\File\File) {
+            $executionContext->addViolationAt('file', 'Vous devez sélectionner un fichier');
         }
     }
 
-    /**
-     * @return string
-     */
-    protected function getTemplatesRootDir()
+    protected function getTemplatesRootDir(): string
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
         return __DIR__.'/../../../public/img/vocabulary';
@@ -65,7 +59,7 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public static function orderBy()
+    public static function orderBy(): string
     {
         return 'name';
     }

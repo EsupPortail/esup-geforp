@@ -27,96 +27,85 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 /**
  * Class VocabularyRegistry.
  */
-class VocabularyRegistry
+final class VocabularyRegistry
 {
-    /**
-     * @var array
-     */
-    private $vocabularies;
+    private array $vocabularies = [];
 
-    /**
-     * @var array
-     */
-    private $groups;
+    private array $groups = [];
 
-    /**
-     * @var array
-     */
-    private $labels;
+    private array $labels = [];
 
     /**
      *
      */
     public function __construct()
     {
-        $this->vocabularies = array();
-        $this->groups       = array();
-        $this->labels       = array();
-
         // Construction de la liste des vocabulaires 'en dur'
         $i=0;
         $voc = new Title();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Publiposttemplate();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Evaluationcriterion();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Actiontype();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Trainingcategory();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Emailtemplate();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new MenuItem();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Supervisor();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Theme();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Inscriptionstatus();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Presencestatus();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Tag();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Sessiontype();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Trainertype();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Publictype();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new Domain();
         $this->addVocabulary($voc, $i);
-        $i++;
+        ++$i;
         $voc = new ImageFile();
         $this->addVocabulary($voc, $i);
     }
 
-    public function addVocabulary($vocabulary, $id, $group = 'Misc', $label = null)
+    public function addVocabulary($vocabulary, $id, $group = 'Misc', $label = null): void
     {
         $vocabulary->setVocabularyId($id);
         $this->vocabularies[$id] = $vocabulary;
         if ($label) {
             $this->labels[$id] = $label;
         }
+
         if (empty($this->groups[$group])) {
-            $this->groups[$group] = array();
+            $this->groups[$group] = [];
         }
+
         $this->groups[$group][$id] = $vocabulary;
     }
 
@@ -127,7 +116,7 @@ class VocabularyRegistry
      */
     public function getVocabularyById($id)
     {
-        return isset($this->vocabularies[$id]) ? $this->vocabularies[$id] : null;
+        return $this->vocabularies[$id] ?? null;
     }
 
     /**
@@ -137,13 +126,10 @@ class VocabularyRegistry
      */
     public function getVocabularyLabel($id)
     {
-        return isset($this->labels[$id]) ? $this->labels[$id] : null;
+        return $this->labels[$id] ?? null;
     }
 
-    /**
-     * @return array
-     */
-    public function getVocabularies()
+    public function getVocabularies(): array
     {
         return $this->vocabularies;
     }
@@ -151,9 +137,8 @@ class VocabularyRegistry
     /**
      * returns known groups.
      *
-     * @return array
      */
-    public function getGroups()
+    public function getGroups(): array
     {
         return $this->groups;
     }
@@ -161,61 +146,60 @@ class VocabularyRegistry
     /**
      * Counts and returns the number of usages of term among all entities
      *
-     * @param EntityManager $em
      * @param $vocTerm
      * @param bool $getCount
-     * @return array|int
      */
-    public function getTermUsages(EntityManager $em, $vocTerm, $getCount = true)
+    public function getTermUsages(EntityManager $entityManager, $vocTerm, $getCount = true): array|int
     {
         /* @var ObjectRepository $repo */
-        $meta     = $em->getMetadataFactory()->getAllMetadata();
-        $vocClass = get_class($vocTerm);
+        $meta     = $entityManager->getMetadataFactory()->getAllMetadata();
+        $vocClass = $vocTerm::class;
         $termId   = $vocTerm->getId();
 
-        $usages = array();
+        $usages = [];
 
         $totalCount = 0;
 
-        /** @var ClassMetadata $m */
-        foreach ($meta as $m) {
-            $mapps = $m->getAssociationMappings();
-            foreach ($mapps as $map) {
+        foreach ($meta as $metum) {
+            $mapps = $metum->getAssociationMappings();
+            foreach ($mapps as $mapp) {
+                if ($vocClass !== $mapp['targetEntity']) {
+                    continue;
+                }
+                if (!$mapp['isOwningSide']) {
+                    continue;
+                }
+                if ( $mapp['type'] === ClassMetadataInfo::MANY_TO_MANY ) {
+                    //getting all entities
+                    $qb1 = $entityManager->createQueryBuilder();
+                    $qb2 = $entityManager->createQueryBuilder();
+                    $qb1->select('f.id')
+                        ->from($metum->getName(), 'f')
+                        ->leftJoin('f.' . $mapp['fieldName'], 'c')
+                        ->where( $qb1->expr()->in('c', ':c'))
+                        ->setParameter('c', $vocTerm);
 
-                if ($vocClass === $map['targetEntity'] && ($map['isOwningSide'])) {
+                    $qb2->select('t')
+                        ->from($metum->getName(), 't')
+                        ->where( $qb1->expr()->in('t.id', ':ids'))->setParameter('ids', $qb1->getQuery()->getResult());
 
-                    if ( $map['type'] === ClassMetadataInfo::MANY_TO_MANY ) {
-                        //getting all entities
-                        $qb1 = $em->createQueryBuilder();
-                        $qb2 = $em->createQueryBuilder();
-                        $qb1->select('f.id')
-                            ->from($m->getName(), 'f')
-                            ->leftJoin('f.' . $map['fieldName'], 'c')
-                            ->where( $qb1->expr()->in('c', ':c'))
-                            ->setParameter('c', $vocTerm);
+                    $tmpArray = $qb2->getQuery()->getResult();
 
-                        $qb2->select('t')
-                            ->from($m->getName(), 't')
-                            ->where( $qb1->expr()->in('t.id', ':ids'))->setParameter('ids', $qb1->getQuery()->getResult());
-
-                        $tmpArray = $qb2->getQuery()->getResult();
-
-                        if (count($tmpArray)) {
-                            $totalCount += count($tmpArray);
-                            $usages[$m->getName()] = array('multiple' => true, 'fieldName' => $map['fieldName'], 'entities' => $tmpArray);
-                        }
+                    if ((is_countable($tmpArray) ? count($tmpArray) : 0) !== 0) {
+                        $totalCount += is_countable($tmpArray) ? count($tmpArray) : 0;
+                        $usages[$metum->getName()] = ['multiple' => true, 'fieldName' => $mapp['fieldName'], 'entities' => $tmpArray];
                     }
-                    else {
-                        $qb = $em->createQueryBuilder()
-                            ->select('t')
-                            ->from($m->getName(), 't')
-                            ->where('t.' . $map['fieldName'] . '= :id')->setParameter('id', $termId);
+                }
+                else {
+                    $qb = $entityManager->createQueryBuilder()
+                        ->select('t')
+                        ->from($metum->getName(), 't')
+                        ->where('t.' . $mapp['fieldName'] . '= :id')->setParameter('id', $termId);
 
-                        $tmpArray = $qb->getQuery()->getResult();
-                        if (count($tmpArray)) {
-                            $totalCount += count($tmpArray);
-                            $usages[$m->getName()] = array('multiple' => false, 'fieldName' => $map['fieldName'], 'entities' => $tmpArray);
-                        }
+                    $tmpArray = $qb->getQuery()->getResult();
+                    if ((is_countable($tmpArray) ? count($tmpArray) : 0) !== 0) {
+                        $totalCount += is_countable($tmpArray) ? count($tmpArray) : 0;
+                        $usages[$metum->getName()] = ['multiple' => false, 'fieldName' => $mapp['fieldName'], 'entities' => $tmpArray];
                     }
                 }
             }
@@ -231,39 +215,32 @@ class VocabularyRegistry
     /**
      * Replaces the a term by another in all its usages.
      *
-     * @param ObjectRepository $em
+     * @param \Doctrine\Persistence\ObjectRepository $entityManager
      * @param $vocTermFrom
      * @param $voctTermTo
      */
-    public function replaceTermInUsages(EntityManager $em, $vocTermFrom, $vocTermTo)
+    public function replaceTermInUsages(EntityManager $entityManager, $vocTermFrom, $vocTermTo): void
     {
-        $usages       = $this->getTermUsages($em, $vocTermFrom, $count = false);
-        $propAccessor = PropertyAccess::createPropertyAccessor();
+        $usages       = $this->getTermUsages($entityManager, $vocTermFrom, $count = false);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($usages as $class => $classUsage) {
             foreach ($classUsage['entities'] as $entity) {
-                $ent = $em->getRepository($class)->findBy(array('id' => $entity->getId()));
+                $ent = $entityManager->getRepository($class)->findBy(['id' => $entity->getId()]);
                 $ent = $ent[0];
-                //echo $entity->getName()."->".$classUsage['fieldName'];
+                $value = $propertyAccessor->getValue($ent, $classUsage['fieldName']);
 
-                $value = null;
-
-                if ($classUsage['multiple'] === true) {
-                    $value = $propAccessor->getValue($ent, $classUsage['fieldName']);
-                } else {
-                    $value = $propAccessor->getValue($ent, $classUsage['fieldName']);
-                }
-
-                $vocClass = get_class($vocTermTo);
+                $vocClass = $vocTermTo::class;
                 if ($value instanceof $vocClass) {
 
-                    $propAccessor->setValue($entity, $classUsage['fieldName'], $vocTermTo);
+                    $propertyAccessor->setValue($entity, $classUsage['fieldName'], $vocTermTo);
                 }
                 else {
 
                     $termInCollection = $this->checkTermIsInCollection($vocTermTo, $value);
                     if (is_array($value)) {
-                        for ($pos = 0; $pos < count($value); ++$pos) {
+                        $valueCount = count($value);
+                        for ($pos = 0; $pos < $valueCount; ++$pos) {
                             if (method_exists($value[$pos], 'getId') && ($value[$pos]->getId() === $vocTermFrom->getId())) {
                                 //if destination element is not already present in collection, we can do a replacement
                                 if ($termInCollection) {
@@ -274,26 +251,32 @@ class VocabularyRegistry
                                 }
                             }
                         }
-                        $propAccessor->setValue($entity, $classUsage['fieldName'], $value);
-                    } else if ($value instanceof \Traversable) {
+                        
+                        $propertyAccessor->setValue($entity, $classUsage['fieldName'], $value);
+                    } elseif ($value instanceof \Traversable) {
                         foreach ($value as $key => $val) {
-                            if (method_exists($val, 'getId') && ($val->getId() === $vocTermFrom->getId())) {
-                                if ($termInCollection) {
-                                    $value->remove($key);
-                                    break;
-                                }
-                                else {
-                                    $value->offsetSet($key, $vocTermTo);
-                                }
+                            if (!method_exists($val, 'getId')) {
+                                continue;
+                            }
+                            if ($val->getId() !== $vocTermFrom->getId()) {
+                                continue;
+                            }
+                            if ($termInCollection) {
+                                $value->remove($key);
+                                break;
+                            }
+                            else {
+                                $value->offsetSet($key, $vocTermTo);
                             }
                         }
-                        $propAccessor->setValue($entity, $classUsage['fieldName'], $value);
+                        
+                        $propertyAccessor->setValue($entity, $classUsage['fieldName'], $value);
                     }
                 }
             }
         }
 
-        $em->flush();
+        $entityManager->flush();
     }
 
     /**
@@ -302,7 +285,7 @@ class VocabularyRegistry
      *
      * @return bool
      */
-    protected function checkTermIsInCollection($term, $collection)
+    private function checkTermIsInCollection($term, $collection)
     {
         $isInCollection = false;
 
@@ -310,7 +293,7 @@ class VocabularyRegistry
             $collection = $collection->toArray();
         }
 
-        foreach ($collection as $key => $val) {
+        foreach ($collection as $val) {
             if (method_exists($val, 'getId') && ($val->getId() === $term->getId())) {
                 $isInCollection = true;
             }

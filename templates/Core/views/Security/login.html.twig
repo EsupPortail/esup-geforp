@@ -3,7 +3,7 @@
 {% block body %}
     <div class="container">
         <form class="form-login" action="{{ path('fos_user_security_check') }}" method="POST">
-            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token }}"/>
             <div class="login-wrap">
                 {% if error %}
                     <div class="alert alert-danger">{{ error|trans([], 'FOSUserBundle') }}</div>
@@ -15,7 +15,8 @@
                 </button>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" id="remember_me" name="_remember_me" value="on"> {{ 'security.login.remember_me'|trans([], 'FOSUserBundle') }}
+                        <input type="checkbox" id="remember_me" name="_remember_me"
+                               value="on"> {{ 'security.login.remember_me'|trans([], 'FOSUserBundle') }}
                     </label>
                 </div>
             </div>

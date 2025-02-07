@@ -29,10 +29,7 @@ trait PersonTrait
      */
     protected $lastname;
 
-    /**
-     * @param mixed $title
-     */
-    public function setTitle($title)
+    public function setTitle(mixed $title): void
     {
         $this->title = $title;
     }
@@ -48,7 +45,7 @@ trait PersonTrait
     /**
      * @param string $firstName
      */
-    public function setFirstname($firstName)
+    public function setFirstname($firstName): void
     {
         $this->firstname = $firstName;
     }
@@ -64,7 +61,7 @@ trait PersonTrait
     /**
      * @param string $lastName
      */
-    public function setLastname($lastName)
+    public function setLastname($lastName): void
     {
         $this->lastname = $lastName;
     }
@@ -78,21 +75,19 @@ trait PersonTrait
     }
 
     /**
-     * @return string
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
-    public function getFullname()
+    public function getFullname(): string
     {
         return $this->getFirstname().' '.$this->getLastname();
     }
 
     /**
-     * @return string
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
-    public function getReverseFullName()
+    public function getReverseFullName(): string
     {
         return $this->getLastName().' '.$this->getFirstName();
     }

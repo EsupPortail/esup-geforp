@@ -1,7 +1,7 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injector', 'search', 'BaseListController', '$state', '$timeout', '$dialog', function($scope, $user, $injector, search, BaseListController, $state, $timeout, $dialog) {
+sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injector', 'search', 'BaseListController', '$state', '$timeout', '$dialog', function ($scope, $user, $injector, search, BaseListController, $state, $timeout, $dialog) {
     $injector.invoke(BaseListController, this, {key: 'institution', $scope: $scope, $search: search});
 
     // batch operations
@@ -13,8 +13,8 @@ sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injecto
                 {
                     icon: 'fa-file-excel-o',
                     label: 'CSV',
-                    execute: function(items, $dialog) {
-                        return $dialog.open('batch.export.csv', { items: items, service: 'institution' })
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.export.csv', {items: items, service: 'institution'})
                     }
                 }
             ]
@@ -37,7 +37,7 @@ sygeforApp.controller('InstitutionListController', ['$scope', '$user', '$injecto
 
     // facets
     $scope.facets = {
-        'city.source' : {
+        'city.source': {
             label: 'Ville'
         }
     };

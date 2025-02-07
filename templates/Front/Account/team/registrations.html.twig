@@ -10,8 +10,12 @@
                 </div>
             </div>
             <ul class="nav nav-tabs">
-                <li class="active"><a href="{{ path('front.account.team.registrations') }}" title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes" class="button secondary">Demandes d'inscription</a></li>
-                <li><a href="{{ path('front.account.team.trainees') }}" title="Pour retrouver tous les agents supervisés et accéder a leur historique de formation" class="button secondary">Mes agents</a></li>
+                <li class="active"><a href="{{ path('front.account.team.registrations') }}"
+                                      title="Pour gérer les demandes d'inscription en cours et retrouver les anciennes demandes"
+                                      class="button secondary">Demandes d'inscription</a></li>
+                <li><a href="{{ path('front.account.team.trainees') }}"
+                       title="Pour retrouver tous les agents supervisés et accéder a leur historique de formation"
+                       class="button secondary">Mes agents</a></li>
             </ul>
         </div>
     </header>
@@ -22,7 +26,8 @@
         <div class="row">
             <div class="col-md-12">
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions à venir</span></h3>
+                    <h3><i class="glyphicon glyphicon-folder-open"></i>&nbsp;&nbsp;<span>Liste des inscriptions à des sessions à venir</span>
+                    </h3>
                     {% if upcoming is not defined or upcoming | length == 0 %}
                         <blockquote class="small">Il n'y a aucune demande d'inscription pour vos agents.</blockquote>
                     {% else %}
@@ -34,7 +39,8 @@
 
                 {% set flagUp = 0 %}
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions qui ont été suivies</span></h3>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des inscriptions qui ont été suivies</span>
+                    </h3>
                     {% if pastEffective is not defined or pastEffective | length == 0 %}
                         <blockquote class="small">Il n'y a aucune formation suivie par vos agents.</blockquote>
                     {% else %}
@@ -44,9 +50,12 @@
                 </section>
 
                 <section>
-                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des autres inscriptions à des sessions passées</span></h3>
+                    <h3><i class="glyphicon glyphicon-folder-close"></i>&nbsp;&nbsp;<span>Liste des autres inscriptions à des sessions passées</span>
+                    </h3>
                     {% if pastOther is not defined or pastOther | length == 0 %}
-                        <blockquote class="small">Il n'y a aucune autre demande d'inscription archivée pour vos agents.</blockquote>
+                        <blockquote class="small">Il n'y a aucune autre demande d'inscription archivée pour vos
+                            agents.
+                        </blockquote>
                     {% else %}
                         {% set list = pastOther %}
                         {% include 'Front/Account/team/registrations-list-pastOther.html.twig' %}

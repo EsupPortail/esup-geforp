@@ -6,11 +6,16 @@
         <li><a href="{{ path('core.index') }}">Accueil</a></li>
         <li><a href="#">Administration</a></li>
         <li><a href="{{ path('taxonomy.index') }}">Vocabulaires</a></li>
-        <li><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">{{ vocabulary.vocabularyLabel }}</a></li>
+        <li>
+            <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">{{ vocabulary.vocabularyLabel }}</a>
+        </li>
         {% if organization is not null %}
-            <li><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId, organizationId: organization.id }) }}">{{ organization.name }}</a></li>
+            <li>
+                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId, organizationId: organization.id }) }}">{{ organization.name }}</a>
+            </li>
         {% elseif vocabulary.vocabularyStatus == 2 %}
-            <li><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a></li>
+            <li><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.vocabularyId }) }}">Termes nationaux</a>
+            </li>
         {% endif %}
         <li class="active"><a href="#">{{ term.id ? term.name : "Ajouter un terme" }}</a></li>
     </ol>
@@ -19,7 +24,7 @@
 {% block subcontent %}
 
     {{ form_start(form) }}
-    {% for child in form.children%}
+    {% for child in form.children %}
         {{ form_row(child) }}
     {% endfor %}
 
@@ -31,72 +36,4 @@
 
     {{ form_end(form) }}
 
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('/build/ckeditor/ckeditor.js') }}"></script>
-
-    <script type="application/javascript">
-        (function($) {
-            const position = document.getElementById('email_template_vocabulary_position');
-            var positionValue = position.value;
-            if (positionValue==1) {
-                $('[ckeditor]').each(function () {
-                    var config = {
-                        language: 'fr',
-                        extraPlugins: "base64image",
-                        toolbar: [
-                            /*                        { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },*/
-                            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-                            { name: 'editing', items: [ 'Scayt' ] },
-                            /*                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },*/
-                            { name: 'links', items: [ 'Link', 'Unlink' ] },
-                            { name: 'insert', items: [ 'base64image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-                            { name: 'document', items: [ 'Source' ] },
-                            '/',
-                            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
-                            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', ] },
-                            /*                        { name: 'styles', items: [ 'Styles', 'Format' ] },*/
-                        ]
-                    };
-                    CKEDITOR.replace(this.id, config);
-                });
-            }
-
-            //change
-            position.addEventListener('change', changeCkeditor);
-
-            function changeCkeditor() {
-                if (position.value == 1) {
-                    $('[ckeditor]').each(function () {
-                        var config = {
-                            language: 'fr',
-                            extraPlugins: "base64image",
-                            toolbar: [
-                                /*                        { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },*/
-                                { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
-                                { name: 'editing', items: [ 'Scayt' ] },
-                                /*                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },*/
-                                { name: 'links', items: [ 'Link', 'Unlink' ] },
-                                { name: 'insert', items: [ 'base64image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
-                                { name: 'document', items: [ 'Source' ] },
-                                '/',
-                                { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
-                                { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', ] },
-                                /*                        { name: 'styles', items: [ 'Styles', 'Format' ] },*/
-                            ]
-                        };
-                        CKEDITOR.replace(this.id, config);
-                    });
-                } else {
-                    $('[ckeditor]').each(function () {
-                        if (CKEDITOR.instances.hasOwnProperty(this.id)) {
-                            CKEDITOR.instances[this.id].destroy();
-                        }
-                    });
-                }
-            }
-
-        }(jQuery));
-    </script>
 {% endblock %}

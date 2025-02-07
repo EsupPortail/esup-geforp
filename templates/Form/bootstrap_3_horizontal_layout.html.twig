@@ -3,11 +3,11 @@
 {% block form_row -%}
     {% set widget_form_group_attr = widget_form_group_attr|merge({class: (widget_form_group_attr.class|default('') ~ ' ' ~ block('form_group_container_class'))|trim}) %}
     <div{% for attrname, attrvalue in widget_form_group_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-        {{- form_label(form) -}}
-        <div class="{{ block('form_group_class') }}">
-            {{- form_widget(form) -}}
-            {{- form_errors(form) -}}
-        </div>
+    {{- form_label(form) -}}
+    <div class="{{ block('form_group_class') }}">
+        {{- form_widget(form) -}}
+        {{- form_errors(form) -}}
+    </div>
     </div>
 {%- endblock form_row %}
 
@@ -21,7 +21,7 @@
         {{ form_widget(form._token) }}
     {% endif %}
     {{- form_errors(form) -}}
-    {#{{- form_widget(form) -}}#}
+    {# {{- form_widget(form) -}} #}
     {{- block('form_rows') -}}
     {{- form_rest(form) -}}
 

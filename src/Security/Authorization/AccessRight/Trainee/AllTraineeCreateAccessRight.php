@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Trainee;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllTraineeCreateAccessRight extends AbstractAccessRight
+final class AllTraineeCreateAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Créer les stagiaires de tous les établissements';
     }
@@ -26,11 +23,10 @@ class AllTraineeCreateAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Trainee') {
+        if ($class === \App\Entity\Back\Trainee::class) {
             return true;
         }
     }
@@ -38,10 +34,8 @@ class AllTraineeCreateAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
-        if ($attribute !== 'CREATE') return false;
-
-        return true;
+        return $attribute === 'CREATE';
     }
 }

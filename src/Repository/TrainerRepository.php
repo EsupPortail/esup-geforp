@@ -13,14 +13,17 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TrainerRepository extends ServiceEntityRepository
+final class TrainerRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Trainer::class);
+        parent::__construct($managerRegistry, Trainer::class);
     }
 
-    public function getTrainersList($keyword, $filters, $page, $pageSize, $sorts, $fields)
+    /**
+     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     */
+    public function getTrainersList($keyword, $filters, $page, $pageSize, $sorts, $fields): array
     {
         $qb = $this->createQueryBuilder('trainer');
         $qb
@@ -30,7 +33,7 @@ class TrainerRepository extends ServiceEntityRepository
             ->where('trainer.firstname LIKE :keyword')
             ->orWhere('trainer.lastname LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         // FILTRE CENTRE
@@ -75,10 +78,12 @@ class TrainerRepository extends ServiceEntityRepository
         elseif ((is_array($sorts)) && (array_key_exists('organization.name', $sorts))) {
             if(!isset($filters['organization.name.source']))
                 $qb->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization');
+
             $qb->addOrderBy('o.name', $sorts['organization.name']);
         } elseif ((is_array($sorts)) && (array_key_exists('institution.name', $sorts))) {
             if(!isset($filters['institution.name.source']))
                 $qb->innerJoin('trainer.institution', 'i', 'WITH', 'i = trainer.institution');
+
             $qb->addOrderBy('i.name', $sorts['institution.name']);
         } elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
             $qb->addOrderBy('trainer.isorganization', $sorts['isOrganization']);
@@ -98,6 +103,7 @@ class TrainerRepository extends ServiceEntityRepository
             $page = 1;
             $pageSize = 50;
         }
+
         $offset = ($page-1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
@@ -107,7 +113,7 @@ class TrainerRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabTrainers = array();
+        $tabTrainers = [];
         foreach($paginator as $tr) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainers[]['id'] = $tr->getId();
@@ -116,15 +122,10 @@ class TrainerRepository extends ServiceEntityRepository
             }
         }
 
-
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabTrainers);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainers];
     }
 
-    public function getNbTrainers($query_filters, $keyword, $aggs, $name)
+    public function getNbTrainers($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('trainer');
         $qb
@@ -134,7 +135,7 @@ class TrainerRepository extends ServiceEntityRepository
             ->where('trainer.firstname LIKE :keyword')
             ->orWhere('trainer.lastname LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         // FILTRE CENTRE
@@ -198,9 +199,8 @@ class TrainerRepository extends ServiceEntityRepository
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 
 }

@@ -14,11 +14,11 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class SessionRepository extends ServiceEntityRepository
+final class SessionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Session::class);
+        parent::__construct($managerRegistry, Session::class);
     }
 
     public function getSessionsProgram($keyword, $filters)
@@ -35,7 +35,7 @@ class SessionRepository extends ServiceEntityRepository
             $qb
                 ->where('s.name LIKE :keyword')
                 /* addcslashes empêchera des manipulations malveillantes éventuelles */
-                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+                ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
         }
 
         // FILTRE DISPLAYONLINE pour affichage stagiaire
@@ -53,7 +53,7 @@ class SessionRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($filters['datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["datebegin"]);
+            $dates = explode('-', (string) $filters["datebegin"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -87,7 +87,10 @@ class SessionRepository extends ServiceEntityRepository
         return $result = $query->getResult();
     }
 
-    public function getSessionsList($keyword, $filters, $page, $pageSize, $sorts, $fields)
+    /**
+     * @return array{total: int, pageSize: mixed, items: array<int, array{availablePlaces?: mixed, datebegin?: mixed, dateend?: mixed, daynumber?: mixed, displayonline?: mixed, hournumber?: mixed, id: mixed, inscriptions?: array<int, array{id: mixed}>&mixed[], inscriptionStats?: array<int, array{id: mixed, name: mixed, status: mixed, count: int}>, limitRegistrationDate?: mixed, maximumnumberofregistrations?: mixed, name?: mixed, numberofacceptedregistrations?: mixed, numberofparticipants?: mixed, numberofregistrations?: mixed, participations?: array<int, array{id: mixed}>&mixed[], promote?: mixed, registrable?: mixed, registration?: mixed, semester?: mixed, semesterLabel?: mixed, sessiontype?: mixed, status?: mixed, theme?: mixed, training?: array{id: mixed, type: mixed, name: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed}, year?: mixed}>}
+     */
+    public function getSessionsList($keyword, $filters, $page, $pageSize, $sorts, $fields): array
     {
         $qb = $this->createQueryBuilder('s');
         $qb
@@ -97,7 +100,7 @@ class SessionRepository extends ServiceEntityRepository
         $qb
             ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         if ((isset($filters['training.organization.name.source'])) ||
@@ -139,6 +142,7 @@ class SessionRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -148,7 +152,7 @@ class SessionRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($filters['datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["datebegin"]);
+            $dates = explode('-', (string) $filters["datebegin"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -201,7 +205,7 @@ class SessionRepository extends ServiceEntityRepository
         // FILTRE FORMATEUR
         if( isset($filters['participations.trainer.fullName']) ) {
             /* le front envoie un full name (prénom+nom), je le découpe et ne récupère que le nom de famille */
-            $fullName = explode(" ", $filters['participations.trainer.fullName']);
+            $fullName = explode(" ", (string) $filters['participations.trainer.fullName']);
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
@@ -231,8 +235,8 @@ class SessionRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabSession = array();
-        $sessionES = array();
+        $tabSession = [];
+        $sessionES = [];
         foreach($paginator as $session) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabSession[]['id'] = $session->getId();
@@ -278,7 +282,7 @@ class SessionRepository extends ServiceEntityRepository
                 $sessionES['training']['firstSessionPeriodYear'] = $session->getTraining()->getFirstSessionPeriodSemester();
                 $sessionES['training']['publictypes'] = $session->getTraining()->getPublicTypes();
 
-                $statsInsc = array();
+                $statsInsc = [];
                 foreach ($session->getInscriptions() as $insc) {
                     $sessionES['inscriptions'][]['id'] = $insc->getId();
 
@@ -286,21 +290,20 @@ class SessionRepository extends ServiceEntityRepository
                     $flagExiste = 0;
                     $i=0;
                     // On parcourt le tableau des stats
-                    foreach ($statsInsc as $stat) {
+                    foreach ($statsInsc as $statInsc) {
                         // si le statut de l'inscription est trouvé dans le tableau
-                        if ($stat['id'] == $insc->getInscriptionStatus()->getId()) {
+                        if ($statInsc['id'] == $insc->getInscriptionStatus()->getId()) {
                             // on incrémente le compteur
-                            $statsInsc[$i]['count']++;
+                            ++$statsInsc[$i]['count'];
                             $flagExiste = 1;
                         }
-                        $i++;
+
+                        ++$i;
                     }
+
                     // si on n'a pas trouvé le statut de l'inscription dans le tableau, on l'ajoute
                     if ($flagExiste == 0) {
-                        $statsInsc [] = array( 'id' => $insc->getInscriptionStatus()->getId(),
-                            'name' => $insc->getInscriptionStatus()->getName(),
-                            'status' => $insc->getInscriptionStatus()->getStatus(),
-                            'count' => 1);
+                        $statsInsc [] = ['id' => $insc->getInscriptionStatus()->getId(), 'name' => $insc->getInscriptionStatus()->getName(), 'status' => $insc->getInscriptionStatus()->getStatus(), 'count' => 1];
                     }
                 }
 
@@ -316,15 +319,11 @@ class SessionRepository extends ServiceEntityRepository
             }
         }
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabSession);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabSession];
 
     }
 
-    public function getNbSessions($query_filters, $keyword, $aggs, $name)
+    public function getNbSessions($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('s');
         $qb
@@ -334,7 +333,7 @@ class SessionRepository extends ServiceEntityRepository
         $qb
             ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         if ((isset( $aggs['training.organization.name.source'])) || (isset($query_filters['training.organization.name.source'])) ||
             (isset( $aggs['theme.name'])) || (isset($query_filters['theme.name']))
@@ -388,6 +387,7 @@ class SessionRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -398,6 +398,7 @@ class SessionRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -407,7 +408,7 @@ class SessionRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($query_filters['datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $query_filters["datebegin"]);
+            $dates = explode('-', (string) $query_filters["datebegin"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -486,7 +487,7 @@ class SessionRepository extends ServiceEntityRepository
                 ->setParameter('id', $name);
         } elseif( isset($query_filters['participations.trainer.fullName']) ) {
             /* le front envoie un full name (prénom+nom), je le découpe et ne récupère que le nom de famille */
-            $fullName = explode(" ", $query_filters['participations.trainer.fullName']);
+            $fullName = explode(" ", (string) $query_filters['participations.trainer.fullName']);
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
@@ -499,9 +500,8 @@ class SessionRepository extends ServiceEntityRepository
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 
 }

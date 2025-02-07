@@ -1,14 +1,14 @@
 /**
  * $session service
  */
-sygeforApp.service('$session', [function() {
+sygeforApp.service('$session', [function () {
     /**
      * setSession
      * @param key
      * @param value
      * @returns {*}
      */
-    this.setSession = function(key, value) {
+    this.setSession = function (key, value) {
         value = typeof value == "undefined" ? null : JSON.stringify(value);
         return sessionStorage.setItem(key, value);
     };
@@ -18,18 +18,18 @@ sygeforApp.service('$session', [function() {
      * @param key
      * @returns {*}
      */
-    this.getSession = function(key) {
+    this.getSession = function (key) {
         return JSON.parse(sessionStorage.getItem(key));
     }
 
     /**
      * defineProperty history
      */
-    Object.defineProperty(this, "history",{
-        get: function() {
+    Object.defineProperty(this, "history", {
+        get: function () {
             return this.getSession('history');
         },
-        set: function(value) {
+        set: function (value) {
             this.setSession('history', value);
         }
     });

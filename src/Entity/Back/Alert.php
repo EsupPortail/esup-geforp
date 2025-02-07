@@ -14,45 +14,40 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- *
- * @ORM\Table(name="alert")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'alert')]
+#[ORM\Entity]
 class Alert
 {
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Trainee", inversedBy="alerts")
-     * @ORM\JoinColumn(name="trainee_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez sélectionner un stagiaire.")
      * @Serializer\Groups({"session"})
      */
+    #[ORM\ManyToOne(targetEntity: 'Trainee', inversedBy: 'alerts')]
+    #[ORM\JoinColumn(name: 'trainee_id')]
+    #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
     protected $trainee;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Session", inversedBy="alerts")
-     * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
-     * @Assert\NotNull()
      * @Serializer\Groups({"trainee"})
      */
+    #[ORM\ManyToOne(targetEntity: 'Session', inversedBy: 'alerts')]
+    #[ORM\JoinColumn(name: 'session_id')]
+    #[Assert\NotNull]
     protected $session;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="created_at",type="datetime", nullable=true)
      * @Serializer\Groups({"inscription", "session", "trainee", "trainer", "api"})
      */
-    protected $createdat;
+    #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $createdat = null;
 
 
     /**
@@ -66,15 +61,12 @@ class Alert
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @param mixed $trainee
-     */
-    public function setTrainee($trainee)
+    public function setTrainee(mixed $trainee): void
     {
         $this->trainee = $trainee;
     }
@@ -95,10 +87,7 @@ class Alert
         return $this->session;
     }
 
-    /**
-     * @param mixed $session
-     */
-    public function setSession($session)
+    public function setSession(mixed $session): void
     {
         $this->session = $session;
     }
@@ -114,7 +103,7 @@ class Alert
     /**
      * @param \DateTime $createdat
      */
-    public function setCreatedat($createdAt)
+    public function setCreatedat($createdAt): void
     {
         $this->createdat = $createdAt;
     }
@@ -124,7 +113,7 @@ class Alert
      */
     public function getOrganization()
     {
-        return $this->getSession()->getTraining()->getOrganization();
+        return $this->session->getTraining()->getOrganization();
     }
 
 }

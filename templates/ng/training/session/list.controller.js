@@ -1,7 +1,7 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector', '$dialog', '$user', 'search', '$dialogParams', 'BaseListController', 'training', '$trainingBundle', function($scope, $state, $injector, $dialog, $user, search, $dialogParams, BaseListController, training, $trainingBundle) {
+sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector', '$dialog', '$user', 'search', '$dialogParams', 'BaseListController', 'training', '$trainingBundle', function ($scope, $state, $injector, $dialog, $user, search, $dialogParams, BaseListController, training, $trainingBundle) {
     $injector.invoke(BaseListController, this, {key: 'session', $scope: $scope, $search: search});
 
     $scope.$trainingBundle = $trainingBundle;
@@ -10,12 +10,15 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
      * Declare add operation
      * @var {Array}
      */
-     $scope.addOperations = [{
+    $scope.addOperations = [{
         //templateUrl: 'mycompanybundle/training/session/modals/add.html',
         label: 'Ajouter une session',
-        execute: function (){
-            $dialog.open('session.create',{training: training.id}).then(function(data) {
-                $state.go('session.detail.view', {id: data.session.id, training: data.session.training.id}, {reload: true});
+        execute: function () {
+            $dialog.open('session.create', {training: training.id}).then(function (data) {
+                $state.go('session.detail.view', {
+                    id: data.session.id,
+                    training: data.session.training.id
+                }, {reload: true});
             });
         },
         available: function () {
@@ -23,7 +26,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             // Pas de sens de créer une session si ce n'est à partir d'un stage
             return false;
         }
-     }];
+    }];
 
     /**
      * Batch operations
@@ -36,7 +39,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             //return true;
             return $user.hasAccessRight('sygefor_training.rights.inscription.own.update') || $user.hasAccessRight('sygefor_trainee.rights.inscription.all.update');
         },
-        subitems: function (){
+        subitems: function () {
             var items = [];
             var options = [
                 'Désactivées',
@@ -44,15 +47,15 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
                 'Privées',
                 'Publiques'
             ];
-            for(var i=0; i<options.length; i++) {
-                (function() {
+            for (var i = 0; i < options.length; i++) {
+                (function () {
                     const _i = i;
-                    items.push ({
+                    items.push({
                         label: options[i],
                         execute: function (items, $dialog) {
                             return $dialog
                                 .open('session.registrationChange', {items: items, registration: _i})
-                                .then(function() {
+                                .then(function () {
                                     // on success, reload the search page
                                     search.search();
                                 });
@@ -62,15 +65,15 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
             }
             return items;
         }()
-    },{
+    }, {
         icon: 'fa-download',
         label: 'Exporter',
         subitems: [
             {
                 icon: 'fa-file-excel-o',
                 label: 'CSV',
-                execute: function(items, $dialog) {
-                    return $dialog.open('batch.export.csv', { items: items, service: 'session' })
+                execute: function (items, $dialog) {
+                    return $dialog.open('batch.export.csv', {items: items, service: 'session'})
                 }
             },
             {
@@ -96,25 +99,25 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
      * Facets
      */
     $scope.facets = {
-        'training.organization.name.source' : {
+        'training.organization.name.source': {
             label: 'Centre'
         },
-        'year' : {
+        'year': {
             label: 'Année'
         },
-        'semester' : {
+        'semester': {
             label: 'Semestre'
         },
-        'theme.name' : {
+        'theme.name': {
             label: 'Domaine de compétence'
         },
-        'module.source' : {
+        'module.source': {
             label: 'Module'
         },
-        'training.typeLabel.source' : {
+        'training.typeLabel.source': {
             label: 'Type'
         },
-        'registration' : {
+        'registration': {
             label: 'Inscriptions',
             values: {
                 '0': 'Désactivées',
@@ -123,7 +126,7 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
                 '3': 'Publiques'
             }
         },
-        'status' : {
+        'status': {
             label: 'Statut',
             values: {
                 '0': 'Ouverte',
@@ -131,24 +134,24 @@ sygeforApp.controller('SessionListController', ['$scope', '$state', '$injector',
                 '2': 'Annulée'
             }
         },
-        'displayOnline' : {
+        'displayOnline': {
             label: 'Afficher en ligne',
             values: {
                 'T': 'Oui',
                 'F': 'Non'
             }
         },
-        'training.name.source' : {
+        'training.name.source': {
             label: 'Formation'
         },
-        'datebegin' : {
+        'datebegin': {
             label: 'Date',
             type: 'range'
         },
-        'participations.trainer.fullName' : {
+        'participations.trainer.fullName': {
             label: 'Formateur'
         },
-        'promote' : {
+        'promote': {
             label: 'Promotion',
             values: {
                 'true': 'Oui',

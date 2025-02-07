@@ -12,43 +12,21 @@ use Doctrine\ORM\EntityRepository;
 /**
  * Class InstitutionType
  */
-class InstitutionType extends BaseInstitutionType
+final class InstitutionType extends BaseInstitutionType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $object = $builder->getData();
-        $builder
-            ->add('idp', TextType::class, array(
-                'label' => 'URL IDP',
-                'required' => false,
-            ))
-            ->add('domains', EntityType::class, array(
-                'label' => 'Noms de domaines',
-                'class' => Domain::class,
-                'choice_label' => 'name',
-                'multiple' => true,
-                'required' => false,
-            ))
-            ->add('visuinstitutions', EntityType::class, array(
-                'label' => 'Autres établissements visibles',
-                'class' => AbstractInstitution::class,
-                'choice_label' => 'name',
-                'multiple' => true,
-                'required' => false,
-                'query_builder' => function (EntityRepository $er) use ($object) {
-                    return $er->createQueryBuilder('i')
-                        ->where('i != :institution')
-                        ->setParameter('institution', $object)
-                        ->orderBy('i.name', 'ASC');
-                },
-            ));
+        $object = $formBuilder->getData();
+        $formBuilder
+            ->add('idp', TextType::class, ['label' => 'URL IDP', 'required' => false])
+            ->add('domains', EntityType::class, ['label' => 'Noms de domaines', 'class' => Domain::class, 'choice_label' => 'name', 'multiple' => true, 'required' => false])
+            ->add('visuinstitutions', EntityType::class, ['label' => 'Autres établissements visibles', 'class' => AbstractInstitution::class, 'choice_label' => 'name', 'multiple' => true, 'required' => false, 'query_builder' => static fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('i')
+                ->where('i != :institution')
+                ->setParameter('institution', $object)
+                ->orderBy('i.name', 'ASC')]);
 
 
 
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
     }
 }

@@ -2,25 +2,20 @@
 
 namespace App\Utils;
 
-class TrainingTypeRegistry
+final class TrainingTypeRegistry
 {
     /**
-     * @var array
-     */
-    private $types;
-
-    /**
      * @param $types
+     * @param mixed[] $types
      */
-    public function __construct($types)
+    public function __construct(private $types)
     {
-        $this->types = $types;
     }
 
     /**
      * @param array $types
      */
-    public function setTypes($types)
+    public function setTypes($types): void
     {
         $this->types = $types;
     }

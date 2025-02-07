@@ -13,14 +13,11 @@ use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -28,22 +25,24 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * This controller regroup actions related to attendance.
  *
- * @Route("/account")
- * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
  */
+#[Route(path: '/account')]
 class AttendanceAccountController extends AbstractController
 {
-    /**
-     * All attendances of the trainee
-     * @Route("/attendances", name="front.account.attendances")
-     * @Template("Front/Account/attendance/attendances.html.twig")
-     * @Method("GET")
-     */
-    public function attendancesAction(Request $request, ManagerRegistry $doctrine)
+    public function index(): \Symfony\Component\HttpFoundation\Response
+    {
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            throw new AccessDeniedException('Vous devez être pleinement authentifié pour accéder à cette page.');
+        }
+        return $this->render('Front/Account/profile/profile.html.twig');
+    }
+    #[Route('/attendances', methods: ['GET'])]
+    #[Route(path: '/attendances', name: 'front.account.attendances')]
+    public function attendances(ManagerRegistry $doctrine): array
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup param evaluations
@@ -53,21 +52,15 @@ class AttendanceAccountController extends AbstractController
         $qb          = $this->createQueryBuilder($doctrine, $trainee);
         $attendances = $qb->getQuery()->getResult();
 
-        return array('user' => $trainee, 'attendances' => $attendances, 'evalActif' => $evalActif);
+        return ['user' => $trainee, 'attendances' => $attendances, 'evalActif' => $evalActif, $this->render('Front/Account/attendance/attendances.html.twig')];
     }
 
-    /**
-     * Single attendance.
-     *
-     * @Route("/attendance/{session}", name="front.account.attendance")
-     * @Template("Front/Account/attendance/attendance.html.twig")
-     * @Method("GET")
-     */
-    public function attendanceAction($session, ManagerRegistry $doctrine, Request $request)
+    #[Route(path: '/attendance/{session}', name: 'front.account.attendance', methods: ['GET'])]
+    public function attendance($session, ManagerRegistry $doctrine): array
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup param pour l'activation des evaluations
@@ -85,19 +78,20 @@ class AttendanceAccountController extends AbstractController
         }*/
         $attendance->getSession()->setAllMaterials($allMaterials);
 
-        return array('user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif);
+        return ['user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif,
+        $this->render('Front/Account/attendance/attendance.html.twig')];
     }
 
-    /**
-     * @Route("/attendance/{id}/evaluation", name="front.account.attendance.evaluation")
-     * @ParamConverter("attendance", class="App\Entity\Back\Inscription", options={"id" = "id"})
-     * @Template("Front/Account/attendance/evaluation.html.twig")
-     */
-    public function evaluationAction(Request $request, ManagerRegistry $doctrine, Inscription $attendance)
+    #[Route(path: '/attendance/{id}/evaluation', name: 'front.account.attendance.evaluation')]
+    public function evaluation(Request $request, ManagerRegistry $doctrine, Inscription $attendance, int $id): Response
     {
+        $attendance = $doctrine->getRepository(\App\Entity\Back\Inscription::class)->find($id);
+        if (!$attendance) {
+            throw $this->createNotFoundException();
+        }
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         // Recup params pour les critères d'évalutation
@@ -110,33 +104,24 @@ class AttendanceAccountController extends AbstractController
 
         //Construction du tableau de choix du formulaire d'évaluation
         if ($evalCritere0Actif) {
-            $tabEvalChoices = array(
-                "Non concerné" => 0,
-                $evalCritere4 => 4,
-                $evalCritere3 => 3,
-                $evalCritere2 => 2,
-                $evalCritere1 => 1);
+            $tabEvalChoices = ["Non concerné" => 0, $evalCritere4 => 4, $evalCritere3 => 3, $evalCritere2 => 2, $evalCritere1 => 1];
         } else {
-            $tabEvalChoices = array(
-                $evalCritere4 => 4,
-                $evalCritere3 => 3,
-                $evalCritere2 => 2,
-                $evalCritere1 => 1);
+            $tabEvalChoices = [$evalCritere4 => 4, $evalCritere3 => 3, $evalCritere2 => 2, $evalCritere1 => 1];
         }
 
         if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
             // Pb : l'évaluation a déjà été remplie
             $this->get('session')->getFlashBag()->add('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
-            return $this->redirectToRoute('front.public.index');
+            return $this->render('Front/Account/attendance/evaluation.html.twig');
 
         }
 
         $evaluationCriterionsLoc = $doctrine
             ->getRepository('App\Entity\Term\EvaluationCriterion')
-            ->findBy(array('organization'=> $attendance->getSession()->getTraining()->getOrganization()), array('name' => 'ASC'));
+            ->findBy(['organization'=> $attendance->getSession()->getTraining()->getOrganization()], ['name' => 'ASC']);
         $evaluationCriterionsNat = $doctrine
             ->getRepository('App\Entity\Term\EvaluationCriterion')
-            ->findBy(array('organization'=> null), array('name' => 'ASC'));
+            ->findBy(['organization'=> null], ['name' => 'ASC']);
         $evaluationCriterions = array_merge($evaluationCriterionsLoc, $evaluationCriterionsNat);
 
         foreach ($evaluationCriterions as $evaluationCriterion) {
@@ -145,33 +130,30 @@ class AttendanceAccountController extends AbstractController
             $evaluationNotedCriterion->setCriterion($evaluationCriterion);
             $attendance->addCriterion($evaluationNotedCriterion);
         }
-        $form = $this->createForm(EvaluationType::class, $attendance, array('tab_eval' => $tabEvalChoices, 'message' => $evalMessage));
+        $form = $this->createForm(EvaluationType::class, $attendance, ['tab_eval' => $tabEvalChoices, 'message' => $evalMessage]);
         if ($request->getMethod() == "POST") {
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $doctrine->getManager()->flush();
                 $this->get('session')->getFlashBag()->add('success', "Les réponses ont bien été enregistrées. Merci d'avoir noté la session.");
-                return $this->redirectToRoute('front.account.attendance', array('session' => $attendance->getSession()->getId()));
+                return $this->redirectToRoute('front.account.attendance', ['session' => $attendance->getSession()->getId()]);
             }
         }
 
-        return array('user' => $trainee, 'attendance' => $attendance, 'form' => $form->createView());
+        return ['user' => $trainee, 'attendance' => $attendance, 'form' => $form->createView()];
     }
 
-    /**
-     * Download a material
-     * @Route("/attendance/{session}/download/{material}", name="front.account.attendance.download")
-     * @Method("GET")
-     */
-    public function downloadAction(Request $request, ManagerRegistry $doctrine, $session, $material)
+
+    #[Route(path: '/attendance/{session}/download/{material}', name: 'front.account.attendance.download', methods: ['GET'])]
+    public function download(ManagerRegistry $doctrine, $session, $material)
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $attendance   = $this->getAttendance($doctrine, $session, $trainee);
-        $allMaterials = array();
+        $allMaterials = [];
         $material     = intval($material);
 
         // get all materials
@@ -197,16 +179,12 @@ class AttendanceAccountController extends AbstractController
         throw new NotFoundHttpException('Unknown resource.');
     }
 
-    /**
-     * Attestation of attendance
-     * @Route("/attendance/{session}/attestation", name="front.account.attendance.attestation")
-     * @Method("GET")
-     */
-    public function attestationAction($session, ManagerRegistry $doctrine, Request $request, Pdf $knpPdf)
+    #[Route(path: '/attendance/{session}/attestation', name: 'front.account.attendance.attestation', methods: ['GET'])]
+    public function attestation($session, ManagerRegistry $doctrine, Pdf $knpPdf): \Symfony\Component\HttpFoundation\Response
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $attendance = $this->getAttendance($doctrine, $session, $trainee);
@@ -214,12 +192,12 @@ class AttendanceAccountController extends AbstractController
 
         // Gestion nombre d'heures de formation
         // On crée le tableau de dates correspondant au tableau des présences
-        $tabDates = array();$nbJoursDate2 = -1;
+        $tabDates = [];$nbJoursDate2 = -1;
         foreach ($session->getDates() as $dateSes) {
             // Conversion date de début de session
             $dateDeb = $dateSes->getDateBegin();
             $dateNewS = $dateDeb->format('d/m/Y');
-            $tab = explode('/', $dateNewS);
+            $tab = explode('/', (string) $dateNewS);
             $dateNew = new \DateTime();
             $dateNew->setDate($tab[2], $tab[1], $tab[0]);
 
@@ -227,7 +205,7 @@ class AttendanceAccountController extends AbstractController
             $nbJoursDate = $nbJoursDate2->format('%a');
             // création du tableau des dates suivant le nombre de jours à afficher
             for ($j = 0; $j < $nbJoursDate + 1; $j++) {
-                $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
+                $tabDates[] = ["dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter()];
                 $dateNew->modify('+ 1 days');
 
             }
@@ -254,7 +232,7 @@ class AttendanceAccountController extends AbstractController
 
         // Recuperation des fichiers logos et signature
         $organization = $session->getTraining()->getOrganization();
-        $images = $doctrine->getRepository('App\Entity\Term\ImageFile')->findBy(array('organization' => $organization));
+        $images = $doctrine->getRepository(\App\Entity\Term\ImageFile::class)->findBy(['organization' => $organization]);
 
         //checking file existence
         $fileSignature = null;
@@ -262,12 +240,12 @@ class AttendanceAccountController extends AbstractController
         $fs = new Filesystem();
         foreach ($images as $img) {
             $fileName = $img->getName();
-            if(strpos($fileName, 'logo') !== false){
+            if(str_contains($fileName, 'logo')){
                 if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileLogo = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }
-            if(strpos($fileName, 'signature') !== false){
+            if(str_contains($fileName, 'signature')){
                 if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileSignature = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
@@ -275,49 +253,36 @@ class AttendanceAccountController extends AbstractController
         }
 
         // patch pb encodage HTML
-        $firstNameTrainee = htmlentities($attendance->getTrainee()->getFirstname());
+        $firstNameTrainee = htmlentities((string) $attendance->getTrainee()->getFirstname());
         $attendance->getTrainee()->setFirstname($firstNameTrainee);
-        $lastNameTrainee = htmlentities($attendance->getTrainee()->getLastname());
+        $lastNameTrainee = htmlentities((string) $attendance->getTrainee()->getLastname());
         $attendance->getTrainee()->setLastname($lastNameTrainee);
-        $orgName = htmlentities($session->getTraining()->getOrganization()->getName());
+        $orgName = htmlentities((string) $session->getTraining()->getOrganization()->getName());
         $session->getTraining()->getOrganization()->setName($orgName);
-        $orgAdr = htmlentities($session->getTraining()->getOrganization()->getAddress());
+        $orgAdr = htmlentities((string) $session->getTraining()->getOrganization()->getAddress());
         $session->getTraining()->getOrganization()->setAddress($orgAdr);
-        $orgCity = htmlentities($session->getTraining()->getOrganization()->getCity());
+        $orgCity = htmlentities((string) $session->getTraining()->getOrganization()->getCity());
         $session->getTraining()->getOrganization()->setCity($orgCity);
-        $nameForm = htmlentities($session->getTraining()->getName());
+        $nameForm = htmlentities((string) $session->getTraining()->getName());
         $session->getTraining()->setName($nameForm);
         $trainers = $session->getTrainers();
         foreach ($trainers as $trainer) {
-            $firstNameTrainer = htmlentities($trainer->getFirstname());
+            $firstNameTrainer = htmlentities((string) $trainer->getFirstname());
             $trainer->setFirstName($firstNameTrainer);
-            $lastNameTrainer = htmlentities($trainer->getLastname());
+            $lastNameTrainer = htmlentities((string) $trainer->getLastname());
             $trainer->setLastname($lastNameTrainer);
         }
         $session->getTraining()->setName($nameForm);
 
-        $pdf = $this->renderView('PDF/attestation.pdf.twig', array(
-            'inscription' => $attendance,
-            'nbHeuresPresence' => $nbHeuresPresence."/".$nbHeuresSession,
-            'logo' => $fileLogo,
-            'signature' => $fileSignature
-        ));
+        $pdf = $this->renderView('PDF/attestation.pdf.twig', ['inscription' => $attendance, 'nbHeuresPresence' => $nbHeuresPresence."/".$nbHeuresSession, 'logo' => $fileLogo, 'signature' => $fileSignature]);
 
         return new Response(
-            $knpPdf->getOutputFromHtml($pdf, array('print-media-type' => null)), 200,
-            array(
-                'Content-Type'        => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="attestation.pdf"',
-                )
+            $knpPdf->getOutputFromHtml($pdf, ['print-media-type' => null]), \Symfony\Component\HttpFoundation\Response::HTTP_OK,
+            ['Content-Type'        => 'application/pdf', 'Content-Disposition' => 'attachment; filename="attestation.pdf"']
         );
     }
 
-    /**
-     * Return the attendance belong to the session.
-     *
-     * @return AbstractInscription
-     */
-    private function getAttendance($doctrine, $session, $trainee)
+    private function getAttendance(\Doctrine\Persistence\ManagerRegistry $doctrine, $session, $trainee)
     {
         $qb = $this->createQueryBuilder($doctrine, $trainee);
         $qb->andWhere('i.session = :session')
@@ -330,15 +295,11 @@ class AttendanceAccountController extends AbstractController
         return $attendance;
     }
 
-    /**
-     * Create a specific query builder for attendees.
-     *
-     * @return QueryBuilder
-     */
-    private function createQueryBuilder($doctrine, $trainee)
+
+    private function createQueryBuilder(\Doctrine\Persistence\ManagerRegistry $doctrine, $trainee)
     {
         $em         = $doctrine->getManager();
-        $repository = $em->getRepository('App\Entity\Core\AbstractInscription');
+        $repository = $em->getRepository(\App\Entity\Core\AbstractInscription::class);
         /** @var QueryBuilder $qb */
         $qb = $repository->createQueryBuilder('i');
         // only for the current user

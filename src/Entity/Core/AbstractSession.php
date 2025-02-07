@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
@@ -18,180 +19,200 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Session.
  *
- * @ORM\Table(name="session")
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\HasLifecycleCallbacks
  *
  * traduction: session
  */
-abstract class AbstractSession implements SerializedAccessRights
+#[ORM\Table(name: 'session')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\HasLifecycleCallbacks]
+abstract class AbstractSession implements SerializedAccessRights, \Stringable
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
 
     // registration states
-    const REGISTRATION_DEACTIVATED = 0;
-    const REGISTRATION_CLOSED = 1;
-    const REGISTRATION_PRIVATE = 2;
-    const REGISTRATION_PUBLIC = 3;
-
-    // registration states
-    const STATUS_OPEN = 0;
-    const STATUS_REPORTED = 1;
-    const STATUS_CANCELED = 2;
+    /**
+     * @var int
+     */
+    final public const REGISTRATION_DEACTIVATED = 0;
 
     /**
      * @var int
+     */
+    final public const REGISTRATION_CLOSED = 1;
+
+    /**
+     * @var int
+     */
+    final public const REGISTRATION_PRIVATE = 2;
+
+    /**
+     * @var int
+     */
+    final public const REGISTRATION_PUBLIC = 3;
+
+    // registration states
+    /**
+     * @var int
+     */
+    final public const STATUS_OPEN = 0;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_REPORTED = 1;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_CANCELED = 2;
+
+    /**
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var AbstractTraining
-     * @ORM\ManyToOne(targetEntity="AbstractTraining", inversedBy="sessions")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractTraining', inversedBy: 'sessions')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     protected $training;
 
     /**
-     * @ORM\OneToMany(targetEntity="AbstractParticipation", mappedBy="session", cascade={"remove"})
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
+     * @var Collection<\App\Entity\Core\AbstractParticipation>
      */
-    protected $participations;
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
+    protected Collection $participations;
 
     /**
-     * @ORM\OneToMany(targetEntity="AbstractInscription", mappedBy="session", fetch="EXTRA_LAZY", cascade={"remove"})
-     * @ORM\OrderBy({"createdat" = "DESC"})
      * @Serializer\Groups({"session"})
+     * @var Collection<\App\Entity\Core\AbstractInscription>
      */
-    protected $inscriptions;
+    #[ORM\OneToMany(targetEntity: 'AbstractInscription', mappedBy: 'session', fetch: 'EXTRA_LAZY', cascade: ['remove'])]
+    #[ORM\OrderBy(['createdat' => 'DESC'])]
+    protected Collection $inscriptions;
 
     /**
-     * @ORM\Column(name="promote", type="boolean")
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $promote = false;
+    #[ORM\Column(name: 'promote', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    protected ?bool $promote = false;
 
     /**
-     * @var \DateTime
      *
-     * @ORM\Column(name="dateBegin", type="datetime")
-     * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $datebegin;
+    #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
+    protected ?\DateTimeInterface $datebegin = null;
 
     /**
-     * @var \DateTime
      *
-     * @ORM\Column(name="dateEnd", type="datetime", nullable=true)
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $dateend;
+    #[ORM\Column(name: 'dateEnd', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $dateend = null;
+
+    #[ORM\Column(name: 'registration', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $registration = self::REGISTRATION_CLOSED;
 
     /**
-     * @ORM\Column(name="registration", type="integer")
-     */
-    protected $registration = self::REGISTRATION_CLOSED;
-
-    /**
-     * @ORM\Column(name="status", type="integer")
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      */
-    protected $status = self::STATUS_OPEN;
+    #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $status = self::STATUS_OPEN;
 
     /**
-     * @ORM\Column(name="displayOnline", type="boolean")
      *
-     * @var bool
      * @Serializer\Groups({"Default", "session", "api"})
      */
-    protected $displayonline = false;
+    #[ORM\Column(name: 'displayOnline', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    protected ?bool $displayonline = false;
 
     /**
-     * @ORM\Column(name="numberOfRegistrations", type="integer", nullable=true)
      * @Serializer\Exclude
      */
-    protected $numberofregistrations;
+    #[ORM\Column(name: 'numberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
+    protected ?int $numberofregistrations = null;
 
     /**
-     * @ORM\Column(name="maximumNumberOfRegistrations", type="integer")
      * @Serializer\Groups({"session", "training", "inscription", "api"})
-     * @Assert\NotBlank()
      */
-    protected $maximumnumberofregistrations = 20;
+    #[ORM\Column(name: 'maximumNumberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[Assert\NotBlank]
+    protected ?int $maximumnumberofregistrations = 20;
 
     /**
-     * @ORM\Column(name="limitRegistrationDate", type="datetime")
      * @Serializer\Groups({"session", "training", "api"})
      */
-    protected $limitregistrationdate;
+    #[ORM\Column(name: 'limitRegistrationDate', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $limitregistrationdate = null;
 
     /**
-     * @ORM\Column(name="comments", type="text", nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"session"})
      */
-    protected $comments;
+    #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $comments = null;
 
     /**
-     * @var Sessiontype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Sessiontype")
-     * @ORM\JoinColumn(name="sessionType_id", referencedColumnName="id", onDelete="SET NULL")
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $sessiontype;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Sessiontype::class)]
+    #[ORM\JoinColumn(name: 'sessionType_id', onDelete: 'SET NULL')]
+    protected ?\App\Entity\Term\Sessiontype $sessiontype = null;
 
     /**
-     * @ORM\Column(name="hourNumber", type="float")
-     * @Serializer\Groups({"session", "inscription", "api"})
-     * @Assert\GreaterThan(value = 0, message = "Vous devez renseigner un nombre d'heures")
-     * @Assert\NotNull(message="Vous devez renseigner un nombre d'heures")
-     */
-    protected $hournumber;
-
-    /**
-     * @ORM\Column(name="dayNumber", type="float")
-     * @Serializer\Groups({"session", "inscription", "api"})
-     * @Assert\GreaterThan(value = 0, message = "Vous devez renseigner un nombre de jours")
-     * @Assert\NotNull(message="Vous devez renseigner un nombre de jours")
-     */
-    protected $daynumber;
-
-    /**
-     * @ORM\Column(name="schedule", type="string", length=512, nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $schedule;
+    #[ORM\Column(name: 'hourNumber', type: \Doctrine\DBAL\Types\Types::FLOAT)]
+    #[Assert\GreaterThan(value: 0, message: "Vous devez renseigner un nombre d'heures")]
+    #[Assert\NotNull(message: "Vous devez renseigner un nombre d'heures")]
+    protected ?float $hournumber = null;
 
     /**
-     * @ORM\Column(name="place", type="text", nullable=true)
-     * @var String
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $place;
+    #[ORM\Column(name: 'dayNumber', type: \Doctrine\DBAL\Types\Types::FLOAT)]
+    #[Assert\GreaterThan(value: 0, message: 'Vous devez renseigner un nombre de jours')]
+    #[Assert\NotNull(message: 'Vous devez renseigner un nombre de jours')]
+    protected ?float $daynumber = null;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Core\ParticipantsSummary", mappedBy="session", fetch="EXTRA_LAZY", cascade={"persist", "remove"})
+     * @Serializer\Groups({"session", "inscription", "api"})
+     */
+    #[ORM\Column(name: 'schedule', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $schedule = null;
+
+    /**
+     * @Serializer\Groups({"session", "inscription", "api"})
+     */
+    #[ORM\Column(name: 'place', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $place = null;
+
+    /**
      * @Serializer\Groups({"session"})
+     * @var Collection<\App\Entity\Core\ParticipantsSummary>
      */
-    protected $participantsSummaries;
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Core\ParticipantsSummary::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    protected Collection $participantsSummaries;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\Core\Material", mappedBy="session", cascade={"remove", "persist"})
-     * @ORM\JoinColumn(nullable=true)
+     * @var Collection<Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
-    protected $materials;
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: Material::class, cascade: ['remove', 'persist'])]
+    #[ORM\JoinColumn]
+    protected Collection $materials;
 
     /**
      * @var ArrayCollection
@@ -210,7 +231,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     public function __clone()
     {
-        $this->setId(null);
+        $this->setId((int)null);
         $this->inscriptions = new ArrayCollection();
         $this->participations = new ArrayCollection();
         $this->participantsSummaries = new ArrayCollection();
@@ -228,7 +249,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -244,7 +265,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param AbstractTraining $training
      */
-    public function setTraining($training)
+    public function setTraining($training): void
     {
         $this->training = $training;
     }
@@ -257,10 +278,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->participations;
     }
 
-    /**
-     * @param mixed $participations
-     */
-    public function setParticipations($participations)
+    public function setParticipations(mixed $participations): void
     {
         $this->participations = $participations;
     }
@@ -304,13 +322,13 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getTrainersListString()
     {
-        if (!$this->getParticipations()) {
+        if (!$this->participations) {
             return '';
         }
 
-        $array = array();
+        $array = [];
         /** @var AbstractParticipation $participation */
-        foreach ($this->getParticipations() as $participation) {
+        foreach ($this->participations as $participation) {
             $array[] = $participation->getTrainer()->getFullname();
         }
 
@@ -327,7 +345,7 @@ abstract class AbstractSession implements SerializedAccessRights
     {
         $trainers = new ArrayCollection();
         /** @var AbstractParticipation $participation */
-        foreach ($this->getParticipations() as $participation) {
+        foreach ($this->participations as $participation) {
             $trainers->add($participation->getTrainer());
         }
 
@@ -342,10 +360,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->inscriptions;
     }
 
-    /**
-     * @param mixed $inscriptions
-     */
-    public function setInscriptions($inscriptions)
+    public function setInscriptions(mixed $inscriptions): void
     {
         $this->inscriptions = $inscriptions;
     }
@@ -390,10 +405,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->promote;
     }
 
-    /**
-     * @param mixed $promote
-     */
-    public function setPromote($promote)
+    public function setPromote(mixed $promote): void
     {
         $this->promote = $promote;
     }
@@ -406,10 +418,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->registration;
     }
 
-    /**
-     * @param mixed $registration
-     */
-    public function setRegistration($registration)
+    public function setRegistration(mixed $registration): void
     {
         $this->registration = $registration;
     }
@@ -433,7 +442,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param bool $displayOnline
      */
-    public function setDisplayonline($displayOnline)
+    public function setDisplayonline($displayOnline): void
     {
         $this->displayonline = $displayOnline;
     }
@@ -452,7 +461,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getYear()
     {
-        return $this->getDatebegin() ? $this->getDatebegin()->format('Y') : null;
+        return $this->datebegin ? $this->datebegin->format('Y') : null;
     }
 
     /**
@@ -461,7 +470,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getSemester()
     {
-        return $this->getDatebegin() ? ceil($this->getDatebegin()->format('m') / 6) : null;
+        return $this->datebegin ? ceil($this->datebegin->format('m') / 6) : null;
     }
 
     /**
@@ -474,10 +483,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->getYear().' - '.($this->getSemester() < 2 ? '1er' : '2nd').' semestre ';
     }
 
-    /**
-     * @param mixed $dateBegin
-     */
-    public function setDatebegin($dateBegin)
+    public function setDatebegin(mixed $dateBegin): void
     {
         $this->datebegin = $dateBegin;
     }
@@ -490,10 +496,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->dateend;
     }
 
-    /**
-     * @param mixed $dateEnd
-     */
-    public function setDateend($dateEnd)
+    public function setDateend(mixed $dateEnd): void
     {
         $this->dateend = $dateEnd;
     }
@@ -506,10 +509,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->hournumber;
     }
 
-    /**
-     * @param mixed $hourNumber
-     */
-    public function setHournumber($hourNumber)
+    public function setHournumber(mixed $hourNumber): void
     {
         $this->hournumber = $hourNumber;
     }
@@ -522,10 +522,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->daynumber;
     }
 
-    /**
-     * @param mixed $dayNumber
-     */
-    public function setDaynumber($dayNumber)
+    public function setDaynumber(mixed $dayNumber): void
     {
         $this->daynumber = $dayNumber;
     }
@@ -535,13 +532,13 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getDuration()
     {
-        return $this->getHournumber() . ' heure(s) sur ' . $this->getDaynumber() . ' jour(s)';
+        return $this->hournumber . ' heure(s) sur ' . $this->daynumber . ' jour(s)';
     }
 
     /**
-     * @return Place
+     * @return string
      */
-    public function getPlace()
+    public function getPlace(): ?string
     {
         return $this->place;
     }
@@ -549,7 +546,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param Place $place
      */
-    public function setPlace($place)
+    public function setPlace($place): void
     {
         $this->place = $place;
     }
@@ -562,10 +559,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->schedule;
     }
 
-    /**
-     * @param mixed $schedule
-     */
-    public function setSchedule($schedule)
+    public function setSchedule(mixed $schedule): void
     {
         $this->schedule = $schedule;
     }
@@ -578,10 +572,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->comments;
     }
 
-    /**
-     * @param mixed $comments
-     */
-    public function setComments($comments)
+    public function setComments(mixed $comments): void
     {
         $this->comments = $comments;
     }
@@ -594,10 +585,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->status;
     }
 
-    /**
-     * @param mixed $status
-     */
-    public function setStatus($status)
+    public function setStatus(mixed $status): void
     {
         $this->status = $status;
     }
@@ -610,10 +598,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->maximumnumberofregistrations;
     }
 
-    /**
-     * @param mixed $maximumNumberOfRegistrations
-     */
-    public function setMaximumnumberofregistrations($maximumNumberOfRegistrations)
+    public function setMaximumnumberofregistrations(mixed $maximumNumberOfRegistrations): void
     {
         $this->maximumnumberofregistrations = $maximumNumberOfRegistrations;
     }
@@ -629,7 +614,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param Sessiontype $sessionType
      */
-    public function setSessiontype($sessionType)
+    public function setSessiontype($sessionType): void
     {
         $this->sessiontype = $sessionType;
     }
@@ -661,28 +646,29 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function isRegistrable()
     {
-        if ($this->getStatus() !== self::STATUS_OPEN) {
+        if ($this->status !== self::STATUS_OPEN) {
             return false;
         }
 
-        $now = new \DateTime();
+        $dateTime = new \DateTime();
 
         // check date
-        if ($this->getDatebegin() <= $now) {
+        if ($this->datebegin <= $dateTime) {
             return false;
         }
 
         // check status
-        if ($this->getRegistration() < self::REGISTRATION_PRIVATE) {
+        if ($this->registration < self::REGISTRATION_PRIVATE) {
             return false;
         }
 
-        if ($this->getLimitregistrationdate() && $this->getLimitregistrationdate() < $now) {
-            return false;
+        if (!$this->limitregistrationdate) {
+            // ok
+            return true;
         }
 
         // ok
-        return true;
+        return $this->limitregistrationdate >= $dateTime;
     }
 
     /**
@@ -704,7 +690,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getAvailablePlaces()
     {
-        return $this->getMaximumnumberofregistrations() - $this->getNumberofacceptedregistrations();
+        return $this->maximumnumberofregistrations - $this->getNumberofacceptedregistrations();
     }
 
     /**
@@ -714,7 +700,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getNumberofregistrations()
     {
-        if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
+        if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
         }
 
@@ -725,10 +711,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->inscriptions->count();
     }
 
-    /**
-     * @param mixed $numberOfRegistrations
-     */
-    public function setNumberofregistrations($numberOfRegistrations)
+    public function setNumberofregistrations(mixed $numberOfRegistrations): void
     {
         $this->numberofregistrations = $numberOfRegistrations;
     }
@@ -740,7 +723,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getNumberofacceptedregistrations()
     {
-        if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
+        if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
         }
 
@@ -766,10 +749,7 @@ abstract class AbstractSession implements SerializedAccessRights
         return $this->limitregistrationdate;
     }
 
-    /**
-     * @param mixed $limitRegistrationDate
-     */
-    public function setLimitregistrationdate($limitRegistrationDate)
+    public function setLimitregistrationdate(mixed $limitRegistrationDate): void
     {
         $this->limitregistrationdate = $limitRegistrationDate;
     }
@@ -777,14 +757,14 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * Update the limit registration date.
      *
-     * @ORM\PrePersist
      */
-    public function updateLimitregistrationdate()
+    #[ORM\PrePersist]
+    public function updateLimitregistrationdate(): void
     {
         // if the limit registration date is not set,
         // set it to the day before date begin
-        if (!$this->getLimitregistrationdate()) {
-            $date = clone $this->getDatebegin();
+        if (!$this->limitregistrationdate) {
+            $date = clone $this->datebegin;
             $date->modify('-1 day');
             $this->setLimitregistrationdate($date);
         }
@@ -801,7 +781,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param ArrayCollection $materials
      */
-    public function setMaterials($materials)
+    public function setMaterials($materials): void
     {
         $this->materials = $materials;
     }
@@ -834,7 +814,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param ArrayCollection $allMaterials
      */
-    public function setAllMaterials($allMaterials)
+    public function setAllMaterials($allMaterials): void
     {
         $this->allMaterials = $allMaterials;
     }
@@ -847,21 +827,22 @@ abstract class AbstractSession implements SerializedAccessRights
     public function getNumberofparticipants()
     {
         $count = 0;
-        if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
-            if ($this->getParticipantsSummaries() != null) {
-                foreach ($this->getParticipantsSummaries() as $summary) {
-                    $count += $summary->getCount();
+        if ($this->registration === self::REGISTRATION_DEACTIVATED) {
+            if ($this->participantsSummaries != null) {
+                foreach ($this->participantsSummaries as $participantSummary) {
+                    $count += $participantSummary->getCount();
                 }
             }
-        }
-        else {
-            if ($this->getInscriptions() != null) {
-                /** @var AbstractInscription $inscription */
-                foreach ($this->getInscriptions() as $inscription) {
-                    if ($inscription->getPresencestatus() && $inscription->getPresencestatus()->getStatus() === PresenceStatus::STATUS_PRESENT) {
-                        ++$count;
-                    }
+        } elseif ($this->inscriptions != null) {
+            /** @var AbstractInscription $inscription */
+            foreach ($this->inscriptions as $inscription) {
+                if (!$inscription->getPresencestatus()) {
+                    continue;
                 }
+                if ($inscription->getPresencestatus()->getStatus() !== PresenceStatus::STATUS_PRESENT) {
+                    continue;
+                }
+                ++$count;
             }
         }
 
@@ -879,12 +860,12 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param ArrayCollection $participantsSummaries
      */
-    public function setParticipantsSummaries($participantsSummaries)
+    public function setParticipantsSummaries($participantsSummaries): void
     {
-        /** @var ParticipantsSummary $summary */
-        foreach ($participantsSummaries as $summary) {
-            $summary->setSession($this);
+        foreach ($participantsSummaries as $participantSummary) {
+            $participantSummary->setSession($this);
         }
+
         $this->participantsSummaries = $participantsSummaries;
     }
 
@@ -895,10 +876,10 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function addParticipantsSummary($participantsSummary)
     {
-        foreach ($this->participantsSummaries as $participantsSummaryOne) {
-            if ($participantsSummaryOne->getPublictype() === $participantsSummary->getPublictype() &&
-                $participantsSummaryOne->getSession() === $participantsSummary->getSession()) {
-                $participantsSummaryOne->setCount($participantsSummaryOne->getCount() + $participantsSummary->getCount());
+        foreach ($this->participantsSummaries as $participantSummary) {
+            if ($participantSummary->getPublictype() === $participantsSummary->getPublictype() &&
+                $participantSummary->getSession() === $participantsSummary->getSession()) {
+                $participantSummary->setCount($participantSummary->getCount() + $participantsSummary->getCount());
 
                 return false;
             }
@@ -939,16 +920,20 @@ abstract class AbstractSession implements SerializedAccessRights
         if ( ! $this->datebegin) {
             return '';
         }
-        if ( ! $this->dateend || $this->datebegin->format('d/m/y') === $this->dateend->format('d/m/y')) {
+
+        if (! $this->dateend) {
+            return 'le ' . $this->datebegin->format('d/m/Y');
+        }
+        if ($this->datebegin->format('d/m/y') === $this->dateend->format('d/m/y')) {
             return 'le ' . $this->datebegin->format('d/m/Y');
         }
 
         return 'du ' . $this->datebegin->format('d/m/Y') . ' au ' . $this->dateend->format('d/m/Y');
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getTraining()->getName().' - '.$this->getDateRange();
+        return $this->training->getName().' - '.$this->getDateRange();
     }
 
     /**

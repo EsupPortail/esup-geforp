@@ -11,17 +11,17 @@ use App\Entity\Core\AbstractParticipation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ParticipationRepository extends ServiceEntityRepository
+final class ParticipationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, AbstractParticipation::class);
+        parent::__construct($managerRegistry, AbstractParticipation::class);
     }
 
     public function getParticipationsList($keyword, $filters)
     {
-        $qb = $this->createQueryBuilder('p');
-        $qb
+        $queryBuilder = $this->createQueryBuilder('p');
+        $queryBuilder
             ->select('p')
             ->innerJoin('p.trainer', 'trainer', 'WITH', 'trainer = p.trainer')
             ->innerJoin('p.session', 's', 'WITH', 's = p.session')
@@ -31,29 +31,28 @@ class ParticipationRepository extends ServiceEntityRepository
             ->where('trainer.firstname LIKE :keyword')
             ->orWhere('trainer.lastname LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         // FILTRE CENTRE
         if (isset($filters['training.organization.name.source'])) {
-            $qb
+            $queryBuilder
                 ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['training.organization.name.source']);
         }
 
         // FILTRE FORMATEUR
         if( isset($filters['trainer.id']) ) {
-            $qb
+            $queryBuilder
                 ->andWhere('trainer = :id')
                 ->setParameter('id', $filters['trainer.id']);
         }
 
 
 
-        $query = $qb->getQuery();
-        $result = $query->getResult();
+        $query = $queryBuilder->getQuery();
 
-        return $result;
+        return $query->getResult();
     }
 
 

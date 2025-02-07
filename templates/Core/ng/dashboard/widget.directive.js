@@ -1,41 +1,40 @@
 /**
  * Widget directive
  */
-sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$controller', '$compile', '$injector', '$user',function($widget, $templateFactory, $resolve, $controller, $compile, $injector, $user) {
+sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$controller', '$compile', '$injector', '$user', function ($widget, $templateFactory, $resolve, $controller, $compile, $injector, $user) {
     return {
         restrict: 'A',
         replace: true,
-        scope:{
+        scope: {
             widgetOptions: '='
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             var body = angular.element('[widget-body]', element);
             var initial = body.html();
 
             /**
              * update the widget content
              */
-            var updateContent = function()
-            {
+            var updateContent = function () {
                 var widget = $widget.get(attrs.widget);
                 var options = widget.options;
-                if(typeof options == "function" || options instanceof Array) {
+                if (typeof options == "function" || options instanceof Array) {
                     options = $injector.invoke(options);
                 }
 
                 //checking user right. If some rights are defined for widget, we need to check them for user
 
-/*                if (typeof options.rights != 'undefined' && (options.rights.length > 0)  ) {
-                    var hasRight = false;
-                    for(var right in options.rights) {
-                        if($user.hasAccessRight(options.rights[right])){hasRight = true;}
-                    }
-                    //if no right, user
-                    if (!hasRight) {
-                        element.html('');
-                        return 0;
-                    }
-                } */
+                /*                if (typeof options.rights != 'undefined' && (options.rights.length > 0)  ) {
+                                    var hasRight = false;
+                                    for(var right in options.rights) {
+                                        if($user.hasAccessRight(options.rights[right])){hasRight = true;}
+                                    }
+                                    //if no right, user
+                                    if (!hasRight) {
+                                        element.html('');
+                                        return 0;
+                                    }
+                                } */
 
                 // extends the base filters
                 var filters = angular.extend({}, options.filters, scope.widgetOptions ? scope.widgetOptions.filters : {});
@@ -56,7 +55,7 @@ sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$con
                 }];
 
                 // resolve
-                $resolve.resolve(injectables, {options: options}).then(function(locals) {
+                $resolve.resolve(injectables, {options: options}).then(function (locals) {
                     locals.$scope = scope;
                     body.html(locals.$template);
                     var link = $compile(body.contents());
@@ -68,8 +67,8 @@ sygeforApp.directive('widget', ['$widget', '$templateFactory', '$resolve', '$con
             //scope.$watch(attrs.options, updateContent);
             updateContent();
         },
-        controller: function($scope) {
-            this.getOptions = function() {
+        controller: function ($scope) {
+            this.getOptions = function () {
                 return $scope.options;
             }
         },

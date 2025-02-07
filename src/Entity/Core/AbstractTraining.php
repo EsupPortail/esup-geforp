@@ -15,175 +15,162 @@ use Symfony\Component\Validator\Constraints as Assert;
 use App\AccessRight\SerializedAccessRights;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="training", uniqueConstraints={@ORM\UniqueConstraint(name="organization_number", columns={"number", "organization_id"})})
- * @ORM\InheritanceType("JOINED")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({})
- * Traduction: Formation
+ * @method getMaterials()
  */
-abstract class AbstractTraining implements SerializedAccessRights
+#[ORM\Table(name: 'training')]
+#[ORM\UniqueConstraint(name: 'organization_number', columns: ['number', 'organization_id'])]
+#[ORM\Entity]
+#[ORM\InheritanceType('JOINED')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap([])]
+abstract class AbstractTraining implements SerializedAccessRights, \Stringable
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
 
 //    use MaterialTrait;
-
     /**
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    private $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    private ?int $id = null;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="AbstractOrganization")
-     * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotBlank()
      * @Serializer\Groups({"Default", "training", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank]
     protected $organization;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="AbstractSession", mappedBy="training", cascade={"persist", "remove"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractSession>
      * @Serializer\Groups({"training", "api.training"})
      */
-    protected $sessions;
+    #[ORM\OneToMany(targetEntity: 'AbstractSession', mappedBy: 'training', cascade: ['persist', 'remove'])]
+    protected \Doctrine\Common\Collections\Collection $sessions;
 
     /**
-     * @ORM\Column(name="number", type="integer")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $number;
+    #[ORM\Column(name: 'number', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $number = null;
 
     /**
-     * @ORM\Column(name="name", type="string", length=255)
-     * @Assert\NotBlank(message="Vous devez renseigner un intitulé.")
      *
-     * @var string
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $name;
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    #[Assert\NotBlank(message: 'Vous devez renseigner un intitulé.')]
+    protected ?string $name = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Theme")
-     * @ORM\JoinColumn(nullable=false)
-     * @Assert\NotBlank(message="Vous devez renseigner une thématique.")
      * @Serializer\Groups({"training", "session", "inscription", "api"})
      */
-    protected $theme;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Theme::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotBlank(message: 'Vous devez renseigner une thématique.')]
+    protected ?\App\Entity\Term\Theme $theme = null;
 
     /**
-     * @ORM\Column(name="program", type="text", nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $program;
+    #[ORM\Column(name: 'program', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $program = null;
 
     /**
-     * @ORM\Column(name="description", type="text", nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $description;
+    #[ORM\Column(name: 'description', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $description = null;
 
     /**
-     * @ORM\Column(name="teaching_methods", type="text", nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $teachingmethods;
+    #[ORM\Column(name: 'teaching_methods', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $teachingmethods = null;
 
     /**
-     * @var AbstractInstitution Institution
      *
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      * @Serializer\Groups({"training", "api"})
      */
-    protected $institution;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    protected ?\App\Entity\Core\AbstractInstitution $institution = null;
 
     /**
-     * @var Supervisor
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Supervisor")
      * @Serializer\Groups({"training", "api.training", "session"})
      */
-    protected $supervisor;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Supervisor::class)]
+    protected ?\App\Entity\Term\Supervisor $supervisor = null;
 
     /**
-     * @var Trainingcategory
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Trainingcategory")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"training", "api"})
      */
-    protected $category;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Trainingcategory::class)]
+    #[ORM\JoinColumn]
+    protected ?\App\Entity\Term\Trainingcategory $category = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Tag")
-     * @ORM\JoinTable(name="training__training_tag",
-     *      joinColumns={@ORM\JoinColumn(name="training_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="tag_id", referencedColumnName="id", onDelete="cascade")}
-     * )
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Tag>
      * @Serializer\Groups({"training", "api"})
      */
-    protected $tags;
+    #[ORM\JoinTable(name: 'training__training_tag')]
+    #[ORM\JoinColumn(name: 'training_id', onDelete: 'cascade')]
+    #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Tag::class)]
+    protected \Doctrine\Common\Collections\Collection $tags;
 
     /**
-     * @ORM\Column(name="interventionType", type="string", length=255, nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"training", "api"})
      */
-    protected $interventiontype;
+    #[ORM\Column(name: 'interventionType', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $interventiontype = null;
 
     /**
-     * @ORM\Column(name="externalInitiative", type="boolean", nullable=true)
      *
-     * @var bool
      * @Serializer\Groups({"training"})
      */
-    protected $externalinitiative;
+    #[ORM\Column(name: 'externalInitiative', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $externalinitiative = null;
 
     /**
-     * @ORM\Column(name="firstSessionPeriodSemester", type="integer")
-     * @Assert\NotNull
      *
-     * @var int
      * @Serializer\Groups({"training", "api"})
      */
-    protected $firstsessionperiodsemester = 1;
+    #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[Assert\NotNull]
+    protected int $firstsessionperiodsemester;
 
     /**
-     * @ORM\Column(name="firstSessionPeriodYear", type="integer")
-     * @Assert\NotNull
      *
-     * @var int
      * @Serializer\Groups({"training", "api"})
      */
-    protected $firstsessionperiodyear;
+    #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[Assert\NotNull]
+    protected ?int $firstsessionperiodyear = null;
 
     /**
-     * @ORM\Column(name="comments", type="text", nullable=true)
      *
-     * @var string
      * @Serializer\Groups({"training"})
      */
-    protected $comments;
+    #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $comments = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\Core\Material", mappedBy="training", cascade={"remove", "persist"})
-     * @ORM\JoinColumn(nullable=true)
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
-    protected $materials;
+    #[ORM\OneToMany(targetEntity: \App\Entity\Core\Material::class, mappedBy: 'training', cascade: ['remove', 'persist'])]
+    #[ORM\JoinColumn]
+    protected \Doctrine\Common\Collections\Collection $materials;
 
     /**
      * Constructor.
@@ -211,12 +198,9 @@ abstract class AbstractTraining implements SerializedAccessRights
         $this->tags     = new ArrayCollection();
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
-        return $this->getName();
+        return $this->name;
     }
 
     /**
@@ -231,7 +215,7 @@ abstract class AbstractTraining implements SerializedAccessRights
      * @param $addMethod
      * @param ArrayCollection $arrayCollection
      */
-    public function duplicateArrayCollection($addMethod, $arrayCollection)
+    public function duplicateArrayCollection($addMethod, $arrayCollection): void
     {
         foreach ($arrayCollection as $item) {
             if (method_exists($this, $addMethod)) {
@@ -245,14 +229,19 @@ abstract class AbstractTraining implements SerializedAccessRights
      *
      * @param AbstractTraining $originalTraining
      */
-    public function copyProperties($originalTraining)
+    public function copyProperties($originalTraining): void
     {
         foreach (array_keys(get_object_vars($this)) as $key) {
-            if ($key !== 'id' && $key !== 'number' && $key !== 'sessions' && $key !== 'session') {
-                if (isset($originalTraining->$key)) {
-                    $this->$key = $originalTraining->$key;
-                }
+            if (!($key !== 'id' && $key !== 'number' && $key !== 'sessions')) {
+                continue;
             }
+            if ($key === 'session') {
+                continue;
+            }
+            if (!isset($originalTraining->$key)) {
+                continue;
+            }
+            $this->$key = $originalTraining->$key;
         }
     }
 
@@ -264,7 +253,7 @@ abstract class AbstractTraining implements SerializedAccessRights
         return $this->id;
     }
 
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -280,7 +269,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param AbstractOrganization $organization
      */
-    public function setOrganization($organization)
+    public function setOrganization($organization): void
     {
         $this->organization = $organization;
     }
@@ -296,7 +285,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName($name): void
     {
         $this->name = $name;
     }
@@ -304,7 +293,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param ArrayCollection $sessions
      */
-    public function setSessions($sessions)
+    public function setSessions($sessions): void
     {
         $this->sessions = $sessions;
     }
@@ -312,7 +301,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param AbstractSession $session
      */
-    public function addSession($session)
+    public function addSession(mixed $session): void
     {
         $this->sessions->add($session);
     }
@@ -320,7 +309,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param AbstractSession $session
      */
-    public function removeSession($session)
+    public function removeSession(mixed $session): void
     {
         $this->sessions->removeElement($session);
     }
@@ -333,10 +322,7 @@ abstract class AbstractTraining implements SerializedAccessRights
         return $this->sessions;
     }
 
-    /**
-     * @param mixed $number
-     */
-    public function setNumber($number)
+    public function setNumber(mixed $number): void
     {
         $this->number = $number;
     }
@@ -357,10 +343,7 @@ abstract class AbstractTraining implements SerializedAccessRights
         return $this->theme;
     }
 
-    /**
-     * @param mixed $theme
-     */
-    public function setTheme($theme)
+    public function setTheme(mixed $theme): void
     {
         $this->theme = $theme;
     }
@@ -376,7 +359,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $program
      */
-    public function setProgram($program)
+    public function setProgram($program): void
     {
         $this->program = $program;
     }
@@ -392,7 +375,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $description
      */
-    public function setDescription($description)
+    public function setDescription($description): void
     {
         $this->description = $description;
     }
@@ -408,7 +391,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $teachingMethods
      */
-    public function setTeachingmethods($teachingmethods)
+    public function setTeachingmethods($teachingmethods): void
     {
         $this->teachingmethods = $teachingmethods;
     }
@@ -424,7 +407,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param AbstractInstitution $institution
      */
-    public function setInstitution($institution)
+    public function setInstitution($institution): void
     {
         $this->institution = $institution;
     }
@@ -440,7 +423,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param Supervisor $supervisor
      */
-    public function setSupervisor($supervisor)
+    public function setSupervisor($supervisor): void
     {
         $this->supervisor = $supervisor;
     }
@@ -456,7 +439,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param Trainingcategory $category
      */
-    public function setCategory($category)
+    public function setCategory($category): void
     {
         $this->category = $category;
     }
@@ -472,7 +455,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param ArrayCollection $tags
      */
-    public function setTags($tags)
+    public function setTags($tags): void
     {
         $this->tags = $tags;
     }
@@ -504,7 +487,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $interventiontype
      */
-    public function setInterventiontype($interventiontype)
+    public function setInterventiontype($interventiontype): void
     {
         $this->interventiontype = $interventiontype;
     }
@@ -520,7 +503,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param boolean $externalinitiative
      */
-    public function setExternalinitiative($externalinitiative)
+    public function setExternalinitiative($externalinitiative): void
     {
         $this->externalinitiative = $externalinitiative;
     }
@@ -536,7 +519,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param string $comments
      */
-    public function setComments($comments)
+    public function setComments($comments): void
     {
         $this->comments = $comments;
     }
@@ -549,10 +532,7 @@ abstract class AbstractTraining implements SerializedAccessRights
         return $this->firstsessionperiodsemester;
     }
 
-    /**
-     * @param int $firstsessionperiodsemester
-     */
-    public function setFirstsessionperiodsemester($firstsessionperiodsemester)
+    public function setFirstsessionperiodsemester(int $firstsessionperiodsemester): void
     {
         $this->firstsessionperiodsemester = $firstsessionperiodsemester;
     }
@@ -568,7 +548,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param int $firstSessionPeriodYear
      */
-    public function setFirstsessionperiodyear($firstSessionPeriodYear)
+    public function setFirstsessionperiodyear($firstSessionPeriodYear): void
     {
         $this->firstsessionperiodyear = $firstSessionPeriodYear;
     }
@@ -576,7 +556,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param ArrayCollection $materials
      */
-    public function setMaterials($materials)
+    public function setMaterials($materials): void
     {
         $this->materials = $materials;
     }
@@ -584,7 +564,7 @@ abstract class AbstractTraining implements SerializedAccessRights
     /**
      * @param Material $material
      */
-    public function addMaterial($material)
+    public function addMaterial(mixed $material): void
     {
         $material->setTraining($this);
         $this->materials->add($material);
@@ -597,13 +577,13 @@ abstract class AbstractTraining implements SerializedAccessRights
      */
     public function getDuplicatedType()
     {
-        return $this->getType();
+        return static::getType();
     }
 
     /**
      * Used for duplicate training choose type form.
      */
-    public function setDuplicatedType($type)
+    public function setDuplicatedType($type): void
     {
     }
 
@@ -627,21 +607,18 @@ abstract class AbstractTraining implements SerializedAccessRights
     }
 
     /**
-     * @return mixed
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getLastsession()
+    public function getLastsession(): mixed
     {
-        if (empty($this->sessions)) {
-            return;
-        }
-        $now = new \DateTime();
+
+        $dateTime = new \DateTime();
 
         $result = null;
-        $maxdif = 9999999999;
+        $maxdif = 9_999_999_999;
         foreach ($this->sessions as $session) {
-            $dif = $now->getTimestamp() - $session->getDatebegin()->getTimeStamp();
+            $dif = $dateTime->getTimestamp() - $session->getDatebegin()->getTimeStamp();
             if (($dif > 0) && ($dif < $maxdif)) {
                 $result = $session;
                 $maxdif = $dif;
@@ -652,21 +629,18 @@ abstract class AbstractTraining implements SerializedAccessRights
     }
 
     /**
-     * @return mixed
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNextsession()
+    public function getNextsession(): mixed
     {
-        if (empty($this->sessions)) {
-            return;
-        }
-        $now = new \DateTime();
+
+        $dateTime = new \DateTime();
 
         $result = null;
-        $maxdif = 9999999999;
+        $maxdif = 9_999_999_999;
         foreach ($this->sessions as $session) {
-            $dif = $session->getDatebegin()->getTimestamp() - $now->getTimeStamp();
+            $dif = $session->getDatebegin()->getTimestamp() - $dateTime->getTimeStamp();
             if (($dif > 0) && ($dif < $maxdif)) {
                 $result = $session;
                 $maxdif = $dif;
@@ -683,10 +657,6 @@ abstract class AbstractTraining implements SerializedAccessRights
      */
     public function getSessionscount()
     {
-        if (empty($this->sessions)) {
-            return 0;
-        }
-
         return count($this->sessions);
     }
 
@@ -697,14 +667,18 @@ abstract class AbstractTraining implements SerializedAccessRights
      */
     public function getTrainers()
     {
-        $trainers = array();
+        $trainers = [];
         if ($this->sessions) {
             foreach ($this->sessions as $session) {
-                if ($session->getParticipations() && $session->getParticipations()->count() > 0) {
-                    foreach ($session->getParticipations() as $participation) {
-                        // do not add several times the same trainer
-                        $trainers[$participation->getTrainer()->getId()] = $participation->getTrainer();
-                    }
+                if (!$session->getParticipations()) {
+                    continue;
+                }
+                if ($session->getParticipations()->count() <= 0) {
+                    continue;
+                }
+                foreach ($session->getParticipations() as $participation) {
+                    // do not add several times the same trainer
+                    $trainers[$participation->getTrainer()->getId()] = $participation->getTrainer();
                 }
             }
         }

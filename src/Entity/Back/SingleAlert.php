@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class SingleAlert
+final class SingleAlert
 {
     public $alert;
 
@@ -27,7 +27,7 @@ class SingleAlert
         return $this->alert;
     }
 
-    public function setAlert($alert)
+    public function setAlert($alert): void
     {
         $this->alert = $alert;
     }
@@ -37,7 +37,7 @@ class SingleAlert
         return $this->session_id;
     }
 
-    public function setSessionId($session_id)
+    public function setSessionId($session_id): void
     {
         $this->session_id = $session_id;
     }
@@ -47,7 +47,7 @@ class SingleAlert
         return $this->trainee_id;
     }
 
-    public function setTraineeId($trainee_id)
+    public function setTraineeId($trainee_id): void
     {
         $this->trainee_id = $trainee_id;
     }

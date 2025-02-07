@@ -1,13 +1,13 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', '$taxonomy', '$timeout', '$q', function($scope, $dialog, $filter, $taxonomy, $timeout, $q) {
+sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', '$taxonomy', '$timeout', '$q', function ($scope, $dialog, $filter, $taxonomy, $timeout, $q) {
 
     // fetch all status and count
     $q.all([
 //        $taxonomy.getIndexedTerms('sygefor_mycompany.vocabulary_evaluation_criterion')
         $taxonomy.getTerms(2)
-    ]).then(function(crit )  {
+    ]).then(function (crit) {
         var criteria = crit[0];
         var crit = [];
         for (key in criteria) {
@@ -23,22 +23,22 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
     /**
      * Get the total accepted inscriptions count
      */
-    $scope.totalAcceptedInscriptions = function() {
+    $scope.totalAcceptedInscriptions = function () {
         // filtre statut 2 : accepté
         var filter2 = $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 2}}).length;
         // filtre statut 4: convoqué
         var filter4 = $filter('filter')($scope.session.inscriptions, {inscriptionstatus: {status: 4}}).length;
-        return (filter2+filter4);
+        return (filter2 + filter4);
     }
 
     /**
      * Get the evaluated inscriptions count
      */
-    $scope.totalEvaluatedInscriptions = function() {
-        var nb=0;
-        for (var i=0; i < $scope.session.inscriptions.length; i++) {
+    $scope.totalEvaluatedInscriptions = function () {
+        var nb = 0;
+        for (var i = 0; i < $scope.session.inscriptions.length; i++) {
             var insc = $scope.session.inscriptions[i];
-            if($(insc.criteria).length) {
+            if ($(insc.criteria).length) {
                 nb++;
             }
         }
@@ -49,12 +49,12 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
     /**
      * Get the average for a criterion
      */
-    $scope.EvalAverage = function(criterion) {
-        var nb=0;
-        var average=0;
-        for (var i=0; i < $scope.session.inscriptions.length; i++) {
+    $scope.EvalAverage = function (criterion) {
+        var nb = 0;
+        var average = 0;
+        for (var i = 0; i < $scope.session.inscriptions.length; i++) {
             var insc = $scope.session.inscriptions[i];
-            for (var j=0; j<insc.criteria.length; j++) {
+            for (var j = 0; j < insc.criteria.length; j++) {
                 var crit = insc.criteria[j];
                 if (crit.criterion.name == criterion.name) {
                     if (crit.note != 0) {
@@ -64,33 +64,12 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
                 }
             }
         }
-        if (nb>0){
-            average = average/nb;
-        }
-        else {
+        if (nb > 0) {
+            average = average / nb;
+        } else {
             average = 0;
         }
         return average;
-
-    }
-
-    /**
-     * Get the number of occurencies for a note of a criterion
-     */
-    $scope.EvalOccur = function(note, criterion) {
-        var nb=0;
-        for (var i=0; i < $scope.session.inscriptions.length; i++) {
-            var insc = $scope.session.inscriptions[i];
-            for (var j=0; j<insc.criteria.length; j++) {
-                var crit = insc.criteria[j];
-                if (crit.criterion.name == criterion.name) {
-                    if ((crit.note != 0) && (crit.note == note)) {
-                        nb++;
-                    }
-                }
-            }
-        }
-        return nb;
 
     }
 

@@ -1,20 +1,20 @@
 /**
  * TraineeBundle
  */
-sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listStateProvider, $dialogProvider, $dialogParams) {
+sygeforApp.config(["$listStateProvider", "$dialogProvider", function ($listStateProvider, $dialogProvider, $dialogParams) {
 
     // trainee states
     $listStateProvider.state('trainer', {
         url: "/trainer?q&session",
         abstract: true,
         templateUrl: "list.html",
-        controller:"TrainerListController",
+        controller: "TrainerListController",
         breadcrumb: [
-            { label: "Intervenants", sref: "trainer.table" }
+            {label: "Intervenants", sref: "trainer.table"}
         ],
         resolve: {
-            session: function($stateParams, $entityManager) {
-                if($stateParams.session) {
+            session: function ($stateParams, $entityManager) {
+                if ($stateParams.session) {
                     return $entityManager('App\\Entity\\Core\\AbstractSession').find($stateParams.session);
                 }
                 return null;
@@ -22,13 +22,15 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
             search: function ($searchFactory, $stateParams, $user, session) {
                 var search = $searchFactory('trainer.search');
                 search.query.sorts = {'lastName.source': 'asc'};
-                if(session) {
+                if (session) {
                     search.filters["sessions.id"] = session.id;
                 }
                 search.query.filters['organization.name.source'] = $user.organization.name;
                 //search.query.filters['isArchived'] = false;
                 search.extendQueryFromJson($stateParams.q);
-                return search.search().then(function() { return search; });
+                return search.search().then(function () {
+                    return search;
+                });
             }
         },
         states: {
@@ -47,7 +49,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
                 weight: 1,
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
-                data:{
+                data: {
                     resultTemplateUrl: "trainer/states/detail/result.html"
                 },
                 states: {
@@ -56,9 +58,11 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
                         templateUrl: "trainer/states/detail/trainer.html",
                         controller: 'TrainerDetailViewController',
                         resolve: {
-                            data: function($http, $stateParams) {
+                            data: function ($http, $stateParams) {
                                 var url = Routing.generate('trainer.view', {id: $stateParams.id});
-                                return $http({method: 'GET', url: url}).then (function (data) { return data.data; });
+                                return $http({method: 'GET', url: url}).then(function (data) {
+                                    return data.data;
+                                });
                             }
                         },
                         breadcrumb: {
@@ -75,17 +79,17 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      */
     $dialogProvider.dialog('trainer.create', /* @ngInject */ {
         templateUrl: 'trainer/dialogs/create.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
             $scope.form = form;
-            $scope.onSuccess = function(data) {
+            $scope.onSuccess = function (data) {
                 growl.addSuccessMessage("Le formateur a bien été créé.");
                 $scope.dialog.close(data);
             };
         },
-        resolve:{
-            form: function ($http){
+        resolve: {
+            form: function ($http) {
                 return $http.get(Routing.generate('trainer.create')).then(function (response) {
                     return response.data.form;
                 });
@@ -98,12 +102,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      */
     $dialogProvider.dialog('trainer.delete', /* @ngInject */ {
         templateUrl: 'trainer/dialogs/delete.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
-            $scope.ok = function() {
+            $scope.ok = function () {
                 var url = Routing.generate('trainer.delete', {id: $dialogParams.trainer.id});
-                $http.post(url).then(function (response){
+                $http.post(url).then(function (response) {
                     $scope.dialog.close();
                     growl.addSuccessMessage("Le formateur a bien été supprimé.");
 
@@ -118,18 +122,18 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider",  function($listState
      */
     $dialogProvider.dialog('trainer.changeOrg', /* @ngInject */ {
         templateUrl: 'trainer/dialogs/change-organization.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
             $scope.form = form;
-            $scope.onSuccess = function(response) {
+            $scope.onSuccess = function (response) {
                 growl.addSuccessMessage("Le formateur a bien changé de centre de référence.");
                 $scope.dialog.close(response);
             };
         },
         resolve: {
-            form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('trainer.changeorg', {id: $dialogParams.trainer.id })).then(function(response) {
+            form: function ($http, $dialogParams) {
+                return $http.get(Routing.generate('trainer.changeorg', {id: $dialogParams.trainer.id})).then(function (response) {
                     return response.data.form;
                 });
             }

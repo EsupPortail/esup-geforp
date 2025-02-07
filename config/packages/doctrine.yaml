@@ -6,45 +6,50 @@ doctrine:
         # either here or in the DATABASE_URL env var (see .env file)
         #server_version: '13'
     orm:
+
+        report_fields_where_declared: true
+        enable_lazy_ghost_objects: true
+        controller_resolver:
+            auto_mapping: false #Désactivation de l'auto_mapping pour cause de deprecated
         dql:
             datetime_functions:
                 year: DoctrineExtensions\Query\Mysql\Year
                 ceil: DoctrineExtensions\Query\Mysql\Ceil
                 floor: DoctrineExtensions\Query\Mysql\Floor
                 month: DoctrineExtensions\Query\Mysql\Month
-                day: DoctrineExtensions\Query\Mysql\Day
+                day: DoctrineExtensions\Query\Mysql\DayAdminShibbolethExtension
                 date_format: DoctrineExtensions\Query\Mysql\DateFormat
         auto_generate_proxy_classes: true
-        naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
-        auto_mapping: true
+        auto_mapping: false
         mappings:
             App:
+
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
             App\Back:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity/Back'
                 prefix: 'App\Entity\Back'
                 alias: AppBack
             App\Core:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity/Core'
                 prefix: 'App\Entity\Core'
                 alias: AppCore
             App\Term:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity/Term'
                 prefix: 'App\Entity\Term'
                 alias: AppTerm
             App\PersonTrait:
                 is_bundle: false
-                type: annotation
+                type: attribute
                 dir: '%kernel.project_dir%/src/Entity/PersonTrait'
                 prefix: 'App\Entity\PersonTrait'
                 alias: AppPersonTrait

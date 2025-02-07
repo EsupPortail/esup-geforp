@@ -1,4 +1,3 @@
-
 /**
  * Created by maxime on 12/06/14.
  */
@@ -43,8 +42,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             templateAttachments: $scope.templates[0]['templateAttachments'],
             templateAttachmentChecklist: []
         };
-    }
-    else {
+    } else {
         $scope.message = {
             template: null,
             subject: '',
@@ -124,7 +122,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
                 message: $scope.message.body,
                 templateAttachments: removeUncheckedPublipostTemplate(attachments, $scope.message.templateAttachmentChecklist)
             },
-            attachments : $scope.message.attachments
+            attachments: $scope.message.attachments
         });
     };
 
@@ -148,7 +146,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             $scope.message.templateAttachments = newValue.templateAttachments;
             $scope.message.templateAttachmentChecklist = [];
             $scope.message.format = newValue.format;
-            angular.forEach (newValue.templateAttachments, function(templateAttachment) {
+            angular.forEach(newValue.templateAttachments, function (templateAttachment) {
                 $scope.message.templateAttachmentChecklist[templateAttachment['id']] = true;
             });
         }
@@ -169,12 +167,12 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
      * Remove file attachment
      * @param key
      */
-    $scope.removeAttachment = function(key) {
+    $scope.removeAttachment = function (key) {
         $scope.message.attachments.splice(key, 1);
         angular.element($('#inputAttachment')).val(null);
     };
 
-    $scope.isAObject = function(mixed) {
+    $scope.isAObject = function (mixed) {
         return typeof mixed === "object";
     };
 }]);

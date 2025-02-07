@@ -3,11 +3,12 @@
 namespace App\Controller\Core;
 
 use App\Entity\Back\Institution;
+use App\Entity\Back\Presence;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
@@ -20,18 +21,14 @@ use App\Entity\Back\Organization;
 use App\Repository\InstitutionRepository;
 
 
-/**
- * @Route("/institution")
- */
+#[Route(path: '/institution')]
 abstract class AbstractInstitutionController extends AbstractController
 {
-    protected $institutionClass = AbstractInstitution::class;
+    protected string $institutionClass = AbstractInstitution::class;
 
-    /**
-     * @Route("/search", name="institution.search", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, InstitutionRepository $institutionRepository)
+    #[Groups(['Default', 'institution'])]
+    #[Route(path: '/search', name: 'institution.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->get('filters', 'NO FILTERS');
@@ -42,10 +39,7 @@ abstract class AbstractInstitutionController extends AbstractController
 
         // Recherche avec les filtres
         $ret = $institutionRepository->getInstitutionsList($keywords, $filters, $page, $size);
-
-        // Recherche pour aggs et query_filters
-        $tabAggs = array();
-        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $institutionRepository);
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $institutionRepository);
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
@@ -53,11 +47,9 @@ abstract class AbstractInstitutionController extends AbstractController
         return $ret;
     }
 
-    /**
-     * @Route("/create", name="institution.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function createAction(Request $request, ManagerRegistry $doctrine)
+    #[Groups(['Default', 'institution'])]
+    #[Route(path: '/create', name: 'institution.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function create(Request $request, ManagerRegistry $managerRegistry): array
     {
         /** @var AbstractInstitution $institution */
         $institution = new $this->institutionClass();
@@ -73,25 +65,24 @@ abstract class AbstractInstitutionController extends AbstractController
             if ($form->isValid()) {
                 $institution->setCreatedAt(new \DateTime('now'));
                 $institution->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->persist($institution);
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($institution);
+                $objectManager->flush();
             }
         }
 
-        return array('institution' => $institution, 'form' => $form->createView());
+        return ['institution' => $institution, 'form' => $form->createView()];
     }
 
-    /**
-     * This action attach a form to the return array when the user has the permission to edit the institution.
-     *
-     * @Route("/{id}/view", requirements={"id" = "\d+"}, name="institution.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("VIEW", subject="institution")
-     * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function viewAction(Request $request, ManagerRegistry $doctrine, AbstractInstitution $institution)
+    #[Route(path: '/{id}/view', name: 'institution.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[IsGranted('VIEW', subject: 'institution')]
+    #[Groups(['Default', 'institution'])]
+    public function view(Request $request, ManagerRegistry $managerRegistry, AbstractInstitution $institution, int $id): array
     {
+        $institution = $managerRegistry->getRepository(Institution::class, $id);
+        if (!$institution) {
+            throw new NotFoundHttpException('Institution not found');
+        }
         if ( ! $this->isGranted('EDIT', $institution)) {
             throw new AccessDeniedException('Action non autorisée');
         }
@@ -100,47 +91,48 @@ abstract class AbstractInstitutionController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $doctrine->getManager()->persist($institution);
-                $doctrine->getManager()->flush();
+                $managerRegistry->getManager()->persist($institution);
+                $managerRegistry->getManager()->flush();
             }
         }
 
-        return array('form' => $form->createView(), 'institution' => $institution);
+        return ['form' => $form->createView(), 'institution' => $institution];
     }
 
-    /**
-     * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="institution.remove", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Method("POST")
-     * @IsGranted("DELETE", subject="institution")
-     * @ParamConverter("institution", class="App\Entity\Core\AbstractInstitution", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "institution"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function removeAction(AbstractInstitution $institution, ManagerRegistry $doctrine)
+    #[Route(path: '/{id}/remove', name: 'institution.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: "POST")]
+    #[IsGranted('DELETE', subject: 'institution')]
+    #[Groups(['Default', 'institution'])]
+    public function remove(AbstractInstitution $institution, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $em = $doctrine->getManager();
-        $em->remove($institution);
-        $em->flush();
+        $institution = $managerRegistry->getRepository(Institution::class, $id);
+        if (!$institution) {
+            throw new NotFoundHttpException('Institution not found');
+        }
+        $objectManager = $managerRegistry->getManager();
+        $objectManager->remove($institution);
+        $objectManager->flush();
 
-        return $this->redirect($this->generateUrl('institution.search'));
+        return $this->redirectToRoute('institution.search');
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $institutionRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \App\Repository\InstitutionRepository $institutionRepository): array
     {
-        $tabAggs = array();
+        $tabAggs = [];
 
         // CONSTRUCTION VILLE
         if(isset( $aggs['city.source'])){
             $allCities = $institutionRepository->getAllCities();
 
-            $i = 0; $tabCit = array();
+            $i = 0; $tabCit = [];
             //Pour chaque ville on teste la requête
-            foreach($allCities as $city){
-                $nbInstPub= $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $city);
+            foreach($allCities as $allCity){
+                $nbInstPub= $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $allCity);
                 if ($nbInstPub > 0) {
-                    $tabCit[$i] = [ 'key' => $city, 'doc_count' => $nbInstPub];
-                    $i++;
+                    $tabCit[$i] = [ 'key' => $allCity, 'doc_count' => $nbInstPub];
+                    ++$i;
                 }
             }
+
             $tabAggs['city.source']['buckets'] = $tabCit;
         }
 

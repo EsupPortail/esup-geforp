@@ -10,29 +10,26 @@ use App\Entity\Core\AbstractSession;
 /**
  * Remove empty module when removing a session.
  */
-class SessionListener implements EventSubscriber
+final class SessionListener implements EventSubscriber
 {
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::preRemove,
-        );
+        return [Events::preRemove];
     }
 
     /**
      * Increment the local training number.
      *
-     * @param LifecycleEventArgs $eventArgs The event arguments
+     * @param LifecycleEventArgs $lifecycleEventArgs The event arguments
      */
-    public function preRemove(LifecycleEventArgs $eventArgs)
+    public function preRemove(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $session = $eventArgs->getEntity();
-        if ($session instanceof AbstractSession) {
+        $entity = $lifecycleEventArgs->getEntity();
+        if ($entity instanceof AbstractSession) {
         }
     }
 }

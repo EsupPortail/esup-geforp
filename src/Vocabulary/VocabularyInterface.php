@@ -9,9 +9,20 @@ use App\Entity\Back\Organization;
  */
 interface VocabularyInterface
 {
-    const VOCABULARY_NATIONAL = 0;
-    const VOCABULARY_LOCAL    = 1;
-    const VOCABULARY_MIXED    = 2;
+    /**
+     * @var int
+     */
+    public const VOCABULARY_NATIONAL = 0;
+
+    /**
+     * @var int
+     */
+    public const VOCABULARY_LOCAL    = 1;
+
+    /**
+     * @var int
+     */
+    public const VOCABULARY_MIXED    = 2;
 
     /**
      * @return bool

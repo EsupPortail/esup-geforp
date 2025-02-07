@@ -9,106 +9,80 @@ use App\Form\Type\AbstractTraineeType;
 use App\Entity\Core\AbstractTrainee;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Core\User;
 
-/**
- *
- * @ORM\Table(name="trainee")
- * @ORM\Entity
- * @UniqueEntity(fields={"email", "institution"}, message="Cette adresse email est déjà utilisée.", ignoreNull=true, groups={"Default", "trainee"})
- */
+#[ORM\Table(name: 'trainee')]
+#[ORM\Entity]
+#[UniqueEntity(fields: ['email', 'institution'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainee'])]
 class Trainee extends AbstractTrainee implements UserInterface
 {
-    /**
-     * @ORM\Column(name="birth_date", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $birthdate;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'birth_date', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $birthdate = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'amu_statut', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $amustatut = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'bap', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $bap = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'corps', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $corps = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'category', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $category = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'campus', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
+    protected ?string $campus = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'first_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $firstnamesup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'last_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $lastnamesup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'email_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $emailsup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'first_name_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $firstnamecorr = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'last_name_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $lastnamecorr = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'email_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $emailcorr = null;
+
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'fonction', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $fonction = null;
 
     /**
-     * @ORM\Column(name="amu_statut", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Alert>
      */
-    protected $amustatut;
-
-    /**
-     * @ORM\Column(name="bap", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $bap;
-
-    /**
-     * @ORM\Column(name="corps", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $corps;
-
-    /**
-     * @ORM\Column(name="category", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $category;
-
-    /**
-     * @ORM\Column(name="campus", type="string", length=20)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $campus;
-
-    /**
-     * @ORM\Column(name="first_name_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $firstnamesup;
-
-    /**
-     * @ORM\Column(name="last_name_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $lastnamesup;
-
-    /**
-     * @ORM\Column(name="email_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $emailsup;
-
-    /**
-     * @ORM\Column(name="first_name_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $firstnamecorr;
-
-    /**
-     * @ORM\Column(name="last_name_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $lastnamecorr;
-
-    /**
-     * @ORM\Column(name="email_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $emailcorr;
-
-    /**
-     * @ORM\Column(name="fonction", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $fonction;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\Alert", mappedBy="trainee", cascade={"remove"})
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $alerts;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\OneToMany(targetEntity: \App\Entity\Back\Alert::class, mappedBy: 'trainee', cascade: ['remove'])]
+    protected \Doctrine\Common\Collections\Collection $alerts;
 
     /**
      * @return mixed
      */
-    static public function getFormType()
+    static public function getFormType(): string
     {
         return AbstractTraineeType::class;
     }
@@ -116,11 +90,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set birth date
      *
-     * @param mixed $birthDate
      *
      * @return Trainee
      */
-    public function setBirthdate($birthDate)
+    public function setBirthdate(mixed $birthDate)
     {
         $this->birthdate = $birthDate;
 
@@ -139,11 +112,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set amuStatut
      *
-     * @param mixed $amuStatut
      *
      * @return Trainee
      */
-    public function setAmustatut($amuStatut)
+    public function setAmustatut(mixed $amuStatut)
     {
         $this->amustatut = $amuStatut;
 
@@ -162,11 +134,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set bap
      *
-     * @param mixed $bap
      *
      * @return Trainee
      */
-    public function setBap($bap)
+    public function setBap(mixed $bap)
     {
         $this->bap = $bap;
 
@@ -186,11 +157,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set corps
      *
-     * @param mixed $corps
      *
      * @return Trainee
      */
-    public function setCorps($corps)
+    public function setCorps(mixed $corps)
     {
         $this->corps = $corps;
 
@@ -209,11 +179,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set category
      *
-     * @param mixed $category
      *
      * @return Trainee
      */
-    public function setCategory($category)
+    public function setCategory(mixed $category)
     {
         $this->category = $category;
 
@@ -232,11 +201,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set campus
      *
-     * @param mixed $campus
      *
      * @return Trainee
      */
-    public function setCampus($campus)
+    public function setCampus(mixed $campus)
     {
         $this->campus = $campus;
 
@@ -423,7 +391,6 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Add inscription
      *
-     * @param \App\Entity\Core\AbstractInscription $inscription
      *
      * @return Trainee
      */
@@ -437,9 +404,8 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Remove inscription
      *
-     * @param \App\Entity\Core\AbstractInscription $inscription
      */
-    public function removeInscription(AbstractInscription $inscription)
+    public function removeInscription(AbstractInscription $inscription): void
     {
         $this->inscriptions->removeElement($inscription);
     }
@@ -455,7 +421,7 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param ArrayCollection $alerts
      */
-    public function setAlerts($alerts)
+    public function setAlerts($alerts): void
     {
         $this->alerts = $alerts;
     }
@@ -463,9 +429,8 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param Alert $alerts
      *
-     * @return bool
      */
-    public function addAlert($alert)
+    public function addAlert($alert): bool
     {
         if (!$this->alerts->contains($alert)) {
             $this->alerts->add($alert);
@@ -479,9 +444,8 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param Alert $alert
      *
-     * @return bool
      */
-    public function removeAlert($alert)
+    public function removeAlert($alert): bool
     {
         if ($this->alerts->contains($alert)) {
             $this->alerts->removeElement($alert);
@@ -490,5 +454,21 @@ class Trainee extends AbstractTrainee implements UserInterface
         }
 
         return false;
+    }
+    public function __construct()
+    {
+        parent::__construct();
+        $this->alerts = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function __serialize(): array
+    {
+        return array();// TODO: Implement __serialize() method.
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->$data = $data;
+        // TODO: Implement __unserialize() method.
     }
 }

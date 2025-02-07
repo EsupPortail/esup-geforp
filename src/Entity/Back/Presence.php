@@ -13,47 +13,41 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- *
- * @ORM\Table(name="presence")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'presence')]
+#[ORM\Entity]
 class Presence
 {
     /**
-     * @var int
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     */
+    public $session;
+    /**
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @ORM\Column(name="dateBegin", type="datetime")
-     * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $datebegin;
+    #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
+    protected ?\DateTimeInterface $datebegin = null;
+
+    #[ORM\Column(name: 'morning', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $morning = null;
+
+    #[ORM\Column(name: 'afternoon', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $afternoon = null;
 
     /**
-     * @ORM\Column(name="morning", type="string", length=512, nullable=true)
-     * @var String
-     */
-    protected $morning;
-
-    /**
-     * @ORM\Column(name="afternoon", type="string", length=512, nullable=true)
-     * @var String
-     */
-    protected $afternoon;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Inscription", inversedBy="presences")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Groups({"session", "trainee", "trainer", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'Inscription', inversedBy: 'presences')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
     protected $inscription;
 
     public function __construct()
@@ -77,7 +71,7 @@ class Presence
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -90,10 +84,7 @@ class Presence
         return $this->datebegin;
     }
 
-    /**
-     * @param mixed $dateBegin
-     */
-    public function setDatebegin($dateBegin)
+    public function setDatebegin(mixed $dateBegin): void
     {
         $this->datebegin = $dateBegin;
     }
@@ -106,10 +97,7 @@ class Presence
         return $this->morning;
     }
 
-    /**
-     * @param mixed $morning
-     */
-    public function setMorning($morning)
+    public function setMorning(mixed $morning): void
     {
         $this->morning = $morning;
     }
@@ -122,10 +110,7 @@ class Presence
         return $this->afternoon;
     }
 
-    /**
-     * @param mixed $afternoon
-     */
-    public function setAfternoon($afternoon)
+    public function setAfternoon(mixed $afternoon): void
     {
         $this->afternoon = $afternoon;
     }
@@ -138,10 +123,7 @@ class Presence
         return $this->inscription;
     }
 
-    /**
-     * @param mixed $inscription
-     */
-    public function setInscription($inscription)
+    public function setInscription(mixed $inscription): void
     {
         $this->inscription = $inscription;
     }

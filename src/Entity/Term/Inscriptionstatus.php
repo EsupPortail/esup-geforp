@@ -16,16 +16,35 @@ use App\Form\Type\InscriptionStatusVocabularyType;
 /**
  * Statut de l'inscription.
  *
- * @ORM\Table(name="inscription_status")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'inscription_status')]
+#[ORM\Entity]
 class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
 {
-    const STATUS_PENDING = 0;
-    const STATUS_WAITING = 1;
-    const STATUS_ACCEPTED = 2;
-    const STATUS_REJECTED = 3;
-    const STATUS_CONVOKED = 4;
+    /**
+     * @var int
+     */
+    final public const STATUS_PENDING = 0;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_WAITING = 1;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_ACCEPTED = 2;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_REJECTED = 3;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_CONVOKED = 4;
 
     /**
      * This term is required during term replacement.
@@ -35,23 +54,21 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     public static $replacementRequired = true;
 
     /**
-     * @var int
-     * @ORM\Column(name="status", type="integer")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $status = self::STATUS_PENDING;
+    #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $status = self::STATUS_PENDING;
 
     /**
-     * @var int
-     * @ORM\Column(name="notify", type="boolean")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $notify = false;
+    #[ORM\Column(name: 'notify', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
+    protected ?bool $notify = false;
 
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->status = $status;
     }
@@ -75,20 +92,17 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @param int $notify
      */
-    public function setNotify($notify)
+    public function setNotify($notify): void
     {
         $this->notify = $notify;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_MIXED;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return "Statut de l'inscription";
     }
@@ -96,9 +110,8 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return InscriptionStatusVocabularyType::class;
     }

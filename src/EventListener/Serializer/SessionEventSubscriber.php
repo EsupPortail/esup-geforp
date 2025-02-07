@@ -11,36 +11,35 @@ use App\EventListener\Serializer\TrainingEventSubscriber;
 /**
  * Session serialization event subscriber.
  */
-class SessionEventSubscriber implements EventSubscriberInterface
+final class SessionEventSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array('event' => 'serializer.pre_serialize', 'method' => 'onPreSerialize'),
-        );
+        return [['event' => 'serializer.pre_serialize', 'method' => 'onPreSerialize']];
     }
 
     /**
      * On API pre serialize, add allMaterial property.
      *
-     * @param PreSerializeEvent $event
      */
-    public function onPreSerialize(PreSerializeEvent $event)
+    public function onPreSerialize(PreSerializeEvent $preSerializeEvent): void
     {
         $allMaterials = new ArrayCollection();
         /** @var AbstractSession $session */
-        $session = $event->getObject();
-        if ($session instanceof AbstractSession && TrainingEventSubscriber::isApiGroup($event->getContext())) {
+        $session = $preSerializeEvent->getObject();
+        if ($session instanceof AbstractSession && TrainingEventSubscriber::isApiGroup($preSerializeEvent->getContext())) {
             $training = $session->getTraining();
             foreach ($session->getMaterials() as $material) {
                 $allMaterials->add($material);
             }
+
             foreach ($training->getMaterials() as $material) {
                 $allMaterials->add($material);
             }
+
             $session->setAllMaterials($allMaterials);
         }
     }

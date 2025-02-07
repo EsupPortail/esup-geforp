@@ -9,41 +9,30 @@ use App\Entity\Term\Publictype;
 /**
  * Participants summary for a session.
  *
- * @ORM\Table(name="participants_summary")
- * @ORM\Entity
- * @ORM\HasLifecycleCallbacks
  *
  * traduction: session
  */
+#[ORM\Table(name: 'participants_summary')]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class ParticipantsSummary
 {
     /**
-     * @var AbstractSession
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractSession", inversedBy="participantsSummary")
      * @Serializer\Exclude
      */
-    protected $session;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractSession::class, inversedBy: 'participantsSummary')]
+    protected ?\App\Entity\Core\AbstractSession $session = null;
 
     /**
-     * @var Publictype
-     * @ORM\Id
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Publictype")
      * @Serializer\Groups({"session"})
      */
-    protected $publictype;
+    #[ORM\Id]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Publictype::class)]
+    protected ?\App\Entity\Term\Publictype $publictype = null;
 
-    /**
-     * @ORM\Column(name="count", type="integer", nullable=true)
-     */
-    protected $count;
-
-    /**
-     *
-     */
-    function __construct() {
-        $this->count = null;
-    }
+    #[ORM\Column(name: 'count', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
+    protected ?int $count = null;
 
     /**
      * @return mixed
@@ -53,10 +42,7 @@ class ParticipantsSummary
         return $this->count;
     }
 
-    /**
-     * @param mixed $count
-     */
-    public function setCount($count)
+    public function setCount(mixed $count): void
     {
         $this->count = $count;
     }
@@ -72,7 +58,7 @@ class ParticipantsSummary
     /**
      * @param AbstractSession $session
      */
-    public function setSession($session)
+    public function setSession($session): void
     {
         $this->session = $session;
     }
@@ -88,7 +74,7 @@ class ParticipantsSummary
     /**
      * @param Publictype $Publictype
      */
-    public function setPublictype($Publictype)
+    public function setPublictype($Publictype): void
     {
         $this->publictype = $Publictype;
     }

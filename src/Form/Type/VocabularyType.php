@@ -5,7 +5,6 @@ namespace App\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Security\Core\Security;
 
 
 /**
@@ -14,20 +13,11 @@ use Symfony\Component\Security\Core\Security;
 class VocabularyType extends AbstractType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @var \Symfony\Component\Form\FormFactoryInterface
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public $factory;
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder->add('name', null, array(
-            'label' => 'Nom',
-        ));
-    }
-
-    protected function setUp()
-    {
-        $this->factory = Forms::createFormFactoryBuilder()
-            ->addExtensions($this->getExtensions())
-            ->getFormFactory();
+        $formBuilder->add('name', null, ['label' => 'Nom']);
     }
 }

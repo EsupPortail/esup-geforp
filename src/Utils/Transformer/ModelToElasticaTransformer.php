@@ -12,8 +12,13 @@ use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
  * This mapper assumes an exact match between
  * elastica documents ids and doctrine object ids.
  */
-class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
+final class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
 {
+    public $propertyAccessor;
+    /**
+     * @var array<string, mixed>
+     */
+    public $options = [];
     /**
      * Transforms an object into an elastica object having the required keys.
      *
@@ -22,14 +27,14 @@ class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
      *
      * @return Document
      **/
-    public function transform($object, array $fields)
+    public function transform($object, array $fields): \Elastica\Document
     {
         $identifier = $this->propertyAccessor->getValue($object, $this->options['identifier']);
         $document = new Document($identifier);
 
         foreach ($fields as $key => $mapping) {
             if ($key === '_parent') {
-                $property = (null !== $mapping['property']) ? $mapping['property'] : $mapping['type'];
+                $property = $mapping['property'] ?? $mapping['type'];
                 $value = $this->propertyAccessor->getValue($object, $property);
                 $document->setParent($this->propertyAccessor->getValue($value, $mapping['identifier']));
                 continue;
@@ -37,13 +42,13 @@ class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
 
             try {
                 $value = $this->propertyAccessor->getValue($object, $key);
-            } catch (NoSuchPropertyException $e) {   // catch the NoSuchPropertyException to avoid error
+            } catch (NoSuchPropertyException) {   // catch the NoSuchPropertyException to avoid error
                 continue;
-            } catch (UnexpectedTypeException $e) {   // catch the UnexpectedTypeException to avoid error
+            } catch (UnexpectedTypeException) {   // catch the UnexpectedTypeException to avoid error
                 continue;
             }
 
-            if (isset($mapping['type']) && in_array($mapping['type'], array('nested', 'object'), true) && isset($mapping['properties']) && !empty($mapping['properties'])) {
+            if (isset($mapping['type']) && in_array($mapping['type'], ['nested', 'object'], true) && isset($mapping['properties']) && !empty($mapping['properties'])) {
                 /* $value is a nested document or object. Transform $value into
                  * an array of documents, respective the mapped properties.
                  */
@@ -58,6 +63,7 @@ class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
                 } else {
                     $document->addFileContent($key, $value);
                 }
+
                 continue;
             }
 
@@ -72,23 +78,23 @@ class ModelToElasticaTransformer extends ModelToElasticaAutoTransformer
     /**
      * Attempts to convert any type to a string or an array of strings.
      *
-     * @param mixed $value
      *
-     * @return string|array
      */
-    protected function normalizeValue($value)
+    private function normalizeValue(mixed $value): string|array
     {
-        $normalizeValue = function (&$v) {
+        $normalizeValue = static function (&$v): void {
             if ($v instanceof \DateTime) {
                 // deactivate timezone support
                 // $v = $v->format('c');
                 $v = $v->format('Y-m-d\TH:i:s');
             } elseif (!is_scalar($v) && !is_null($v)) {
-                $v = (string) $v;
+                $v = (string)$v;
             }
         };
 
-        if (is_array($value) || $value instanceof \Traversable || $value instanceof \ArrayAccess) {
+        if ($value instanceof \Doctrine\Common\Lexer\Token) {
+            $value = $value->value;
+        } elseif (is_iterable($value)) {
             $value = is_array($value) ? $value : iterator_to_array($value, false);
             array_walk_recursive($value, $normalizeValue);
         } else {

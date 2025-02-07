@@ -27,68 +27,59 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 
 Use Elastica\Query;
 Use Elastica\Filter\BoolAnd;
 Use Elastica\Filter\BoolOr;
 Use Elastica\Filter\Term;
 Use Elastica\Filter\Range;
-use Elastica\Query\Match;
 
-class AjaxController extends AbstractController
+final class AjaxController extends AbstractController
 {
+
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
+    {
+    }
 
     /**
      * Retourne la liste des sessions (autocomplétion)
      *
-     * @Route("/ajax/completlist", name="ajax_completlist")
      *
      * @return string la liste des sessions au format json
      */
-    public function CompletListAction()
+    #[Route(path: '/ajax/completlist', name: 'ajax_completlist')]
+    public function CompletList(): \Symfony\Component\HttpFoundation\Response
     {
+        $json = [];
         $request = $this->get('request');
 
         $term = $request->request->get('motcle');
         $domaine = $request->request->get('domaine');
         $centre = $request->request->get('centre');
 
-        /** @var EntityManager $em */
-        $em = $this->getDoctrine()->getManager();
-        $theme = $em->getRepository('SygeforTrainingBundle:Training\Term\Theme')->findOneBy(array('id' => $domaine ));
-        $organization = $em->getRepository('SygeforCoreBundle:Organization')->findOneBy(array('id' => $centre));
+        /** @var EntityManager $objectManager */
+        $objectManager = $this->managerRegistry->getManager();
+        $theme = $objectManager->getRepository('SygeforTrainingBundle:Training\Term\Theme')->findOneBy(['id' => $domaine]);
+        $sygeforCoreBundle = $objectManager->getRepository('SygeforCoreBundle:Organization')->findOneBy(['id' => $centre]);
 
-        if ($theme->getName() == "Tous les domaines") {
-            $themeName = null;
-        }
-        else {
-            $themeName = $theme->getName();
-        }
+        $themeName = $theme->getName() == "Tous les domaines" ? null : $theme->getName();
 
-        if ($organization->getCode() == "tous" ) {
-            $code = null;
-        }
-        else {
-            $code = $organization->getCode();
-        }
+        $code = $sygeforCoreBundle->getCode() == "tous" ? null : $sygeforCoreBundle->getCode();
 
-        if (strlen($term)<3)
+        if (strlen((string) $term)<3)
         {
-            $json[] = array('label' => 'au moins 3 caractères ('.$term.')', 'value' => '');
+            $json[] = ['label' => 'au moins 3 caractères ('.$term.')', 'value' => ''];
             $response = new Response (json_encode($json));
             $response->headers->set('Content-Type','application/json');
             return $response;
         }
 
         // Recherche dans Elasticsearch
-        $term = strtolower($term);
+        $term = strtolower((string) $term);
         $search = $this->createProgramQuerySearch(1, 100, $code, $themeName, $term);
 
-        $arraySessions = array();
+        $arraySessions = [];
 
         $NbEnreg = $search['total'];
         /*
@@ -107,11 +98,11 @@ class AjaxController extends AbstractController
             foreach ($search['items'] as $res)
             {
                 $arraySessions[$cpt]['label']  = $res['name'];
-                $cpt++;
+                ++$cpt;
             }
         }
 
-        $response = new Response (json_encode($arraySessions));
+        $response = new Response (json_encode($arraySessions, JSON_THROW_ON_ERROR));
         $response->headers->set('Content-Type','application/json');
         return $response;
 
@@ -119,48 +110,47 @@ class AjaxController extends AbstractController
 
     /**
      * @param $page
-     * @param int $itemPerPage
      * @param $code
      * @param $theme
      * @return array
      */
-    protected function createProgramQuerySearch($page, $itemPerPage = 10, $code = null, $theme = null, $texte = null)
+    private function createProgramQuerySearch(int $page, int $itemPerPage = 10, $code = null, $theme = null, $texte = null)
     {
         $search = $this->get('sygefor_training.session.search');
-        if ($page) {
+        if ($page !== 0) {
             $search->setPage($page);
             $search->setSize($itemPerPage);
         }
 
         // add filters
-        $filters = new BoolAnd();
+        $boolAnd = new BoolAnd();
 
         //centre
         if (!empty($code)) {
-            $organization = new Term(array('training.organization.code' => $code));
-            $filters->addFilter($organization);
+            $organization = new Term(['training.organization.code' => $code]);
+            $boolAnd->addFilter($organization);
         }
 
         // thème
         if (!empty($theme)) {
-            $organization = new Term(array('training.theme.name' => $theme));
-            $filters->addFilter($organization);
+            $organization = new Term(['training.theme.name' => $theme]);
+            $boolAnd->addFilter($organization);
         }
 
         //texte
         if (!empty($texte)) {
-            $name = new Term(array('training.name.autocomplete' => $texte));
-            $filters->addFilter($name);
+            $name = new Term(['training.name.autocomplete' => $texte]);
+            $boolAnd->addFilter($name);
         }
 
         // date à venir
-        $dateBegin = new Range('dateBegin', array("gte" => (new \DateTime("now", timezone_open('Europe/Paris')))->format('Y-m-d')));
-        $filters->addFilter($dateBegin);
+        $range = new Range('dateBegin', ["gte" => (new \DateTime("now", timezone_open('Europe/Paris')))->format('Y-m-d')]);
+        $boolAnd->addFilter($range);
 
 //        $types = new Terms('training.type', array('internship'));
 //        $filters->addFilter($types);
 
-        $search->addFilter('filters', $filters);
+        $search->addFilter('filters', $boolAnd);
 
         $search->addSort('training.theme.name');
         $search->addSort('dateBegin');

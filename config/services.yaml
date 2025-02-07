@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    .container.dumper.inline_factories: true
     router.request_context.scheme: 'https'
     asset.request_context.secure: true
     front_url: '%env(front_host)%'
@@ -36,6 +37,7 @@ parameters:
         session_id: 'Shib-Session-ID'
         remote_user: '%env(REMOTE_USER)%'
     batch:
+
         convert_type:
             semestered_training:
                 class: 'App\Entity\Core\AbstractTraining'
@@ -323,7 +325,6 @@ parameters:
                     categorie: { property: category.name }
                     typeIntervention: { property: interventionType }
                     initiativeExterne: { property: externalInitiative }
-                    commentaires: { property: comments }
                     # Internship && Long training
                     prerequis: { property: prerequisites }
                     public: { property: publictype.name }
@@ -403,6 +404,13 @@ parameters:
 
 services:
     # default configuration for services in *this* file
+    Symfony\Component\Security\Core\Security: '@Symfony\Bundle\SecurityBundle\Security'
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+
+    Namespace\ImportService:
+        arguments:
+            - '@service_container'
+ # Injection explicite du service conteneur
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -425,6 +433,9 @@ services:
             - "@knp_menu.factory"
             - "@security.authorization_checker"
             - "@router"
+            - $router: '@router'
+            - $logger: '@logger'
+            - $eventDispatcher: '@event_dispatcher'
         tags:
             - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
 
@@ -432,13 +443,10 @@ services:
         tags:
             - { name: doctrine.event_subscriber }
 
-    App\Listener\SessionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
 
-    App\EventListener\ORM\InscriptionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
+    App\Twig\SpacelessExtension:
+        tags: ['twig.extension']
+
 
     shibbundle.sup_service:
         class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider

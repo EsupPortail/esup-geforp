@@ -11,7 +11,7 @@ namespace App\Security\Authorization\Voter;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
-class AdminVoter implements VoterInterface
+final class AdminVoter implements VoterInterface
 {
     /**
      * Checks if the voter supports the given attribute.
@@ -20,7 +20,7 @@ class AdminVoter implements VoterInterface
      *
      * @return bool true if this Voter supports the attribute, false otherwise
      */
-    public function supportsAttribute($attribute)
+    public function supportsAttribute($attribute): bool
     {
         return true;
     }
@@ -32,7 +32,7 @@ class AdminVoter implements VoterInterface
      *
      * @return bool true if this Voter can process the class
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return true;
     }
@@ -49,7 +49,7 @@ class AdminVoter implements VoterInterface
      *
      * @return int either ACCESS_GRANTED, ACCESS_ABSTAIN, or ACCESS_DENIED
      */
-    public function vote(TokenInterface $token, $object, array $attributes)
+    public function vote(TokenInterface $token, $object, array $attributes): int
     {
         foreach ($token->getRoleNames() as $role) {
             if ($role === 'ROLE_ADMIN') {

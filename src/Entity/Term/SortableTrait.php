@@ -12,7 +12,7 @@ trait SortableTrait
      */
     private $position = 0;
 
-    public function setPosition($position)
+    public function setPosition($position): void
     {
         $this->position = $position;
     }

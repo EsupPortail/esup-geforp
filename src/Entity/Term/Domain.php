@@ -15,20 +15,17 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Type de personnel.
  *
- * @ORM\Table(name="domain")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'domain')]
+#[ORM\Entity]
 class Domain extends AbstractTerm implements VocabularyInterface
 {
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Nom de domaine';
     }

@@ -34,142 +34,84 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 
 
-class MenuBuilder
+final readonly class MenuBuilder
 {
-    private $factory;
-    private $authorizationChecker;
-    private $router;
-    private $registry;
-    private $doctrine;
-
-    public function __construct(FactoryInterface $factory, AuthorizationCheckerInterface $authorizationChecker, Router $router, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $doctrine)
+    public function __construct(private FactoryInterface $menuFactory, private AuthorizationCheckerInterface $authorizationChecker, private Router $router, private VocabularyRegistry $vocabularyRegistry, private ManagerRegistry $managerRegistry)
     {
-        $this->factory = $factory;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->router = $router;
-        $this->registry = $vocabularyRegistry;
-        $this->doctrine = $doctrine;
     }
 
     public function createMainMenu(array $options): ItemInterface
     {
-        $menu = $this->factory->createItem('root');
+        $menu = $this->menuFactory->createItem('root');
 
         // Menu administration et sous menus
-        $adminMenu = $menu->addChild('administration', array(
-            'label' => 'Administration',
-            'icon' => 'gear',
-            'uri' => $this->router->generate('core.index'),
-        ));
-        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Organization')) {
-            $adminMenu->addChild('organizations', array(
-                    'label' => 'Centres',
-                    'uri' => $this->router->generate('organization.index'),
-                )
+        $adminMenu = $menu->addChild('administration', ['label' => 'Administration', 'icon' => 'gear', 'uri' => $this->router->generate('core.index')]);
+        if ($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Organization::class)) {
+            $adminMenu->addChild('organizations', ['label' => 'Centres', 'uri' => $this->router->generate('organization.index')]
             );
         }
 
-        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Term\AbstractTerm') || $this->authorizationChecker->isGranted('VIEW', 'App\Vocabulary\VocabularyInterface') ) {
-            $adminMenu->addChild('taxonomy', array(
-                    'label' => 'Vocabulaires',
-                    'uri' => $this->router->generate('taxonomy.index'),
-                )
+        if ($this->authorizationChecker->isGranted('VIEW', \App\Entity\Term\AbstractTerm::class) || $this->authorizationChecker->isGranted('VIEW', \App\Vocabulary\VocabularyInterface::class) ) {
+            $adminMenu->addChild('taxonomy', ['label' => 'Vocabulaires', 'uri' => $this->router->generate('taxonomy.index')]
             );
         }
 
-        if ($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Core\User')) {
-            $adminMenu->addChild('users', array(
-                'label' => 'Utilisateurs',
-                'uri' => $this->router->generate('user.index'),
-            ));
+        if ($this->authorizationChecker->isGranted('VIEW', \App\Entity\Core\User::class)) {
+            $adminMenu->addChild('users', ['label' => 'Utilisateurs', 'uri' => $this->router->generate('user.index')]);
         }
 
 
 
         try {
-            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Internship')) {
-                $item = $menu->addChild('trainings', array(
-                    'label' => 'Événements',
-                    'icon'  => 'calendar',
-                    'uri'   => $this->router->generate('core.index') . '#/training',
-                ));
+            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Internship::class)) {
+                $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training']);
 
-                $item->addChild('internships', array(
-                    'label' => 'Stages',
-                    'uri'   => $this->router->generate('core.index') . '#/training?type=internship',
-                ));
+                $item->addChild('internships', ['label' => 'Stages', 'uri'   => $this->router->generate('core.index') . '#/training?type=internship']);
 
-                $item->addChild('sessions', array(
-                    'label' => 'Toutes les sessions',
-                    'uri'   => $this->router->generate('core.index') . '#/training/session',
-                ))->setAttribute('divider_prepend', true);
+                $item->addChild('sessions', ['label' => 'Toutes les sessions', 'uri'   => $this->router->generate('core.index') . '#/training/session'])->setAttribute('divider_prepend', true);
 
             }
 
-            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Trainee')) {
-                $menu->addChild('trainees', array(
-                    'label' => 'Publics',
-                    'icon'  => 'group',
-                    'uri'   => $this->router->generate('core.index') . '#/trainee',
-//                    'uri' => $this->router->generate('core.index'),
-                ));
+            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainee::class)) {
+                $menu->addChild('trainees', ['label' => 'Publics', 'icon'  => 'group', 'uri'   => $this->router->generate('core.index') . '#/trainee']);
             }
 
-            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Inscription')) {
-                $menu->addChild('inscriptions', array(
-                    'label' => 'Inscriptions',
-                    'icon'  => 'graduation-cap',
-                    'uri'   => $this->router->generate('core.index') . '#/inscription',
-                ));
+            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Inscription::class)) {
+                $menu->addChild('inscriptions', ['label' => 'Inscriptions', 'icon'  => 'graduation-cap', 'uri'   => $this->router->generate('core.index') . '#/inscription']);
             }
 
-            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Institution')) {
-                $menu->addChild('institutions', array(
-                    'label' => 'Etablissements',
-                    'icon'  => 'university',
-                    'uri'   => $this->router->generate('core.index') . '#/institution',
-                ));
+            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Institution::class)) {
+                $menu->addChild('institutions', ['label' => 'Etablissements', 'icon'  => 'university', 'uri'   => $this->router->generate('core.index') . '#/institution']);
             }
 
             // Vocabulary id=6 => menuitem
-            $menuitemTerm = $this->registry->getVocabularyById(6); // vocabulary_menuitem;
+            $menuitemTerm = $this->vocabularyRegistry->getVocabularyById(6); // vocabulary_menuitem;
             /** @var EntityManager $em */
-            $em = $this->doctrine->getManager();
-            $repo = $em->getRepository(get_class($menuitemTerm));
+            $em = $this->managerRegistry->getManager();
+            $entityRepository = $em->getRepository($menuitemTerm::class);
 
-            if (($repo->findAll()!==null) && (count($repo->findAll()) !==0)) {
+            if (($entityRepository->findAll()!==null) && ($entityRepository->findAll() !==[])) {
                 // si des liens externes ont été renseignés, on ajoute l'onglet pour y accéder
-                $item = $menu->addChild('menuitems', array(
-                    'label' => 'Liens externes',
-                    'icon'  => 'external-link',
-                    'uri'   => '',
-                ));
-                foreach ($repo->findAll() as $menuitem) {
-                    $item->addChild($menuitem->getName(), array(
-                        'label' => $menuitem->getName(),
-                        'uri' => $menuitem->getLink(),
-                    ));
+                $item = $menu->addChild('menuitems', ['label' => 'Liens externes', 'icon'  => 'external-link', 'uri'   => '']);
+                foreach ($entityRepository->findAll() as $menuitem) {
+                    $item->addChild($menuitem->getName(), ['label' => $menuitem->getName(), 'uri' => $menuitem->getLink()]);
                 }
             }
 
-            if($this->authorizationChecker->isGranted('VIEW', 'App\Entity\Back\Trainer')) {
-                $menu->addChild('trainers', array(
-                    'label' => 'Intervenants',
-                    'icon'  => 'user',
-                    'uri'   => $this->router->generate('core.index') . '#/trainer',
-                ));
+            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainer::class)) {
+                $menu->addChild('trainers', ['label' => 'Intervenants', 'icon'  => 'user', 'uri'   => $this->router->generate('core.index') . '#/trainer']);
             }
 
-        } catch (AuthenticationCredentialsNotFoundException $e) {
+        } catch (AuthenticationCredentialsNotFoundException) {
         }
 
         if (!isset($adminMenu)) {
             $menu->removeChild('administration');
         }
         else {
-            $manipulator = new MenuManipulator();
+            $menuManipulator = new MenuManipulator();
             $item = $menu->getChild('administration');
-            $manipulator->moveToLastPosition($item);
+            $menuManipulator->moveToLastPosition($item);
         }
 
         return $menu;

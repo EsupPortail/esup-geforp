@@ -1,64 +1,54 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: maxime
- * Date: 07/07/14
- * Time: 14:12.
- */
-
 namespace App\Form\Type;
 
 use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Term\Publiposttemplate;
 
-class PublipostTemplateVocabularyType extends VocabularyType
+final class PublipostTemplateVocabularyType extends AbstractType
 {
-    /**
-     * @var HumanReadablePropertyAccessorFactory
-     */
-    protected $HRPAFactory;
+    private readonly bool|string|int|float|\UnitEnum|array|null $mailingConfig;
 
-    public function __construct(ContainerInterface $container, HumanReadablePropertyAccessorFactory $HRPAfactory)
+    /**
+     * PublipostTemplateVocabularyType constructor.
+     */
+    public function __construct(protected HumanReadablePropertyAccessorFactory $humanReadablePropertyAccessorFactory, ParameterBagInterface $parameterBag, ContainerInterface $service_Container)
     {
-        // Recup de la conf batch mailing
-        $this->HRPAFactory = $HRPAfactory;
-        $conf = $container->getParameter('batch');
-        $this->HRPAFactory->setTermCatalog($conf['mailing']);
+        // Récupération de la configuration "batch" depuis le conteneur de services
+        $this->mailingConfig = $parameterBag->get('batch');
+        $this->humanReadablePropertyAccessorFactory->setTermCatalog($this->mailingConfig['mailing']);
     }
 
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * Construit le formulaire.
      *
-     * @throws MissingOptionsException
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $tab = array_flip($this->HRPAFactory->getKnownEntities(false));
-        $builder->add('entity', ChoiceType::class, array(
-            'label' => 'Entité associée',
-            'choices' => $tab,
-        ));
+        // Construction du tableau d'options de l'entité
+        $tab = array_flip($this->humanReadablePropertyAccessorFactory->getKnownEntities(false));
 
-        $builder->add('file', FileType::class, array(
-            'label' => 'Fichier du modèle',
-            'block_name' => 'updatable_file',
-        ));
+        // Ajout du champ 'entity'
+        $formBuilder->add('entity', ChoiceType::class, ['label' => 'Entité associée', 'choices' => $tab]);
+
+        // Ajout du champ 'file'
+        $formBuilder->add('file', FileType::class, ['label' => 'Fichier du modèle', 'block_name' => 'updatable_file']);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    /**
+     * Configure les options du formulaire.
+     *
+     */
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => Publiposttemplate::class,
-        ));
+        $optionsResolver->setDefaults(['data_class' => Publiposttemplate::class]);
     }
 }

@@ -19,7 +19,6 @@ class BatchOperationRegistrationPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
     public function process(ContainerBuilder $container)
     {
@@ -37,13 +36,13 @@ class BatchOperationRegistrationPass implements CompilerPassInterface
             }
 
             if (!$container->getDefinition($id)->isAbstract()) {
-                $definition->addMethodCall('addBatchOperation', array(new Reference($id), $id));
-                $container->getDefinition($id)->addMethodCall('setEm', array(new Reference('doctrine.orm.entity_manager')));
+                $definition->addMethodCall('addBatchOperation', [new Reference($id), $id]);
+                $container->getDefinition($id)->addMethodCall('setEm', [new Reference('doctrine.orm.entity_manager')]);
             }
         }
     }
 
-    private function isBatchOperationImplementation($class)
+    private function isBatchOperationImplementation(string $class): bool
     {
         $refl = new \ReflectionClass($class);
 

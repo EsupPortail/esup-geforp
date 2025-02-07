@@ -18,33 +18,30 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Responsable pédagogique.
  *
- * @ORM\Table(name="supervisor")
- * @ORM\Entity
  */
-class Supervisor extends AbstractTerm implements VocabularyInterface
+#[ORM\Table(name: 'supervisor')]
+#[ORM\Entity]
+class Supervisor extends AbstractTerm implements VocabularyInterface, \Stringable
 {
     /**
-     * @var string
-     * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $firstName;
+    #[ORM\Column(name: 'first_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 50, nullable: true)]
+    protected ?string $firstName = null;
 
     /**
-     * @var string
-     * @Assert\Email(message="Vous devez renseigner un email valide.")
-     * @ORM\Column(name="email", type="string", length=128, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $email;
+    #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
+    #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
+    protected ?string $email = null;
 
     /**
-     * @var string
      *
-     * @ORM\Column(name="phone_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $phoneNumber;
+    #[ORM\Column(name: 'phone_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $phoneNumber = null;
 
     /**
      * @return string
@@ -57,7 +54,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $firstName
      */
-    public function setFirstName($firstName)
+    public function setFirstName($firstName): void
     {
         $this->firstName = $firstName;
     }
@@ -73,7 +70,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $email
      */
-    public function setEmail($email)
+    public function setEmail($email): void
     {
         $this->email = $email;
     }
@@ -89,25 +86,21 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $phoneNumber
      */
-    public function setPhoneNumber($phoneNumber)
+    public function setPhoneNumber($phoneNumber): void
     {
         $this->phoneNumber = $phoneNumber;
     }
 
     /**
-     * @return string
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
-    public function getFullName()
+    public function getFullName(): string
     {
-        return $this->getFirstName() . ' ' . $this->getName();
+        return $this->firstName . ' ' . $this->getName();
     }
 
-    /**
-     * @return string
-     */
-    function __toString()
+    function __toString(): string
     {
         return $this->getFullName();
     }
@@ -115,9 +108,8 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return SupervisorType::class;
     }
@@ -125,12 +117,12 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Responsable pédagogique';
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }

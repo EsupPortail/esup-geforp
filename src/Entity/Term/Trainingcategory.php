@@ -12,18 +12,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * Catégorie de formation.
  *
- * @ORM\Table(name="training_category")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'training_category')]
+#[ORM\Entity]
 class Trainingcategory extends AbstractTerm implements VocabularyInterface
 {
     /**
-     * @var string
-     * @ORM\Column(name="trainingType", type="string", length=256, nullable=true)
-     * @Assert\NotNull(message="Vous devez renseigner un type de formation")
      * @Serializer\Groups({"Default", "api"})
      */
-    private $trainingType;
+    #[ORM\Column(name: 'trainingType', type: \Doctrine\DBAL\Types\Types::STRING, length: 256, nullable: true)]
+    #[Assert\NotNull(message: 'Vous devez renseigner un type de formation')]
+    private ?string $trainingType = null;
 
     /**
      * @return string
@@ -36,7 +35,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $trainingType
      */
-    public function setTrainingType($trainingType)
+    public function setTrainingType($trainingType): void
     {
         $this->trainingType = $trainingType;
     }
@@ -44,17 +43,17 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Catégorie de formation';
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return TrainingcategoryType::class;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }

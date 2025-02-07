@@ -6,26 +6,17 @@ use App\Form\Type\VocabularyType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class MenuItemType extends VocabularyType
+final class MenuItemType extends VocabularyType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder
-            ->add('link', UrlType::class, array(
-                'label' => 'Lien externe',
-            ));
+        $formBuilder
+            ->add('link', UrlType::class, ['label' => 'Lien externe']);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
       return VocabularyType::class;
     }

@@ -1,49 +1,57 @@
 {% block header %}
-<!-- Fixed navbar -->
-<nav class="navbar navbar-default">
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default">
 
-    <div class="container">
-        <div class="navbar-header visible-xs">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
+        <div class="container">
+            <div class="navbar-header visible-xs">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                        aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
 
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <a class="navbar-brand" href="{{ path('front.program.myprogram') }}" style="margin-left: -10em;" >
-                <div class="logo-image">
-                    <img src="{{ asset('img/logo-esup-geforp.png') }}" alt="Logo" height="30" align="left">
-                </div>
-            </a>
-            <ul class="nav navbar-nav">
-                {% if user.fullName is defined %}
-                    <li class="hidden-xs">
-                            <a href="{{ path('front.program.myprogram') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Catalogue des formations</a></li>
-                        <li><a href="{{ path('front.program.contact') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Contact</a></li>
-                        <li><a href="{{ path('front.program.faq') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <a class="navbar-brand" href="{{ path('front.program.myprogram') }}" style="margin-left: -10em;">
+                    <div class="logo-image">
+                        <img src="{{ asset('img/logo-esup-geforp.png') }}" alt="Logo" height="30" align="left">
+                    </div>
+                </a>
+                <ul class="nav navbar-nav">
+                    {% if user.fullName is defined %}
+                        <li class="hidden-xs">
+                            <a href="{{ path('front.program.myprogram') }}" data-toggle="collapse"
+                               data-target=".navbar-collapse.in">Catalogue des formations</a></li>
+                        <li><a href="{{ path('front.program.contact') }}" data-toggle="collapse"
+                               data-target=".navbar-collapse.in">Contact</a></li>
+                        <li><a href="{{ path('front.program.faq') }}" data-toggle="collapse"
+                               data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
 
-                    </li>
-                {% else %}
-                    <li><a href="{{ path('front.public.contact') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Contact</a></li>
-                    <li><a href="{{ path('front.public.faq') }}" data-toggle="collapse" data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
-                {%  endif %}
-            </ul>
-
-            <ul class="nav navbar-nav navbar-right">
-                {% if user.fullName is not defined %}
-                    <li><a href="{{ path('front.public.login') }}" title="Accéder à votre espace">Espace personnel</a></li>
-                {% else %}
-                    {% if is_granted('ROLE_RESP') %}
-                        <li><a href="{{ path('front.account.team.registrations') }}" title="Espace agents">Espace agents</a></li>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ path('front.public.contact') }}" data-toggle="collapse"
+                               data-target=".navbar-collapse.in">Contact</a></li>
+                        <li><a href="{{ path('front.public.faq') }}" data-toggle="collapse"
+                               data-target=".navbar-collapse.in">Guide d'utilisation</a></li>
                     {% endif %}
-                    <li><a href="{{ path('front.account.registrations') }}">Mon compte</a></li>
-{#                     <li><a href="{{ path('front.account.logout') }}">Se déconnecter</a></li> #}
-                {% endif %}
-            </ul>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user.fullName is not defined %}
+                        <li><a href="{{ path('front.public.login') }}" title="Accéder à votre espace">Espace
+                                personnel</a></li>
+                    {% else %}
+                        {% if is_granted('ROLE_RESP') %}
+                            <li><a href="{{ path('front.account.team.registrations') }}" title="Espace agents">Espace
+                                    agents</a></li>
+                        {% endif %}
+                        <li><a href="{{ path('front.account.registrations') }}">Mon compte</a></li>
+                        {#                     <li><a href="{{ path('front.account.logout') }}">Se déconnecter</a></li> #}
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
 {% endblock header %}

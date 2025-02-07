@@ -16,13 +16,20 @@ use App\Form\Type\PresenceStatusVocabularyType;
 /**
  * Statut de présense.
  *
- * @ORM\Table(name="presence_status")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'presence_status')]
+#[ORM\Entity]
 class Presencestatus extends AbstractTerm implements VocabularyInterface
 {
-    const STATUS_ABSENT = 0;
-    const STATUS_PRESENT = 1;
+    /**
+     * @var int
+     */
+    final public const STATUS_ABSENT = 0;
+
+    /**
+     * @var int
+     */
+    final public const STATUS_PRESENT = 1;
 
     /**
      * This term is required during term replacement.
@@ -32,11 +39,10 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     public static $replacementRequired = true;
 
     /**
-     * @var int
-     * @ORM\Column(name="status", type="integer")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $status = self::STATUS_ABSENT;
+    #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $status = self::STATUS_ABSENT;
 
     /**
      * @param int $status
@@ -49,7 +55,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @param int $status
      */
-    public function setStatus($status)
+    public function setStatus($status): void
     {
         $this->status = $status;
     }
@@ -62,18 +68,12 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
         return $this->status;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Statut de présence';
     }
 
-    /**
-     * @return int
-     */
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_MIXED;
     }
@@ -81,9 +81,8 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return PresenceStatusVocabularyType::class;
     }

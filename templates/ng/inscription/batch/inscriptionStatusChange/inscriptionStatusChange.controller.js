@@ -1,8 +1,7 @@
 /**
  * BatchMailingController
  */
-sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config)
-{
+sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', '$modalInstance', '$dialogParams', '$dialog', 'config', function ($scope, $http, $window, $modalInstance, $dialogParams, $dialog, config) {
     $scope.service = 'sygefor_inscription.batch.inscription_status_change';
     $scope.dialog = $modalInstance;
     $scope.items = $dialogParams.items;
@@ -57,7 +56,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         var attTemplates = [];
         if (typeof $scope.attCheckList != 'undefined') {
             angular.forEach($scope.attCheckList, function (tpl) {
-                if (( typeof tpl.selected != 'undefined' ) && tpl.selected) {
+                if ((typeof tpl.selected != 'undefined') && tpl.selected) {
                     attTemplates.push(tpl.id);
                 }
             });
@@ -109,10 +108,10 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         }).success(function (data) {
             $scope.dialog.close();
         });
-/*
-        $http.post(url, data).success(function() {
-            $scope.dialog.close();
-        });*/
+        /*
+                $http.post(url, data).success(function() {
+                    $scope.dialog.close();
+                });*/
     };
 
     $scope.preview = function () {
@@ -201,16 +200,16 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
      * Remove file attachment
      * @param key
      */
-    $scope.removeAttachment = function(key) {
+    $scope.removeAttachment = function (key) {
         $scope.message.attachments.splice(key, 1);
         angular.element($('#inputAttachment')).val(null);
     };
 
-    $scope.isAObject = function(mixed) {
+    $scope.isAObject = function (mixed) {
         return typeof mixed === "object";
     };
 
-    
+
     /**
      * Watches selected template. When changed, current field contents are stored,
      * then replaced byselected template values

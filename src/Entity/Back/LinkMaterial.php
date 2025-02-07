@@ -11,17 +11,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * LinkMaterial.
  *
- * @ORM\Entity
- * @ORM\Table(name="link_material")
  */
+#[ORM\Table(name: 'link_material')]
+#[ORM\Entity]
 class LinkMaterial extends Material
 {
     /**
-     * @ORM\Column(name="url", type="string", nullable=false)
-     * @Assert\Url(message="Url non valide !")
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    private $url;
+    #[ORM\Column(name: 'url', type: \Doctrine\DBAL\Types\Types::STRING)]
+    #[Assert\Url(message: 'Url non valide !')]
+    private ?string $url = null;
 
     /**
      * @return mixed
@@ -31,18 +31,12 @@ class LinkMaterial extends Material
         return $this->url;
     }
 
-    /**
-     * @param mixed $link
-     */
-    public function setUrl($link)
+    public function setUrl(mixed $link): void
     {
         $this->url = $link;
     }
 
-    /**
-     * @return string
-     */
-    static public function getType()
+    static public function getType(): string
     {
         return 'link';
     }

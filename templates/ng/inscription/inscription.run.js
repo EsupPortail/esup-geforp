@@ -1,19 +1,19 @@
 /**
  * Application run
  */
-sygeforApp.run(['$rootScope', function($rootScope) {
+sygeforApp.run(['$rootScope', function ($rootScope) {
 
     /**
      * This helper could be used in ng-class to colorize inscription status label
      *
      * @param statusId
      */
-    $rootScope.inscriptionStatusClass = function(statusId, prefix) {
-        if(!prefix) {
+    $rootScope.inscriptionStatusClass = function (statusId, prefix) {
+        if (!prefix) {
             prefix = 'label';
         }
         var prefix = prefix ? prefix + '-' : '';
-        switch(statusId) {
+        switch (statusId) {
             case 0:
                 return prefix + 'default';
             case 1:
@@ -32,12 +32,12 @@ sygeforApp.run(['$rootScope', function($rootScope) {
      *
      * @param statusId
      */
-    $rootScope.presenceStatusClass = function(statusId, prefix) {
-        if(!prefix) {
+    $rootScope.presenceStatusClass = function (statusId, prefix) {
+        if (!prefix) {
             prefix = 'label';
         }
         var prefix = prefix ? prefix + '-' : '';
-        switch(statusId) {
+        switch (statusId) {
             case 0:
                 return prefix + 'danger';
             case 1:

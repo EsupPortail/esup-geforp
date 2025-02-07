@@ -14,9 +14,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Civilité.
  *
- * @ORM\Table(name="title")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'title')]
+#[ORM\Entity]
 class Title extends AbstractTerm implements VocabularyInterface
 {
     /**
@@ -29,12 +29,12 @@ class Title extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Civilités';
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }

@@ -19,19 +19,18 @@ use App\Form\Type\MenuItemType;
 /**
  * Civilité.
  *
- * @ORM\Table(name="menu_item")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'menu_item')]
+#[ORM\Entity]
 class MenuItem extends AbstractTerm implements VocabularyInterface
 {
     /**
-     * @var string
      *
-     * @ORM\Column(name="link", type="string", length=255)
-     * @Assert\NotBlank()
      * @Serializer\Groups({"Default", "api"})
      */
-    private $link;
+    #[ORM\Column(name: 'link', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    #[Assert\NotBlank]
+    private ?string $link = null;
 
     /**
      * @return string
@@ -44,7 +43,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $link
      */
-    public function setLink($link)
+    public function setLink($link): void
     {
         $this->link = $link;
     }
@@ -52,9 +51,8 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * returns the form type name for template edition.
      *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return MenuItemType::class;
     }
@@ -62,12 +60,12 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Onglet de menu';
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }

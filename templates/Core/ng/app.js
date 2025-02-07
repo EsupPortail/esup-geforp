@@ -5,7 +5,7 @@ var sygeforApp = angular.module('conjecto.sygefor.app', ['ui.bootstrap', 'ui.rou
 /**
  * config block
  */
-sygeforApp.config(function($httpProvider, $urlRouterProvider, growlProvider, uiZeroclipConfigProvider) {
+sygeforApp.config(function ($httpProvider, $urlRouterProvider, growlProvider, uiZeroclipConfigProvider) {
     // set some default headers
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.headers.common['Accept'] = 'application/json';
@@ -28,7 +28,7 @@ sygeforApp.config(function($httpProvider, $urlRouterProvider, growlProvider, uiZ
 /**
  * run block
  */
-sygeforApp.run(['$rootScope', '$location', '$dialog', '$templateCache', 'hotkeys', function($rootScope, $location, $dialog, $templateCache, hotkeys) {
+sygeforApp.run(['$rootScope', '$location', '$dialog', '$templateCache', 'hotkeys', function ($rootScope, $location, $dialog, $templateCache, hotkeys) {
     // set the $dialog service available in all scopes
     $rootScope.$dialog = $dialog;
     /*$location.replace = function() {
@@ -36,7 +36,7 @@ sygeforApp.run(['$rootScope', '$location', '$dialog', '$templateCache', 'hotkeys
     }*/
     // log stateChange errors
     $rootScope.$on('$stateChangeError',
-        function(event, toState, toParams, fromState, fromParams, error){
+        function (event, toState, toParams, fromState, fromParams, error) {
             //console.log(error);
         });
 
@@ -54,35 +54,39 @@ sygeforApp.run(['$rootScope', '$location', '$dialog', '$templateCache', 'hotkeys
  */
 sygeforApp.filter('joinObjects', function () {
     return function (input, property, delimiter) {
-        if(!Array.isArray(input)) {
-            input = Object.keys(input).map(function (key) {return input[key]});
+        if (!Array.isArray(input)) {
+            input = Object.keys(input).map(function (key) {
+                return input[key]
+            });
         }
-        return input.map(function(o) { return o[property || 'name']; }).join(delimiter || ', ');
+        return input.map(function (o) {
+            return o[property || 'name'];
+        }).join(delimiter || ', ');
     };
 });
 
 /**
  * Filter : orderObjectBy
  */
-sygeforApp.filter('orderObjectBy', function() {
-  return function(items, field, reverse) {
-    var filtered = [];
-    angular.forEach(items, function(item) {
-      filtered.push(item);
-    });
-    filtered.sort(function (a, b) {
-      return (a[field] > b[field] ? 1 : -1);
-    });
-    if(reverse) filtered.reverse();
-    return filtered;
-  };
+sygeforApp.filter('orderObjectBy', function () {
+    return function (items, field, reverse) {
+        var filtered = [];
+        angular.forEach(items, function (item) {
+            filtered.push(item);
+        });
+        filtered.sort(function (a, b) {
+            return (a[field] > b[field] ? 1 : -1);
+        });
+        if (reverse) filtered.reverse();
+        return filtered;
+    };
 });
 
 /**
  * Filter : ceil
  */
-sygeforApp.filter('ceil', function() {
-    return function(input) {
+sygeforApp.filter('ceil', function () {
+    return function (input) {
         return Math.ceil(input);
     }
 });
@@ -90,8 +94,8 @@ sygeforApp.filter('ceil', function() {
 /**
  * Filter : floor
  */
-sygeforApp.filter('floor', function() {
-    return function(input) {
+sygeforApp.filter('floor', function () {
+    return function (input) {
         return Math.floor(input);
     }
 });
@@ -99,17 +103,17 @@ sygeforApp.filter('floor', function() {
 /**
  * Filter : slice
  */
-sygeforApp.filter('slice', function() {
-  return function(input, start, end) {
-    return arr.slice(input, end);
-  };
+sygeforApp.filter('slice', function () {
+    return function (input, start, end) {
+        return arr.slice(input, end);
+    };
 });
 
 /**
  * Filter : nl2br
  */
-sygeforApp.filter('nl2br', function($sce){
-    return function(text) {
+sygeforApp.filter('nl2br', function ($sce) {
+    return function (text) {
         return $sce.trustAsHtml(text.replace(/\n/g, '<br>'));
     };
 });
@@ -117,11 +121,11 @@ sygeforApp.filter('nl2br', function($sce){
 /**
  * Filter : typeaheadlist
  */
-sygeforApp.filter('typeaheadlist', function() {
-    return function(input) {
+sygeforApp.filter('typeaheadlist', function () {
+    return function (input) {
         var result = [];
         for (var i in input) {
-            result.push({'value':i,'label':input[i]});
+            result.push({'value': i, 'label': input[i]});
         }
 
         return result;
@@ -131,8 +135,8 @@ sygeforApp.filter('typeaheadlist', function() {
 /**
  * Filter : nl2br
  */
-sygeforApp.filter('nl2br', function($sce) {
-    return function(text) {
+sygeforApp.filter('nl2br', function ($sce) {
+    return function (text) {
         return text ? $sce.trustAsHtml(text.replace(/\n/g, '<br/>')) : '';
     };
 });
@@ -154,9 +158,9 @@ sygeforApp.filter('characters', function () {
                 if (lastspace !== -1) {
                     input = input.substr(0, lastspace);
                 }
-            }else{
-                while(input.charAt(input.length-1) === ' '){
-                    input = input.substr(0, input.length -1);
+            } else {
+                while (input.charAt(input.length - 1) === ' ') {
+                    input = input.substr(0, input.length - 1);
                 }
             }
             return input + '...';
@@ -186,28 +190,28 @@ sygeforApp.filter('words', function () {
 /**
  * Factory : httpInterceptor
  */
-sygeforApp.factory('httpInterceptor', function($q, growl) {
+sygeforApp.factory('httpInterceptor', function ($q, growl) {
     return {
         // optional method
-        'requestError': function(rejection) {
+        'requestError': function (rejection) {
             // do something on error
             growl.addErrorMessage("requestError");
             return $q.reject(rejection);
         },
 
         // optional method
-        'response': function(response) {
+        'response': function (response) {
             // do something on success
             return response;
         },
 
         // optional method
-        'responseError': function(rejection) {
+        'responseError': function (rejection) {
             //if response data contains a message, it is displayed
             if (rejection.data.message) {
                 // symfony prod env
                 growl.addErrorMessage(rejection.data.message);
-            } else if(rejection.data[0] && rejection.data[0].message) {
+            } else if (rejection.data[0] && rejection.data[0].message) {
                 // symfony dev env
                 growl.addErrorMessage(rejection.data[0].message);
             } else {

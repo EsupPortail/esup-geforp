@@ -17,62 +17,60 @@ use App\Entity\Core\TimestampableTrait;
 /**
  * Trainee.
  *
- * @ORM\Table(name="inscription", uniqueConstraints={@UniqueConstraint(name="traineesession_idx", columns={"trainee_id", "session_id"})})
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\HasLifecycleCallbacks()
- * @UniqueEntity(fields={"trainee", "session"}, message="Cet utilisateur est déjà inscrit à cette session !")
  */
+#[ORM\Table(name: 'inscription')]
+#[UniqueConstraint(name: 'traineesession_idx', columns: ['trainee_id', 'session_id'])]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\HasLifecycleCallbacks]
+#[UniqueEntity(fields: ['trainee', 'session'], message: 'Cet utilisateur est déjà inscrit à cette session !')]
 abstract class AbstractInscription implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
 
     /**
-     * @var int id
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var AbstractTrainee
-     * @ORM\ManyToOne(targetEntity="AbstractTrainee", inversedBy="inscriptions")
-     * @ORM\JoinColumn(name="trainee_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez sélectionner un stagiaire.")
      * @Serializer\Groups({"inscription", "session"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractTrainee', inversedBy: 'inscriptions')]
+    #[ORM\JoinColumn(name: 'trainee_id')]
+    #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
     protected $trainee;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession", inversedBy="inscriptions")
-     * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
-     * @Assert\NotNull()
      * @Serializer\Groups({"inscription", "trainee", "api"})
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'inscriptions')]
+    #[ORM\JoinColumn(name: 'session_id')]
+    #[Assert\NotNull]
     protected $session;
 
     /**
-     * @var Inscriptionstatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Inscriptionstatus")
-     * @ORM\JoinColumn(name="inscription_status_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez spécifier un status d'inscription.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $inscriptionstatus;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Inscriptionstatus::class)]
+    #[ORM\JoinColumn(name: 'inscription_status_id')]
+    #[Assert\NotNull(message: "Vous devez spécifier un status d'inscription.")]
+    protected ?\App\Entity\Term\Inscriptionstatus $inscriptionstatus = null;
 
     /**
-     * @var Presencestatus
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Presencestatus")
-     * @ORM\JoinColumn(name="presence_status_id", referencedColumnName="id")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $presencestatus;
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Presencestatus::class)]
+    #[ORM\JoinColumn(name: 'presence_status_id')]
+    protected ?\App\Entity\Term\Presencestatus $presencestatus = null;
 
     /**
      * @var bool
@@ -82,7 +80,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -98,7 +96,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param Inscriptionstatus
      */
-    public function setInscriptionstatus($inscriptionStatus)
+    public function setInscriptionstatus($inscriptionStatus): void
     {
         $this->inscriptionstatus = $inscriptionStatus;
     }
@@ -114,7 +112,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param Presencestatus
      */
-    public function setPresencestatus($presenceStatus)
+    public function setPresencestatus($presenceStatus): void
     {
         $this->presencestatus = $presenceStatus;
     }
@@ -130,7 +128,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param AbstractSession
      */
-    public function setSession($session)
+    public function setSession($session): void
     {
         $this->session = $session;
     }
@@ -146,7 +144,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param AbstractTrainee
      */
-    public function setTrainee($trainee)
+    public function setTrainee($trainee): void
     {
         $this->trainee = $trainee;
     }
@@ -170,7 +168,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param bool $sendinscriptionstatusmail
      */
-    public function setSendinscriptionstatusmail($sendinscriptionstatusmail)
+    public function setSendinscriptionstatusmail($sendinscriptionstatusmail): void
     {
         $this->sendinscriptionstatusmail = $sendinscriptionstatusmail;
     }
@@ -178,15 +176,15 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * Set the default inscription status (1).
      *
-     * @ORM\PreUpdate
-     * @ORM\PrePersist
      */
-    public function setDefaultInscriptionstatus(LifecycleEventArgs $eventArgs)
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
+    public function setDefaultInscriptionstatus(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        if (!$this->getInscriptionstatus()) {
-            $repository = $eventArgs->getEntityManager()->getRepository(Inscriptionstatus::class);
-            $status = $repository->findOneBy(array('machineName' => 'waiting'));
-            $this->setInscriptionstatus($status);
+        if (!$this->inscriptionstatus) {
+            $entityRepository = $lifecycleEventArgs->getEntityManager()->getRepository(Inscriptionstatus::class);
+            $inscriptionstatus = $entityRepository->findOneBy(['machineName' => 'waiting']);
+            $this->setInscriptionstatus($inscriptionstatus);
         }
     }
 
@@ -195,7 +193,7 @@ abstract class AbstractInscription implements SerializedAccessRights
      */
     public function getOrganization()
     {
-        return $this->getSession()->getTraining()->getOrganization();
+        return $this->session->getTraining()->getOrganization();
     }
 
     /**

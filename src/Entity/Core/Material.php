@@ -8,45 +8,43 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Material.
  *
- * @ORM\Entity
- * @ORM\Table(name="material")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({})
- * @ORM\InheritanceType("JOINED")
  */
+#[ORM\Table(name: 'material')]
+#[ORM\Entity]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap([])]
+#[ORM\InheritanceType('JOINED')]
 abstract class Material
 {
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $name;
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $name = null;
 
     /**
      * @var AbstractTraining
-     * @ORM\ManyToOne(targetEntity="AbstractTraining")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Exclude
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractTraining')]
+    #[ORM\JoinColumn]
     protected $training;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Exclude
      */
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession')]
+    #[ORM\JoinColumn]
     protected $session;
 
     /**
@@ -86,7 +84,7 @@ abstract class Material
     /**
      * @param AbstractTraining $training
      */
-    public function setTraining($training = null)
+    public function setTraining($training = null): void
     {
         $this->training = $training;
     }
@@ -110,7 +108,7 @@ abstract class Material
     /**
      * @param AbstractSession $session
      */
-    public function setSession($session = null)
+    public function setSession($session = null): void
     {
         $this->session = $session;
     }

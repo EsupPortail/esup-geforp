@@ -17,29 +17,21 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class AbstractParticipationType extends AbstractType
+final class AbstractParticipationType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $notBlank = new NotBlank(array('message' => 'Vous devez sélectionner une session.'));
+        $notBlank = new NotBlank(['message' => 'Vous devez sélectionner une session.']);
         $notBlank->addImplicitGroupName('session_add');
 
-        $builder
-            ->add('trainer', EntityHiddenType::class, array(
-                'label' => 'Intervenant',
-                'class' => AbstractTrainer::class,
-                'constraints' => new NotBlank(array('message' => 'Vous devez sélectionner un intervenant.')),
-            ))
-            ->add('session', EntityHiddenType::class, array(
-                'label' => 'Session',
-                'class' => AbstractSession::class,
-                'constraints' => $notBlank,
-            ));
+        $formBuilder
+            ->add('trainer', EntityHiddenType::class, ['label' => 'Intervenant', 'class' => AbstractTrainer::class, 'constraints' => new NotBlank(['message' => 'Vous devez sélectionner un intervenant.'])])
+            ->add('session', EntityHiddenType::class, ['label' => 'Session', 'class' => AbstractSession::class, 'constraints' => $notBlank]);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array('data_class' => AbstractParticipation::class)
+        $optionsResolver->setDefaults(['data_class' => AbstractParticipation::class]
         );
     }
 

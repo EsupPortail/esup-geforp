@@ -3,7 +3,7 @@
  *
  * Usage : <div resume-session-block="session"></div>
  */
-sygeforApp.directive('resumeSessionBlock', [function() {
+sygeforApp.directive('resumeSessionBlock', [function () {
     return {
         restrict: 'EA',
         scope: {

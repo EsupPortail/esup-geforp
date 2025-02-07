@@ -15,14 +15,17 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class InscriptionSearchRepository extends ServiceEntityRepository
+final class InscriptionSearchRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Inscription::class);
+        parent::__construct($managerRegistry, Inscription::class);
     }
 
-    public function getInscriptionsList($keyword, $filters, $page, $pageSize, $sorts, $fields)
+    /**
+     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     */
+    public function getInscriptionsList($keyword, $filters, $page, $pageSize, $sorts, $fields): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -39,13 +42,13 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             ->andWhere('i.session = s.id')
 
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
             // Filtre keyword sur les tags
             $qb
                 ->leftJoin('tr.tags', 'tag')
                 ->orWhere('tag.name LIKE :tagName')
-                ->setParameter('tagName', '%' . addcslashes($keyword, '%_') . '%');
+                ->setParameter('tagName', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE CENTRE
         if (isset($filters['session.training.organization.name.source'])) {
@@ -70,6 +73,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -79,7 +83,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($filters['session.datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["session.datebegin"]);
+            $dates = explode('-', (string) $filters["session.datebegin"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -151,16 +155,15 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         elseif ((is_array($sorts)) && (array_key_exists('trainee.publictype.name', $sorts))){
             if(!isset($filters['publicType.source']))
                 $qb->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype');
+
             $qb->addOrderBy('publictype.name', $sorts['trainee.publictype.name']);
-        } else {
+        } elseif (isset($filters['inscriptionStatusUpdatedAt'])) {
             //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
-            if( isset($filters['inscriptionStatusUpdatedAt'])) {
-                // Tri par date de modification
-                $qb->addOrderBy('i.updatedat', 'DESC');
-            } else {
-                // TRI DES RESULTATS
-                $qb->addOrderBy('i.createdat', 'DESC');
-            }
+            // Tri par date de modification
+            $qb->addOrderBy('i.updatedat', 'DESC');
+        } else {
+            // TRI DES RESULTATS
+            $qb->addOrderBy('i.createdat', 'DESC');
         }
 
         // PAGINATION
@@ -173,7 +176,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabIns = array();
+        $tabIns = [];
         foreach($paginator as $insc) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabIns[]['id'] = $insc->getId();
@@ -182,14 +185,10 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             }
         }
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabIns);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabIns];
     }
 
-    public function getNbInscriptions($query_filters, $keyword, $aggs, $name)
+    public function getNbInscriptions($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -203,7 +202,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             ->orWhere('trainee.lastname LIKE :keyword')
             ->andWhere('i.trainee = trainee.id')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE CENTRE
         if(isset( $aggs['session.training.organization.name.source'])) {
@@ -236,6 +235,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -246,6 +246,7 @@ class InscriptionSearchRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
+
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -320,9 +321,8 @@ class InscriptionSearchRepository extends ServiceEntityRepository
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 
 }

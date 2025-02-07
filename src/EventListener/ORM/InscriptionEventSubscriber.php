@@ -10,31 +10,24 @@ use App\Entity\Core\AbstractInscription;
 /**
  * Inscription serialization event subscriber.
  */
-class InscriptionEventSubscriber implements EventSubscriberInterface
+final class InscriptionEventSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array('event' => 'serializer.post_serialize', 'method' => 'onPostSerialize'),
-        );
+        return [['event' => 'serializer.post_serialize', 'method' => 'onPostSerialize']];
     }
 
     /**
      * On post serialize, add inscription price.
      *
-     * @param ObjectEvent $event
      */
-    public function onPostSerialize(ObjectEvent $event)
+    public function onPostSerialize(ObjectEvent $objectEvent): void
     {
-        $inscription = $event->getObject();
+        $inscription = $objectEvent->getObject();
         if ($inscription instanceof AbstractInscription) {
-            try {
-            } catch (InvalidArgumentException $e) {
-                // nothing to do
-            }
         }
     }
 }

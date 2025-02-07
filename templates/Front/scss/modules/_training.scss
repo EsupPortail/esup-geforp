@@ -2,10 +2,12 @@
   & .session__type .label {
     background-color: $internship-color;
   }
+
   & .session__avenir .label {
     background-color: $a-venir;
   }
 }
+
 .training-detail-view {
   h4 {
     margin-top: $padding-large-vertical * 2;

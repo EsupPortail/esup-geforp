@@ -12,17 +12,20 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TrainingRepository extends ServiceEntityRepository
+final class TrainingRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Internship::class);
+        parent::__construct($managerRegistry, Internship::class);
     }
 
-    public function getTrainingsList($keyword, $filters, $page, $pageSize, $sorts)
+    /**
+     * @return array{total: int, pageSize: mixed, items: array<int, array{id: mixed, name: mixed, number: mixed, sessionscount: mixed, trainers?: array{fullname: mixed}[]|array{id: mixed}[]&mixed[], training: array{id: mixed, type: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, name: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed, trainers: string}, nextsession: mixed, lastsession: mixed, theme: mixed, inscriptionsStats: never[]}>}
+     */
+    public function getTrainingsList($keyword, $filters, $page, $pageSize, $sorts): array
     {
         /* addcslashes empêchera des manipulations malveillantes éventuelles */
-        $keywordPr = '%' . addcslashes($keyword, '%_') . '%';
+        $keywordPr = '%' . addcslashes((string) $keyword, '%_') . '%';
         $qb = $this->createQueryBuilder('training');
         $qb
             ->select('training')
@@ -64,6 +67,7 @@ class TrainingRepository extends ServiceEntityRepository
                 } else {
                     $monthFrom = 7; $monthTo = 12;
                 }
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
@@ -79,7 +83,7 @@ class TrainingRepository extends ServiceEntityRepository
 
             // FILTRE FORMATEUR
             if(isset($filters['trainers.fullName'])) {
-                $fullName = explode(" ", $filters['trainers.fullName']);
+                $fullName = explode(" ", (string) $filters['trainers.fullName']);
                 $lastName = array_pop($fullName);
                 $firstName = array_shift($fullName);
                 $qb
@@ -114,6 +118,7 @@ class TrainingRepository extends ServiceEntityRepository
         elseif ((is_array($sorts)) && (array_key_exists('training.category.source', $sorts))) {
             if(!isset($filters['training.category.source']))
                 $qb->innerJoin('training.category', 'category', 'WITH', 'training.category = category');
+
             $qb->addOrderBy('category.name', $sorts['training.category.source']);
         } else
             $qb->addOrderBy('training.name');
@@ -128,10 +133,10 @@ class TrainingRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabTrainings = array();
+        $tabTrainings = [];
 
         foreach($paginator as $training) {
-            $trainingES = array();
+            $trainingES = [];
             // On ne garde que les infos du stage dont on a besoin
             $trainingES['sessionscount'] = $training->getSessionscount();
             $trainingES['id'] = $training->getId();
@@ -166,7 +171,8 @@ class TrainingRepository extends ServiceEntityRepository
                     $trainingES['training']['trainers'] .= ', ' . $trainer->getFullname();
                 else
                     $trainingES['training']['trainers'] .= $trainer->getFullname();
-                $i++;
+
+                ++$i;
             }
 
 
@@ -175,19 +181,15 @@ class TrainingRepository extends ServiceEntityRepository
 
             $trainingES['theme'] = $training->getTheme();
 
-            $trainingES['inscriptionsStats'] = array();
+            $trainingES['inscriptionsStats'] = [];
 
             $tabTrainings[] = $trainingES;
         }
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabTrainings);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainings];
     }
 
-    public function getNbTrainings($query_filters, $keyword, $aggs, $name)
+    public function getNbTrainings($query_filters, $keyword, $aggs, $name): int
     {
         $qb = $this->createQueryBuilder('training');
         $qb
@@ -196,7 +198,7 @@ class TrainingRepository extends ServiceEntityRepository
             // FILTRE KEYWORD
             ->where('training.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         // FILTRE CENTRE
@@ -238,6 +240,7 @@ class TrainingRepository extends ServiceEntityRepository
                 } else {
                     $monthFrom = 7; $monthTo = 12;
                 }
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
@@ -248,6 +251,7 @@ class TrainingRepository extends ServiceEntityRepository
                 } else {
                     $monthFrom = 7; $monthTo = 12;
                 }
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
@@ -274,7 +278,7 @@ class TrainingRepository extends ServiceEntityRepository
                     ->setParameter('id', $name);
             } elseif( isset($query_filters['trainers.fullName']) ) {
                 /* le front envoie un full name (prénom+nom), je le découpe et ne récupère que le nom de famille */
-                $fullName = explode(" ", $query_filters['participations.trainer.fullName']);
+                $fullName = explode(" ", (string) $query_filters['participations.trainer.fullName']);
                 $lastName = array_pop($fullName);
                 $firstName = array_shift($fullName);
                 $qb
@@ -301,9 +305,8 @@ class TrainingRepository extends ServiceEntityRepository
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
 
-        return $totalRows;
+        return count($paginator);
     }
 
 }

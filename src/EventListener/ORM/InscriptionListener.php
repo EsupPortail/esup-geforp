@@ -3,11 +3,11 @@
 namespace App\EventListener\ORM;
 
 use App\BatchOperations\Generic\EmailingBatchOperation;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Events;
-use Html2Text\Html2Text;
 use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Symfony\Component\DependencyInjection\Container;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use App\Entity\Term\Emailtemplate;
@@ -17,117 +17,103 @@ use App\Entity\Core\AbstractInscription;
  * Inscription listener to perfom some operation on persist/update
  *  - send a mail to the trainee if the property sendInscriptionStatusMail has been set to true.
  */
-class InscriptionListener implements EventSubscriber
+#[AsDoctrineListener(event: Events::postPersist)]
+#[AsDoctrineListener(event: Events::postUpdate)]final readonly class InscriptionListener
 {
-    private $emailingBatchOp;
-    private $mailer;
-
-    /**
-     * @param EmailingBatchOperation $emailingBatchOp
-     * @param MailerInterface $mailer
-     */
-    public function __construct(EmailingBatchOperation $emailingBatchOp, MailerInterface $mailer)
+    public function __construct(private EmailingBatchOperation $emailingBatchOperation, private MailerInterface $mailer)
     {
-        $this->emailingBatchOp = $emailingBatchOp;
-        $this->mailer = $mailer;
     }
 
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-          Events::postPersist,
-          Events::postUpdate,
-        );
+        return [Events::postPersist, Events::postUpdate];
     }
 
     /**
      * Send the inscription status mail.
+     * @throws TransportExceptionInterface
      */
-    public function postProcess(LifecycleEventArgs $eventArgs, $new = false)
+    public function postProcess(PostPersistEventArgs $postPersistEventArgs, $new = false): void
     {
-        $inscription = $eventArgs->getObject();
-        if ($inscription instanceof AbstractInscription) {
-            if ($inscription->isSendinscriptionstatusmail()) {
-                $this->sendInscriptionStatusMail($eventArgs);
+        $object = $postPersistEventArgs->getObject();
+        if ($object instanceof AbstractInscription) {
+            if ($object->isSendinscriptionstatusmail()) {
+                $this->sendInscriptionStatusMail($postPersistEventArgs);
             }
 
             // sending mail to organization manager if new inscription status is disclaimer
 	        if (!$new) {
-		        $this->sendMailDisclaimerInscriptionStatusMail($eventArgs);
+		        $this->sendMailDisclaimerInscriptionStatusMail($postPersistEventArgs);
 	        }
         }
     }
 
     /**
      * postPersist.
+     * @throws TransportExceptionInterface
      */
-    public function postPersist(LifecycleEventArgs $eventArgs)
+    public function postPersist(PostPersistEventArgs $postPersistEventArgs): void
     {
-        $this->postProcess($eventArgs, true);
+        $this->postProcess($postPersistEventArgs, true);
     }
 
     /**
      * postUpdate.
+     * @throws TransportExceptionInterface
      */
-    public function postUpdate(LifecycleEventArgs $eventArgs)
+    public function postUpdate(PostPersistEventArgs $postPersistEventArgs): void
     {
-        $this->postProcess($eventArgs, false);
+        $this->postProcess($postPersistEventArgs);
     }
 
     /**
      * sendMail.
      */
-    protected function sendInscriptionStatusMail(LifecycleEventArgs $eventArgs)
+    private function sendInscriptionStatusMail(PostPersistEventArgs $postPersistEventArgs): void
     {
-        /** @var AbstractInscription $inscription */
-        $inscription = $eventArgs->getEntity();
+        /** @var AbstractInscription $object */
+        $object = $postPersistEventArgs->getObject();
 
         // find the first template for the given inscription status
-        $repository = $eventArgs->getEntityManager()->getRepository('App\Entity\Term\Emailtemplate');
+        $entityRepository = $postPersistEventArgs->getObjectManager()->getRepository(\App\Entity\Term\Emailtemplate::class);
 
-        /** @var Emailtemplate $template */
-        $template = $repository->findOneBy(array(
-            'organization' => $inscription->getSession()->getTraining()->getOrganization(),
-            'inscriptionStatus' => $inscription->getInscriptionstatus(),
-        ), array('position' => 'ASC'));
+        /** @var Emailtemplate $emailtemplate */
+        $emailtemplate = $entityRepository->findOneBy(['organization' => $object->getSession()->getTraining()->getOrganization(), 'inscriptionStatus' => $object->getInscriptionstatus()], ['position' => 'ASC']);
 
-	    if ($template) {
+	    if ($emailtemplate) {
 		    // send the mail with the batch service
-		    $this->emailingBatchOp->sendEmails(
-		    	$inscription,
-			    $template->getSubject(),
-			    $template->getCc(),
+		    $this->emailingBatchOperation->parseAndSendMail(
+		    	$object,
+			    $emailtemplate->getSubject(),
+			    $emailtemplate->getCc(),
 			    null,
-			    $template->getBody()
+			    $emailtemplate->getBody()
 		    );
 	    }
     }
 
     /**
-     * @param LifecycleEventArgs $eventArgs
      *
-     * @return mixed
      *
-     * @throws \Exception
+     * @throws TransportExceptionInterface
      */
-    protected function sendMailDisclaimerInscriptionStatusMail($eventArgs)
+    private function sendMailDisclaimerInscriptionStatusMail(PostPersistEventArgs  $postPersistEventArgs): void
     {
-	    /** @var AbstractInscription $inscription */
-	    $inscription = $eventArgs->getEntity();
+	    /** @var AbstractInscription $object */
+     $object = $postPersistEventArgs->getObject();
 
-	    $uow = $eventArgs->getEntityManager()->getUnitOfWork();
-	    $chgSet = $uow->getEntityChangeSet($inscription);
+	    $unitOfWork = $postPersistEventArgs->getObjectManager()->getUnitOfWork();
+	    $chgSet = $unitOfWork->getEntityChangeSet($object);
 
 	    if (isset($chgSet['inscriptionstatus'])) {
-		    $status = $inscription->getInscriptionstatus();
+		    $inscriptionstatus = $object->getInscriptionstatus();
 
-		    if ($status->getNotify()) {
-                $Dates = $inscription->getSession()->getDates();
+		    if ($inscriptionstatus->getNotify() !== 0) {
+                $Dates = $object->getSession()->getDates();
                 $Texte = "";
                 foreach ($Dates as $date) {
                     if ($date->getDateend() == $date->getDatebegin()) {
@@ -139,18 +125,18 @@ class InscriptionListener implements EventSubscriber
                 }
 
                 $body = "Bonjour,\n" .
-                    "Le statut de l'inscription de " . $inscription->getTrainee()->getFullName() . ' à la session du ' . $inscription->getSession()->getDateBegin()->format('d/m/Y') . "\nde la formation intitulée '" . $inscription->getSession()->getTraining()->getName() . "'\n"
-                    . "est passé à '" . $status->getName() . "'.\n"
+                    "Le statut de l'inscription de " . $object->getTrainee()->getFullName() . ' à la session du ' . $object->getSession()->getDateBegin()->format('d/m/Y') . "\nde la formation intitulée '" . $object->getSession()->getTraining()->getName() . "'\n"
+                    . "est passé à '" . $inscriptionstatus->getName() . "'.\n"
                     . "Le calendrier de la session est le suivant : \n" . $Texte;
 
-                $message = (new Email())
-                    ->from($inscription->getSession()->getTraining()->getOrganization()->getEmail())
-                    ->replyTo($inscription->getSession()->getTraining()->getOrganization()->getEmail())
-                    ->to($inscription->getSession()->getTraining()->getOrganization()->getEmail())
-                    ->subject("Changement de statut d'inscription : ". $status->getName())
+                $email = (new Email())
+                    ->from($object->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->replyTo($object->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->to($object->getSession()->getTraining()->getOrganization()->getEmail())
+                    ->subject("Changement de statut d'inscription : ". $inscriptionstatus->getName())
                     ->text($body);
 
-                $this->mailer->send($message);
+                $this->mailer->send($email);
 
             }
 	    }

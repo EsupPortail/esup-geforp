@@ -19,27 +19,18 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextAreaType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class ProgramAlertType extends AbstractType
+final class ProgramAlertType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-            ->add('alerts', CollectionType::class, array(
-                'entry_type' => AlertType::class,
-                'entry_options' => array('label' => false),
-            ));
+        $formBuilder
+            ->add('alerts', CollectionType::class, ['entry_type' => AlertType::class, 'entry_options' => ['label' => false]]);
 
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => MultipleAlert::class
-        ));
+        $optionsResolver->setDefaults(['data_class' => MultipleAlert::class]);
     }
 
 }
