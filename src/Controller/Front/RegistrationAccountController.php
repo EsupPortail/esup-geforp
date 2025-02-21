@@ -267,6 +267,7 @@ class RegistrationAccountController extends AbstractController
             }
         }
         $newbody = str_replace("[dates]", $Texte, $newbody);
+        $newbody = str_replace("[motivation]", $registration->getMotivation(), $newbody);
         $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
         $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
         $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
@@ -453,6 +454,7 @@ class RegistrationAccountController extends AbstractController
                                     }
                                 }
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
+                                $newbody = str_replace("[refuse]", $registration->getRefuse(), $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
