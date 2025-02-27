@@ -18,7 +18,7 @@ class Publictype extends AbstractTerm implements VocabularyInterface
      * @Serializer\Groups({"Default", "api"})
      */
     #[ORM\Column(name: 'machine_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
-    protected $machinename = null;
+    protected string $machinename;
 
     /**
      * @param string $machinename

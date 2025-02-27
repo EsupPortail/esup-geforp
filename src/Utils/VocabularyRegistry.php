@@ -39,7 +39,7 @@ final class VocabularyRegistry
      *
      * @return VocabularyInterface
      */
-    public function getVocabularyById($id)
+    public function getVocabularyById(string $id): ?VocabularyInterface
     {
         return $this->vocabularies[$id] ?? null;
     }
@@ -49,7 +49,7 @@ final class VocabularyRegistry
      *
      * @return VocabularyInterface
      */
-    public function getVocabularyLabel($id)
+    public function getVocabularyLabel(string $id): ?VocabularyInterface
     {
         return $this->labels[$id] ?? null;
     }

@@ -6,8 +6,11 @@ use App\Vocabulary\VocabularyInterface;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-final class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
+class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
 {
+    /**
+     * @return string
+     */
     public function getLabel(): string
     {
         return 'Gestion des vocabulaires locaux de tous les centres';
@@ -18,21 +21,24 @@ final class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
      *
      * @param string
      *
+     * @return bool
      */
     public function supportsClass($class): bool
     {
-        if ($class === \App\Vocabulary\VocabularyInterface::class) {
+        if ($class === 'App\Vocabulary\VocabularyInterface') {
             return true;
         }
 
         try {
-            $reflectionClass = new \ReflectionClass($class);
+            $refl = new \ReflectionClass($class);
 
-            return $reflectionClass->isSubclassOf(\App\Entity\Term\VocabularyInterface::class);
+            return $refl->isSubclassOf('App\Entity\Term\VocabularyInterface');
         }
-        catch (\ReflectionException) {
+        catch (\ReflectionException $re) {
             return false;
         }
+
+        return false;
     }
 
     /**
@@ -40,12 +46,14 @@ final class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
      */
     public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
-        if ($object) {
-            if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
-                return false;
-            }
-
-            return (bool) $object->getOrganization();
+        if (is_string($object)) {
+            return true;
+        }
+        else if ($object) {
+            return $object->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && $object->getOrganization();
+        }
+        else {
+            return true;
         }
     }
 }

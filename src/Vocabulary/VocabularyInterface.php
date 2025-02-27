@@ -12,7 +12,7 @@ interface VocabularyInterface
     /**
      * @var int
      */
-    public const VOCABULARY_NATIONAL = 0;
+    public const VOCABULARY_NATIONAL = 1;
 
     /**
      * @var int
@@ -27,7 +27,7 @@ interface VocabularyInterface
     /**
      * @return bool
      */
-    public static function getVocabularyStatus();
+    public static function getVocabularyStatus(): int;
 
     /**
      * @return Organization|null mixed
@@ -52,5 +52,5 @@ interface VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName();
+    public function getVocabularyName(): string;
 }

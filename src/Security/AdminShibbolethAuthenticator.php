@@ -20,6 +20,8 @@ use Symfony\Component\Security\Http\Event\LogoutEvent;
 class AdminShibbolethAuthenticator extends AbstractAuthenticator implements EventSubscriberInterface
 {
 
+    private $idpUrl;
+
     public function __construct(
         private readonly AdminShibbolethUserProvider $shibbolethUserProvider,
     )

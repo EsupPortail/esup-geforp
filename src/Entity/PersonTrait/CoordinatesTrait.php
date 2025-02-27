@@ -1,11 +1,11 @@
 <?php
 
 namespace App\Entity\PersonTrait;
-
-use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use App\EventListener\Serializer;
+use Doctrine\ORM\Mapping as ORM;
 /**
  * Trait CoordinatesTrait.
  */
@@ -17,7 +17,9 @@ trait CoordinatesTrait
      * @ORM\Column(name="address_type", type="integer", nullable=true)
      * @Serializer\Groups({"Default", "trainee", "api.profile"})
      */
-    protected $addresstype;
+    #[ORM\Column(name: 'address_type', type: 'integer', nullable: true)]
+    #[Groups(['Default', 'trainee', 'api.profile'])]
+    protected bool $addresstype;
 
     /**
      * @var string address
@@ -25,7 +27,9 @@ trait CoordinatesTrait
      * @ORM\Column(name="address", type="string", length=512, nullable=true)
      * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
-    protected $address;
+    #[ORM\Column(name: 'address', type: 'string', length: 512, nullable: true)]
+    #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
+    protected string $address;
 
     /**
      * @var string zip
@@ -33,7 +37,9 @@ trait CoordinatesTrait
      * @ORM\Column(name="zip", type="string", length=32, nullable=true)
      * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
-    protected $zip;
+    #[ORM\Column(name: 'zip', type: 'string', length: 512, nullable: true)]
+    #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
+    protected string $zip;
 
     /**
      * @var string city
@@ -41,15 +47,19 @@ trait CoordinatesTrait
      * @ORM\Column(name="city", type="string", length=128, nullable=true)
      * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
-    protected $city;
+    #[ORM\Column(name: 'city', type: 'string', length: 128, nullable: true)]
+    #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
+    protected string $city;
 
     /**
      * @var string
      * @ORM\Column(name="email", type="string", length=128, nullable=true)
      * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "session", "api.profile", "api.inscription", "api.token"})
      */
+    #[ORM\Column(name: 'email', type: 'string', length: 128, nullable: true)]
+    #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'session', 'api.profile', 'api.inscription' , 'api.token'])]
     #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
-    protected $email;
+    protected ?string $email = null;
 
     /**
      * @var string
@@ -57,7 +67,9 @@ trait CoordinatesTrait
      * @ORM\Column(name="phone_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"trainee", "inscription", "trainer", "api.profile"})
      */
-    protected $phonenumber;
+    #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
+    #[Groups(['trainee', 'inscription', 'trainer', 'api.profile'])]
+    protected string $phonenumber;
 
     /**
      * @var string
@@ -65,22 +77,26 @@ trait CoordinatesTrait
      * @ORM\Column(name="fax_number", type="string", length=255, nullable=true)
      * @Serializer\Groups({"organization", "trainee", "trainer", "api.profile"})
      */
-    protected $faxnumber;
+    #[ORM\Column(name: 'fax_number', type: 'string', length: 255, nullable: true)]
+    #[Groups(['organization', 'trainee', 'trainer', 'api.profile'])]
+    protected string $faxnumber;
 
     /**
      * @var string
      * @ORM\Column(name="website", type="string", length=512, nullable=true)
      * @Serializer\Groups({"organization", "trainee", "trainer", "institution", "api.profile"})
      */
-    protected $website;
+    #[ORM\Column(name: 'website', type: 'string', length: 512, nullable: true)]
+    #[Groups(['organization', 'trainee', 'trainer', 'institution' , 'api.profile'])]
+    protected string $website;
 
     /**
      * Copy coordinates from another entity.
      *
      * @param CoordinatesTrait $entity
-     * @param bool             $force  override existing data
+     * @param bool $force  override existing data
      */
-    public function copyCoordinates($entity, $force = true): void
+    public function copyCoordinates(CoordinatesTrait $entity, bool $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
         foreach (['addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website'] as $property) {
@@ -103,7 +119,7 @@ trait CoordinatesTrait
     /**
      * @return boolean
      */
-    public function getAddresstype()
+    public function getAddresstype(): bool
     {
         return $this->addresstype;
     }
@@ -111,7 +127,7 @@ trait CoordinatesTrait
     /**
      * @param string $address
      */
-    public function setAddress($address): void
+    public function setAddress(string $address): void
     {
         $this->address = $address;
     }
@@ -119,7 +135,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getAddress()
+    public function getAddress(): string
     {
         return $this->address;
     }
@@ -127,7 +143,7 @@ trait CoordinatesTrait
     /**
      * @param string $zip
      */
-    public function setZip($zip): void
+    public function setZip(string $zip): void
     {
         $this->zip = $zip;
     }
@@ -135,7 +151,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getZip()
+    public function getZip(): string
     {
         return $this->zip;
     }
@@ -143,7 +159,7 @@ trait CoordinatesTrait
     /**
      * @param string $city
      */
-    public function setCity($city): void
+    public function setCity(string $city): void
     {
         $this->city = $city;
     }
@@ -151,20 +167,20 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getCity()
+    public function getCity(): string
     {
         return $this->city;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
 
-    public function setEmail(mixed $email): void
+    public function setEmail(?string $email): void
     {
         $this->email = $email;
     }
@@ -172,7 +188,7 @@ trait CoordinatesTrait
     /**
      * @param string $phoneNumber
      */
-    public function setPhonenumber($phoneNumber): void
+    public function setPhonenumber(string $phoneNumber): void
     {
         $this->phonenumber = $phoneNumber;
     }
@@ -180,7 +196,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getPhonenumber()
+    public function getPhonenumber(): string
     {
         return $this->phonenumber;
     }
@@ -188,7 +204,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getFaxnumber()
+    public function getFaxnumber(): string
     {
         return $this->faxnumber;
     }
@@ -196,7 +212,7 @@ trait CoordinatesTrait
     /**
      * @param string $faxNumber
      */
-    public function setFaxnumber($faxNumber): void
+    public function setFaxnumber(string $faxNumber): void
     {
         $this->faxnumber = $faxNumber;
     }
@@ -204,7 +220,7 @@ trait CoordinatesTrait
     /**
      * @param string $website
      */
-    public function setWebsite($website): void
+    public function setWebsite(string $website): void
     {
         $this->website = $website;
     }
@@ -212,7 +228,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getWebsite()
+    public function getWebsite(): string
     {
         return $this->website;
     }

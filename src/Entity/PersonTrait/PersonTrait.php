@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Entity\PersonTrait;
-
-use JMS\Serializer\Annotation as Serializer;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
+use App\EventListener\Serializer;
 
 /**
  * Trait PersonTrait.
@@ -13,21 +14,27 @@ trait PersonTrait
      * @ORM\ManyToOne(targetEntity="App\Entity\Term\Title")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $title;
+    #[ORM\ManyToOne(targetEntity : 'App\Entity\Term\Title')]
+    #[Groups(['Default', 'api'])]
+    protected mixed $title;
 
     /**
      * @var string
      * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $firstname;
+    #[ORM\Column(name: 'first_name', type: 'string', length: 50, nullable: true)]
+    #[Groups(['Default', 'api'])]
+    protected string $firstname;
 
     /**
      * @var string
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $lastname;
+    #[ORM\Column(name: 'last_name', type: 'string', length: 50)]
+    #[Groups(['Default', 'api'])]
+    protected string $lastname;
 
     public function setTitle(mixed $title): void
     {
@@ -37,7 +44,7 @@ trait PersonTrait
     /**
      * @return mixed
      */
-    public function getTitle()
+    public function getTitle(): mixed
     {
         return $this->title;
     }
@@ -45,7 +52,7 @@ trait PersonTrait
     /**
      * @param string $firstName
      */
-    public function setFirstname($firstName): void
+    public function setFirstname(string $firstName): void
     {
         $this->firstname = $firstName;
     }
@@ -53,7 +60,7 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getFirstname()
+    public function getFirstname(): string
     {
         return $this->firstname;
     }
@@ -61,7 +68,7 @@ trait PersonTrait
     /**
      * @param string $lastName
      */
-    public function setLastname($lastName): void
+    public function setLastname(string $lastName): void
     {
         $this->lastname = $lastName;
     }
@@ -69,7 +76,7 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getLastname()
+    public function getLastname(): string
     {
         return $this->lastname;
     }

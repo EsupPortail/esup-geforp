@@ -19,7 +19,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @var string
      */
-    protected $vocabularyId;
+    protected string $vocabularyId;
 
     /**
      * @var int
@@ -29,7 +29,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private $id;
+    private int $id;
 
     /**
      * @var string
@@ -38,7 +38,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      */
     #[ORM\Column(name: 'name', type: 'string', length: 255)]
     #[Assert\NotBlank]
-    private $name;
+    private string $name;
 
     /**
      * @Serializer\Groups({"Default", "api"})
@@ -53,18 +53,18 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      */
     #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractOrganization::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    protected $organization;
+    protected AbstractOrganization $organization;
 
     /**
      * @var string
      */
 
-    protected $machinename;
+    protected string $machinename;
 
     /**
      * @return mixed
      */
-    abstract public function getVocabularyName();
+    abstract public function getVocabularyName(): mixed;
 
     /**
      * @param $label

@@ -21,7 +21,10 @@ use App\Entity\Term\Trainertype;
 use App\Entity\Term\Trainingcategory;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Exception\NotSupported;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
+use Doctrine\ORM\OptimisticLockException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
@@ -96,8 +99,11 @@ final class VocabularyRegistry
 
     public function addVocabulary($vocabulary, $id, $group = 'Misc', $label = null): void
     {
+
+
         $vocabulary->setVocabularyId($id);
         $this->vocabularies[$id] = $vocabulary;
+
         if ($label) {
             $this->labels[$id] = $label;
         }
@@ -109,14 +115,16 @@ final class VocabularyRegistry
         $this->groups[$group][$id] = $vocabulary;
     }
 
+
     /**
      * @param string $id
      *
-     * @return VocabularyInterface
+     * @return string|null
      */
-    public function getVocabularyById($id)
+    public function getVocabularyById(string $id): ?VocabularyInterface
+
     {
-        return $this->vocabularies[$id] ?? null;
+        return null;
     }
 
     /**
@@ -215,9 +223,12 @@ final class VocabularyRegistry
     /**
      * Replaces the a term by another in all its usages.
      *
-     * @param \Doctrine\Persistence\ObjectRepository $entityManager
+     * @param EntityManager $entityManager
      * @param $vocTermFrom
-     * @param $voctTermTo
+     * @param $vocTermTo
+     * @throws NotSupported
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function replaceTermInUsages(EntityManager $entityManager, $vocTermFrom, $vocTermTo): void
     {

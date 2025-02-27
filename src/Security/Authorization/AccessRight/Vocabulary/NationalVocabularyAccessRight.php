@@ -40,16 +40,15 @@ final class NationalVocabularyAccessRight extends AbstractAccessRight
      */
     public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
-        if ($object) {
-            if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
-                return true;
-            }
+        if (!is_object($object)) {
+            return false;
+        }
 
-            if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
-                return false;
-            }
+        if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
+            return true;
+        }
 
             return !$object->getOrganization();
         }
-    }
+
 }

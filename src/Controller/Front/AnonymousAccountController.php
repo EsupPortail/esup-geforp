@@ -42,7 +42,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
      *
      */
     #[Route(path: '/register', name: 'front.account.register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): array
+    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception

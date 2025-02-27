@@ -11,10 +11,10 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
-class AdminShibbolethUserProvider implements UserProviderInterface
+readonly class AdminShibbolethUserProvider implements UserProviderInterface
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager)
+        private EntityManagerInterface $entityManager)
     {
     }
 
@@ -45,7 +45,7 @@ class AdminShibbolethUserProvider implements UserProviderInterface
     {
 	 $user = $this->entityManager->getRepository(User::class)
             ->findOneBy(['username' => $identifier]);
-dump($identifier);
+//dump($identifier);
         return $user;
     }
 

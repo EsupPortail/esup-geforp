@@ -9,6 +9,7 @@
 namespace App\Security\Authorization\AccessRight\Trainee;
 
 use App\AccessRight\AbstractAccessRight;
+use App\Entity\Back\Trainee;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
 final class AllTraineeCreateAccessRight extends AbstractAccessRight
@@ -26,9 +27,7 @@ final class AllTraineeCreateAccessRight extends AbstractAccessRight
      */
     public function supportsClass($class): bool
     {
-        if ($class === \App\Entity\Back\Trainee::class) {
-            return true;
-        }
+        return Trainee::class === $class;
     }
 
     /**

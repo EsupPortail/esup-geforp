@@ -105,7 +105,7 @@ final class AccountListener implements EventSubscriber
         $parameters = ['trainee' => $trainee, 'password' => $trainee->getPlainPassword(), 'new' => $new, 'url' => $this->container->getParameter('front_url')];
 
         $template = 'welcome.html.twig';
-        if ($trainee->getShibbolethPersistentId()) {
+        if ($trainee->getShibbolethpersistentid()) {
             // if shibboleth, send special message
             $template = 'welcome.shibboleth.html.twig';
         }

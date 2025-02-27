@@ -81,7 +81,7 @@ class ProgramController extends AbstractController
     }
 
     #[Route(path: '/faq', name: 'front.program.faq')]
-    public function faq(ManagerRegistry $doctrine): ?array
+    public function faq(ManagerRegistry $doctrine): RedirectResponse
     {
 
         $user = $this->getUser();
@@ -447,10 +447,10 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @return array{user: mixed, search: mixed[], img: string, form: \Symfony\Component\Form\FormView, multiEtab: bool}
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/myprogram', name: 'front.program.myprogram')]
-    public function myProgram(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository): array
+    public function myProgram(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository): \Symfony\Component\HttpFoundation\Response
     {
         $codes = [];
         $user = $this->getUser();
@@ -531,7 +531,13 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return ['user' => $arTrainee[0], 'search' => $search, 'img' => '', 'form' => $form->createView(), 'multiEtab' => $multiEtab, $this->render('Front/Public/myprogram.html.twig')];
+        return $this->render('Front/Public/myprogram.html.twig', [
+            'user' => $arTrainee[0],
+            'search' => $search,
+            'img' => '',
+            'form' => $form->createView(),
+            'multiEtab' => $multiEtab
+        ]);
     }
 
     /**
@@ -634,10 +640,10 @@ class ProgramController extends AbstractController
      * @param null centreCode
      * @param null theme
      * @param null texte
-     * @return array{search: mixed[], form: \Symfony\Component\Form\FormView, multiEtab: bool}
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/searchalerts/{centreCode}/{theme}/{texte}', name: 'front.program.searchalerts')]
-    public function searchalerts(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null): array
+    public function searchalerts(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, $centreCode=null, $theme=null, $texte=null): \Symfony\Component\HttpFoundation\Response
     {
         $organizations = [];
         $user = $this->getUser();
@@ -754,11 +760,15 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return ['search' => $search, 'form' => $formAlert->createView(), 'multiEtab' => $multiEtab, $this->render('Front/Public/searchResult.html.twig')];
+        return $this->render('Front/Public/searchResult.html.twig', [
+            'search' => $search,
+            'form' => $formAlert->createView(),
+            'multiEtab' => $multiEtab,
+        ]);
     }
 
     #[Route(path: '/search', name: 'front.program.search')]
-    public function search(Request $request, ManagerRegistry $doctrine): array
+    public function search(Request $request, ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
@@ -810,7 +820,11 @@ class ProgramController extends AbstractController
             }
         }
 
-        return ['user' => $this->getUser(), 'form' => $form->createView(), 'multiEtab' => $multiEtab, $this->render('Front/Public/search.html.twig')];
+        return $this->render('Front/Public/search.html.twig', [
+            'user' => $this->getUser(),
+            'form' => $form->createView(),
+            'multiEtab' => $multiEtab,
+        ]);
     }
 
 
@@ -820,7 +834,7 @@ class ProgramController extends AbstractController
      * @param $code
      * @return array{total: int, pageSize: int, items: mixed}
      */
-    protected function createProgramQuery($sessionRepository, $code = null)
+    protected function createProgramQuery($sessionRepository, $code = null): array
     {
         $filters = [];
         // Construction filtres : code et date
@@ -848,7 +862,7 @@ class ProgramController extends AbstractController
      * @param $theme
      * @return array{total: int, pageSize: int, items: mixed}
      */
-    protected function createProgramQuerySearch($sessionRepository, $code = null, $theme = null, $texte = null)
+    protected function createProgramQuerySearch($sessionRepository, $code = null, $theme = null, $texte = null): array
     {
         $filters = [];
         $keywords = $texte;

@@ -5,141 +5,102 @@ namespace App\Entity\PersonTrait;
 use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractInstitution;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Validator\ExecutionContextInterface;
-use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
- * Class ProfessionalSituationTraitInstitution
+ * Trait ProfessionalSituationTrait
  * @package App\Entity\PersonTrait
  */
 trait ProfessionalSituationTrait
 {
-    /**
-     * @var AbstractInstitution Institution
-     * @Assert\NotNull(message="Vous devez renseigner un établissement ou une entreprise.", groups={"api.profile"})
-     * @ORM\ManyToOne(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
-     * @Serializer\Groups({"trainee", "trainer", "inscription", "session", "api.profile"})
-     */
-    protected $institution;
+    #[Assert\NotNull(message: 'Vous devez renseigner un établissement ou une entreprise.', groups: ['api.profile'])]
+    #[ORM\ManyToOne(targetEntity: 'App\Entity\Core\AbstractInstitution')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups(['trainee', 'trainer', 'inscription', 'session', 'api.profile'])]
+    protected AbstractInstitution $institution;
+
+    #[ORM\ManyToOne(targetEntity: Publictype::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(["trainee", "trainer", "inscription", "api.profile", "session"])]
+    protected ?Publictype $publictype;
+
+    #[ORM\Column(name: "service", type: "string", length: 255, nullable: true)]
+    #[Groups(["trainee", "trainer", "inscription", "api.profile"])]
+    protected ?string $service;
+
+    #[ORM\Column(name: "is_paying", type: "boolean")]
+    #[Groups(["trainee", "inscription", "api.profile", "api.token"])]
+    protected bool $isPaying = false;
+
+    #[ORM\Column(name: "status", type: "string", length: 512, nullable: true)]
+    #[Groups(["trainee", "trainer", "inscription", "api.profile"])]
+    protected ?string $status;
 
     /**
-     * @var Publictype
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Publictype")
-     * @ORM\JoinColumn(nullable=true)
-     * @Serializer\Groups({"trainee", "trainer", "inscription", "api.profile","session"})
-     */
-    protected $publictype;
-
-    /**
-     * @var string service
-     * @ORM\Column(name="service", type="string", length=255, nullable=true)
-     * @Serializer\Groups({"trainee", "trainer", "inscription", "api.profile"})
-     */
-    protected $service;
-
-    /**
-     * @ORM\Column(name="is_paying", type="boolean")
-     * @Serializer\Groups({"trainee", "inscription", "api.profile","api.token"})
-     */
-    protected $isPaying = false;
-
-    /**
-     * @var string status
-     * @ORM\Column(name="status", type="string", length=512, nullable=true)
-     * @Serializer\Groups({"trainee", "trainer", "inscription", "api.profile"})
-     */
-    protected $status;
-
-    /**
-     * Copy professional situation informations from another entity
+     * Copy professional situation information from another entity
      *
      * @param ProfessionalSituationTrait $entity
      * @param boolean $force
      */
-    public function copyProfessionalSituation($entity, $force = true): void
+    public function copyProfessionalSituation($entity, bool $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
         foreach (['institution', 'publictype', 'service', 'isPaying', 'status'] as $property) {
             $thisValue = $propertyAccessor->getValue($this, $property);
-            if ($force || ! $thisValue) {
+            if ($force || !$thisValue) {
                 $propertyAccessor->setValue($this, $property, $propertyAccessor->getValue($entity, $property));
             }
         }
     }
 
-    /**
-     * @param AbstractInstitution $institution
-     */
-    public function setInstitution($institution): void
+    public function setInstitution(?AbstractInstitution $institution): void
     {
         $this->institution = $institution;
     }
-    /**
-     * @return AbstractInstitution
-     */
-    public function getInstitution()
+
+    public function getInstitution(): ?AbstractInstitution
     {
         return $this->institution;
     }
 
-    public function setPublictype(mixed $Publictype): void
+    public function setPublictype(?Publictype $publictype): void
     {
-        $this->publictype = $Publictype;
+        $this->publictype = $publictype;
     }
 
-    /**
-     * @return Publictype
-     */
-    public function getPublictype()
+    public function getPublictype(): ?Publictype
     {
         return $this->publictype;
     }
 
-    /**
-     * @param string $service
-     */
-    public function setService($service): void
+    public function setService(?string $service): void
     {
         $this->service = $service;
     }
 
-    /**
-     * @return string
-     */
-    public function getService()
+    public function getService(): ?string
     {
         return $this->service;
     }
 
-    /**
-     * @return boolean
-     */
-    public function getIsPaying()
+    public function getIsPaying(): bool
     {
         return $this->isPaying;
     }
 
-    /**
-     * @param boolean $isPaying
-     */
-    public function setIsPaying($isPaying): void
+    public function setIsPaying(bool $isPaying): void
     {
         $this->isPaying = $isPaying;
     }
 
-    /**
-     * @param string $status
-     */
-    public function setStatus($status): void
+    public function setStatus(?string $status): void
     {
         $this->status = $status;
     }
 
-    /**
-     * @return string
-     */
-    public function getStatus()
+    public function getStatus(): ?string
     {
         return $this->status;
     }

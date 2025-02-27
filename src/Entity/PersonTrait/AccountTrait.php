@@ -8,6 +8,11 @@
  */
 namespace App\Entity\PersonTrait;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use App\EventListener\Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+
 /**
  * Class AccountTrait.
  */
@@ -20,44 +25,47 @@ trait AccountTrait
      * @ORM\Column(type="string", length=32)
      * @Serializer\Exclude
      */
-    private $salt;
+    #[ORM\Column(type: 'string', length: 32)]
+    private mixed $salt;
 
     /**
      * string.
      *
      * @Serializer\Exclude
      */
-    private $plainPassword;
+    private mixed $plainPassword;
 
     /**
      * @ORM\Column(type="string")
      * @Serializer\Exclude
      */
-    private $password;
+    #[ORM\Column(type: 'string')]
+    private mixed $password;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
      * @Serializer\Groups({"trainee"})
      */
-    private $isactive;
+    #[ORM\Column(name: 'is_active', type: 'boolean')]
+    #[Groups(['trainee'])]
+    private mixed $isactive;
 
-    /**
-     * @ORM\Column(name="shibboleth_persistent_id", type="string", nullable=true)
-     * @Serializer\Groups({"api.token", "api.profile"})
-     */
-    private $shibbolethpersistentid;
-
+    #[ORM\Column(name: 'shibboleth_persistent_id', type: 'string', nullable: true)]
+    #[Groups(['api.token', 'api.profile'])]
+    private ?string $shibbolethPersistentId;
+    
     /**
      * @ORM\Column(name="data", type="array", nullable=true)
      * @Serializer\Exclude
      */
-    private $data;
+    #[ORM\Column(name: 'data', type: 'json', nullable: true)]
+    private mixed $data;
 
     /**
      * @var bool
      * @Serializer\Exclude
      */
-    private $sendCredentialsMail = false;
+    private bool $sendCredentialsMail = false;
 
     /**
      * @var mixed
@@ -65,12 +73,12 @@ trait AccountTrait
      * This properties is used to automatically send a activation link to the trainee.
      * true or array of options
      */
-    private $sendActivationMail = false;
+    private mixed $sendActivationMail = false;
 
     /**
      * {@inheritdoc}
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         return $this->email;
     }
@@ -86,7 +94,7 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getSalt()
+    public function getSalt(): mixed
     {
         return $this->salt;
     }
@@ -99,7 +107,7 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getPlainPassword()
+    public function getPlainPassword(): mixed
     {
         return $this->plainPassword;
     }
@@ -112,7 +120,7 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getPassword()
+    public function getPassword(): mixed
     {
         return $this->password;
     }
@@ -125,7 +133,7 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getIsactive()
+    public function getIsactive(): mixed
     {
         return $this->isactive;
     }
@@ -136,22 +144,22 @@ trait AccountTrait
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getShibbolethpersistentid()
+    public function getShibbolethpersistentid(): ?string
     {
-        return $this->shibbolethpersistentid;
+        return $this->shibbolethPersistentId;
     }
 
     public function setShibbolethpersistentid(mixed $shibbolethPersistentId): void
     {
-        $this->shibbolethpersistentid = $shibbolethPersistentId;
+        $this->shibbolethPersistentId = $shibbolethPersistentId;
     }
-    
+
     /**
      * @return mixed
      */
-    public function getData()
+    public function getData(): mixed
     {
         return $this->data;
     }
@@ -164,7 +172,7 @@ trait AccountTrait
     /**
      * @return bool
      */
-    public function isSendCredentialsMail()
+    public function isSendCredentialsMail(): bool
     {
         return $this->sendCredentialsMail;
     }
@@ -172,7 +180,7 @@ trait AccountTrait
     /**
      * @param bool $sendCredentialsMail
      */
-    public function setSendCredentialsMail($sendCredentialsMail): void
+    public function setSendCredentialsMail(bool $sendCredentialsMail): void
     {
         $this->sendCredentialsMail = $sendCredentialsMail;
     }
@@ -180,7 +188,7 @@ trait AccountTrait
     /**
      * @return mixed
      */
-    public function getSendActivationMail()
+    public function getSendActivationMail(): mixed
     {
         return $this->sendActivationMail;
     }
@@ -230,7 +238,7 @@ trait AccountTrait
      *
      * @return bool
      */
-    public function isEnabled()
+    public function isEnabled(): bool
     {
         return $this->isActive;
     }

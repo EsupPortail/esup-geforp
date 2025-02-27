@@ -40,6 +40,6 @@ interface VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName();
+    public function getVocabularyName(): mixed;
 
 }

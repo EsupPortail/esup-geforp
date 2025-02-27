@@ -33,7 +33,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var \DateTime
      */
     #[ORM\Column(name: 'last_login', type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
-    protected \DateTime $lastLogin;
+    protected ?\DateTime $lastLogin = null;
 
     #[ORM\Column(type: 'simple_array')]
     private array $roles = [];
@@ -114,12 +114,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Gets the last login time.
      *
      */
-    public function getLastLogin(): \DateTime
+    public function getLastLogin(): ?\DateTime
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(\DateTime $time)
+    public function setLastLogin(\DateTime $time): static
     {
         $this->lastLogin = $time;
 

@@ -73,10 +73,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     protected ?string $fonction = null;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Alert>
+     * @var \Doctrine\Common\Collections\Collection<Alert>
      */
     #[Groups(['Default', 'trainee', 'api'])]
-    #[ORM\OneToMany(targetEntity: \App\Entity\Back\Alert::class, mappedBy: 'trainee', cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: Alert::class, cascade: ['remove'])]
     protected \Doctrine\Common\Collections\Collection $alerts;
 
     /**
@@ -86,6 +86,13 @@ class Trainee extends AbstractTrainee implements UserInterface
     {
         return AbstractTraineeType::class;
     }
+
+    /**
+     * Set shibboleth persistent id
+     *
+     *
+     * @return Trainee
+     */
 
     /**
      * Set birth date

@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  */
 #[ORM\Table(name: 'supervisor')]
 #[ORM\Entity]
-class Supervisor extends AbstractTerm implements VocabularyInterface, \Stringable
+class Supervisor extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @Serializer\Groups({"Default", "api"})

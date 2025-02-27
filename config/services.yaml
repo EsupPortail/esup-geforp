@@ -406,7 +406,6 @@ services:
     # default configuration for services in *this* file
     Symfony\Component\Security\Core\Security: '@Symfony\Bundle\SecurityBundle\Security'
     Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
-
     Namespace\ImportService:
         arguments:
             - '@service_container'
@@ -430,14 +429,10 @@ services:
     app.menu_builder:
         class: App\Menu\MenuBuilder
         arguments:
-            - "@knp_menu.factory"
-            - "@security.authorization_checker"
-            - "@router"
-            - $router: '@router'
-            - $logger: '@logger'
-            - $eventDispatcher: '@event_dispatcher'
+            $menuFactory: '@knp_menu.factory'  # Utilisation de la factory KnpMenuFactory
+            $router: '@router'
         tags:
-            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
+            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main }
 
     App\Listener\TrainingListener:
         tags:
@@ -446,6 +441,8 @@ services:
 
     App\Twig\SpacelessExtension:
         tags: ['twig.extension']
+
+    App\Vocabulary\VocabularyRegistry: ~
 
 
     shibbundle.sup_service:

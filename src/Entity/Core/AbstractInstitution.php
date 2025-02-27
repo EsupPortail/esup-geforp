@@ -63,6 +63,11 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     protected \Doctrine\Common\Collections\Collection $domains;
 
     /**
+     * @var int
+     * @ORM\Column(name="addresstype", type="integer")
+     */
+    protected bool $addresstype;
+    /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractInstitution>
      * @Serializer\Groups({"Default", "api"})
      */
@@ -94,6 +99,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     {
         return $this->name;
     }
+
 
     /**
      * @param string $name

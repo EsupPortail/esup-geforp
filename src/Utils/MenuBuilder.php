@@ -20,13 +20,14 @@ final class MenuBuilder
      * Constructor
      *
      */
-    public function __construct(private readonly LoggerInterface $logger, private readonly EventDispatcherInterface $eventDispatcher)
+    public function __construct(FactoryInterface $factory, private readonly LoggerInterface $logger, private readonly EventDispatcherInterface $eventDispatcher)
     {
+        $this->factory = $factory;
     }
 
     public function createMainMenu(Request $request): ItemInterface
     {
-        $menu = $this->logger->createItem('root');
+        $menu = $this->factory->createItem('root');
 
 // Add some children to the menu
         $menu->addChild('administration', [
