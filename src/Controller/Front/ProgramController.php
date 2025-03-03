@@ -274,7 +274,7 @@ class ProgramController extends AbstractController
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
                 $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
-                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
             $form = $this->createForm(InscriptionType::class, $inscription);
