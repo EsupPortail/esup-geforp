@@ -5,6 +5,7 @@ namespace App\Entity\Core;
 use App\Entity\Term\Domain;
 use App\Form\Type\BaseInstitutionType;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\PersonTrait\CoordinatesTrait;
@@ -53,29 +54,25 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     protected ?string $idp = null;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Domain>
+     * @var Collection<\App\Entity\Term\Domain>
      * @Serializer\Groups({"Default", "api"})
      */
     #[ORM\JoinTable(name: 'institution__institution_domain')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'domain_id', referencedColumnName: 'id', onDelete: 'cascade')]
     #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Domain::class)]
-    protected \Doctrine\Common\Collections\Collection $domains;
+    protected Collection $domains;
+
 
     /**
-     * @var int
-     * @ORM\Column(name="addresstype", type="integer")
-     */
-    protected bool $addresstype;
-    /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractInstitution>
+     * @var Collection<AbstractInstitution>
      * @Serializer\Groups({"Default", "api"})
      */
     #[ORM\JoinTable(name: 'institution__visuinstitutions')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'visu_institution_id', referencedColumnName: 'id', onDelete: 'cascade')]
-    #[ORM\ManyToMany(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
-    protected \Doctrine\Common\Collections\Collection $visuinstitutions;
+    #[ORM\ManyToMany(targetEntity: AbstractInstitution::class)]
+    protected Collection $visuinstitutions;
 
     public function __construct()
     {

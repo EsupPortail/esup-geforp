@@ -33,27 +33,27 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
     /**
      * @var string
      */
-    private $login_path;
+    private mixed $login_path;
 
     /**
      * @var string
      */
-    private $login_target;
+    private mixed $login_target;
 
     /**
      * @var string
      */
-    private $session_id;
+    private mixed $session_id;
 
     /**
      * @var string
      */
-    private $username;
+    private mixed $username;
 
     /**
      * @var array
      */
-    private $attributes = [];
+    private mixed $attributes = [];
 
     private $request;
 
@@ -154,9 +154,9 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
     {
         $attributes = [$name, strtoupper((string) $name), "HTTP_" . strtoupper((string) $name), sprintf('REDIRECT_%s', $name)];
         foreach ($attributes as $attribute)
-            if (!empty($request->server->has($attribute)))
+            if ($request->server->has($attribute))
                 return $request->server->get($attribute);
-        return $this;
+        return null;
     }
 
     /**

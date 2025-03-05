@@ -19,6 +19,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
@@ -34,9 +35,12 @@ final class LogInFormAuthenticator extends AbstractAuthenticator
     public const string LOGIN_ROUTE = 'app_login';
     private TokenStorageInterface $tokenStorage;
 
+    private UserProviderInterface $userProvider;
 
-    public function __construct(private readonly EntityManagerInterface $entityManager, private readonly UrlGeneratorInterface $urlGenerator, private readonly CsrfTokenManagerInterface $csrfTokenManager, private readonly UserPasswordHasherInterface $userPasswordEncoder, TokenStorageInterface $tokenStorage)
+
+    public function __construct(UserProviderInterface $userProvider, private readonly EntityManagerInterface $entityManager, private readonly UrlGeneratorInterface $urlGenerator, private readonly CsrfTokenManagerInterface $csrfTokenManager, private readonly UserPasswordHasherInterface $userPasswordEncoder, TokenStorageInterface $tokenStorage)
     {
+        $this->userProvider = $userProvider;
     }
 
     public function supports(Request $request): ?bool
@@ -87,10 +91,11 @@ final class LogInFormAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
-        $user = $this->getUser($credentials, $this->getUserProvider());
 
         return new Passport(
-            $user, // L'utilisateur authentifié
+            new UserBadge($credentials ['email'], function($userIdentifier){
+                $this->userProvider->loadUserByIdentifier($userIdentifier);
+            }), // L'utilisateur authentifié
             new PasswordCredentials($credentials['password']) // Les informations d'identification
         );
     }

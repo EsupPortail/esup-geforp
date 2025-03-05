@@ -65,7 +65,7 @@ class RegistrationAccountController extends AbstractController
     }
 
     #[Route(path: '/registrations', name: 'front.account.registrations', methods: 'GET')]
-    public function registrations(ManagerRegistry $doctrine): array
+    public function registrations(ManagerRegistry $doctrine): Response
     {
         // Recup param pour l'activation du bouton de relance au N+1
         $relanceActif = $this->getParameter('relance_actif');
@@ -95,7 +95,12 @@ class RegistrationAccountController extends AbstractController
             }
         }
 
-        return ['user' => $trainee, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif, $this->render('Front/Account/registration/registrations.html.twig')];
+        return $this->render('Front/Account/registration/registrations.html.twig',[
+            'user' => $trainee,
+            'upcoming' => $upcoming,
+            'past' => $past, 'upcomingIds' => implode(',', $upcomingIds),
+            'relance' => $relanceActif,
+            ]);
     }
 
     /**

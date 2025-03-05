@@ -19,7 +19,7 @@ trait CoordinatesTrait
      */
     #[ORM\Column(name: 'address_type', type: 'integer', nullable: true)]
     #[Groups(['Default', 'trainee', 'api.profile'])]
-    protected bool $addresstype;
+    protected int $addresstype;
 
     /**
      * @var string address

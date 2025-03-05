@@ -16,6 +16,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Event\LogoutEvent;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class AdminShibbolethAuthenticator extends AbstractAuthenticator implements EventSubscriberInterface
 {
@@ -24,6 +25,7 @@ class AdminShibbolethAuthenticator extends AbstractAuthenticator implements Even
 
     public function __construct(
         private readonly AdminShibbolethUserProvider $shibbolethUserProvider,
+        private readonly UrlGeneratorInterface       $urlGenerator,
     )
         //private readonly  EntityManagerInterface $entityManager,)
     {
@@ -100,8 +102,9 @@ dump($user);
         if ($logoutEvent->getResponse() !== null) {
             return;
         }
+
         $redirectTo = $this->urlGenerator->generate('shib_logout', [
-            'return' => $this->idpUrl . '/profile/Logout',
+            'return' => $this->idpUrl . 'geforp-test.univ-amu.fr',
         ]);
         $logoutEvent->setResponse(new RedirectResponse($redirectTo));
     }

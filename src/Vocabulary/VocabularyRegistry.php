@@ -124,7 +124,7 @@ final class VocabularyRegistry
     public function getVocabularyById(string $id): ?VocabularyInterface
 
     {
-        return null;
+        return $this->VocabularyInterface[$id] ?? null;
     }
 
     /**

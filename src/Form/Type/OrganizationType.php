@@ -16,11 +16,11 @@ use Symfony\Component\Form\FormEvents;
 
 final class OrganizationType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($formBuilder, $options);
+        parent::buildForm($builder, $options);
 
-        $formBuilder
+        $builder
             ->add('name', TextType::class, ['label' => 'Nom'])
             ->add('code', TextType::class, ['label' => 'Code'])
             ->add('email', EmailType::class, ['label' => 'Email'])

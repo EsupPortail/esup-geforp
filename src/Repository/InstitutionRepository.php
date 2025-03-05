@@ -35,11 +35,11 @@ final class InstitutionRepository extends ServiceEntityRepository
             ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE VILLE
-        if (isset($filters['city.source'])) {
+        if (isset($filters['city.source']) && is_array($filters['city.source'])) {
             $qb
                 /* On récupère l'année du dateBegin (à l'aide d'une doctrine extension) */
                 ->andWhere('i.city in (:cities)')
-                ->setParameter('cities', $filters['city.source']);
+                ->setParameter('cities', array_values($filters['city.source']));
         }
 
         // TRI DES RESULTATS

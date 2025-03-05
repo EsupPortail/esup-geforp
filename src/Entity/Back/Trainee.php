@@ -17,7 +17,7 @@ use App\Entity\Core\User;
 #[ORM\Table(name: 'trainee')]
 #[ORM\Entity]
 #[UniqueEntity(fields: ['email', 'institution'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainee'])]
-class Trainee extends AbstractTrainee implements UserInterface
+class Trainee extends AbstractTrainee
 {
     #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'birth_date', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]

@@ -8,6 +8,7 @@ use App\Repository\TraineeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\PersistentCollection;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\PersonTrait\AccountTrait;
 use App\Entity\Core\AbstractOrganization;
@@ -23,12 +24,12 @@ use App\Form\Type\AbstractTraineeType;
  * Trainee.
  *
  */
-#[ORM\Table(name: 'trainee')]
+#[AllowDynamicProperties] #[ORM\Table(name: 'trainee')]
 #[ORM\UniqueConstraint(name: 'emailUnique', columns: ['email'])]
 #[ORM\Entity(repositoryClass: TraineeRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
-#[ORM\HasLifecycleCallbacks]abstract class AbstractTrainee implements UserInterface, \Serializable, SerializedAccessRights, \Stringable
+#[ORM\HasLifecycleCallbacks]abstract class AbstractTrainee
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
@@ -68,7 +69,7 @@ use App\Form\Type\AbstractTraineeType;
         $this->isactive = true;
         $this->salt = md5(uniqid('', true));
         $this->password = md5(uniqid('', true));
-        $this->addressType = 0;
+        $this->addresstype = 0;
     }
 
     public function setId(int $id): void
@@ -86,7 +87,7 @@ use App\Form\Type\AbstractTraineeType;
         $this->inscriptions = $inscriptions;
     }
 
-    public function getInscriptions(): ArrayCollection
+    public function getInscriptions(): Collection
     {
         return $this->inscriptions;
     }

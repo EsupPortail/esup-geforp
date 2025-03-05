@@ -8,9 +8,9 @@ use Symfony\Component\Routing\Router;
 
 final class LogoutSuccessHandler
 {
-    private $logout_path;
+    private mixed $logout_path;
 
-    private $logout_target;
+    private mixed $logout_target;
 
     public function __construct($config, private readonly Router $router)
     {

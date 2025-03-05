@@ -55,13 +55,14 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
 
     #[Route(path: '/{vocabularyId}/view/{organizationId}', name: 'taxonomy.view', defaults: ['organizationId' => null])]
-    public function viewVocabulary(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId, AbstractOrganization $organization = null, ?int $organizationId = null): \Symfony\Component\HttpFoundation\Response
+    public function viewVocabulary(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, int $vocabularyId, AbstractOrganization $organization = null, ?int $id = null): \Symfony\Component\HttpFoundation\Response
     {
-        $organization = $organizationId ? $managerRegistry->getRepository(AbstractOrganization::class)->find($organization) : null;
-        if ($organizationId && !$organization) {
+        $organization = $id ? $managerRegistry->getRepository(AbstractOrganization::class)->find($organization) : null;
+        if ($id && !$organization) {
             throw new NotFoundHttpException();
         }
         /** @var AbstractTerm $abstractVocabulary */
+        dump($vocabularyRegistry->getVocabularyById(1)); die;
         $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
         // for mixed vocabularies

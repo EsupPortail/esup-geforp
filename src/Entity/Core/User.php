@@ -16,12 +16,12 @@ use Symfony\Component\Serializer\Annotation\MaxDepth;
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table("user")]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private readonly int $id;
+    private int $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private ?string $email = null;
@@ -194,14 +194,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->organization;
     }
 
-    public function getAccessRights(): string|array
+    public function getAccessRights(): array
     {
-        return $this->accessRights;
+        return is_array($this->accessRights) ? $this->accessRights : explode(',', (string) $this->accessRights);
     }
 
-    public function setAccessRights(mixed $accessRights): void
+    public function setAccessRights(array  $accessRights): void
     {
-        $this->accessRights = $accessRights ?: [];
+        $this->accessRights = implode(',', $accessRights);
     }
 
     public function isAdmin(): bool

@@ -6,6 +6,7 @@ use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\VocabularyInterface;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\PublictypeVocabularyType;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Type de personnel.
@@ -14,10 +15,9 @@ use App\Form\Type\PublictypeVocabularyType;
 #[ORM\Entity]
 class Publictype extends AbstractTerm implements VocabularyInterface
 {
-    /**
-     * @Serializer\Groups({"Default", "api"})
-     */
-    #[ORM\Column(name: 'machine_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+
+    #[ORM\Column(name: 'machine_name', type: 'string', length: 255)]
+    #[Groups(['Default', 'api'])]
     protected string $machinename;
 
     /**
@@ -32,6 +32,11 @@ class Publictype extends AbstractTerm implements VocabularyInterface
      * @return string
      */
     public function getMachinename()
+    {
+        return $this->machinename;
+    }
+
+    public function __toString(): string
     {
         return $this->machinename;
     }

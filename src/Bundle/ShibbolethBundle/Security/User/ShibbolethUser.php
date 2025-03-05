@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 
-final class ShibbolethUser implements UserInterface, EquatableInterface, \Stringable, PasswordAuthenticatedUserInterface
+final class ShibbolethUser implements UserInterface, EquatableInterface, \Stringable
 {
     public function __construct(private $username, private readonly array $credentials, private array $roles)
     {

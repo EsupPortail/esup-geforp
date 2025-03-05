@@ -9,14 +9,14 @@
 
 namespace App\Controller\Core;
 
-use Symfony\Bridge\Doctrine\ManagerRegistry;
+use MongoDB\Driver\Manager;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Back\Organization;
 use App\Form\Type\OrganizationType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-
+use Doctrine\Persistence\ManagerRegistry;
 /**
  * Class OrganizationController.
  *
@@ -25,14 +25,14 @@ use Symfony\Component\HttpFoundation\Request;
 {
     private static string $ORGANIZATION_CLASS = Organization::class;
 
-    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
+    public function __construct(private readonly ManagerRegistry $managerRegistry)
     {
     }
 
     #[Route(path: '/', name: 'organization.index')]
-    public function index(): \Symfony\Component\HttpFoundation\Response
+    public function index(ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
-        $organizations = $this->get('doctrine')->getManager()
+        $organizations = $doctrine->getManager()
             ->getRepository(self::$ORGANIZATION_CLASS)->findBy([], ['name' => 'ASC'])
         ;
 

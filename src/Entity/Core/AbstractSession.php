@@ -14,6 +14,7 @@ use App\Entity\Term\Inscriptionstatus;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Core\ParticipantsSummary;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -204,6 +205,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @var Collection<\App\Entity\Core\ParticipantsSummary>
      */
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Core\ParticipantsSummary::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
+    #[Groups('session')]
     protected Collection $participantsSummaries;
 
     /**
@@ -211,7 +213,8 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Material::class, cascade: ['remove', 'persist'])]
-    #[ORM\JoinColumn]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['training', 'session', 'api.attendence'])]
     protected Collection $materials;
 
     /**

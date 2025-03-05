@@ -43,9 +43,9 @@ abstract class Material
      * @var AbstractSession
      * @Serializer\Exclude
      */
-    #[ORM\ManyToOne(targetEntity: 'AbstractSession')]
-    #[ORM\JoinColumn]
-    protected $session;
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'materials')]
+    #[ORM\JoinColumn(nullable: true)]
+    protected AbstractSession $session;
 
     /**
      * Get id.

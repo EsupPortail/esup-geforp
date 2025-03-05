@@ -305,7 +305,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -313,7 +313,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
