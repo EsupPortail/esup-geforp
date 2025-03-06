@@ -86,6 +86,7 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
+                    taking: "Recettes"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
                     comments: "Commentaires"
                     evalResume: "Evaluations"
