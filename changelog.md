@@ -1,5 +1,11 @@
 # Geforp changelog :
 
+## 2.3.16 (2025-03-06)
+
+### Ajouts
+- Ajout paramètres dans les exports, publipostage et modèles de mail
+- Ajout email du N+1 dans l'avertissement lors d'une inscription par un stagiaire
+
 ## 2.3.15 (2025-01-23)
 
 ### Ajouts
