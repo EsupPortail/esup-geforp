@@ -95,7 +95,8 @@ class SessionRepository extends ServiceEntityRepository
 
             // FILTRE KEYWORD
         $qb
-            ->where('s.name LIKE :keyword')
+            ->where('s.name LIKE :keyword OR s.id = :keywordId')
+            ->setParameter('keywordId', $keyword)
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
