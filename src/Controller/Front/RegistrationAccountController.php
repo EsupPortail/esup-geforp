@@ -275,6 +275,7 @@ class RegistrationAccountController extends AbstractController
         $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
         $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
         $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
+        $newbody = str_replace("[session.nom]", $registration->getSession()->getName(), $newbody);
 
         $newbody = str_replace("[lien]", $lien, $newbody);
 
