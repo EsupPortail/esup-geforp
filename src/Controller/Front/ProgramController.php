@@ -324,6 +324,8 @@ class ProgramController extends AbstractController
                         $newbody = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastname(), $newbody);
                         $newbody = str_replace("[session.dateDebut]", $inscription->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                         $newbody = str_replace("[session.dateFin]", $inscription->getSession()->getDateend()->format('d/m/Y'), $newbody);
+                        $newbody = str_replace("[session.nom]", $inscription->getSession()->getName(), $newbody);
+                        $newbody = str_replace("[motivation]", $inscription->getMotivation(), $newbody);
                         $newbody = str_replace("[lien]", $lien, $newbody);
 
                         // Envoyer un mail au supérieur hiérarchique
