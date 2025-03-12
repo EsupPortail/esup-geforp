@@ -1,5 +1,11 @@
 # Geforp changelog :
 
+## 2.3.17 (2025-03-12)
+
+### Ajouts
+- Ajout mots clés modèles de mail (envoi côté stagiaire)
+- Ajout id recherche de session côté gestionnaire
+
 ## 2.3.16 (2025-03-06)
 
 ### Ajouts
