@@ -305,7 +305,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             $inscriptions = $entities[0]->getInscriptions();
                             foreach ($inscriptions as $insc) {
                                 if ($insc->getInscriptionstatus() == 'Accepté') {
-                                    $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction());
+                                    $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation());
                                 }
                             }
                             usort($lines[0]['inscriptions'], function ($a, $b) {
@@ -453,7 +453,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $inscriptions = $entities[0]->getInscriptions();
                 foreach ($inscriptions as $insc) {
                     if ($insc->getInscriptionstatus() == 'Convoqué') {
-                        $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction());
+                        $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation());
                     }
                 }
 
