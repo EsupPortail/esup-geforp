@@ -34,5 +34,15 @@ sygeforApp.controller('DatesViewController', ['$scope', '$dialog', '$filter', '$
         });
     };
 
+    /**
+     * duplicate dates
+     */
+    $scope.duplicateDates = function (dates) {
+        $dialog.open('dates.duplicate', {dates: dates}).then(function (data){
+            $scope.session.dates.push(data.date);
+
+        });
+    };
+
 
 }]);

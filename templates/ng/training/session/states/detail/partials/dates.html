@@ -19,6 +19,7 @@
                 <th>Lieu</th>
                 <th>Modifier</th>
                 <th>Supprimer</th>
+                <th>Dupliquer</th>
             </tr>
             </thead>
             <tbody>
@@ -33,6 +34,7 @@
                     <td>{{ date.place }}</td>
                     <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>
                     <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span class="fa fa-trash-o"></span></a></td>
+                    <td><a class="btn btn-fa" href="" ng-click="duplicateDates(date)" tooltip="Dupliquer"><span class="fa fa-copy"></span></a></td>
                 <!--/form-->
             </tr>
             </tbody>
