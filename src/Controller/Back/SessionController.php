@@ -6,6 +6,7 @@ use App\Entity\Back\Participation;
 use App\Entity\Back\Session;
 use App\Entity\Back\DateSession;
 use App\Entity\Back\Inscription;
+use App\Entity\Core\AbstractSession;
 use App\Form\Type\DateSessionType;
 use App\Controller\Core\AbstractSessionController;
 use Doctrine\Persistence\ManagerRegistry;
@@ -13,11 +14,15 @@ use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\Routing\Annotation\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\FormError;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 /**
  * @Route("/training/session")
@@ -265,4 +270,55 @@ class SessionController extends AbstractSessionController
         return array('form' => $form->createView(), 'dates' => $dates);
     }
 
+    /**
+     * @param Request              $request
+     * @param DateSession          $dates
+     *
+     * @Route("/duplicate/{id}}", requirements={"id" = "\d+"}, name="dates.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
+     * @ParamConverter("dates", class="App\Entity\Back\DateSession", isOptional="true")
+     * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
+     *
+     * @return array
+     */
+    public function duplicatedatesAction(Request $request, ManagerRegistry $doctrine, DateSession $dates)
+    {
+        // we need at least one of both arguments
+        if (!$dates) {
+            throw new MissingOptionsException('You have to pass a dates id');
+        }
+
+        // new session can't be created if user has no rights for it
+        if (!$this->isGranted('EDIT', $dates->getSession()->getTraining())) {
+            throw new AccessDeniedException('Action non autorisée');
+        }
+
+        $cloned = clone $dates;
+        $form = $this->createFormBuilder($cloned)
+            ->add('datebegin', DateType::class, array(
+                'label' => 'Date de début',
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'required' => true,
+            ))
+            ->add('dateend', DateType::class, array(
+                'label' => 'Date de fin',
+                'widget' => 'single_text',
+                'format' => 'dd/MM/yyyy',
+                'html5' => false,
+                'required' => false,
+            ));
+
+        $form = $form->getForm();
+        if ($request->getMethod() === 'POST') {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $em = $doctrine->getManager();
+                $em->persist($cloned);
+                $em->flush();
+            }
+        }
+
+        return array('form' => $form->createView(), 'dates' => $dates);
+    }
 }

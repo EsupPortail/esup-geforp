@@ -259,6 +259,31 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
         }
     });
 
+    /**
+     * dates.duplicate
+     */
+    $dialogProvider.dialog('dates.duplicate', /* @ngInject */ {
+        controller: function($scope, $modalInstance, $dialogParams, $state, $trainingBundle, $http, form, growl) {
+            $scope.dialog = $modalInstance;
+            $scope.dialog.params = $dialogParams;
+            $scope.form = form;
+            $scope.$moment = moment;
+            $scope.dates = $dialogParams.dates;
+            $scope.onSuccess = function(response) {
+                growl.addSuccessMessage("La ligne de dates a bien été dupliquée.");
+                $scope.dialog.close(response.dates);
+            };
+        },
+        templateUrl: 'training/session/dialogs/dates/duplicate.html',
+        resolve:{
+            form: function ($http, $dialogParams){
+                return $http.get(Routing.generate('dates.duplicate', {'dates': $dialogParams.dates.id })).then(function(response) {
+                    return response.data.form;
+                });
+            }
+        }
+    });
+
 
     /**
      * WIDGETS
