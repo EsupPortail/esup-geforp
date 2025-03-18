@@ -39,7 +39,7 @@ sygeforApp.controller('DatesViewController', ['$scope', '$dialog', '$filter', '$
      */
     $scope.duplicateDates = function (dates) {
         $dialog.open('dates.duplicate', {dates: dates}).then(function (data){
-            $scope.session.dates.push(data.date);
+            $scope.session.dates.push(data.dates);
 
         });
     };

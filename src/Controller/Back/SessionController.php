@@ -271,11 +271,9 @@ class SessionController extends AbstractSessionController
     }
 
     /**
-     * @param Request              $request
-     * @param DateSession          $dates
      *
-     * @Route("/duplicate/{id}}", requirements={"id" = "\d+"}, name="dates.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="App\Entity\Back\DateSession", isOptional="true")
+     * @Route("/duplicatedates/{dates}", name="dates.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
+     * @ParamConverter("dates", class="App\Entity\Back\DateSession", options={"id" = "dates"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      *
      * @return array
