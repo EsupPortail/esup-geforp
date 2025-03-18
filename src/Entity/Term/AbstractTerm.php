@@ -29,7 +29,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
-    private int $id;
+    private ?int $id = null;
 
     /**
      * @var string
@@ -53,7 +53,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      */
     #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractOrganization::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    protected AbstractOrganization $organization;
+    protected ?AbstractOrganization $organization = null;
 
     /**
      * @var string
@@ -64,6 +64,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @return mixed
      */
+
     abstract public function getVocabularyName(): mixed;
 
     /**
@@ -101,7 +102,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -136,19 +137,20 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     }
 
     /**
-     * @param AbstractOrganization $organization
+     * @param AbstractOrganization|null $organization
+     * @return AbstractOrganization|null
      */
-    public function setOrganization($organization): void
+    public function setOrganization(?AbstractOrganization $organization): ?AbstractOrganization
     {
-        $this->organization = $organization;
+       return $this->organization = $organization;
     }
 
     /**
      * @return AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): ?AbstractOrganization
     {
-        return $this->organization;
+        return $this->organization ?? null;
     }
 
     /**

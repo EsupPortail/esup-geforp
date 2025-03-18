@@ -9,6 +9,7 @@
 
 namespace App\Controller\Core;
 
+use App\Entity\Core\AbstractOrganization;
 use MongoDB\Driver\Manager;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Back\Organization;
@@ -52,7 +53,7 @@ use Doctrine\Persistence\ManagerRegistry;
                 $em->persist($organization);
                 $em->flush();
 
-                $this->get('session')->getFlashBag()->add('success', 'Le centre a bien été ajouté.');
+                $this->addFlash('success', 'Le centre a bien été ajouté.');
 
                 return $this->redirectToRoute('organization.index');
             }
@@ -78,7 +79,7 @@ use Doctrine\Persistence\ManagerRegistry;
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $this->managerRegistry->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Le centre a bien été mis à jour.');
+                $this->addFlash('success', 'Le centre a bien été mis à jour.');
 
                 return $this->redirectToRoute('organization.index');
             }

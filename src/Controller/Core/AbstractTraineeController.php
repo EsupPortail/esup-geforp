@@ -47,13 +47,13 @@ abstract class AbstractTraineeController extends AbstractController
     {
         $tabFilters = [];
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', []);
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $filters = $request->request->all('filters');
+        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->all('aggs', 'NO AGGS');
         $query = $request->request->get('query', 'NO QUERY');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
+        $sorts = $request->request->all('sorts', 'NO SORTS');
         $fields = $request->request->get('fields', 'NO FIELDS');
 
         // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17

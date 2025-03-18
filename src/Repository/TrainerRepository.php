@@ -114,12 +114,15 @@ final class TrainerRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainers = [];
+        var_dump($tabTrainers);
+        die();
         foreach($paginator as $tr) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainers[]['id'] = $tr->getId();
             } else {
                 $tabTrainers[] = $tr;
             }
+            var_dump($tabTrainers);
         }
 
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainers];

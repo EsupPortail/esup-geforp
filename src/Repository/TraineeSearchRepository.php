@@ -28,7 +28,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     * @return array{total: int, pageSize: mixed, items: array}
      */
     public function getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields): array
     {
@@ -140,7 +140,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
 
         $query = $qb->getQuery();
 
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $paginator = new Paginator($query, true);
 
         $c = count($paginator);
         $tabTrainees = [];
@@ -148,10 +148,9 @@ final class TraineeSearchRepository extends ServiceEntityRepository
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainees[]['id'] = $tr->getId();
             } else {
-                $tabTrainees[] = $tr;
+                $tabTrainees[] = $this->sanitizeTrainee($tr);
             }
         }
-
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainees];
     }
 
@@ -210,5 +209,11 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         $paginator = new Paginator($qb->getQuery());
 
         return count($paginator);
+    }
+
+    private function sanitizeTrainee($trainee):array
+    {
+        $data = json_decode(json_decode($trainee), true);
+        return $data ?? [];
     }
 }

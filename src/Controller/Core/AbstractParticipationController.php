@@ -23,6 +23,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
  * Class ParticipationController.
@@ -43,12 +44,13 @@ abstract class AbstractParticipationController extends AbstractController
      * @return array{total: int, pageSize: int, items: mixed, aggs: never[]}
      */
     #[Route(path: '/participation/search', name: 'participation.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function participationSearch(Request $request, ManagerRegistry $managerRegistry, ParticipationRepository $participationRepository, AccessRightRegistry $accessRightRegistry)
+    public function participationSearch(Request $request, ManagerRegistry $managerRegistry, ParticipationRepository $participationRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', []);
+        $filters = $request->request->all('filters');
         $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $request->request->get('aggs', 'NO AGGS');
+        $request->request->all('aggs');
+
 
         // security check : trainer : 'sygefor_trainer.rights.trainer.all.view' -> id=33
         if(!$accessRightRegistry->hasAccessRight(33)) {

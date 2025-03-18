@@ -19,8 +19,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\SecurityExtraBundle\Annotation\SecureParam;
+use PHPUnit\Util\Json;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Core\User;
@@ -34,6 +36,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
 #[Route(path: '/admin/users')]final class UserController extends AbstractController
 {
@@ -102,7 +105,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
      *
      */
     #[Route(path: '/add/{eppn}/{email}', name: 'user.add')]
-    public function add(ManagerRegistry $managerRegistry, Request $request, AccessRightRegistry $accessRightRegistry, string $eppn=null, string $email=null): \Symfony\Component\HttpFoundation\Response
+    public function add(ManagerRegistry $managerRegistry, Request $request, AccessRightRegistry $accessRightRegistry, string $eppn, string $email): \Symfony\Component\HttpFoundation\Response
     {
         // Test si current user is admin
         $curUserRoles = $this->getUser()->getRoles();
@@ -146,7 +149,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
                 $em->flush();
 
-                $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été ajouté.');
+                $this->addFlash('success', 'L\'utilisateur a bien été ajouté.');
 
                 return $this->redirectToRoute('user.index');
             }
@@ -158,7 +161,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
     /**
      *
      *
-     * @return array|RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/searchadd', name: 'user.searchadd')]
     public function searchadd(ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $userPasswordHasher): \Symfony\Component\HttpFoundation\Response
@@ -183,7 +186,8 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
                 $keyword = $form['nom']->getData();
                 $filters['institution.name.source'] = $etab;
-
+                dump($traineeSearchRepository->getTraineesList($keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, self::FIELDS));
+                die();
                 $resSearch = $traineeSearchRepository->getTraineesList($keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, self::FIELDS);
                 $trainees = $resSearch['items'];
 
@@ -249,14 +253,12 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
                     // on ajoute le role 'admin' au user
                     $roles[] = 'ROLE_ADMIN';
                     $user->setRoles($roles);
-                } else {
-                    // on ne change rien
                 }
 
                 $objectManager = $managerRegistry->getManager();
                 $objectManager->persist($user);
                 $objectManager->flush();
-                $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été mis à jour.');
+                $this->addFlash('success', 'L\'utilisateur a bien été mis à jour.');//'success', 'L\'utilisateur a bien été mis à jour.'
 
                 return $this->redirectToRoute('user.index');
             }
@@ -277,7 +279,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
             if ($form->isValid()) {
                 $managerRegistry->getManager()->persist($user);
                 $managerRegistry->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été mis à jour.');
+                $this->addFlash('success', 'Votre profil a bien été mis à jour.');//'success', 'Votre profil a bien été mis à jour.';
 
                 return $this->redirectToRoute('user.account');
             }
@@ -319,7 +321,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
                 $user->setAccessRights($newRights);
                 $managerRegistry->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', "Les droits d'accès ont bien été enregistrés.");
+                $this->addFlash('success', "Les droits d'accès ont bien été enregistrés.");//'success', "Les droits d'accès ont bien été enregistrés.";
 
                 return $this->redirectToRoute('user.access_rights', ['id' => $user->getId()]);
             }
@@ -337,7 +339,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
         }
         if ($request->getMethod() === 'POST') {
             if ($user->isAdmin()) {
-                $this->get('session')->getFlashBag()->add('error', 'L\'utilisateur actuel est administrateur et ne peut pas être supprimé.');
+                $this->getSubscribedServices();//'error', 'L\'utilisateur actuel est administrateur et ne peut pas être supprimé.';
 
                 return $this->redirectToRoute('user.edit', ['id' => $user->getId()]);
             }
@@ -345,7 +347,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
             $em = $managerRegistry->getManager();
             $em->remove($user);
             $em->flush();
-            $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été supprimé.');
+            $this->addFlash('success', 'L\'utilisateur a bien été supprimé.');//'success', 'L\'utilisateur a bien été supprimé.';
 
             return $this->redirectToRoute('user.index');
         }
@@ -358,14 +360,15 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
      * @throws NotFoundExceptionInterface
      */
     #[Route(path: '/{id}/login', name: 'user.login', requirements: ['id' => '\d+'])]
-    public function loginAs(User $loginAsUser): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function loginAs(User $loginAsUser, TokenStorageInterface $tokenStorage): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->getUser()->isAdmin()) {
             throw new AccessDeniedHttpException("You can't do this action");
         }
 
-        $usernamePasswordToken = new UsernamePasswordToken($loginAsUser, null, (array)'user_db', $loginAsUser->getRoles());
-        $this->container->get('security.context_listener')->setToken($usernamePasswordToken);
+        $usernamePasswordToken = new UsernamePasswordToken($loginAsUser, (string)'user_db', $loginAsUser->getRoles());
+        $tokenStorage->setToken($usernamePasswordToken,(string)'user_db');
+       // $this->container->get(TokenStorageInterface::class)->setToken($usernamePasswordToken);
 
         return $this->redirectToRoute('core.index');
     }

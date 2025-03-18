@@ -49,12 +49,12 @@ abstract class AbstractTrainingController extends AbstractController
     public function search(Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry)
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', []);
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $filters = $request->request->all('filters');
+        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->all('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
+        $sorts = $request->request->all('sorts', 'NO SORTS');
 
 
         // security check : training : 'sygefor_training.rights.inscription.all.view' -> id=9

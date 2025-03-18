@@ -56,7 +56,7 @@ class ProgramController extends AbstractController
     }
 
     #[Route(path: '/contact', name: 'front.program.contact')]
-    public function contact(ManagerRegistry $doctrine): array
+    public function contact(ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
@@ -77,11 +77,11 @@ class ProgramController extends AbstractController
             if ($institution->getEmail() !== null)
                 $instContacts[] = $institution;
         }
-        return ['etablissements' => $instContacts, 'user' => $trainee, $this->render('Front/Public/program/contact.html.twig')];
+        return $this->render('Front/Public/program/contact.html.twig', ['etablissements' => $instContacts, 'user' => $trainee]);
     }
 
     #[Route(path: '/faq', name: 'front.program.faq')]
-    public function faq(ManagerRegistry $doctrine): RedirectResponse
+    public function faq(ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
 
         $user = $this->getUser();
@@ -96,7 +96,7 @@ class ProgramController extends AbstractController
             $trainee = $arTrainee[0];
         }
 
-        return ['contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $trainee, $this->render('Front/Public/program/faq.html.twig')];
+        return $this->render('Front/Public/program/faq.html.twig',['contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url')]);
     }
 
     /**
@@ -541,10 +541,10 @@ class ProgramController extends AbstractController
     }
 
     /**
-     * @return array{user: mixed, search: mixed[], img: string, form: \Symfony\Component\Form\FormView}
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/allprogram', name: 'front.program.allprogram')]
-    public function allProgram(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository): array
+    public function allProgram(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository): \Symfony\Component\HttpFoundation\Response
     {
         // Recuperation info du user authentifié
         $user = $this->getUser();
@@ -633,7 +633,7 @@ class ProgramController extends AbstractController
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
         }
 
-        return ['user' => $arTrainee, 'search' => $search, 'img' => '', 'form' => $form->createView(), $this->render('Front/Public/allprogram.html.twig')];
+        return $this->render('Front/Public/allprogram.html.twig', ['user' => $arTrainee, 'search' => $search, 'img' => '', 'form' => $form->createView()]);
     }
 
     /**

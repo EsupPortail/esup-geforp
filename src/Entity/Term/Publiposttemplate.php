@@ -19,14 +19,14 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
 {
     use UploadableTrait;
 
-    #[ORM\Column(name: 'entity', type: \Doctrine\DBAL\Types\Types::TEXT)]
+    #[ORM\Column(name: 'entity', type: 'text', nullable: false)]
     #[Assert\NotNull]
     protected ?string $entity = null;
 
     /**
      * @param string $entity
      */
-    public function setEntity($entity): void
+    public function setEntity(string $entity): void
     {
         $this->entity = $entity;
     }
@@ -34,7 +34,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getEntity()
+    public function getEntity(): ?string
     {
         return $this->entity;
     }
@@ -65,7 +65,7 @@ class Publiposttemplate extends AbstractTerm implements VocabularyInterface
     public function validateFile(ExecutionContext $executionContext): void
     {
         if (!$this->file instanceof \Symfony\Component\HttpFoundation\File\File) {
-            $executionContext->addViolationAt('file', 'Vous devez sélectionner un fichier');
+            $executionContext->addViolation('file', (array)'Vous devez sélectionner un fichier');
         }
     }
 

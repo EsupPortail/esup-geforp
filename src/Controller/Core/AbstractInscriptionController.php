@@ -47,13 +47,13 @@ abstract class AbstractInscriptionController extends AbstractController
     public function search(Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', []);
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $filters = $request->request->all('filters');
+        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->all('aggs', 'NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
-        $fields = $request->request->get('fields', 'NO FIELDS');
+        $sorts = $request->request->all('sorts', 'NO SORTS');
+        $fields = $request->request->all('fields', 'NO FIELDS');
 
         // security check : inscirption : 'sygefor_inscription.rights.inscription.all.view' -> id=25
         if(!$accessRightRegistry->hasAccessRight(25)) {

@@ -36,9 +36,9 @@ use Symfony\Component\HttpFoundation\Request;
     public function search(Request $request, ManagerRegistry $managerRegistry, EmailRepository $emailRepository): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
+        $filters = $request->request->all('filters','NO FILTERS');
         $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $request->request->get('aggs', 'NO AGGS');
+        $request->request->all('aggs', 'NO AGGS');
 
         // Recherche avec les filtres
         $emails = $emailRepository->getEmailsList($keywords, $filters);

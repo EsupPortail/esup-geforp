@@ -12,14 +12,14 @@ use Doctrine\ORM\Mapping as ORM;
 trait CoordinatesTrait
 {
     /**
-     * @var boolean addressType
+     * @var ?int addressType
      *
      * @ORM\Column(name="address_type", type="integer", nullable=true)
      * @Serializer\Groups({"Default", "trainee", "api.profile"})
      */
     #[ORM\Column(name: 'address_type', type: 'integer', nullable: true)]
     #[Groups(['Default', 'trainee', 'api.profile'])]
-    protected int $addresstype;
+    protected ?int $addresstype;
 
     /**
      * @var string address

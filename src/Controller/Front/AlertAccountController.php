@@ -83,10 +83,10 @@ final class AlertAccountController extends AbstractController
             }
 
             $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
-            return $this->render('Front/Account/alert/alerts.html.twig');
+
         }
 
-        return ['user' => $trainee, 'alerts' => $alertsTrainee, 'form' => $form->createView()];
+        return $this->render('Front/Account/alert/alerts.html.twig',['user' => $trainee, 'alerts' => $alertsTrainee, 'form' => $form->createView()]);
     }
 
 }

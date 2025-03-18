@@ -4,6 +4,7 @@ namespace App\Entity\Back;
 
 
 use App\Entity\Core\AbstractInscription;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Form\Type\AbstractTraineeType;
 use App\Entity\Core\AbstractTrainee;
@@ -88,6 +89,7 @@ class Trainee extends AbstractTrainee
     }
 
     /**
+     * Set shibboleth persistent id
      * Set shibboleth persistent id
      *
      *
@@ -418,7 +420,7 @@ class Trainee extends AbstractTrainee
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
      */
     public function getAlerts()
     {

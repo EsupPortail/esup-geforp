@@ -458,7 +458,6 @@ dump($this->getUser());
                     }
                 }
             }
-            return $this->render('Front/Account/profile/profile.html.twig');
         }
 
         if ($flagEtab !== 1) {
@@ -593,7 +592,7 @@ dump($this->getUser());
             }
         }
 
-        return ['user' => $trainee, 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()];
+        return $this->render('Front/Account/profile/profile.html.twig',['user' => $trainee, 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()]);
     }
 
     /**

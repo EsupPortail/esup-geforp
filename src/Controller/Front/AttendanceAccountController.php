@@ -38,7 +38,7 @@ class AttendanceAccountController extends AbstractController
     }
     #[Route('/attendances', methods: ['GET'])]
     #[Route(path: '/attendances', name: 'front.account.attendances')]
-    public function attendances(ManagerRegistry $doctrine): array
+    public function attendances(ManagerRegistry $doctrine): Response
     {
         // recup trainee
         $user = $this->getUser();
@@ -52,7 +52,7 @@ class AttendanceAccountController extends AbstractController
         $qb          = $this->createQueryBuilder($doctrine, $trainee);
         $attendances = $qb->getQuery()->getResult();
 
-        return ['user' => $trainee, 'attendances' => $attendances, 'evalActif' => $evalActif, $this->render('Front/Account/attendance/attendances.html.twig')];
+        return $this->render('Front/Account/attendance/attendances.html.twig', ['user' => $trainee, 'attendances' => $attendances, 'evalActif' => $evalActif]);
     }
 
     #[Route(path: '/attendance/{session}', name: 'front.account.attendance', methods: ['GET'])]

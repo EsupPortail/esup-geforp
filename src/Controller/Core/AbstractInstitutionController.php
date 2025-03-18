@@ -6,7 +6,9 @@ use App\Entity\Back\Institution;
 use App\Entity\Back\Presence;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use http\Env\Response;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Routing\Annotation\Route;
@@ -28,12 +30,12 @@ abstract class AbstractInstitutionController extends AbstractController
 
     #[Groups(['Default', 'institution'])]
     #[Route(path: '/search', name: 'institution.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): array
+    public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): JsonResponse
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $filters = $request->request->all('filters', 'NO FILTERS');
+        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
+        $aggs = $request->request->all( 'aggs','NO AGGS');
         $page = $request->request->get('page', 'NO PAGE');
         $size = $request->request->get('size', 'NO SIZE');
 
@@ -44,7 +46,7 @@ abstract class AbstractInstitutionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        return $ret;
+        return new JsonResponse($ret);
     }
 
     #[Groups(['Default', 'institution'])]

@@ -35,9 +35,9 @@ abstract class Material
      * @var AbstractTraining
      * @Serializer\Exclude
      */
-    #[ORM\ManyToOne(targetEntity: 'AbstractTraining')]
+    #[ORM\ManyToOne(targetEntity: 'AbstractTraining', inversedBy: 'materials')]
     #[ORM\JoinColumn]
-    protected $training;
+    protected AbstractTraining $training;
 
     /**
      * @var AbstractSession

@@ -2,18 +2,19 @@
 
 namespace App\Entity\Core;
 
+
+use App\AccessRight\SerializedAccessRights;
+use App\Entity\Core\AbstractOrganization;
+use App\Entity\PersonTrait\CoordinatesTrait;
 use App\Entity\Term\Domain;
 use App\Form\Type\BaseInstitutionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use App\Entity\PersonTrait\CoordinatesTrait;
-use App\Entity\Core\AbstractOrganization;
-use App\AccessRight\SerializedAccessRights;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use App\Form\Type\BaseInstitutionType as FormType;
+use JMS\Serializer\Annotation\Groups;
+
 
 /**
  * Institution.
@@ -31,32 +32,22 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
 
     use CoordinatesTrait;
 
-    /**
-     *
-     * @Serializer\Groups({"Default", "api"})
-     */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     protected ?int $id = null;
 
-    /**
-     * @Serializer\Groups({"Default", "api"})
-     */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 512)]
     #[Assert\NotBlank(message: "Vous devez renseigner un nom d'établissement.")]
     protected ?string $name = null;
 
-    /**
-     * @Serializer\Groups({"Default", "api"})
-     */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $idp = null;
 
-    /**
-     * @var Collection<\App\Entity\Term\Domain>
-     * @Serializer\Groups({"Default", "api"})
-     */
+    #[Groups(['Default', 'api'])]
     #[ORM\JoinTable(name: 'institution__institution_domain')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'domain_id', referencedColumnName: 'id', onDelete: 'cascade')]
@@ -64,10 +55,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     protected Collection $domains;
 
 
-    /**
-     * @var Collection<AbstractInstitution>
-     * @Serializer\Groups({"Default", "api"})
-     */
+    #[Groups(['Default', 'api'])]
     #[ORM\JoinTable(name: 'institution__visuinstitutions')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'visu_institution_id', referencedColumnName: 'id', onDelete: 'cascade')]
@@ -101,7 +89,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }

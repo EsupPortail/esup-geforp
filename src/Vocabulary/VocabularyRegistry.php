@@ -21,6 +21,7 @@ use App\Entity\Term\Trainertype;
 use App\Entity\Term\Trainingcategory;
 use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Exception\NotSupported;
 use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
@@ -97,7 +98,7 @@ final class VocabularyRegistry
         $this->addVocabulary($voc, $i);
     }
 
-    public function addVocabulary($vocabulary, $id, $group = 'Misc', $label = null): void
+    public function addVocabulary(object $vocabulary, int $id, string $group = 'Misc', ?string $label = null): void
     {
 
 
@@ -119,12 +120,12 @@ final class VocabularyRegistry
     /**
      * @param string $id
      *
-     * @return string|null
+     * @return array|null
      */
-    public function getVocabularyById(string $id): ?VocabularyInterface
+    public function getVocabularyById(int $id): ?object
 
     {
-        return $this->VocabularyInterface[$id] ?? null;
+        return $this->vocabularies[$id] ?? null;
     }
 
     /**
@@ -132,7 +133,7 @@ final class VocabularyRegistry
      *
      * @return VocabularyInterface
      */
-    public function getVocabularyLabel($id)
+    public function getVocabularyLabel(int $id): ?string
     {
         return $this->labels[$id] ?? null;
     }
@@ -157,11 +158,11 @@ final class VocabularyRegistry
      * @param $vocTerm
      * @param bool $getCount
      */
-    public function getTermUsages(EntityManager $entityManager, $vocTerm, $getCount = true): array|int
+    public function getTermUsages(EntityManagerInterface $entityManager, $vocTerm, bool $getCount = true): array|int
     {
         /* @var ObjectRepository $repo */
         $meta     = $entityManager->getMetadataFactory()->getAllMetadata();
-        $vocClass = $vocTerm::class;
+        $vocClass = get_class($vocTerm);
         $termId   = $vocTerm->getId();
 
         $usages = [];
@@ -296,7 +297,7 @@ final class VocabularyRegistry
      *
      * @return bool
      */
-    private function checkTermIsInCollection($term, $collection)
+    private function checkTermIsInCollection($term, $collection): bool
     {
         $isInCollection = false;
 

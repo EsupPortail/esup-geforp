@@ -7,6 +7,7 @@ use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\ORM\Event\PostUpdateEventArgs;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -37,17 +38,17 @@ use App\Entity\Core\AbstractInscription;
      * Send the inscription status mail.
      * @throws TransportExceptionInterface
      */
-    public function postProcess(PostPersistEventArgs $postPersistEventArgs, $new = false): void
+    public function postProcess(PostPersistEventArgs|PostUpdateEventArgs $eventArgs, $new = false): void
     {
-        $object = $postPersistEventArgs->getObject();
+        $object = $eventArgs->getObject();
         if ($object instanceof AbstractInscription) {
             if ($object->isSendinscriptionstatusmail()) {
-                $this->sendInscriptionStatusMail($postPersistEventArgs);
+                $this->sendInscriptionStatusMail($eventArgs);
             }
 
             // sending mail to organization manager if new inscription status is disclaimer
 	        if (!$new) {
-		        $this->sendMailDisclaimerInscriptionStatusMail($postPersistEventArgs);
+		        $this->sendMailDisclaimerInscriptionStatusMail($eventArgs);
 	        }
         }
     }
@@ -65,9 +66,9 @@ use App\Entity\Core\AbstractInscription;
      * postUpdate.
      * @throws TransportExceptionInterface
      */
-    public function postUpdate(PostPersistEventArgs $postPersistEventArgs): void
+    public function postUpdate(PostUpdateEventArgs $postUpdateEventArgs): void
     {
-        $this->postProcess($postPersistEventArgs);
+        $this->postProcess($postUpdateEventArgs, true);
     }
 
     /**

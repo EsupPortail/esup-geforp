@@ -303,15 +303,16 @@ final class AccessRightRegistry
     /**
      * @param $accessRightName
      *
-     * @return array|void
+     * @return int|string
      */
-    public function getByName($accessRightName): string
+    public function getByName($accessRightName): array|int
     {
         $id = array_search($accessRightName, self::RIGHT_NAMES, true);
         if ($id === false) {
         } elseif (isset($this->rights[$id])) {
             return $id;
         }
+        return $id;
     }
 
     /**

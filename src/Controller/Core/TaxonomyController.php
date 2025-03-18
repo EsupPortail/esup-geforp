@@ -22,9 +22,9 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractOrganization;
-use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\Publiposttemplate;
 use App\Entity\Term\TreeTrait;
 use App\Form\Type\VocabularyType;
@@ -62,7 +62,6 @@ use Symfony\Component\Validator\Constraints\NotBlank;
             throw new NotFoundHttpException();
         }
         /** @var AbstractTerm $abstractVocabulary */
-        dump($vocabularyRegistry->getVocabularyById(1)); die;
         $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
         // for mixed vocabularies
@@ -146,7 +145,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
                 $term->setOrganization($organization);
                 $objectManager->persist($term);
                 $objectManager->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Le terme a bien été enregistré.');
+                $this->addFlash('success', 'Le terme a bien été enregistré.');
 
                 $organization_id = null;
                 if ($organization instanceof \App\Entity\Core\AbstractOrganization) {
@@ -171,6 +170,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
         // find term
         $vocabulary = $objectManager->find($termClass, $id);
+
         if (!$vocabulary instanceof \App\Vocabulary\VocabularyInterface) {
             throw new NotFoundHttpException();
         }
@@ -194,7 +194,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         // build query
         $queryBuilder = $objectManager->createQueryBuilder('s')
             ->select('t')
-            ->from($termClass, 't')
+            ->from($termClass/** @type MODEL */, 't')
             ->where('t.id != :id')->setParameter('id', $id)
             ->orderBy('t.'.$abstractVocabulary::orderBy());
         if ($vocabulary->getOrganization() instanceof \App\Entity\Back\Organization) {
@@ -235,7 +235,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 
                 $objectManager->remove($vocabulary);
                 $objectManager->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Le terme a bien été supprimé.');
+                $this->addFlash('success', 'Le terme a bien été supprimé.');
 
                 return $this->redirectToRoute('taxonomy.view', ['vocabularyId' => $vocabularyId, 'organizationId' => $organization_id]);
             }
@@ -352,7 +352,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 	}
 
     #[Route(path: '/get_terms/{vocabularyId}', name: 'taxonomy.get', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function getTerms(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId)
+    public function getTerms(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId,  $isAdmin=null)
     {
         /*
          * @var AbstractTerm
@@ -362,9 +362,10 @@ use Symfony\Component\Validator\Constraints\NotBlank;
             throw new \InvalidArgumentException('This vocabulary does not exists.');
         }
 
-        $userOrg = $this->getUser()->getOrganization();
+        $userOrg = $this->getUser()->getOrganization() ?? null;
         $isAdmin = $this->getUser()->isAdmin();
 
-        return $this->getRootTerms($managerRegistry, $vocabulary, $userOrg, $isAdmin);
+       $terms = $this->getRootTerms($managerRegistry, $vocabulary, $userOrg = null, $isAdmin);
+        return new JsonResponse($terms);
     }
 }

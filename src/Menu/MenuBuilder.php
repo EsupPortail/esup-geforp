@@ -116,7 +116,7 @@ final readonly class MenuBuilder
                 }
             } else {
                 // Log ou var_dump pour examiner la valeur retournée
-                var_dump($menuitemTerm);  // ou $this->logger->error("Erreur : l'objet retourné n'est pas une instance de VocabularyInterface");
+                  // ou $this->logger->error("Erreur : l'objet retourné n'est pas une instance de VocabularyInterface");
             }
 
             if (!$menuitemTerm instanceof VocabularyInterface) {
