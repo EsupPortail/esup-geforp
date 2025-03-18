@@ -2,7 +2,7 @@
     <button type="button" class="close" ng-click="dialog.dismiss()" aria-hidden="true">×</button>
     <h4 class="modal-title"><i class="fa fa-copy"></i> Dupliquer une ligne de dates</h4>
 </div>
-<form sf-href="dates.duplicate({id: date.id})" sf-form="form" json-path="form"
+<form sf-href="dates.duplicate({dates: dialog.params.dates.id})" sf-form="form" json-path="form"
       on-success="onSuccess(data)" class="form-horizontal" novalidate>
     <div class="modal-body center-block">
         <div class="form-group" ng-if="form.children['name']" ng-class="{'has-error': form.children['name'].errors.length }">

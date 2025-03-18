@@ -291,6 +291,7 @@ class SessionController extends AbstractSessionController
         }
 
         $cloned = clone $dates;
+        $session = $cloned->getSession();
         $form = $this->createFormBuilder($cloned)
             ->add('datebegin', DateType::class, array(
                 'label' => 'Date de début',
@@ -311,9 +312,72 @@ class SessionController extends AbstractSessionController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
+                $existingDate = null;
+                $datesBegin = array();
+                $datesEnd = array();
+                /** @var DateSession $existingDate */
+                foreach ($session->getDates() as $existingDate) {
+                    if ($existingDate->getDatebegin() == $cloned->getDatebegin()) {
+                        $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
+                        return array('form' => $form->createView(), 'dates' => $dates);
+                    }
+                    $datesBegin[] = $existingDate->getDatebegin();
+                    $datesEnd[] = $existingDate->getDateend();
+
+                    if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
+                        $daysSum++;
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
+                    }
+                    else {
+                        $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
+                    }
+                }
+
+                if (!$existingDate || ($existingDate->getDatebegin() !== cloned->getDatebegin())) {
+                    $session->setUpdatedAt(new \DateTime('now'));
+                    $session->getTraining()->setUpdatedAt(new \DateTime('now'));
+                    $em = $doctrine->getManager();
+                    $em->persist($cloned);
+                    $em->flush();
+                    $datesBegin[] = $cloned->getDatebegin();
+                    $datesEnd[] = $cloned->getDateend();
+
+                    // Calcul nombre de jours
+                    if (($cloned->getDatebegin() == $cloned->getDateend()) || ($cloned->getDateend() == null)) {
+                        $daysSum++;
+                        $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter());
+                    }
+                    else {
+                        $daysSum += $cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1;
+                        $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter()) * ($cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1);
+                    }
+                }
+
+                // Tri des tableaux de dates
+                usort($datesBegin, function($a, $b) {
+                    return $a < $b ? -1: 1;
+                });
+                usort($datesEnd, function($a, $b) {
+                    return $a < $b ? -1: 1;
+                });
+
+                // Renseigner le lieu
+                $session->setPlace($session->getDates()[0]->getPlace());
+
+                // Renseigner le nombre d'heures
+                $session->setHournumber($hoursSum);
+
+                // Renseigner le nombre de jours
+                $session->setDaynumber($daysSum);
+
+                // Récupérer les dates min et max début et fin pour les caler dans les dates de session
+                $session->setDatebegin($datesBegin[0]);
+                $session->setDateend($datesEnd[count($datesEnd)-1]);
                 $em = $doctrine->getManager();
-                $em->persist($cloned);
+                $em->persist($session);
                 $em->flush();
+
             }
         }
 

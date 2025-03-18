@@ -263,7 +263,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
      * dates.duplicate
      */
     $dialogProvider.dialog('dates.duplicate', /* @ngInject */ {
-        controller: 'DatesEditController',
+        controller: 'DatesDuplicateController',
         templateUrl: 'training/session/dialogs/dates/duplicate.html',
         resolve:{
             form: function ($http, $dialogParams){
