@@ -327,8 +327,7 @@ class SessionController extends AbstractSessionController
                     if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
                         $daysSum++;
                         $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
-                    }
-                    else {
+                    } else {
                         $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
                         $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
                     }
@@ -347,19 +346,18 @@ class SessionController extends AbstractSessionController
                     if (($cloned->getDatebegin() == $cloned->getDateend()) || ($cloned->getDateend() == null)) {
                         $daysSum++;
                         $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter());
-                    }
-                    else {
+                    } else {
                         $daysSum += $cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1;
                         $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter()) * ($cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1);
                     }
                 }
 
                 // Tri des tableaux de dates
-                usort($datesBegin, function($a, $b) {
-                    return $a < $b ? -1: 1;
+                usort($datesBegin, function ($a, $b) {
+                    return $a < $b ? -1 : 1;
                 });
-                usort($datesEnd, function($a, $b) {
-                    return $a < $b ? -1: 1;
+                usort($datesEnd, function ($a, $b) {
+                    return $a < $b ? -1 : 1;
                 });
 
                 // Renseigner le lieu
@@ -373,14 +371,13 @@ class SessionController extends AbstractSessionController
 
                 // Récupérer les dates min et max début et fin pour les caler dans les dates de session
                 $session->setDatebegin($datesBegin[0]);
-                $session->setDateend($datesEnd[count($datesEnd)-1]);
+                $session->setDateend($datesEnd[count($datesEnd) - 1]);
                 $em = $doctrine->getManager();
                 $em->persist($session);
                 $em->flush();
 
             }
         }
-
         return array('form' => $form->createView(), 'dates' => $dates);
     }
 }
