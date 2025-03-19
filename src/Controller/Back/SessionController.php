@@ -291,7 +291,12 @@ class SessionController extends AbstractSessionController
         }
 
         $cloned = clone $dates;
-        $session = $cloned->getSession();
+        /** @var Session $session */
+        $session = $dates->getSession();
+        $cloned->setSession($session);
+        $daysSum =0;
+        $hoursSum = 0;
+
         $form = $this->createFormBuilder($cloned)
             ->add('datebegin', DateType::class, array(
                 'label' => 'Date de début',
@@ -333,12 +338,10 @@ class SessionController extends AbstractSessionController
                     }
                 }
 
-                if (!$existingDate || ($existingDate->getDatebegin() !== cloned->getDatebegin())) {
+                if (!$existingDate || ($existingDate->getDatebegin() !== $cloned->getDatebegin())) {
+                    $session->addDates($cloned);
                     $session->setUpdatedAt(new \DateTime('now'));
                     $session->getTraining()->setUpdatedAt(new \DateTime('now'));
-                    $em = $doctrine->getManager();
-                    $em->persist($cloned);
-                    $em->flush();
                     $datesBegin[] = $cloned->getDatebegin();
                     $datesEnd[] = $cloned->getDateend();
 
@@ -373,6 +376,7 @@ class SessionController extends AbstractSessionController
                 $session->setDatebegin($datesBegin[0]);
                 $session->setDateend($datesEnd[count($datesEnd) - 1]);
                 $em = $doctrine->getManager();
+                $em->persist($cloned);
                 $em->persist($session);
                 $em->flush();
 
