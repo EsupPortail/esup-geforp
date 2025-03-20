@@ -143,8 +143,10 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, true);
 
         $c = count($paginator);
+        
         $tabTrainees = [];
         foreach($paginator as $tr) {
+            echo gettype($paginator), "\n";
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainees[]['id'] = $tr->getId();
             } else {

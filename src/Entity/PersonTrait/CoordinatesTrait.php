@@ -4,7 +4,6 @@ namespace App\Entity\PersonTrait;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-use App\EventListener\Serializer;
 use Doctrine\ORM\Mapping as ORM;
 /**
  * Trait CoordinatesTrait.
@@ -14,8 +13,6 @@ trait CoordinatesTrait
     /**
      * @var ?int addressType
      *
-     * @ORM\Column(name="address_type", type="integer", nullable=true)
-     * @Serializer\Groups({"Default", "trainee", "api.profile"})
      */
     #[ORM\Column(name: 'address_type', type: 'integer', nullable: true)]
     #[Groups(['Default', 'trainee', 'api.profile'])]
@@ -24,8 +21,6 @@ trait CoordinatesTrait
     /**
      * @var string address
      *
-     * @ORM\Column(name="address", type="string", length=512, nullable=true)
-     * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
     #[ORM\Column(name: 'address', type: 'string', length: 512, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
@@ -34,8 +29,6 @@ trait CoordinatesTrait
     /**
      * @var string zip
      *
-     * @ORM\Column(name="zip", type="string", length=32, nullable=true)
-     * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
     #[ORM\Column(name: 'zip', type: 'string', length: 512, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
@@ -44,8 +37,6 @@ trait CoordinatesTrait
     /**
      * @var string city
      *
-     * @ORM\Column(name="city", type="string", length=128, nullable=true)
-     * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "api.profile"})
      */
     #[ORM\Column(name: 'city', type: 'string', length: 128, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
@@ -53,8 +44,6 @@ trait CoordinatesTrait
 
     /**
      * @var string
-     * @ORM\Column(name="email", type="string", length=128, nullable=true)
-     * @Serializer\Groups({"trainee", "institution", "inscription", "trainer", "session", "api.profile", "api.inscription", "api.token"})
      */
     #[ORM\Column(name: 'email', type: 'string', length: 128, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'session', 'api.profile', 'api.inscription' , 'api.token'])]
@@ -64,8 +53,6 @@ trait CoordinatesTrait
     /**
      * @var string
      *
-     * @ORM\Column(name="phone_number", type="string", length=255, nullable=true)
-     * @Serializer\Groups({"trainee", "inscription", "trainer", "api.profile"})
      */
     #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
     #[Groups(['trainee', 'inscription', 'trainer', 'api.profile'])]
@@ -74,8 +61,6 @@ trait CoordinatesTrait
     /**
      * @var string
      *
-     * @ORM\Column(name="fax_number", type="string", length=255, nullable=true)
-     * @Serializer\Groups({"organization", "trainee", "trainer", "api.profile"})
      */
     #[ORM\Column(name: 'fax_number', type: 'string', length: 255, nullable: true)]
     #[Groups(['organization', 'trainee', 'trainer', 'api.profile'])]
@@ -83,8 +68,6 @@ trait CoordinatesTrait
 
     /**
      * @var string
-     * @ORM\Column(name="website", type="string", length=512, nullable=true)
-     * @Serializer\Groups({"organization", "trainee", "trainer", "institution", "api.profile"})
      */
     #[ORM\Column(name: 'website', type: 'string', length: 512, nullable: true)]
     #[Groups(['organization', 'trainee', 'trainer', 'institution' , 'api.profile'])]

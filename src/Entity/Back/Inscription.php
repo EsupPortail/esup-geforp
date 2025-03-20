@@ -5,6 +5,7 @@ namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractInscription;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Form\Type\InscriptionType;
 use JMS\Serializer\Annotation as Serializer;
@@ -22,11 +23,11 @@ class Inscription extends AbstractInscription implements \Stringable
     protected ?string $motivation = null;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\EvaluationNotedCriterion>
+     * @var Collection<\App\Entity\Back\EvaluationNotedCriterion>
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
     #[ORM\OneToMany(targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, mappedBy: 'inscription', cascade: ['persist', 'merge', 'remove'])]
-    protected \Doctrine\Common\Collections\Collection $criteria;
+    protected Collection $criteria;
 
     /**
      * @Serializer\Groups({"Default", "inscription", "api.attendance"})
@@ -41,6 +42,15 @@ class Inscription extends AbstractInscription implements \Stringable
     #[ORM\JoinColumn]
     protected ?\App\Entity\Term\Actiontype $actiontype = null;
 
+    public function checkAndLoadActionType($entityManager): void
+    {
+        $actionType = $this->getActiontype();
+        if ($actionType !== null) {
+            $entityManager->initialiszeObject($actionType);
+            dump ($actionType);
+        }
+    }
+
     /**
      * @Serializer\Groups({"Default", "api"})
      */
@@ -48,12 +58,12 @@ class Inscription extends AbstractInscription implements \Stringable
     protected ?string $refuse = null;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Presence> $presences
+     * @var Collection<Presence> $presences
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    #[ORM\OneToMany(targetEntity: \App\Entity\Back\Presence::class, mappedBy: 'inscription', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Presence::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
-    protected \Doctrine\Common\Collections\Collection $presences;
+    protected Collection $presences;
 
     /**
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
@@ -138,6 +148,7 @@ class Inscription extends AbstractInscription implements \Stringable
     /**
      * @return mixed
      */
+
     public function getActiontype()
     {
         return $this->actiontype;

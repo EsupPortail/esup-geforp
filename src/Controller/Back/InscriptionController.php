@@ -5,6 +5,7 @@ namespace App\Controller\Back;
 use App\Entity\Back\Session;
 use Doctrine\Persistence\ManagerRegistry;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Back\Inscription;
 use App\Entity\Back\Presence;
@@ -26,7 +27,7 @@ use Symfony\Component\HttpFoundation\Request;
 
     public function editpresence(Presence $presence,ManagerRegistry $managerRegistry, Request $request, int $id ): array
     {
-        $presence = $managerRegistry->getRepository(Presence::class, $id);
+        $presence = $managerRegistry->getRepository(Presence::class)->find($id);
         if (!$presence) {
             throw $this->createNotFoundException();
         }
@@ -34,15 +35,30 @@ use Symfony\Component\HttpFoundation\Request;
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //Mise à jour presence
-                $objectManager = $this->managerRegistry->getManager();
+                $objectManager = $managerRegistry->getManager();
                 $objectManager->flush();
             }
         }
 
         return ['form' => $form->createView(), 'presence' => $presence];
 
+    }
+
+    #[Route("load-actiontype/{id}", name: "inscription.loadActionType", methods: ["get"])]
+    public function loadActionType(int $id, ManagerRegistry $managerRegistry): JsonResponse
+    {
+        $repository = $managerRegistry->getRepository(Inscription::class);
+        $inscription = $repository->find($id);
+
+        if (!$inscription) {
+            return new JsonResponse(["error" => 'Inscription non trouvée'], 400);
+        }
+        $entityManager = $managerRegistry->getManager();
+        $inscription->checkAndLoadActionType($entityManager);
+        
+        return new JsonResponse(["sucess" => 'ActionType chargée']);
     }
 
 }

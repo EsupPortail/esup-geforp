@@ -53,4 +53,6 @@ interface VocabularyInterface
      * @return mixed
      */
     public function getVocabularyName(): string;
+
+    public function isLocked();
 }

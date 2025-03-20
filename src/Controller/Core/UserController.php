@@ -186,8 +186,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
                 $keyword = $form['nom']->getData();
                 $filters['institution.name.source'] = $etab;
-                dump($traineeSearchRepository->getTraineesList($keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, self::FIELDS));
-                die();
+
                 $resSearch = $traineeSearchRepository->getTraineesList($keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, self::FIELDS);
                 $trainees = $resSearch['items'];
 

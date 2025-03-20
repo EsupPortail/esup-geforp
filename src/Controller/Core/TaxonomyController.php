@@ -36,6 +36,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Doctrine\ORM\EntityManager;
 
 /**
  * Class TaxonomyController.
@@ -122,7 +123,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         }
 
         // create term if not found
-        if (!$term instanceof \App\Vocabulary\VocabularyInterface) {
+        if (!$term) {
             $term = new $termClass();
             $term->setOrganization($organization);
         }
@@ -160,7 +161,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
     }
 
     #[Route(path: '/{vocabularyId}/remove/{id}', name: 'taxonomy.remove')]
-    public function remove(Request $request, ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId, $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    public function remove(Request $request, ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, int $vocabularyId, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);
         $abstractVocabulary->setVocabularyId($vocabularyId);
@@ -169,9 +170,9 @@ use Symfony\Component\Validator\Constraints\NotBlank;
         $objectManager = $managerRegistry->getManager();
 
         // find term
-        $vocabulary = $objectManager->find($termClass, $id);
+        $vocabulary = $objectManager->getRepository($termClass)->find($id);
 
-        if (!$vocabulary instanceof \App\Vocabulary\VocabularyInterface) {
+        if (!$vocabulary) {
             throw new NotFoundHttpException();
         }
 

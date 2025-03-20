@@ -41,10 +41,10 @@ abstract class AbstractInscriptionController extends AbstractController
 
     /**
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
-     * @return array{total: int, pageSize: mixed, items: mixed[], aggs: mixed}
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
      */
     #[Route(path: '/search', name: 'inscription.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): array
+    public function search(Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->all('filters');
@@ -68,7 +68,7 @@ abstract class AbstractInscriptionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        return $ret;
+        return $this->json($ret);
     }
 
     #[Route(path: '/create/{session}', name: 'inscription.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
