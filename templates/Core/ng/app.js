@@ -207,6 +207,9 @@ sygeforApp.factory('httpInterceptor', function($q, growl) {
             if (rejection.data.message) {
                 // symfony prod env
                 growl.addErrorMessage(rejection.data.message);
+            } else if(rejection.data.detail) {
+                // symfony dev env
+                growl.addErrorMessage(rejection.data.detail);
             } else if(rejection.data[0] && rejection.data[0].message) {
                 // symfony dev env
                 growl.addErrorMessage(rejection.data[0].message);

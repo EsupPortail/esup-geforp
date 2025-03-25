@@ -235,6 +235,12 @@ abstract class AbstractSessionController extends AbstractController
         if (!$this->isGranted('DELETE', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
+
+        // Suppression interdite s'il y a des inscrits
+        if ($session->getNumberofregistrations()>0) {
+            throw new \Exception('Impossible de supprimer la session car elle comporte des inscriptions');
+        }
+
         $training = $session->getTraining();
         $em = $doctrine->getManager();
         $em->remove($session);
