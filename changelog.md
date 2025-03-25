@@ -1,5 +1,12 @@
 # Geforp changelog :
 
+## 2.3.18 (2025-03-25)
+
+### Ajouts
+- Ajout duplication dates de session
+- Garde-fou lors des suppressions (stagiaire, session)
+- Informations complémentaires dans la FAQ
+
 ## 2.3.17 (2025-03-12)
 
 ### Ajouts
