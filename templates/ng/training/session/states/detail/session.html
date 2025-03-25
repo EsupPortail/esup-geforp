@@ -11,7 +11,7 @@
                 <a class="btn btn-fa" href="" ng-if="!session.promote" tooltip="Promouvoir la session" ng-if="session._accessRights.edit" ng-click="promote(1)"><span class="fa fa-star-o"></span></a>
                 <a class="btn btn-fa" href="" ng-if="session.promote" tooltip="Dépromouvoir la session" ng-if="session._accessRights.edit" ng-click="promote(0)"><span class="fa fa-star fa-highlight"></span></a>
                 <a class="btn btn-fa" href="" tooltip="Dupliquer" ng-click="duplicate()"><span class="fa fa-copy"></span></a>
-                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="session._accessRights.delete"ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
             <div class="pre-title">{{ session.training.typeLabel }} n°{{ session.training.id }} -  {{ session.training.name }}</div>
