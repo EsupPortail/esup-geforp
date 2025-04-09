@@ -13,16 +13,15 @@ use App\AccessRight\AccessRightRegistry;
 use App\Form\Type\AccessRightType;
 use App\Form\Type\TraineeSearchType;
 use App\Repository\TraineeSearchRepository;
-use ClassesWithParents\D;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
 use PHPUnit\Util\Json;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Core\User;
@@ -43,19 +42,19 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
     /**
      * @var int
      */
-    private const PAGE = 1;
+    private const int PAGE = 1;
     /**
      * @var int
      */
-    private const PAGE_SIZE = 100000;
+    private const int PAGE_SIZE = 100000;
     /**
      * @var string[]
      */
-    private const SORT = ['lastName.source'];
+    private const array SORT = ['lastName.source'];
     /**
      * @var string
      */
-    private const FIELDS = '';
+    private const string FIELDS = '';
     #[Route(path: '/', name: 'user.index')]
     public function index(ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\Response
     {
@@ -100,9 +99,12 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
     }
 
     /**
-     * @param null eppn
-     * @param null email
-     *
+     * @param ManagerRegistry $managerRegistry eppn
+     * @param Request $request email
+     * @param AccessRightRegistry $accessRightRegistry
+     * @param string $eppn
+     * @param string $email
+     * @return Response
      */
     #[Route(path: '/add/{eppn}/{email}', name: 'user.add')]
     public function add(ManagerRegistry $managerRegistry, Request $request, AccessRightRegistry $accessRightRegistry, string $eppn, string $email): \Symfony\Component\HttpFoundation\Response
@@ -174,7 +176,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
         // Fonction de recherche
         $traineeSearchRepository = new TraineeSearchRepository($managerRegistry);
-
+        $etab = '';
         $form = $this->createForm(TraineeSearchType::class, $defaultData);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -198,7 +200,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $repository = $em->getRepository(User::class);
                 foreach($trainees as $trainee) {
                     // On teste si le trainee est dejà gestionnaire
-                    $rUser = $repository->findByEmail($trainee->getEmail());
+                    $rUser = $repository->findOneBy(['email' => $trainee]);
                     $tabTrainees[] = $rUser ? 1 : 0;
                 }
 

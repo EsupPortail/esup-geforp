@@ -41,7 +41,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getId()
+    public function getId(): mixed
     {
         return $this->id;
     }
@@ -54,7 +54,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getInscription()
+    public function getInscription(): mixed
     {
         return $this->inscription;
     }
@@ -67,7 +67,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getCriterion()
+    public function getCriterion(): mixed
     {
         return $this->criterion;
     }
@@ -80,7 +80,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getNote()
+    public function getNote(): mixed
     {
         return $this->note;
     }

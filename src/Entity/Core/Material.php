@@ -52,7 +52,7 @@ abstract class Material
      *
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -64,7 +64,7 @@ abstract class Material
      *
      * @return self
      */
-    public function setName($name)
+    public function setName($name): \App\Entity\Core\Material
     {
         $this->name = $name;
 
@@ -76,7 +76,7 @@ abstract class Material
      *
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -92,7 +92,7 @@ abstract class Material
     /**
      * @return AbstractTraining
      */
-    public function getTraining()
+    public function getTraining(): AbstractTraining
     {
         return $this->training;
     }
@@ -100,7 +100,7 @@ abstract class Material
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }

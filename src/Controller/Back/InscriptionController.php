@@ -41,7 +41,6 @@ use Symfony\Component\HttpFoundation\Request;
                 $objectManager->flush();
             }
         }
-
         return ['form' => $form->createView(), 'presence' => $presence];
 
     }
@@ -57,7 +56,7 @@ use Symfony\Component\HttpFoundation\Request;
         }
         $entityManager = $managerRegistry->getManager();
         $inscription->checkAndLoadActionType($entityManager);
-        
+
         return new JsonResponse(["sucess" => 'ActionType chargée']);
     }
 

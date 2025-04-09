@@ -168,7 +168,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
-    #[ORM\OneToMany(targetEntity: \App\Entity\Core\Material::class, mappedBy: 'training', cascade: ['remove', 'persist'])]
+    #[ORM\OneToMany(mappedBy: 'training', targetEntity: \App\Entity\Core\Material::class, cascade: ['remove', 'persist'])]
     #[ORM\JoinColumn]
     protected \Doctrine\Common\Collections\Collection $materials;
 
@@ -206,7 +206,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return mixed
      */
-    public static function getFormType()
+    public static function getFormType(): mixed
     {
         return AbstractTrainingType::class;
     }
@@ -215,7 +215,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @param $addMethod
      * @param ArrayCollection $arrayCollection
      */
-    public function duplicateArrayCollection($addMethod, $arrayCollection): void
+    public function duplicateArrayCollection($addMethod, ArrayCollection $arrayCollection): void
     {
         foreach ($arrayCollection as $item) {
             if (method_exists($this, $addMethod)) {
@@ -229,7 +229,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @param AbstractTraining $originalTraining
      */
-    public function copyProperties($originalTraining): void
+    public function copyProperties(AbstractTraining $originalTraining): void
     {
         foreach (array_keys(get_object_vars($this)) as $key) {
             if (!($key !== 'id' && $key !== 'number' && $key !== 'sessions')) {
@@ -246,9 +246,9 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -261,7 +261,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): AbstractOrganization
     {
         return $this->organization;
     }
@@ -269,7 +269,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param AbstractOrganization $organization
      */
-    public function setOrganization($organization): void
+    public function setOrganization(AbstractOrganization $organization): void
     {
         $this->organization = $organization;
     }
@@ -277,7 +277,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -285,7 +285,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -293,7 +293,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $sessions
      */
-    public function setSessions($sessions): void
+    public function setSessions(ArrayCollection $sessions): void
     {
         $this->sessions = $sessions;
     }
@@ -317,7 +317,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getSessions()
+    public function getSessions(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->sessions;
     }
@@ -328,17 +328,17 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getNumber()
+    public function getNumber(): ?int
     {
         return $this->number;
     }
 
     /**
-     * @return mixed
+     * @return \App\Entity\Term\Theme|null
      */
-    public function getTheme()
+    public function getTheme(): ?\App\Entity\Term\Theme
     {
         return $this->theme;
     }
@@ -351,7 +351,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getProgram()
+    public function getProgram(): ?string
     {
         return $this->program;
     }
@@ -359,7 +359,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $program
      */
-    public function setProgram($program): void
+    public function setProgram(string $program): void
     {
         $this->program = $program;
     }
@@ -367,7 +367,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): ?string
     {
         return $this->description;
     }
@@ -375,7 +375,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $description
      */
-    public function setDescription($description): void
+    public function setDescription(string $description): void
     {
         $this->description = $description;
     }
@@ -383,7 +383,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getTeachingmethods()
+    public function getTeachingmethods(): ?string
     {
         return $this->teachingmethods;
     }
@@ -397,9 +397,9 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return AbstractInstitution
+     * @return AbstractInstitution|null
      */
-    public function getInstitution()
+    public function getInstitution(): ?\App\Entity\Core\AbstractInstitution
     {
         return $this->institution;
     }
@@ -407,7 +407,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param AbstractInstitution $institution
      */
-    public function setInstitution($institution): void
+    public function setInstitution(\App\Entity\Core\AbstractInstitution $institution): void
     {
         $this->institution = $institution;
     }
@@ -415,7 +415,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return Supervisor
      */
-    public function getSupervisor()
+    public function getSupervisor(): ?Supervisor
     {
         return $this->supervisor;
     }
@@ -423,7 +423,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param Supervisor $supervisor
      */
-    public function setSupervisor($supervisor): void
+    public function setSupervisor(Supervisor $supervisor): void
     {
         $this->supervisor = $supervisor;
     }
@@ -431,7 +431,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return Trainingcategory
      */
-    public function getCategory()
+    public function getCategory(): ?Trainingcategory
     {
         return $this->category;
     }
@@ -439,7 +439,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param Trainingcategory $category
      */
-    public function setCategory($category): void
+    public function setCategory(Trainingcategory $category): void
     {
         $this->category = $category;
     }
@@ -447,7 +447,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getTags()
+    public function getTags(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->tags;
     }
@@ -455,7 +455,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $tags
      */
-    public function setTags($tags): void
+    public function setTags(ArrayCollection $tags): void
     {
         $this->tags = $tags;
     }
@@ -465,7 +465,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function addTag($tag)
+    public function addTag(Tag $tag): bool
     {
         if ( ! $this->tags->contains($tag)) {
             $this->tags->add($tag);
@@ -479,7 +479,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getInterventiontype()
+    public function getInterventiontype(): ?string
     {
         return $this->interventiontype;
     }
@@ -487,7 +487,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $interventiontype
      */
-    public function setInterventiontype($interventiontype): void
+    public function setInterventiontype(string $interventiontype): void
     {
         $this->interventiontype = $interventiontype;
     }
@@ -495,7 +495,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return boolean
      */
-    public function isexternalinitiative()
+    public function isexternalinitiative(): ?bool
     {
         return $this->externalinitiative;
     }
@@ -503,7 +503,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param boolean $externalinitiative
      */
-    public function setExternalinitiative($externalinitiative): void
+    public function setExternalinitiative(bool $externalinitiative): void
     {
         $this->externalinitiative = $externalinitiative;
     }
@@ -511,7 +511,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }
@@ -519,7 +519,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $comments
      */
-    public function setComments($comments): void
+    public function setComments(string $comments): void
     {
         $this->comments = $comments;
     }
@@ -527,7 +527,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return int
      */
-    public function getFirstsessionperiodsemester()
+    public function getFirstsessionperiodsemester(): int
     {
         return $this->firstsessionperiodsemester;
     }
@@ -540,7 +540,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return int
      */
-    public function getFirstsessionperiodyear()
+    public function getFirstsessionperiodyear(): ?int
     {
         return $this->firstsessionperiodyear;
     }
@@ -548,7 +548,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param int $firstSessionPeriodYear
      */
-    public function setFirstsessionperiodyear($firstSessionPeriodYear): void
+    public function setFirstsessionperiodyear(int $firstSessionPeriodYear): void
     {
         $this->firstsessionperiodyear = $firstSessionPeriodYear;
     }
@@ -556,7 +556,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $materials
      */
-    public function setMaterials($materials): void
+    public function setMaterials(ArrayCollection $materials): void
     {
         $this->materials = $materials;
     }
@@ -575,7 +575,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @return string
      */
-    public function getDuplicatedType()
+    public function getDuplicatedType(): string
     {
         return static::getType();
     }
@@ -592,7 +592,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
-    public static function getTypeLabel()
+    public static function getTypeLabel(): string
     {
         return 'Formation';
     }
@@ -601,7 +601,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @return string
      *                Serializer : via listener to include in all cases
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'training';
     }
@@ -651,21 +651,21 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getSessionscount()
+    public function getSessionscount(): int
     {
         return count($this->sessions);
     }
 
     /**
-     * @return mixed
+     * @return array
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getTrainers()
+    public function getTrainers(): array
     {
         $trainers = [];
         if ($this->sessions) {

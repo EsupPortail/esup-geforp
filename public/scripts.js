@@ -6707,7 +6707,7 @@ jQuery.fn.extend({
 		// Show any hidden elements after setting opacity to 0
 		return this.filter( isHidden ).css( "opacity", 0 ).show()
 
-			// Animate to the value specified
+            // Animate to the value specified
 			.end().animate({ opacity: to }, speed, easing, callback );
 	},
 	animate: function( prop, speed, easing, callback ) {
@@ -47865,7 +47865,7 @@ Makes editable any HTML element on the page. Applied as jQuery method.
             }      
             
             //show container
-            this.container.show(closeAll);
+            this.container.show();
         },
         
         /**
@@ -75965,7 +75965,7 @@ sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function($sc
                     items.push({
                         name: key,
                         label: ($scope.facets[name] && $scope.facets[name].values && $scope.facets[name].values[key]) || key,
-                        count: agg.buckets[i].doc_count
+                        count: response.agg.buckets[i].doc_count
                     });
                 }
                 return items;
@@ -75974,6 +75974,16 @@ sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function($sc
 
         return getFacetItemsTimeout;
     };
+
+.success(function(response) {
+        if (response && response.aggs) {
+            // Traiter response.aggs normalement
+        } else {
+            // Gérer le cas où aggs n'existe pas
+            console.log('Aucune donnée d'agrégation disponible');
+            return []; // ou une valeur par défaut appropriée
+        }
+    })
 
     /**
      * Add the facets

@@ -37,6 +37,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Doctrine\ORM\EntityManager;
+use App\Entity\Term\AbstractTerm;
 
 /**
  * Class TaxonomyController.

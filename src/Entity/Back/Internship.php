@@ -75,7 +75,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypes(): \Doctrine\Common\Collections\Collection
+    public function getPublictypes(): mixed
     {
         return $this->publictypes;
     }
@@ -123,7 +123,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypesrestrict(): \Doctrine\Common\Collections\Collection
+    public function getPublictypesrestrict(): mixed
     {
         return $this->publictypesrestrict;
     }
@@ -166,7 +166,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPrerequisites(): ?string
+    public function getPrerequisites(): mixed
     {
         return $this->prerequisites;
     }
@@ -179,7 +179,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getDesignatedpublic(): ?bool
+    public function getDesignatedpublic(): mixed
     {
         return $this->designatedpublic;
     }

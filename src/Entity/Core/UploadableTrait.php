@@ -69,7 +69,7 @@ trait UploadableTrait
     /**
      * @return File
      */
-    public function getFile()
+    public function getFile(): File
     {
         if ($this->filepath !== null) {
             $this->file = new File($this->getTemplatesRootDir() . '/' . $this->filepath);
@@ -81,7 +81,7 @@ trait UploadableTrait
     /**
      * @return string
      */
-    public function getFilepath()
+    public function getFilepath(): string
     {
         return $this->filepath;
     }
@@ -97,7 +97,7 @@ trait UploadableTrait
     /**
      * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
@@ -134,7 +134,7 @@ trait UploadableTrait
     /**
      * @return \DateTime
      */
-    public function getUploaded()
+    public function getUploaded(): \DateTime
     {
         return $this->uploaded;
     }
@@ -191,7 +191,7 @@ trait UploadableTrait
     /**
      * @return mixed
      */
-    public static function getMaxFileSize()
+    public static function getMaxFileSize(): mixed
     {
         return self::$maxFileSize;
     }

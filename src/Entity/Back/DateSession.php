@@ -11,6 +11,8 @@ namespace App\Entity\Back;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'date_session')]
@@ -58,24 +60,26 @@ class DateSession
      * @var Session
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      */
-    #[ORM\ManyToOne(targetEntity: 'Session', inversedBy: 'dates')]
+    #[Groups([ 'inscription', 'trainee', 'trainer', 'api'])]
+    #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'dates')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    protected $session;
+    #[MaxDepth(1)]
+    protected Session $session;
 
     public function __construct()
     {
-        $this->session = new ArrayCollection();
+        $this->session = new Session();
     }
 
     public function __clone()
     {
-        $this->session = new ArrayCollection();
+        $this->session = new Session();
     }
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -83,15 +87,15 @@ class DateSession
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDatebegin()
+    public function getDatebegin(): ?\DateTimeInterface
     {
         return $this->datebegin;
     }
@@ -102,9 +106,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDateend()
+    public function getDateend(): ?\DateTimeInterface
     {
         return $this->dateend;
     }
@@ -115,9 +119,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getHournumbermorn()
+    public function getHournumbermorn(): ?string
     {
         return $this->hournumbermorn;
     }
@@ -128,9 +132,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getSchedulemorn()
+    public function getSchedulemorn(): ?string
     {
         return $this->schedulemorn;
     }
@@ -141,9 +145,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getScheduleafter()
+    public function getScheduleafter(): ?string
     {
         return $this->scheduleafter;
     }
@@ -154,9 +158,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getHournumberafter()
+    public function getHournumberafter(): ?string
     {
         return $this->hournumberafter;
     }
@@ -167,9 +171,9 @@ class DateSession
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getPlace()
+    public function getPlace(): ?string
     {
         return $this->place;
     }
@@ -182,7 +186,7 @@ class DateSession
     /**
      * @return ArrayCollection
      */
-    public function getSession()
+    public function getSession(): Session|ArrayCollection
     {
         return $this->session;
     }

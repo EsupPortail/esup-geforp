@@ -68,18 +68,22 @@ abstract class AbstractInscriptionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        return $this->json($ret);
+        return $this->json($ret, 200, [], [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            }
+        ]);
     }
 
     #[Route(path: '/create/{session}', name: 'inscription.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[Groups(['Default', 'inscription'])]
     public function create(Request $request, AbstractSession $session, ManagerRegistry $managerRegistry, int $id): array
     {
-        $session = $managerRegistry->getRepository(AbstractSession::class, $id);
-        if (!$session) {
+        $sessions = $managerRegistry->getRepository(AbstractSession::class, $id);
+        if (!$sessions) {
             throw new NotFoundHttpException();
         }
-        if (!$this->isGranted('EDIT',$session->getTraining())) {
+        if (!$this->isGranted('EDIT', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
 
@@ -112,8 +116,8 @@ abstract class AbstractInscriptionController extends AbstractController
     #[IsGranted('VIEW', subject: 'inscription')]
     public function view(AbstractInscription $inscription, Request $request, ManagerRegistry $managerRegistry, int $id): array
     {
-        $inscription = $managerRegistry->getRepository(AbstractSession::class, $id);
-        if (!$inscription) {
+        $inscriptions = $managerRegistry->getRepository(AbstractSession::class, $id);
+        if (!$inscriptions) {
             throw new NotFoundHttpException();
         }
         if (!$this->isGranted('EDIT', $inscription)) {
@@ -169,7 +173,7 @@ abstract class AbstractInscriptionController extends AbstractController
         return $inscription;
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\InscriptionSearchRepository $inscriptionSearchRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\InscriptionSearchRepository $inscriptionSearchRepository): array
     {
         $tabAggs = [];
 

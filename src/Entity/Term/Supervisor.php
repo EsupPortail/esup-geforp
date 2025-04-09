@@ -46,7 +46,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getFirstName()
+    public function getFirstName(): string
     {
         return $this->firstName;
     }
@@ -62,7 +62,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getEmail()
+    public function getEmail(): string
     {
         return $this->email;
     }
@@ -78,7 +78,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getPhoneNumber()
+    public function getPhoneNumber(): string
     {
         return $this->phoneNumber;
     }
@@ -117,7 +117,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Responsable pédagogique';
     }

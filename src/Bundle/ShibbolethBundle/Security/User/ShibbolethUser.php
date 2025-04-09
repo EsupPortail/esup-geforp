@@ -3,12 +3,13 @@
 namespace App\Bundle\ShibbolethBundle\Security\User;
 
 use App\Entity\Core\User;
+use Stringable;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 
-final class ShibbolethUser implements UserInterface, EquatableInterface, \Stringable
+final class ShibbolethUser implements UserInterface, EquatableInterface, Stringable
 {
     public function __construct(private $username, private readonly array $credentials, private array $roles)
     {
@@ -22,7 +23,6 @@ final class ShibbolethUser implements UserInterface, EquatableInterface, \String
     public function getRoles(): array
     {
         $roles = $this->roles;
-dump($roles);
         // guarantees that a user always has at least one role for security
         $roles[] = 'ROLE_SHIB_AUTHENTICATED';
 

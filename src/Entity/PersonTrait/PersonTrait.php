@@ -4,6 +4,7 @@ namespace App\Entity\PersonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use App\EventListener\Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Trait PersonTrait.
@@ -12,8 +13,9 @@ trait PersonTrait
 {
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Term\Title")
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
+    #[Ignore]
     #[ORM\ManyToOne(targetEntity : 'App\Entity\Term\Title')]
     #[Groups(['Default', 'api'])]
     protected mixed $title;
@@ -21,7 +23,7 @@ trait PersonTrait
     /**
      * @var string
      * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
     #[ORM\Column(name: 'first_name', type: 'string', length: 50, nullable: true)]
     #[Groups(['Default', 'api'])]
@@ -30,7 +32,7 @@ trait PersonTrait
     /**
      * @var string
      * @ORM\Column(name="last_name", type="string", length=50)
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
     #[ORM\Column(name: 'last_name', type: 'string', length: 50)]
     #[Groups(['Default', 'api'])]
@@ -81,19 +83,13 @@ trait PersonTrait
         return $this->lastname;
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     * @Serializer\Groups({"Default", "api"})
-     */
+
     public function getFullname(): string
     {
         return $this->getFirstname().' '.$this->getLastname();
     }
 
-    /**
-     * @Serializer\VirtualProperty
-     * @Serializer\Groups({"Default", "api"})
-     */
+
     public function getReverseFullName(): string
     {
         return $this->getLastName().' '.$this->getFirstName();

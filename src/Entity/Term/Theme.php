@@ -24,7 +24,7 @@ class Theme extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Thématiques de formation';
     }

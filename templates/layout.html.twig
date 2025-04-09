@@ -26,7 +26,8 @@
                 </div>
 
                 <nav class="navbar-collapse collapse" id="bs-navbar" aria-expanded="false">
-                    {{ knp_menu_render('main', {'automenu': 'navbar'})  }}
+
+                    {{ knp_menu_render('main', {'automenu': 'navbar', 'attr': {'class': 'nav navbar-nav'}}) }}
 
                     <ul class="nav navbar-nav navbar-right">
                         {% if app.user %}

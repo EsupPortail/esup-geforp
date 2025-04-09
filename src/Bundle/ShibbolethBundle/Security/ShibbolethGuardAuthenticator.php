@@ -125,7 +125,7 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
     /**
      * @return JsonResponse
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): JsonResponse
     {
         return new JsonResponse(['message' => $authenticationException->getMessageKey()], Response::HTTP_FORBIDDEN);
     }
@@ -133,7 +133,7 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
     /**
      * @return null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token,string $firewallName): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token,string $firewallName): null
     {
         return null;
     }

@@ -16,22 +16,19 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class Publictype extends AbstractTerm implements VocabularyInterface
 {
 
-    #[ORM\Column(name: 'machine_name', type: 'string', length: 255)]
-    #[Groups(['Default', 'api'])]
-    protected string $machinename;
 
     /**
-     * @param string $machinename
+     * @param string $machineName
      */
-    public function setMachinename($machinename): void
+    public function setMachinename(string $machineName): void
     {
-        $this->machinename = $machinename;
+        $this->machinename = $machineName;
     }
 
     /**
      * @return string
      */
-    public function getMachinename()
+    public function getMachinename(): ?string
     {
         return $this->machinename;
     }

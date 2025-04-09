@@ -35,7 +35,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getLink()
+    public function getLink(): string
     {
         return $this->link;
     }
@@ -60,7 +60,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Onglet de menu';
     }

@@ -122,7 +122,7 @@ function SearchServiceFactory($http, $q) {
                 // query the server
                 $http({method: 'POST', url: url, data: query})
                     .success(function (response) {
-                        var agg = response.aggs[name];
+                        const agg = response.aggs[name];
                         if (agg[name]) {
                             // support filtered aggregation (see hack in SearchService)
                             // @todo better way ?

@@ -23,7 +23,7 @@ class Sessiontype extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Type de session';
     }

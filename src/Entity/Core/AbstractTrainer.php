@@ -48,13 +48,13 @@ abstract class AbstractTrainer implements SerializedAccessRights
      */
     #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
     #[ORM\JoinColumn]
-    protected $organization;
+    protected AbstractOrganization $organization;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractParticipation>
      * @Serializer\Exclude
      */
-    #[ORM\OneToMany(targetEntity: 'AbstractParticipation', mappedBy: 'trainer', cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
     protected \Doctrine\Common\Collections\Collection $participations;
 
     /**
@@ -109,7 +109,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -117,7 +117,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): AbstractOrganization
     {
         return $this->organization;
     }
@@ -133,7 +133,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return ArrayCollection
      */
-    public function getParticipations()
+    public function getParticipations(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->participations;
     }
@@ -141,7 +141,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param ArrayCollection $participations
      */
-    public function setParticipations($participations): void
+    public function setParticipations(ArrayCollection $participations): void
     {
         $this->participations = $participations;
     }
@@ -152,7 +152,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
      *
      * @return ArrayCollection
      */
-    public function getSessions()
+    public function getSessions(): ArrayCollection
     {
         $sessions = new ArrayCollection();
         foreach ($this->participations as $participation) {
@@ -165,7 +165,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return Trainertype
      */
-    public function getTrainertype()
+    public function getTrainertype(): ?Trainertype
     {
         return $this->trainertype;
     }
@@ -173,7 +173,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param Trainertype $trainerType
      */
-    public function setTrainertype($trainerType): void
+    public function setTrainertype(Trainertype $trainerType): void
     {
         $this->trainertype = $trainerType;
     }
@@ -181,7 +181,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isIsarchived()
+    public function isIsarchived(): ?bool
     {
         return $this->isarchived;
     }
@@ -189,7 +189,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isArchived
      */
-    public function setIsarchived($isArchived): void
+    public function setIsarchived(bool $isArchived): void
     {
         $this->isarchived = $isArchived;
     }
@@ -197,7 +197,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isIsallowsendmail()
+    public function isIsallowsendmail(): ?bool
     {
         return $this->isallowsendmail;
     }
@@ -205,7 +205,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isAllowSendMail
      */
-    public function setIsallowsendmail($isAllowSendMail): void
+    public function setIsallowsendmail(bool $isAllowSendMail): void
     {
         $this->isallowsendmail = $isAllowSendMail;
     }
@@ -213,7 +213,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function getIsorganization()
+    public function getIsorganization(): ?bool
     {
         return $this->isorganization;
     }
@@ -221,7 +221,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isOrganization
      */
-    public function setIsorganization($isOrganization): void
+    public function setIsorganization(bool $isOrganization): void
     {
         $this->isorganization = $isOrganization;
     }
@@ -229,7 +229,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isIspublic()
+    public function isIspublic(): ?bool
     {
         return $this->ispublic;
     }
@@ -237,7 +237,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param bool $isPublic
      */
-    public function setIspublic($isPublic): void
+    public function setIspublic(bool $isPublic): void
     {
         $this->ispublic = $isPublic;
     }
@@ -245,7 +245,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return string
      */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }
@@ -253,7 +253,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @param string $comments
      */
-    public function setComments($comments): void
+    public function setComments(string $comments): void
     {
         $this->comments = $comments;
     }
@@ -261,7 +261,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return mixed
      */
-    public static function getFormType()
+    public static function getFormType(): mixed
     {
         return AbstractTrainerType::class;
     }
@@ -283,7 +283,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'trainer';
     }

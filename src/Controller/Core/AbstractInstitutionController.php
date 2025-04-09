@@ -8,6 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use http\Env\Response;
 use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -21,6 +22,7 @@ use App\Form\Type\InstitutionType;
 use App\Form\Type\BaseInstitutionType;
 use App\Entity\Back\Organization;
 use App\Repository\InstitutionRepository;
+use Symfony\Component\Serializer\SerializerInterface;
 
 
 #[Route(path: '/institution')]
@@ -32,12 +34,12 @@ abstract class AbstractInstitutionController extends AbstractController
     #[Route(path: '/search', name: 'institution.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): JsonResponse
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters', 'NO FILTERS');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all( 'aggs','NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters') ?: [];
+        $query_filters = $request->request->all('query_filters')?: [];
+        $aggs = $request->request->all( 'aggs')?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
 
         // Recherche avec les filtres
         $ret = $institutionRepository->getInstitutionsList($keywords, $filters, $page, $size);
@@ -51,7 +53,7 @@ abstract class AbstractInstitutionController extends AbstractController
 
     #[Groups(['Default', 'institution'])]
     #[Route(path: '/create', name: 'institution.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry): array
+    public function create(Request $request, ManagerRegistry $managerRegistry, SerializerInterface $serializer): JsonResponse
     {
         /** @var AbstractInstitution $institution */
         $institution = new $this->institutionClass();
@@ -72,8 +74,8 @@ abstract class AbstractInstitutionController extends AbstractController
                 $objectManager->flush();
             }
         }
-
-        return ['institution' => $institution, 'form' => $form->createView()];
+        $data = $serializer->serialize($institution, 'json', ['groups' => 'institution']);
+        return new JsonResponse([$data, 200 ]);
     }
 
     #[Route(path: '/{id}/view', name: 'institution.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]

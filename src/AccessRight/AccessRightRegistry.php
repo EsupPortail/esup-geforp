@@ -305,7 +305,7 @@ final class AccessRightRegistry
      *
      * @return int|string
      */
-    public function getByName($accessRightName): array|int
+    public function getByName($accessRightName): int|string
     {
         $id = array_search($accessRightName, self::RIGHT_NAMES, true);
         if ($id === false) {

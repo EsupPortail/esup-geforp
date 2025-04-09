@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Form\Type\InscriptionType;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Table(name: 'inscription')]
 #[ORM\Entity]
@@ -19,6 +21,7 @@ class Inscription extends AbstractInscription implements \Stringable
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'motivation', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $motivation = null;
 
@@ -26,34 +29,30 @@ class Inscription extends AbstractInscription implements \Stringable
      * @var Collection<\App\Entity\Back\EvaluationNotedCriterion>
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    #[ORM\OneToMany(targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, mappedBy: 'inscription', cascade: ['persist', 'merge', 'remove'])]
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, cascade: ['persist', 'merge', 'remove'])]
     protected Collection $criteria;
 
     /**
      * @Serializer\Groups({"Default", "inscription", "api.attendance"})
      */
+    #[Groups(['Default', 'inscription', 'api.attendance'])]
     #[ORM\Column(name: 'message', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $message = null;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Actiontype::class)]
     #[ORM\JoinColumn]
     protected ?\App\Entity\Term\Actiontype $actiontype = null;
 
-    public function checkAndLoadActionType($entityManager): void
-    {
-        $actionType = $this->getActiontype();
-        if ($actionType !== null) {
-            $entityManager->initialiszeObject($actionType);
-            dump ($actionType);
-        }
-    }
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'refuse', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $refuse = null;
 
@@ -61,13 +60,15 @@ class Inscription extends AbstractInscription implements \Stringable
      * @var Collection<Presence> $presences
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Presence::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
-    protected Collection $presences;
+    protected Collection|ArrayCollection $presences;
 
     /**
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
     #[ORM\Column(name: 'dif', type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
     protected ?bool $dif = null;
 
@@ -85,15 +86,17 @@ class Inscription extends AbstractInscription implements \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api"})
      */
-    public function getPrice()
+    #[Serializer\VirtualProperty]
+    #[Groups(['api'])]
+    public function getPrice(): float|int|null
     {
         return $this->isPaying ? $this->getSession()->getPrice() : 0;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMotivation()
+    public function getMotivation(): ?string
     {
         return $this->motivation;
     }
@@ -104,9 +107,9 @@ class Inscription extends AbstractInscription implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getRefuse()
+    public function getRefuse(): ?string
     {
         return $this->refuse;
     }
@@ -114,15 +117,25 @@ class Inscription extends AbstractInscription implements \Stringable
     /**
      * @param mixed refuse
      */
+
+    public function checkAndLoadActionType($entityManager): void
+    {
+        $actionType = $this->getActiontype();
+        if ($actionType !== null) {
+            $entityManager->initialiszeObject($actionType);
+            dump ($actionType);
+        }
+    }
+
     public function setRefuse($refuse): void
     {
         $this->refuse = $refuse;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getCriteria()
+    public function getCriteria(): ArrayCollection|Collection
     {
         return $this->criteria;
     }
@@ -133,9 +146,9 @@ class Inscription extends AbstractInscription implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMessage()
+    public function getMessage(): ?string
     {
         return $this->message;
     }
@@ -146,10 +159,10 @@ class Inscription extends AbstractInscription implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return \App\Entity\Term\Actiontype|null
      */
 
-    public function getActiontype()
+    public function getActiontype(): ?\App\Entity\Term\Actiontype
     {
         return $this->actiontype;
     }
@@ -160,9 +173,9 @@ class Inscription extends AbstractInscription implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getPresences()
+    public function getPresences(): ArrayCollection|Collection
     {
         return $this->presences;
     }
@@ -176,9 +189,9 @@ class Inscription extends AbstractInscription implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getDif()
+    public function getDif(): ?bool
     {
         return $this->dif;
     }

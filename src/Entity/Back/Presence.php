@@ -9,8 +9,13 @@
 namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'presence')]
@@ -20,7 +25,7 @@ class Presence
     /**
      * @var \Doctrine\Common\Collections\ArrayCollection
      */
-    public $session;
+    public ArrayCollection $session;
     /**
      *
      * @Serializer\Groups({"Default", "api"})
@@ -46,9 +51,11 @@ class Presence
     /**
      * @Serializer\Groups({"session", "trainee", "trainer", "api"})
      */
+    #[Groups(['session', 'trainee', 'trainer', 'api'])]
     #[ORM\ManyToOne(targetEntity: 'Inscription', inversedBy: 'presences')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    protected $inscription;
+    #[Ignore]
+    protected Inscription $inscription;
 
     public function __construct()
     {
@@ -63,7 +70,7 @@ class Presence
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -71,15 +78,15 @@ class Presence
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDatebegin()
+    public function getDatebegin(): ?\DateTimeInterface
     {
         return $this->datebegin;
     }
@@ -90,9 +97,9 @@ class Presence
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMorning()
+    public function getMorning(): ?string
     {
         return $this->morning;
     }
@@ -103,9 +110,9 @@ class Presence
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getAfternoon()
+    public function getAfternoon(): ?string
     {
         return $this->afternoon;
     }
@@ -116,11 +123,12 @@ class Presence
     }
 
     /**
-     * @return ArrayCollection
+     * @return Inscription
      */
-    public function getInscription()
+
+    public function getInscriptionId(): int
     {
-        return $this->inscription;
+        return $this->inscription->getId();
     }
 
     public function setInscription(mixed $inscription): void

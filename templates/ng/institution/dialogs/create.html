@@ -10,11 +10,11 @@
         <div ng-repeat="key in ['organization', 'name', 'zip', 'city']">
             <div class="form-group" ng-if="form.children[key]"
                  ng-class="{'has-error': form.children[key].errors.length }">
-                <label class="col-sm-3 control-label" for="{{ form.children[key].id }}">{{ form.children[key].label
+                <label class="col-sm-3 control-label">{{ form.children[key].label
                     }}</label>
                 <div class="col-sm-9">
-                    <span sf-form-widget="form.children[key]" class="form-control"/>
-                    <div ng-if="error.length" ng-repeat="error in form.children[key].errors" class="help-block">{{ error
+                    <span sf-form-widget="form.children[key]" class="form-control"></span>
+                    <div ng-if="form.children[key].errors.length" ng-repeat="error in form.children[key].errors" class="help-block">{{ error
                         }}
                     </div>
                 </div>

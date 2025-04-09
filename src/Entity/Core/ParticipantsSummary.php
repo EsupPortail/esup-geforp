@@ -37,7 +37,7 @@ class ParticipantsSummary
     /**
      * @return mixed
      */
-    public function getCount()
+    public function getCount(): mixed
     {
         return $this->count;
     }
@@ -50,7 +50,7 @@ class ParticipantsSummary
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
@@ -66,7 +66,7 @@ class ParticipantsSummary
     /**
      * @return Publictype
      */
-    public function getPublictype()
+    public function getPublictype(): Publictype
     {
         return $this->publictype;
     }

@@ -25,7 +25,7 @@ interface VocabularyInterface
     /**
      * @return bool
      */
-    public static function getVocabularyStatus();
+    public static function getVocabularyStatus(): int;
 
     /**
      * @return mixed

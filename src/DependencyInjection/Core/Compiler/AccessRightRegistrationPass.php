@@ -20,7 +20,7 @@ class AccessRightRegistrationPass implements CompilerPassInterface
      * Process the compiler pass.
      *
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         if (!$container->hasDefinition('sygefor_core.access_right_registry')) {
             return;

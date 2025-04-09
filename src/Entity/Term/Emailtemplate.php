@@ -55,7 +55,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return ArrayCollection
      */
-    public function getAttachmentTemplates()
+    public function getAttachmentTemplates(): ArrayCollection
     {
         return $this->attachmentTemplates;
     }
@@ -68,7 +68,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }
@@ -84,7 +84,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getSubject()
+    public function getSubject(): mixed
     {
         return $this->subject;
     }
@@ -92,7 +92,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return array
      */
-    public function getCc()
+    public function getCc(): array
     {
         return $this->cc;
     }
@@ -116,7 +116,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return Inscriptionstatus
      */
-    public function getInscriptionstatus()
+    public function getInscriptionstatus(): Inscriptionstatus
     {
         return $this->inscriptionstatus;
     }
@@ -132,7 +132,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return Presencestatus
      */
-    public function getPresencestatus()
+    public function getPresencestatus(): Presencestatus
     {
         return $this->presencestatus;
     }
@@ -140,7 +140,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Modèles d\'emails';
     }

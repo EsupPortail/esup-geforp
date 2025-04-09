@@ -74,7 +74,7 @@ class DynamicMappingPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function extendTypeConfig($fields, $typeConfigs)
+    private function extendTypeConfig($fields, $typeConfigs): array
     {
         $includedFields = [];
         foreach ($fields as $field => $config) {
@@ -103,7 +103,7 @@ class DynamicMappingPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function extractMapping($path, $typeConfigs, array $exclude = [])
+    private function extractMapping($path, $typeConfigs, array $exclude = []): array
     {
         $parts = explode('.', (string) $path);
         $fields = $typeConfigs;

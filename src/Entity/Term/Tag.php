@@ -19,7 +19,7 @@ class Tag extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return "Tags";
     }
@@ -32,7 +32,7 @@ class Tag extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public static function orderBy(): string
+    public static function orderBy(): mixed
     {
         return 'name';
     }

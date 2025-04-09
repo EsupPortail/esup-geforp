@@ -893,7 +893,7 @@ class ProgramController extends AbstractController
      * @param $trainee
      * @return bool
      */
-    protected function isMultiEtab($trainee)
+    protected function isMultiEtab($trainee): bool
     {
         $multiEtab = false;
         // Récupération des établissements liés

@@ -118,7 +118,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
     /**
      * @return JsonResponse
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): Response
+    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): JsonResponse
     {
 //        return new JsonResponse(array('message' => $exception->getMessageKey()), Response::HTTP_FORBIDDEN);
         return new JsonResponse(['message' => "Vous n'avez pas les droits pour accéder à cette application"], Response::HTTP_FORBIDDEN);
@@ -128,7 +128,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
      * @param string $providerKey
      * @return null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): null
     {
         return null;
     }

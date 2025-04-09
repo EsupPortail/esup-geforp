@@ -16,7 +16,7 @@ final class VocabularyRegistrationPass implements CompilerPassInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function process(ContainerBuilder $containerBuilder)
+    public function process(ContainerBuilder $containerBuilder): void
     {
         if (!$containerBuilder->hasDefinition('sygefor_core.vocabulary_registry')) {
             return;

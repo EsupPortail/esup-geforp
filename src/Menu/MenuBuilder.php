@@ -56,7 +56,11 @@ final readonly class MenuBuilder
      */
     public function createMainMenu(array $options): ItemInterface
     {
-        $menu = $this->menuFactory->createItem('root');
+        $menu = $this->menuFactory->createItem('root', array(
+            'childrenAttributes' => array(
+                'class' => 'nav navbar-nav',
+            )
+        ));
 
         // Menu administration et sous menus
         $adminMenu = $menu->addChild('administration', ['label' => 'Administration', 'icon' => 'gear', 'uri' => $this->router->generate('core.index')]);
@@ -81,7 +85,7 @@ final readonly class MenuBuilder
 
         try {
             if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Internship::class)) {
-                $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training']);
+                $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training', 'attributes' => ['class' => 'dropdown-toggle']]);
 
                 $item->addChild('internships', ['label' => 'Stages', 'uri'   => $this->router->generate('core.index') . '#/training?type=internship']);
 

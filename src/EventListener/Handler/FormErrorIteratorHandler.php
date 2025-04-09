@@ -23,7 +23,7 @@ final class FormErrorIteratorHandler implements SubscribingHandlerInterface
      *
      * @return mixed
      */
-    public function serializeToJson(JsonSerializationVisitor $jsonSerializationVisitor, FormErrorIterator $formErrorIterator, array $type, SerializationContext $serializationContext)
+    public function serializeToJson(JsonSerializationVisitor $jsonSerializationVisitor, FormErrorIterator $formErrorIterator, array $type, SerializationContext $serializationContext): mixed
     {
         return $serializationContext->getNavigator()->accept($this->getErrors($formErrorIterator->getForm()), ['name' => 'array'], $serializationContext);
     }

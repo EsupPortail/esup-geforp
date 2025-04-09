@@ -72,7 +72,7 @@ class Email
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -80,7 +80,7 @@ class Email
     /**
      * @return User
      */
-    public function getUserfrom()
+    public function getUserfrom(): User
     {
         return $this->userfrom;
     }
@@ -96,7 +96,7 @@ class Email
     /**
      * @return string
      */
-    public function getEmailfrom()
+    public function getEmailfrom(): string
     {
         return $this->emailfrom;
     }
@@ -112,7 +112,7 @@ class Email
     /**
      * @return AbstractTrainee
      */
-    public function getTrainee()
+    public function getTrainee(): AbstractTrainee
     {
         return $this->trainee;
     }
@@ -128,7 +128,7 @@ class Email
     /**
      * @return AbstractTrainer
      */
-    public function getTrainer()
+    public function getTrainer(): AbstractTrainer
     {
         return $this->trainer;
     }
@@ -144,7 +144,7 @@ class Email
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
@@ -160,7 +160,7 @@ class Email
     /**
      * @return string
      */
-    public function getSendat()
+    public function getSendat(): string
     {
         return $this->sendat;
     }
@@ -176,7 +176,7 @@ class Email
     /**
      * @return string
      */
-    public function getSubject()
+    public function getSubject(): string
     {
         return $this->subject;
     }
@@ -218,7 +218,7 @@ class Email
     /**
      * @return string
      */
-    public function getBody()
+    public function getBody(): string
     {
         return $this->body;
     }

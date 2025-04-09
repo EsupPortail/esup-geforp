@@ -47,14 +47,14 @@ abstract class AbstractTraineeController extends AbstractController
     {
         $tabFilters = [];
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all('aggs', 'NO AGGS');
-        $query = $request->request->get('query', 'NO QUERY');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
+        $filters = $request->request->all('filters')  ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?: [];
+        $query = $request->request->get('query' ) ?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
         $sorts = $request->request->all('sorts', 'NO SORTS');
-        $fields = $request->request->get('fields', 'NO FIELDS');
+        $fields = $request->request->all('fields', 'NO FIELDS');
 
         // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17
         if(!$accessRightRegistry->hasAccessRight(17)) {
@@ -117,7 +117,7 @@ abstract class AbstractTraineeController extends AbstractController
 
         // Recherche avec query (pour autocompletion)
         // on transforme le champ 'query' en 'keywords'
-        if (isset($query) && isset($query['match']['fullname.autocomplete']['query'])) {
+        if (isset($query['match']['fullname.autocomplete']['query'])) {
             $keywords = $query['match']['fullname.autocomplete']['query'];
             $ret = $traineeSearchRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
         }
@@ -130,7 +130,7 @@ abstract class AbstractTraineeController extends AbstractController
 
     #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create', name: 'trainee.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry)
+    public function create(Request $request, ManagerRegistry $managerRegistry): array
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
@@ -162,7 +162,7 @@ abstract class AbstractTraineeController extends AbstractController
     }
 
 
-    #[Route(path: '/{id}/view', requirements: ['id' => '\d+'], name: 'trainee.view', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[Route(path: '/{id}/view', name: 'trainee.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('VIEW', subject: 'trainee')]
     #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
     public function view(Request $request,  ManagerRegistry $managerRegistry, AbstractTrainee $trainee, int $id): array
@@ -231,7 +231,7 @@ abstract class AbstractTraineeController extends AbstractController
         return [];
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TraineeSearchRepository $traineeSearchRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TraineeSearchRepository $traineeSearchRepository): array
     {
         $tabAggs = [];
 

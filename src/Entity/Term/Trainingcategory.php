@@ -27,7 +27,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getTrainingType()
+    public function getTrainingType(): string
     {
         return $this->trainingType;
     }
@@ -43,7 +43,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Catégorie de formation';
     }

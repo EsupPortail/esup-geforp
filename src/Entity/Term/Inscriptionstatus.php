@@ -12,6 +12,7 @@ namespace App\Entity\Term;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\InscriptionStatusVocabularyType;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Statut de l'inscription.
@@ -24,34 +25,34 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @var int
      */
-    final public const STATUS_PENDING = 0;
+    final public const int STATUS_PENDING = 0;
 
     /**
      * @var int
      */
-    final public const STATUS_WAITING = 1;
+    final public const int STATUS_WAITING = 1;
 
     /**
      * @var int
      */
-    final public const STATUS_ACCEPTED = 2;
+    final public const int STATUS_ACCEPTED = 2;
 
     /**
      * @var int
      */
-    final public const STATUS_REJECTED = 3;
+    final public const int STATUS_REJECTED = 3;
 
     /**
      * @var int
      */
-    final public const STATUS_CONVOKED = 4;
+    final public const int STATUS_CONVOKED = 4;
 
     /**
      * This term is required during term replacement.
      *
      * @var bool
      */
-    public static $replacementRequired = true;
+    public static bool $replacementRequired = true;
 
     /**
      * @Serializer\Groups({"Default", "api"})
@@ -62,13 +63,14 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'notify', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
-    protected ?bool $notify = false;
+    protected bool $notify = false;
 
     /**
      * @param int $status
      */
-    public function setStatus($status): void
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -76,7 +78,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }
@@ -84,7 +86,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @return int
      */
-    public function getNotify()
+    public function getNotify(): bool|int|null
     {
         return $this->notify;
     }
@@ -92,7 +94,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @param int $notify
      */
-    public function setNotify($notify): void
+    public function setNotify(int $notify): void
     {
         $this->notify = $notify;
     }

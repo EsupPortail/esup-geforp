@@ -23,7 +23,7 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): string
+    public function getVocabularyName(): mixed
     {
         return 'Fichiers images';
     }
@@ -59,7 +59,7 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public static function orderBy(): string
+    public static function orderBy(): mixed
     {
         return 'name';
     }

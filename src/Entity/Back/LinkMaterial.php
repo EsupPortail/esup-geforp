@@ -26,7 +26,7 @@ class LinkMaterial extends Material
     /**
      * @return mixed
      */
-    public function getUrl()
+    public function getUrl(): mixed
     {
         return $this->url;
     }

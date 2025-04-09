@@ -88,9 +88,9 @@ abstract class AbstractOrganization implements \Stringable
      * Copy coordinates from another entity.
      *
      * @param CoordinatesTrait $entity
-     * @param bool             $force  override existing data
+     * @param bool $force  override existing data
      */
-    public function copyCoordinates($entity, $force = true): void
+    public function copyCoordinates(CoordinatesTrait $entity, bool $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();
         foreach (['addresstype', 'address', 'zip', 'city', 'email', 'phonenumber', 'faxnumber', 'website'] as $property) {
@@ -113,7 +113,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return boolean
      */
-    public function getAddresstype()
+    public function getAddresstype(): bool|int|null
     {
         return $this->addresstype;
     }
@@ -121,7 +121,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $address
      */
-    public function setAddress($address): void
+    public function setAddress(string $address): void
     {
         $this->address = $address;
     }
@@ -129,7 +129,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getAddress()
+    public function getAddress(): ?string
     {
         return $this->address;
     }
@@ -137,7 +137,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $zip
      */
-    public function setZip($zip): void
+    public function setZip(string $zip): void
     {
         $this->zip = $zip;
     }
@@ -145,7 +145,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getZip()
+    public function getZip(): ?string
     {
         return $this->zip;
     }
@@ -153,7 +153,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $city
      */
-    public function setCity($city): void
+    public function setCity(string $city): void
     {
         $this->city = $city;
     }
@@ -161,15 +161,15 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getCity()
+    public function getCity(): ?string
     {
         return $this->city;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getEmail()
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -182,7 +182,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $phoneNumber
      */
-    public function setPhonenumber($phoneNumber): void
+    public function setPhonenumber(string $phoneNumber): void
     {
         $this->phonenumber = $phoneNumber;
     }
@@ -190,7 +190,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getPhonenumber()
+    public function getPhonenumber(): ?string
     {
         return $this->phonenumber;
     }
@@ -198,7 +198,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getFaxnumber()
+    public function getFaxnumber(): ?string
     {
         return $this->faxnumber;
     }
@@ -206,7 +206,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $faxNumber
      */
-    public function setFaxnumber($faxNumber): void
+    public function setFaxnumber(string $faxNumber): void
     {
         $this->faxnumber = $faxNumber;
     }
@@ -214,7 +214,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $website
      */
-    public function setWebsite($website): void
+    public function setWebsite(string $website): void
     {
         $this->website = $website;
     }
@@ -222,7 +222,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getWebsite()
+    public function getWebsite(): ?string
     {
         return $this->website;
     }
@@ -232,7 +232,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @return string
      */
-    public function getFullAddress()
+    public function getFullAddress(): string
     {
         $lines = [];
         if ($this->address !== '' && $this->getAddress() !== '0') {
@@ -272,8 +272,8 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @Serializer\Exclude
      */
-    #[ORM\OneToMany(targetEntity: 'User', mappedBy: 'organization', cascade: ['persist', 'merge'])]
-    private \Doctrine\Common\Collections\Collection $users;
+    #[ORM\OneToMany(mappedBy: 'organization', targetEntity: 'User', cascade: ['persist', 'merge'])]
+    private Collection $users;
 
     /**
      * @Serializer\Groups({"api"})
@@ -321,7 +321,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param string $code
      */
-    public function setCode($code): void
+    public function setCode(string $code): void
     {
         $this->code = $code;
     }
@@ -329,7 +329,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getCode()
+    public function getCode(): ?string
     {
         return $this->code;
     }
@@ -342,7 +342,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -355,7 +355,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getUsers(): ArrayCollection
+    public function getUsers(): Collection
     {
         return $this->users;
     }
@@ -363,7 +363,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return bool
      */
-    public function getTraineeRegistrable()
+    public function getTraineeRegistrable(): ?bool
     {
         return $this->traineeRegistrable;
     }
@@ -371,12 +371,12 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param bool $traineeRegistrable
      */
-    public function setTraineeRegistrable($traineeRegistrable): void
+    public function setTraineeRegistrable(bool $traineeRegistrable): void
     {
         $this->traineeRegistrable = $traineeRegistrable;
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return AbstractOrganizationType::class;
     }
@@ -384,7 +384,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'trainer';
     }
@@ -392,7 +392,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @return AbstractInstitution
      */
-    public function getInstitution()
+    public function getInstitution(): ?AbstractInstitution
     {
         return $this->institution;
     }
@@ -400,7 +400,7 @@ abstract class AbstractOrganization implements \Stringable
     /**
      * @param AbstractInstitution $institution
      */
-    public function setInstitution($institution): void
+    public function setInstitution(AbstractInstitution $institution): void
     {
         $this->institution = $institution;
     }

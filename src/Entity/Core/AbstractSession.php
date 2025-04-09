@@ -15,6 +15,8 @@ use App\Entity\Core\AbstractInscription;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Core\ParticipantsSummary;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -28,7 +30,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
 #[ORM\HasLifecycleCallbacks]
-abstract class AbstractSession implements SerializedAccessRights, \Stringable
+abstract class AbstractSession implements SerializedAccessRights
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
@@ -37,38 +39,38 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @var int
      */
-    final public const REGISTRATION_DEACTIVATED = 0;
+    final public const int REGISTRATION_DEACTIVATED = 0;
 
     /**
      * @var int
      */
-    final public const REGISTRATION_CLOSED = 1;
+    final public const int REGISTRATION_CLOSED = 1;
 
     /**
      * @var int
      */
-    final public const REGISTRATION_PRIVATE = 2;
+    final public const int REGISTRATION_PRIVATE = 2;
 
     /**
      * @var int
      */
-    final public const REGISTRATION_PUBLIC = 3;
+    final public const int REGISTRATION_PUBLIC = 3;
 
     // registration states
     /**
      * @var int
      */
-    final public const STATUS_OPEN = 0;
+    final public const int STATUS_OPEN = 0;
 
     /**
      * @var int
      */
-    final public const STATUS_REPORTED = 1;
+    final public const int STATUS_REPORTED = 1;
 
     /**
      * @var int
      */
-    final public const STATUS_CANCELED = 2;
+    final public const int STATUS_CANCELED = 2;
 
     /**
      *
@@ -76,21 +78,24 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      */
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
-    #[ORM\GeneratedValue]
+    #[ORM\GeneratedValue(strategy: 'AUTO')]
+    #[Groups(['Default', 'api'])]
     protected ?int $id = null;
 
     /**
      * @var AbstractTraining
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      */
+    #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
     #[ORM\ManyToOne(targetEntity: 'AbstractTraining', inversedBy: 'sessions')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    protected $training;
+    protected AbstractTraining $training;
 
     /**
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
-     * @var Collection<\App\Entity\Core\AbstractParticipation>
+     * @var Collection<AbstractParticipation>
      */
+    #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
     protected Collection $participations;
 
@@ -98,13 +103,14 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\AbstractInscription>
      */
-    #[ORM\OneToMany(targetEntity: 'AbstractInscription', mappedBy: 'session', fetch: 'EXTRA_LAZY', cascade: ['remove'])]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractInscription', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdat' => 'DESC'])]
     protected Collection $inscriptions;
 
     /**
      * @Serializer\Groups({"Default", "session", "api"})
      */
+    #[Groups(['Default', 'session', 'api'])]
     #[ORM\Column(name: 'promote', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
     protected ?bool $promote = false;
 
@@ -112,6 +118,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"Default", "session", "api"})
      */
+    #[Groups(['Default', 'session', 'api'])]
     #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
     protected ?\DateTimeInterface $datebegin = null;
@@ -120,6 +127,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"Default", "session", "api"})
      */
+    #[Groups(['Default', 'session', 'api'])]
     #[ORM\Column(name: 'dateEnd', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $dateend = null;
 
@@ -129,6 +137,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      */
+    #[Groups(['session', 'training', 'inscription', 'api'])]
     #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $status = self::STATUS_OPEN;
 
@@ -136,18 +145,21 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"Default", "session", "api"})
      */
+    #[Groups(['Default', 'session', 'api'])]
     #[ORM\Column(name: 'displayOnline', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
     protected ?bool $displayonline = false;
 
     /**
      * @Serializer\Exclude
      */
+    #[Ignore]
     #[ORM\Column(name: 'numberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
     protected ?int $numberofregistrations = null;
 
     /**
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      */
+    #[Groups(['session', 'training', 'inscription', 'api'])]
     #[ORM\Column(name: 'maximumNumberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[Assert\NotBlank]
     protected ?int $maximumnumberofregistrations = 20;
@@ -155,6 +167,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"session", "training", "api"})
      */
+    #[Groups(['session', 'training', 'api'])]
     #[ORM\Column(name: 'limitRegistrationDate', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     protected ?\DateTimeInterface $limitregistrationdate = null;
 
@@ -162,12 +175,14 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"session"})
      */
+    #[Groups(['session'])]
     #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $comments = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Sessiontype::class)]
     #[ORM\JoinColumn(name: 'sessionType_id', onDelete: 'SET NULL')]
     protected ?\App\Entity\Term\Sessiontype $sessiontype = null;
@@ -175,6 +190,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'hourNumber', type: \Doctrine\DBAL\Types\Types::FLOAT)]
     #[Assert\GreaterThan(value: 0, message: "Vous devez renseigner un nombre d'heures")]
     #[Assert\NotNull(message: "Vous devez renseigner un nombre d'heures")]
@@ -183,6 +199,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'dayNumber', type: \Doctrine\DBAL\Types\Types::FLOAT)]
     #[Assert\GreaterThan(value: 0, message: 'Vous devez renseigner un nombre de jours')]
     #[Assert\NotNull(message: 'Vous devez renseigner un nombre de jours')]
@@ -191,12 +208,14 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'schedule', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $schedule = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'place', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $place = null;
 
@@ -221,7 +240,8 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @var ArrayCollection
      * @Serializer\Groups({"api.attendance"})
      */
-    protected $allMaterials;
+    #[Groups(['api.attendance'])]
+    protected ArrayCollection $allMaterials;
 
 
     public function __construct()
@@ -244,7 +264,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -252,7 +272,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -260,7 +280,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return AbstractTraining
      */
-    public function getTraining()
+    public function getTraining(): AbstractTraining
     {
         return $this->training;
     }
@@ -268,15 +288,15 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param AbstractTraining $training
      */
-    public function setTraining($training): void
+    public function setTraining(AbstractTraining $training): void
     {
         $this->training = $training;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getParticipations()
+    public function getParticipations(): ArrayCollection|Collection
     {
         return $this->participations;
     }
@@ -291,7 +311,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function addParticipation($participation)
+    public function addParticipation(AbstractParticipation $participation): bool
     {
         if (!$this->participations->contains($participation)) {
             $this->participations->add($participation);
@@ -307,7 +327,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function removeParticipation($participation)
+    public function removeParticipation(AbstractParticipation $participation): bool
     {
         if ($this->participations->contains($participation)) {
             $this->participations->removeElement($participation);
@@ -323,7 +343,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return string
      */
-    public function getTrainersListString()
+    public function getTrainersListString(): string
     {
         if (!$this->participations) {
             return '';
@@ -344,7 +364,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return ArrayCollection
      */
-    public function getTrainers()
+    public function getTrainers(): ArrayCollection
     {
         $trainers = new ArrayCollection();
         /** @var AbstractParticipation $participation */
@@ -356,9 +376,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getInscriptions()
+    public function getInscriptions(): ArrayCollection|Collection
     {
         return $this->inscriptions;
     }
@@ -373,7 +393,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function addInscription($inscription)
+    public function addInscription(\App\Entity\Core\AbstractInscription $inscription): bool
     {
         if (!$this->inscriptions->contains($inscription)) {
             $this->inscriptions->add($inscription);
@@ -389,7 +409,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function removeInscription($inscription)
+    public function removeInscription(\App\Entity\Core\AbstractInscription $inscription): bool
     {
         if ($this->inscriptions->contains($inscription)) {
             $this->inscriptions->removeElement($inscription);
@@ -401,9 +421,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getPromote()
+    public function getPromote(): ?bool
     {
         return $this->promote;
     }
@@ -414,9 +434,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getRegistration()
+    public function getRegistration(): ?int
     {
         return $this->registration;
     }
@@ -429,15 +449,15 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return bool
      */
-    public function isDisplayonline()
+    public function isDisplayonline(): ?bool
     {
         return $this->displayonline;
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getDisplayonline()
+    public function getDisplayonline(): ?bool
     {
         return $this->displayonline;
     }
@@ -445,15 +465,15 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param bool $displayOnline
      */
-    public function setDisplayonline($displayOnline): void
+    public function setDisplayonline(bool $displayOnline): void
     {
         $this->displayonline = $displayOnline;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDatebegin()
+    public function getDatebegin(): ?\DateTimeInterface
     {
         return $this->datebegin;
     }
@@ -462,16 +482,16 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @return int
      * @Serializer\VirtualProperty
      */
-    public function getYear()
+    public function getYear(): ?int
     {
-        return $this->datebegin ? $this->datebegin->format('Y') : null;
+        return $this->datebegin?->format('Y');
     }
 
     /**
      * @return int
      * @Serializer\VirtualProperty
      */
-    public function getSemester()
+    public function getSemester(): ?int
     {
         return $this->datebegin ? ceil($this->datebegin->format('m') / 6) : null;
     }
@@ -481,7 +501,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups("api")
      */
-    public function getSemesterLabel()
+    public function getSemesterLabel(): int|string
     {
         return $this->getYear().' - '.($this->getSemester() < 2 ? '1er' : '2nd').' semestre ';
     }
@@ -492,9 +512,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDateend()
+    public function getDateend(): ?\DateTimeInterface
     {
         return $this->dateend;
     }
@@ -505,9 +525,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getHournumber()
+    public function getHournumber(): ?float
     {
         return $this->hournumber;
     }
@@ -518,9 +538,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getDaynumber()
+    public function getDaynumber(): ?float
     {
         return $this->daynumber;
     }
@@ -533,7 +553,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public function getDuration()
+    public function getDuration(): string
     {
         return $this->hournumber . ' heure(s) sur ' . $this->daynumber . ' jour(s)';
     }
@@ -547,17 +567,17 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @param Place $place
+     * @param String $place
      */
-    public function setPlace($place): void
+    public function setPlace(String $place): void
     {
         $this->place = $place;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getSchedule()
+    public function getSchedule(): ?string
     {
         return $this->schedule;
     }
@@ -568,9 +588,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getComments()
+    public function getComments(): ?string
     {
         return $this->comments;
     }
@@ -581,9 +601,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }
@@ -594,9 +614,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getMaximumnumberofregistrations()
+    public function getMaximumnumberofregistrations(): ?int
     {
         return $this->maximumnumberofregistrations;
     }
@@ -609,7 +629,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return Sessiontype
      */
-    public function getSessiontype()
+    public function getSessiontype(): ?Sessiontype
     {
         return $this->sessiontype;
     }
@@ -617,7 +637,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param Sessiontype $sessionType
      */
-    public function setSessiontype($sessionType): void
+    public function setSessiontype(Sessiontype $sessionType): void
     {
         $this->sessiontype = $sessionType;
     }
@@ -625,9 +645,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * Return true if the session is available on the website (private or public_old registration).
      *
-     * @return mixed
+     * @return int|null
      */
-    public function isAvailable()
+    public function isAvailable(): ?int
     {
         return $this->registration > self::REGISTRATION_CLOSED;
     }
@@ -639,7 +659,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api"})
      */
-    public function isPublic()
+    public function isPublic(): ?int
     {
         return $this->registration === self::REGISTRATION_PUBLIC;
     }
@@ -647,7 +667,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * The session is registrable.
      */
-    public function isRegistrable()
+    public function isRegistrable(): ?int
     {
         if ($this->status !== self::STATUS_OPEN) {
             return false;
@@ -680,7 +700,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training", "api.training"})
      */
-    public function registrable()
+    public function registrable(): ?int
     {
         return $this->isRegistrable();
     }
@@ -691,17 +711,17 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api.training"})
      */
-    public function getAvailablePlaces()
+    public function getAvailablePlaces(): ?int
     {
         return $this->maximumnumberofregistrations - $this->getNumberofacceptedregistrations();
     }
 
     /**
-     * @return mixed
+     * @return int|null
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberofregistrations()
+    public function getNumberofregistrations(): ?int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
@@ -720,11 +740,11 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return int|null
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberofacceptedregistrations()
+    public function getNumberofacceptedregistrations(): ?int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
@@ -745,9 +765,9 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getLimitregistrationdate()
+    public function getLimitregistrationdate(): ?\DateTimeInterface
     {
         return $this->limitregistrationdate;
     }
@@ -776,7 +796,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getMaterials()
+    public function getMaterials(): ArrayCollection|Collection
     {
         return $this->materials;
     }
@@ -784,7 +804,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $materials
      */
-    public function setMaterials($materials): void
+    public function setMaterials(ArrayCollection $materials): void
     {
         $this->materials = $materials;
     }
@@ -794,7 +814,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function addMaterial($material)
+    public function addMaterial(Material $material): Collection
     {
         if (!$this->materials->contains($material)) {
             $material->setSession($this);
@@ -809,7 +829,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getAllMaterials()
+    public function getAllMaterials(): ArrayCollection
     {
         return $this->allMaterials;
     }
@@ -817,7 +837,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $allMaterials
      */
-    public function setAllMaterials($allMaterials): void
+    public function setAllMaterials(ArrayCollection $allMaterials): void
     {
         $this->allMaterials = $allMaterials;
     }
@@ -827,7 +847,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberofparticipants()
+    public function getNumberofparticipants(): mixed
     {
         $count = 0;
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
@@ -855,7 +875,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getParticipantsSummaries()
+    public function getParticipantsSummaries(): ArrayCollection|Collection
     {
         return $this->participantsSummaries;
     }
@@ -863,7 +883,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @param ArrayCollection $participantsSummaries
      */
-    public function setParticipantsSummaries($participantsSummaries): void
+    public function setParticipantsSummaries(ArrayCollection $participantsSummaries): void
     {
         foreach ($participantsSummaries as $participantSummary) {
             $participantSummary->setSession($this);
@@ -877,7 +897,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function addParticipantsSummary($participantsSummary)
+    public function addParticipantsSummary(\App\Entity\Core\ParticipantsSummary $participantsSummary): Collection
     {
         foreach ($this->participantsSummaries as $participantSummary) {
             if ($participantSummary->getPublictype() === $participantsSummary->getPublictype() &&
@@ -899,7 +919,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return bool
      */
-    public function removeParticipantsSummary($participantsSummary)
+    public function removeParticipantsSummary(\App\Entity\Core\ParticipantsSummary $participantsSummary): Collection
     {
         if ($this->participantsSummaries->contains($participantsSummary)) {
             $this->participantsSummaries->removeElement($participantsSummary);
@@ -918,7 +938,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
      *
      * @return string
      */
-    public function getDateRange()
+    public function getDateRange(): string
     {
         if ( ! $this->datebegin) {
             return '';
@@ -942,7 +962,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return mixed
      */
-    public static function getFormType()
+    public static function getFormType(): mixed
     {
         return AbstractSessionType::class;
     }
@@ -950,7 +970,7 @@ abstract class AbstractSession implements SerializedAccessRights, \Stringable
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'session';
     }

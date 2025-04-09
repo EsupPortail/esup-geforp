@@ -118,7 +118,7 @@ final class OrganizationChangedListener implements EventSubscriber
      *
      * @return array
      */
-    private function getExcludedProperties($class)
+    private function getExcludedProperties($class): array
     {
         $excludedProperties = [AbstractTrainer::class => ['participations']];
 

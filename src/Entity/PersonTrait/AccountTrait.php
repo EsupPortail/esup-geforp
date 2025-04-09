@@ -11,7 +11,9 @@ namespace App\Entity\PersonTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\EventListener\Serializer;
+use JMS\Serializer\Annotation\Exclude;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Class AccountTrait.
@@ -23,28 +25,31 @@ trait AccountTrait
 
     /**
      * @ORM\Column(type="string", length=32)
-     * @Serializer\Exclude
+     * @Ignore()
      */
+    #[Ignore]
     #[ORM\Column(type: 'string', length: 32)]
     private mixed $salt;
 
     /**
      * string.
      *
-     * @Serializer\Exclude
+     * @Ignore()
      */
+    #[Ignore]
     private mixed $plainPassword;
 
     /**
      * @ORM\Column(type="string")
-     * @Serializer\Exclude
+     * @Ignore()
      */
+    #[Ignore]
     #[ORM\Column(type: 'string')]
     private mixed $password;
 
     /**
      * @ORM\Column(name="is_active", type="boolean")
-     * @Serializer\Groups({"trainee"})
+     * @Groups({"trainee"})
      */
     #[ORM\Column(name: 'is_active', type: 'boolean')]
     #[Groups(['trainee'])]
@@ -53,26 +58,29 @@ trait AccountTrait
     #[ORM\Column(name: 'shibboleth_persistent_id', type: 'string', nullable: true)]
     #[Groups(['api.token', 'api.profile'])]
     private ?string $shibbolethPersistentId;
-    
+
     /**
      * @ORM\Column(name="data", type="array", nullable=true)
-     * @Serializer\Exclude
+     * @Ignore()
      */
+    #[Ignore]
     #[ORM\Column(name: 'data', type: 'json', nullable: true)]
     private mixed $data;
 
     /**
      * @var bool
-     * @Serializer\Exclude
+     * @Ignore()
      */
+    #[Ignore]
     private bool $sendCredentialsMail = false;
 
     /**
      * @var mixed
-     * @Serializer\Exclude
+     * @Ignore()
      * This properties is used to automatically send a activation link to the trainee.
      * true or array of options
      */
+    #[Ignore]
     private mixed $sendActivationMail = false;
 
     /**
@@ -138,9 +146,9 @@ trait AccountTrait
         return $this->isactive;
     }
 
-    public function setIsactive(mixed $isActive): void
+    public function setIsactive(mixed $isactive): void
     {
-        $this->isactive = $isActive;
+        $this->isactive = $isactive;
     }
 
     /**
@@ -240,7 +248,7 @@ trait AccountTrait
      */
     public function isEnabled(): bool
     {
-        return $this->isActive;
+        return $this->isactive;
     }
 
     /**

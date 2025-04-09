@@ -2,8 +2,11 @@
 
 namespace App\Entity\Term;
 
+use AllowDynamicProperties;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Persistence\Proxy;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Core\AbstractOrganization;
 
@@ -11,7 +14,7 @@ use App\Entity\Core\AbstractOrganization;
  * Class AbstractTerm.
  *
  */
-#[ORM\MappedSuperclass]
+#[AllowDynamicProperties] #[ORM\MappedSuperclass]
 abstract class AbstractTerm implements VocabularyInterface, \Stringable
 {
     use SortableTrait;
@@ -46,8 +49,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     #[ORM\Column(name: 'private', type: 'boolean')]
     private bool $private = false;
 
-    private $label = null;
-
+    public ?string $labelVocabulary = null;
     /**
      * @var AbstractOrganization
      */
@@ -59,29 +61,27 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      * @var string
      */
 
+    #[ORM\Column(name: 'machine_name' ,type: 'string', length: 255, nullable: true)]
+    #[Groups(['Default', 'api'])]
     protected string $machinename;
+
+
+    public function getVocabularyLabel(): string
+    {
+        return $this->labelVocabulary ?: $this->getVocabularyName();
+    }
+
+    public function setVocabularyLabel($labelVocabulary): void
+    {
+        $this->labelVocabulary = $labelVocabulary;
+    }
 
     /**
      * @return mixed
      */
 
+
     abstract public function getVocabularyName(): mixed;
-
-    /**
-     * @param $label
-     */
-    public function setVocabularyLabel($label): void
-    {
-        $this->label = $label;
-    }
-
-    /**
-     * @return string
-     */
-    public function getVocabularyLabel()
-    {
-        return $this->label ?: $this->getVocabularyName();
-    }
 
     /**
      * @return string
@@ -94,7 +94,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -110,7 +110,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -118,15 +118,15 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getPrivate()
+    public function getPrivate(): bool
     {
         return $this->private;
     }
@@ -161,25 +161,25 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @return int
      */
-    public function getOrganizationId()
+    public function getOrganizationId(): ?int
     {
-        return $this->getOrganization() ? $this->getOrganization()->getId() : null;
+        return $this->getOrganization()?->getId();
     }
 
     /**
      * @return string|null
      */
-    public function getMachinename()
+    public function getMachinename(): ?string
     {
         return $this->machinename;
     }
 
     /**
-     * @param string
+     * @param string $machineName
      */
-    public function setMachinename($machineName): void
+    public function setMachinename(string $machineName): void
     {
-        $this->machinename = $machineName;
+       $this->machinename = $machineName;
     }
 
     /**
@@ -187,7 +187,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @return bool
      */
-    public function isLocked($machineName = null)
+    public function isLocked($machineName = null): bool
     {
         return !empty($this->machinename);
     }
@@ -199,15 +199,15 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @return bool
      */
-    public function isMachinename($machineName)
+    public function isMachinename($machineName): bool
     {
         return $this->machinename === $machineName;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getVocabularyId()
+    public function getVocabularyId(): string
     {
         return $this->vocabularyId;
     }
@@ -225,7 +225,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *               This static method is used to set a specific order field
      *               when fetch terms
      */
-    public static function orderBy()
+    public static function orderBy(): mixed
     {
         return 'name';
     }

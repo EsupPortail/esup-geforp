@@ -71,7 +71,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -79,7 +79,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -96,7 +96,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return string
      */
-    public function getIdp()
+    public function getIdp(): string
     {
         return $this->idp;
     }
@@ -104,7 +104,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @param string $idp
      */
-    public function setIdp($idp): void
+    public function setIdp(string $idp): void
     {
         $this->idp = $idp;
     }
@@ -112,7 +112,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return mixed
      */
-    public function getDomains()
+    public function getDomains(): mixed
     {
         return $this->domains;
     }
@@ -127,7 +127,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
      *
      * @return bool
      */
-    public function addDomain($domain)
+    public function addDomain(Domain $domain): bool
     {
         if (!$this->domains->contains($domain)) {
             $this->domains->add($domain);
@@ -143,7 +143,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
      *
      * @return bool
      */
-    public function removeDomain($domain)
+    public function removeDomain(Domain $domain): bool
     {
         if ($this->domains->contains($domain)) {
             $this->domains->removeElement($domain);
@@ -157,7 +157,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return mixed
      */
-    public function getVisuinstitutions()
+    public function getVisuinstitutions(): mixed
     {
         return $this->visuinstitutions;
     }
@@ -172,7 +172,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
      *
      * @return bool
      */
-    public function addVisuinstitution($institution)
+    public function addVisuinstitution(AbstractInstitution $institution): bool
     {
         if (!$this->visuinstitutions->contains($institution)) {
             $this->visuinstitutions->add($institution);
@@ -188,7 +188,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
      *
      * @return bool
      */
-    public function removeVisuinstitution($institution)
+    public function removeVisuinstitution(AbstractInstitution $institution): bool
     {
         if ($this->visuinstitutions->contains($institution)) {
             $this->visuinstitutions->removeElement($institution);
@@ -204,12 +204,12 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
         return $this->name;
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return BaseInstitutionType::class;
     }
 
-    public static function getType()
+    public static function getType(): string
     {
         return 'institution';
     }

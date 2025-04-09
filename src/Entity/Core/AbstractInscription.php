@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Term\Inscriptionstatus;
@@ -46,16 +48,18 @@ abstract class AbstractInscription implements SerializedAccessRights
     #[ORM\ManyToOne(targetEntity: 'AbstractTrainee', inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'trainee_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
-    protected $trainee;
+    protected AbstractTrainee $trainee;
 
     /**
      * @var AbstractSession
      * @Serializer\Groups({"inscription", "trainee", "api"})
      */
+    #[Groups(['inscription', 'trainee', 'api'])]
     #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'inscriptions')]
-    #[ORM\JoinColumn(name: 'session_id')]
+    #[ORM\JoinColumn(name: 'session_id', referencedColumnName: 'id')]
     #[Assert\NotNull]
-    protected $session;
+    #[MaxDepth(1)]
+    protected AbstractSession $session;
 
     /**
      * @Serializer\Groups({"Default", "api"})
@@ -75,12 +79,12 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @var bool
      */
-    protected $sendinscriptionstatusmail = false;
+    protected bool $sendinscriptionstatusmail = false;
 
     /**
      * @param int $id
      */
-    public function setId($id): void
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -88,7 +92,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -104,7 +108,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return Inscriptionstatus
      */
-    public function getInscriptionstatus()
+    public function getInscriptionstatus(): ?Inscriptionstatus
     {
         return $this->inscriptionstatus;
     }
@@ -120,7 +124,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return Presencestatus
      */
-    public function getPresencestatus()
+    public function getPresencestatus(): ?Presencestatus
     {
         return $this->presencestatus;
     }
@@ -136,7 +140,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
@@ -152,7 +156,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return AbstractTrainee
      */
-    public function getTrainee()
+    public function getTrainee(): AbstractTrainee
     {
         return $this->trainee;
     }
@@ -160,7 +164,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isSendinscriptionstatusmail()
+    public function isSendinscriptionstatusmail(): bool
     {
         return $this->sendinscriptionstatusmail;
     }
@@ -179,10 +183,10 @@ abstract class AbstractInscription implements SerializedAccessRights
      */
     #[ORM\PreUpdate]
     #[ORM\PrePersist]
-    public function setDefaultInscriptionstatus(LifecycleEventArgs $lifecycleEventArgs): void
+    public function setDefaultInscriptionstatus(\Doctrine\Persistence\Event\LifecycleEventArgs $lifecycleEventArgs): void
     {
         if (!$this->inscriptionstatus) {
-            $entityRepository = $lifecycleEventArgs->getEntityManager()->getRepository(Inscriptionstatus::class);
+            $entityRepository = $lifecycleEventArgs->getObjectManager()->getRepository(Inscriptionstatus::class);
             $inscriptionstatus = $entityRepository->findOneBy(['machineName' => 'waiting']);
             $this->setInscriptionstatus($inscriptionstatus);
         }
@@ -191,15 +195,15 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): AbstractOrganization
     {
         return $this->session->getTraining()->getOrganization();
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return BaseInscriptionType::class;
     }
@@ -207,7 +211,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'inscription';
     }

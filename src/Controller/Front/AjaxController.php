@@ -49,7 +49,7 @@ final class AjaxController extends AbstractController
      * @return string la liste des sessions au format json
      */
     #[Route(path: '/ajax/completlist', name: 'ajax_completlist')]
-    public function CompletList(): \Symfony\Component\HttpFoundation\Response
+    public function CompletList(): string
     {
         $json = [];
         $request = $this->get('request');
@@ -114,7 +114,7 @@ final class AjaxController extends AbstractController
      * @param $theme
      * @return array
      */
-    private function createProgramQuerySearch(int $page, int $itemPerPage = 10, $code = null, $theme = null, $texte = null)
+    private function createProgramQuerySearch(int $page, int $itemPerPage = 10, $code = null, $theme = null, $texte = null): array
     {
         $search = $this->get('sygefor_training.session.search');
         if ($page !== 0) {

@@ -19,7 +19,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\Type\AbstractTraineeType;
-
+use Symfony\Component\Serializer\Attribute\Ignore;
 /**
  * Trainee.
  *
@@ -70,6 +70,7 @@ use App\Form\Type\AbstractTraineeType;
         $this->salt = md5(uniqid('', true));
         $this->password = md5(uniqid('', true));
         $this->addresstype = 0;
+        $this->lastname = '';
     }
 
     public function setId(int $id): void
@@ -106,7 +107,7 @@ use App\Form\Type\AbstractTraineeType;
     }
 
     /**
-     * {@inheritdoc}
+     * {}
      */
     public function getRoles(): array
     {
@@ -144,7 +145,7 @@ use App\Form\Type\AbstractTraineeType;
     {
         // PersonTrait
         $classMetadata->addPropertyConstraint('title', new Assert\NotBlank(['message' => 'Vous devez renseigner une civilité.']));
-        $classMetadata->addPropertyConstraint('lastname', new Assert\NotBlank(['message' => 'Vous devez renseigner un nom de famille.']));
+        $classMetadata->addPropertyConstraint('lastname', new Assert\NotBlank(['message' => 'Vous devez renseigner un nom de famille.', 'groups' => 'api']));
         $classMetadata->addPropertyConstraint('firstname', new Assert\NotBlank(['message' => 'Vous devez renseigner un prénom.']));
 
         // CoordinateTrait

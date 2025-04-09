@@ -13,5 +13,5 @@ Interface AdminShibbolethUserProviderInterface extends UserProviderInterface{
     /**
      * @return mixed
      */
-    public function loadUser(array $credentials);
+    public function loadUser(array $credentials): mixed;
 }

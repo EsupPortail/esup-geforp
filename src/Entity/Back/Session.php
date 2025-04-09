@@ -4,67 +4,79 @@ namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractSession;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\SessionType;
 use App\Entity\Back\DateSession;
 use App\Entity\Back\Alert;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ORM\Table(name: 'session')]
 #[ORM\Entity]
-class Session extends AbstractSession implements \Stringable
+class Session extends AbstractSession
 {
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $name = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $price = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'teaching_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $teachingcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'vacation_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $vacationcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'accommodation_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $accommodationcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'meal_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $mealcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'transport_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $transportcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(name: 'material_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $materialcost = null;
 
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $taking = null;
 
@@ -72,21 +84,24 @@ class Session extends AbstractSession implements \Stringable
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\DateSession> $dates
      * @Serializer\Groups({"session", "api.session"})
      */
-    #[ORM\OneToMany(targetEntity: \App\Entity\Back\DateSession::class, mappedBy: 'session', cascade: ['persist', 'remove'])]
+    #[Groups(['session', 'api.session'])]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\DateSession::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
-    protected \Doctrine\Common\Collections\Collection $dates;
+    #[MaxDepth(1)]
+    protected Collection $dates;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Alert> $alerts
      * @Serializer\Groups({"session", "api.session"})
      */
-    #[ORM\OneToMany(targetEntity: \App\Entity\Back\Alert::class, mappedBy: 'session', cascade: ['persist', 'remove'])]
+    #[Groups(['session', 'api.session'])]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\Alert::class, cascade: ['persist', 'remove'])]
     protected \Doctrine\Common\Collections\Collection $alerts;
 
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -94,15 +109,15 @@ class Session extends AbstractSession implements \Stringable
     /**
      * @param string $name
      */
-    public function setName($name): void
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
@@ -113,9 +128,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTeachingcost()
+    public function getTeachingcost(): ?float
     {
         return $this->teachingcost;
     }
@@ -126,9 +141,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getVacationcost()
+    public function getVacationcost(): ?float
     {
         return $this->vacationcost;
     }
@@ -139,9 +154,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getAccommodationcost()
+    public function getAccommodationcost(): ?float
     {
         return $this->accommodationcost;
     }
@@ -152,9 +167,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getMealcost()
+    public function getMealcost(): ?float
     {
         return $this->mealcost;
     }
@@ -165,9 +180,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTransportcost()
+    public function getTransportcost(): ?float
     {
         return $this->transportcost;
     }
@@ -178,9 +193,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getMaterialcost()
+    public function getMaterialcost(): ?float
     {
         return $this->materialcost;
     }
@@ -191,9 +206,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTaking()
+    public function getTaking(): ?float
     {
         return $this->taking;
     }
@@ -204,9 +219,9 @@ class Session extends AbstractSession implements \Stringable
     }
 
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|Collection
      */
-    public function getDates()
+    public function getDates(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->dates;
     }
@@ -214,7 +229,7 @@ class Session extends AbstractSession implements \Stringable
     /**
      * @param ArrayCollection $dates
      */
-    public function setDates($dates): void
+    public function setDates(ArrayCollection $dates): void
     {
         $this->dates = $dates;
     }
@@ -223,7 +238,7 @@ class Session extends AbstractSession implements \Stringable
      * @param DateSession $dates
      *
      */
-    public function addDates($dates): bool
+    public function addDates(\App\Entity\Back\DateSession $dates): bool
     {
         if (!$this->dates->contains($dates)) {
             $this->dates->add($dates);
@@ -238,7 +253,7 @@ class Session extends AbstractSession implements \Stringable
      * @param DateSession $dates
      *
      */
-    public function removeDate($dates): bool
+    public function removeDate(\App\Entity\Back\DateSession $dates): bool
     {
         if ($this->dates->contains($dates)) {
             $this->dates->removeElement($dates);
@@ -252,7 +267,7 @@ class Session extends AbstractSession implements \Stringable
     /**
      * @return ArrayCollection
      */
-    public function getAlerts()
+    public function getAlerts(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->alerts;
     }
@@ -260,7 +275,7 @@ class Session extends AbstractSession implements \Stringable
     /**
      * @param ArrayCollection $alerts
      */
-    public function setAlerts($alerts): void
+    public function setAlerts(ArrayCollection $alerts): void
     {
         $this->alerts = $alerts;
     }
@@ -284,7 +299,7 @@ class Session extends AbstractSession implements \Stringable
      * @param Alert $alert
      *
      */
-    public function removeAlert($alert): bool
+    public function removeAlert(\App\Entity\Back\Alert $alert): bool
     {
         if ($this->alerts->contains($alert)) {
             $this->alerts->removeElement($alert);
@@ -295,7 +310,7 @@ class Session extends AbstractSession implements \Stringable
         return false;
     }
 
-    function __construct()
+   public function __construct()
     {
         $this->dates          = new ArrayCollection();
         $this->alerts          = new ArrayCollection();
@@ -303,7 +318,7 @@ class Session extends AbstractSession implements \Stringable
 
     public function __clone()
     {
-        $this->setId(null);
+        $this->setId((int)null);
         $this->dates         = new ArrayCollection();
         $this->alerts          = new ArrayCollection();
     }
@@ -311,11 +326,11 @@ class Session extends AbstractSession implements \Stringable
     /**
      * @Serializer\VirtualProperty
      *
-     * @param $front_root_url
-     * @param $apiSerialization
+     * @param string $front_root_url
+     * @param false $apiSerialization
      *
      */
-    public function getFronturl($front_root_url = 'https://sygefor3.univ-amu.fr', $apiSerialization = false): string
+    public function getFronturl(string $front_root_url = 'https://sygefor3.univ-amu.fr', false $apiSerialization = false): string
     {
         $url = $front_root_url . '/training/' . $this->getTraining()->getId() . '/';
         if ($apiSerialization) {

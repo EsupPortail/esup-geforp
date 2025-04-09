@@ -38,4 +38,5 @@ class Title extends AbstractTerm implements VocabularyInterface
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }
+
 }

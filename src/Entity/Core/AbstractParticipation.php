@@ -63,7 +63,7 @@ abstract class AbstractParticipation
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -71,7 +71,7 @@ abstract class AbstractParticipation
     /**
      * @return AbstractTrainer
      */
-    public function getTrainer()
+    public function getTrainer(): AbstractTrainer
     {
         return $this->trainer;
     }
@@ -87,7 +87,7 @@ abstract class AbstractParticipation
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
@@ -103,7 +103,7 @@ abstract class AbstractParticipation
     /**
      * @return mixed
      */
-    public function getIsOrganization()
+    public function getIsOrganization(): mixed
     {
         return $this->isOrganization;
     }
@@ -116,7 +116,7 @@ abstract class AbstractParticipation
     /**
      * @return mixed
      */
-    public function getOrganization()
+    public function getOrganization(): mixed
     {
         return $this->organization;
     }
@@ -129,7 +129,7 @@ abstract class AbstractParticipation
     /**
      * @return mixed
      */
-    public static function getFormType()
+    public static function getFormType(): mixed
     {
         return AbstractParticipationType::class;
     }
@@ -137,7 +137,7 @@ abstract class AbstractParticipation
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'participation';
     }

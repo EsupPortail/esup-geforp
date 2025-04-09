@@ -63,7 +63,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         //FILTRE DATE DE CREATION
         if( isset($filters['createdAt']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', (string) $filters["createdAt"]);
+            $dates = explode('-', (string)$filters["createdAt"]);
             /* on retire les caractères non utiles */
             $from = str_replace('/','-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
@@ -143,10 +143,9 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, true);
 
         $c = count($paginator);
-        
+
         $tabTrainees = [];
         foreach($paginator as $tr) {
-            echo gettype($paginator), "\n";
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainees[]['id'] = $tr->getId();
             } else {
@@ -215,7 +214,16 @@ final class TraineeSearchRepository extends ServiceEntityRepository
 
     private function sanitizeTrainee($trainee):array
     {
-        $data = json_decode(json_decode($trainee), true);
-        return $data ?? [];
+        //Récupération des propriétés de l'objet Trainee en tableau associatif
+        return [
+            'id' => $trainee->getId(),
+            'firstname' => $trainee->getFirstname(),
+            'lastname' => $trainee->getLastname(),
+            'email' => $trainee->getEmail(),
+            'createdAt' => $trainee->getCreatedAt()?->format('Y-m-d H:i:s'),
+            'title' => $trainee->getTitle()?->getName(),
+            'institution' => $trainee->getInstitution()?->getName(),
+            'publictype' => $trainee->getPublictype()?->getName(),
+        ];
     }
 }

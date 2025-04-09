@@ -102,7 +102,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setBirthdate(mixed $birthDate)
+    public function setBirthdate(mixed $birthDate): static
     {
         $this->birthdate = $birthDate;
 
@@ -113,7 +113,7 @@ class Trainee extends AbstractTrainee
      * Get birth date
      *
      */
-    public function getBirthdate()
+    public function getBirthdate(): ?string
     {
         return $this->birthdate;
     }
@@ -124,7 +124,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setAmustatut(mixed $amuStatut)
+    public function setAmustatut(mixed $amuStatut): static
     {
         $this->amustatut = $amuStatut;
 
@@ -135,7 +135,7 @@ class Trainee extends AbstractTrainee
      * Get amuStatut
      *
      */
-    public function getAmustatut()
+    public function getAmustatut(): ?string
     {
         return $this->amustatut;
     }
@@ -146,7 +146,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setBap(mixed $bap)
+    public function setBap(mixed $bap): static
     {
         $this->bap = $bap;
 
@@ -157,7 +157,7 @@ class Trainee extends AbstractTrainee
      * Get bap
      *
      */
-    public function getBap()
+    public function getBap(): ?string
     {
         return $this->bap;
     }
@@ -169,7 +169,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setCorps(mixed $corps)
+    public function setCorps(mixed $corps): static
     {
         $this->corps = $corps;
 
@@ -180,7 +180,7 @@ class Trainee extends AbstractTrainee
      * Get corps
      *
      */
-    public function getCorps()
+    public function getCorps(): ?string
     {
         return $this->corps;
     }
@@ -191,7 +191,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setCategory(mixed $category)
+    public function setCategory(mixed $category): static
     {
         $this->category = $category;
 
@@ -202,7 +202,7 @@ class Trainee extends AbstractTrainee
      * Get category
      *
      */
-    public function getCategory()
+    public function getCategory(): ?string
     {
         return $this->category;
     }
@@ -213,7 +213,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setCampus(mixed $campus)
+    public function setCampus(mixed $campus): static
     {
         $this->campus = $campus;
 
@@ -224,7 +224,7 @@ class Trainee extends AbstractTrainee
      * Get campus
      *
      */
-    public function getCampus()
+    public function getCampus(): ?string
     {
         return $this->campus;
     }
@@ -236,7 +236,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setFirstnamesup($firstNameSup)
+    public function setFirstnamesup($firstNameSup): static
     {
         $this->firstnamesup = $firstNameSup;
 
@@ -248,7 +248,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getFirstnamesup()
+    public function getFirstnamesup(): ?string
     {
         return $this->firstnamesup;
     }
@@ -260,7 +260,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setLastnamesup($lastNameSup)
+    public function setLastnamesup($lastNameSup): static
     {
         $this->lastnamesup = $lastNameSup;
 
@@ -272,7 +272,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getLastnamesup()
+    public function getLastnamesup(): ?string
     {
         return $this->lastnamesup;
     }
@@ -284,7 +284,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setEmailsup($emailSup)
+    public function setEmailsup(string $emailSup): static
     {
         $this->emailsup = $emailSup;
 
@@ -296,7 +296,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getEmailsup()
+    public function getEmailsup(): ?string
     {
         return $this->emailsup;
     }
@@ -304,11 +304,10 @@ class Trainee extends AbstractTrainee
     /**
      * Set firstnameCorr
      *
-     * @param string $firstnamecorr
-     *
+     * @param $firstNameCorr
      * @return Trainee
      */
-    public function setFirstnamecorr($firstNameCorr)
+    public function setFirstnamecorr($firstNameCorr): static
     {
         $this->firstnamecorr = $firstNameCorr;
 
@@ -320,7 +319,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getFirstnamecorr()
+    public function getFirstnamecorr(): ?string
     {
         return $this->firstnamecorr;
     }
@@ -332,7 +331,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setLastnamecorr($lastNameCorr)
+    public function setLastnamecorr(string $lastNameCorr): static
     {
         $this->lastnamecorr = $lastNameCorr;
 
@@ -344,7 +343,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getLastnamecorr()
+    public function getLastnamecorr(): ?string
     {
         return $this->lastnamecorr;
     }
@@ -356,7 +355,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setEmailcorr($emailCorr)
+    public function setEmailcorr(string $emailCorr): static
     {
         $this->emailcorr = $emailCorr;
 
@@ -368,7 +367,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getEmailcorr()
+    public function getEmailcorr(): ?string
     {
         return $this->emailcorr;
     }
@@ -380,7 +379,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setFonction($fonction)
+    public function setFonction(string $fonction): static
     {
         $this->fonction = $fonction;
 
@@ -392,7 +391,7 @@ class Trainee extends AbstractTrainee
      *
      * @return string
      */
-    public function getFonction()
+    public function getFonction(): ?string
     {
         return $this->fonction;
     }
@@ -403,7 +402,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function addInscription(AbstractInscription $inscription)
+    public function addInscription(AbstractInscription $inscription): static
     {
         $this->inscriptions[] = $inscription;
 
@@ -422,7 +421,7 @@ class Trainee extends AbstractTrainee
     /**
      * @return \Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
      */
-    public function getAlerts()
+    public function getAlerts(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->alerts;
     }
@@ -430,7 +429,7 @@ class Trainee extends AbstractTrainee
     /**
      * @param ArrayCollection $alerts
      */
-    public function setAlerts($alerts): void
+    public function setAlerts(ArrayCollection $alerts): void
     {
         $this->alerts = $alerts;
     }
@@ -454,7 +453,7 @@ class Trainee extends AbstractTrainee
      * @param Alert $alert
      *
      */
-    public function removeAlert($alert): bool
+    public function removeAlert(Alert $alert): bool
     {
         if ($this->alerts->contains($alert)) {
             $this->alerts->removeElement($alert);

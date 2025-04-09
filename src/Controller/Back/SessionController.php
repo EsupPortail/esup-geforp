@@ -48,7 +48,8 @@ use Symfony\Component\Form\FormError;
                 foreach ($session->getDates() as $existingDate) {
                     if ($existingDate->getDatebegin() == $dateSession->getDatebegin()) {
                         $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
-                        return ['form' => $form->createView(), 'dates' => $dateSession];
+                        return new JsonResponse(['form' => $form->createView(), 'dates' => $dateSession, 'groups' => 'session']);
+
                     }
 
                     $datesBegin[] = $existingDate->getDatebegin();
@@ -107,8 +108,7 @@ use Symfony\Component\Form\FormError;
 
              }
         }
-
-        return $this->json($form, $dateSession);
+        return new JsonResponse($form, $dateSession, ['groups' => ['session', 'api.session'], 'enable_max_depth' => true]);
     }
 
       #[Route("/{session}/remove/{dates}", name: "dates.remove", options: ["expose" => true], defaults: ["_format" => "json"])]
@@ -116,8 +116,8 @@ use Symfony\Component\Form\FormError;
 
     public function removedates(Session $session, DateSession $dateSession, ManagerRegistry $managerRegistry, SerializerInterface $serializer, int $id): JsonResponse
     {
-        $session = $managerRegistry->getRepository(Session::class, $id);
-        if (!$session) {
+        $sessions = $managerRegistry->getRepository(Session::class, $id);
+        if (!$sessions) {
             throw new NotFoundHttpException();
         }
         $dateSession = $managerRegistry->getRepository(DateSession::class, $id);
@@ -166,7 +166,7 @@ use Symfony\Component\Form\FormError;
             $em->flush();
         }
 
-        $data = $serializer->serialize($session, 'json', ['groups' => ['Default', 'session'],'enable_max_depth' => true]);
+        $data = $serializer->serialize($session, 'json', ['groups' => ['session', 'api.session'],'enable_max_depth' => true]);
         return new JsonResponse($data, ResponseAlias::HTTP_OK, [], true);
 
     }
@@ -231,7 +231,7 @@ use Symfony\Component\Form\FormError;
             }
         }
 
-        return ['form' => $form->createView(), 'dates' => $dateSession];
+        return ['form' => $form->createView(), 'dates' => $dateSession, 'groups' => ['session', 'api.session'], 'enable_max_depth' => true];
     }
 
     #[Route(path: '/viewdates/{dates}', name: 'dates.view', options: ['expose' => true], defaults: ['_format' => 'json'])]
@@ -249,8 +249,7 @@ use Symfony\Component\Form\FormError;
                 $objectManager->flush();
             }
         }
-
-        return ['form' => $form->createView(), 'dates' => $dateSession];
+        return ['form' => $form->createView(), 'dates' => $dateSession, ['groups' => ['session', 'api.session'], 'enable_max_depth' => true]];
     }
 
 }
