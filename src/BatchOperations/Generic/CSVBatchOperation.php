@@ -614,7 +614,9 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec');
+                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
+                                WHERE ec.organization = :org')
+                            ->setParameter('org', $session->getTraining()->getOrganization());
                         $tabCrit = $query->getResult();
 
                         // On initialise les variables pour la moyenne
