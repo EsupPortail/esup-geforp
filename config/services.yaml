@@ -166,6 +166,7 @@ parameters:
                     session.training.supervisor.name: "Nom du responsable pédagogique"
                     session.training.supervisor.first_name: "Prénom du responsable pédagogique"
                     session.training.theme.name: "Domaine de formation"
+                    session.training.category.name: "Type de formation"
                     session.dayNumber: "Nombre de jours"
                     session.totalCost: "Coût total de la session"
                     inscriptionStatus.name: "Statut de l'inscription"
