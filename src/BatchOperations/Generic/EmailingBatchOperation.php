@@ -237,8 +237,47 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                 $tabEvent[$i] = new CalendarEvent();
                                 $dateBegin = clone $dateSession->getDatebegin();
                                 $dateEnd = clone $dateSession->getDateend();
-                                $tabEvent[$i]->setStart($dateBegin->modify('+8 hours'))
-                                    ->setEnd($dateEnd->modify('+18 hours'))
+                                $schedulemorn = $dateSession->getSchedulemorn();
+                                $scheduleafter = $dateSession->getScheduleafter();
+
+                                // Par défaut, on fixe les horaires à la journée
+                                $horBegin = '+8 hours';
+                                $horEnd = '+18 hours';
+
+                                // récupération des horaires pour exploitation avec le calendrier
+                                $j=0;
+                                $horMod1=[];
+                                $horMod2=[];
+                                if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
+                                    foreach ($matchesMorn[0] as $hor) {
+                                        $partsMorn = explode(':', $hor);
+                                        $horMod1[$j] = "$partsMorn[0]h$partsMorn[1]";
+                                        $horMod2[$j] = "$partsMorn[0] hours $partsMorn[1] minutes";
+                                        $j++;
+                                    }
+                                }
+                                if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
+                                    foreach ($matchesAfter[0] as $hor) {
+                                        $partsAfter = explode(':', $hor);
+                                        $horMod1[$j] = "$partsAfter[0]h$partsAfter[1]";
+                                        $horMod2[$j] = "$partsAfter[0] hours $partsAfter[1] minutes";
+                                        $j++;
+                                    }
+                                }
+                                // au moins 2 horaires dans le tableau
+                                if (sizeof($horMod1) >= 2) {
+                                    // Conversion en date pour comparaison
+                                    $heureBegin = \DateTime::createFromFormat('H:i', $horMod1[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H:i', end($horMod1));
+                                    // Vérif l'heure de fin est bien > à l'heure de début
+                                    if ($heureBegin<$heureEnd) {
+                                        $horBegin = "+" . $horMod2[0];
+                                        $horEnd = "+" . end($horMod2);
+                                    }
+                                }
+
+                                $tabEvent[$i]->setStart($dateBegin->modify($horBegin))
+                                    ->setEnd($dateEnd->modify($horEnd))
                                     ->setSummary($sessionName)
                                     ->setUid('geforp'.$id);
                                 $calendar->addEvent($tabEvent[$i]);
