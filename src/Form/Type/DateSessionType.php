@@ -50,7 +50,7 @@ class DateSessionType extends AbstractType
                 'label' => "Horaires matin",
                 'required' => false,
                 'attr' => array(
-                    'placeholder' => 'format h:mm-h:mm'
+                    'placeholder' => 'h:mm-h:mm'
                 )
             ))
             ->add('hournumbermorn', TextType::class, array(
@@ -65,7 +65,7 @@ class DateSessionType extends AbstractType
                 'label' => "Horaires après-midi",
                 'required' => false,
                 'attr' => array(
-                    'placeholder' => 'format h:mm-h:mm'
+                    'placeholder' => 'h:mm-h:mm'
                 )
             ))
             ->add('hournumberafter', TextType::class, array(
