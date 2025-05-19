@@ -248,6 +248,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                 $j=0;
                                 $horMod1=[];
                                 $horMod2=[];
+                                // Horaires matin
                                 if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
                                     foreach ($matchesMorn[0] as $hor) {
                                         $partsMorn = explode(':', $hor);
@@ -256,6 +257,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                         $j++;
                                     }
                                 }
+                                // Horaires après-midi
                                 if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
                                     foreach ($matchesAfter[0] as $hor) {
                                         $partsAfter = explode(':', $hor);
@@ -267,8 +269,8 @@ class EmailingBatchOperation extends AbstractBatchOperation
                                 // au moins 2 horaires dans le tableau
                                 if (sizeof($horMod1) >= 2) {
                                     // Conversion en date pour comparaison
-                                    $heureBegin = \DateTime::createFromFormat('H:i', $horMod1[0]);
-                                    $heureEnd = \DateTime::createFromFormat('H:i', end($horMod1));
+                                    $heureBegin = \DateTime::createFromFormat('H\hi', $horMod1[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H\hi', end($horMod1));
                                     // Vérif l'heure de fin est bien > à l'heure de début
                                     if ($heureBegin<$heureEnd) {
                                         $horBegin = "+" . $horMod2[0];
