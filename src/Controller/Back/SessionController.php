@@ -72,6 +72,84 @@ class SessionController extends AbstractSessionController
                 }
 
                 if (!$existingDate || ($existingDate->getDatebegin() !== $dateSession->getDatebegin())) {
+                    // Test si un nombre d'heures est bien renseigné
+                    if (($dateSession->getHournumbermorn()==null) && ($dateSession->getHournumberafter()==null)) {
+                        $form->get('hournumbermorn')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                        return array('form' => $form->createView(), 'dates' => $dateSession);
+                    }
+
+                    // Test validité du format des horaires
+                    $cptHor=0;
+                    $horMod=[];
+                    // Horaires matin
+                    if ($dateSession->getSchedulemorn()!=null) {
+                        if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $dateSession->getSchedulemorn(), $matchesMorn)) {
+                            foreach ($matchesMorn[0] as $hor) {
+                                $horMod[$cptHor] = $hor;
+                                $cptHor++;
+                            }
+                            switch (sizeof($horMod)) {
+                                case 2:
+                                    // 2 horaires dans le tableau
+                                    // Conversion en date pour comparaison
+                                    $heureBegin = \DateTime::createFromFormat('H:i', $horMod[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H:i', end($horMod));
+                                    // Vérif l'heure de fin est bien > à l'heure de début
+                                    if ($heureBegin>=$heureEnd) {
+                                        $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                                        return array('form' => $form->createView(), 'dates' => $dateSession);
+                                    }
+                                    // Test si un nombre d'heures est bien renseigné
+                                    if ($dateSession->getHournumbermorn()==null) {
+                                        $form->get('hournumbermorn')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                                        return array('form' => $form->createView(), 'dates' => $dateSession);
+                                    }
+                                    break;
+                                default:
+                                    $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                                    return array('form' => $form->createView(), 'dates' => $dateSession);
+                            }
+                        } else {
+                            $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                            return array('form' => $form->createView(), 'dates' => $dateSession);
+                        }
+                    }
+                    // Horaires après-midi
+                    $cptHor=0;
+                    $horMod=[];
+                    if ($dateSession->getScheduleafter()!=null) {
+                        if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $dateSession->getScheduleafter(), $matchesAfter)) {
+                            foreach ($matchesAfter[0] as $hor) {
+                                $horMod[$cptHor] = $hor;
+                                $cptHor++;
+                            }
+                            switch (sizeof($horMod)) {
+                                case 2:
+                                    // 2 horaires dans le tableau
+                                    // Conversion en date pour comparaison
+                                    $heureBegin = \DateTime::createFromFormat('H:i', $horMod[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H:i', end($horMod));
+                                    // Vérif l'heure de fin est bien > à l'heure de début
+                                    if ($heureBegin>=$heureEnd) {
+                                        $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                                        return array('form' => $form->createView(), 'dates' => $dateSession);
+                                    }
+                                    // Test si un nombre d'heures est bien renseigné
+                                    if ($dateSession->getHournumberafter()==null) {
+                                        $form->get('hournumberafter')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                                        return array('form' => $form->createView(), 'dates' => $dateSession);
+                                    }
+                                    break;
+                                default:
+                                    $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                                    return array('form' => $form->createView(), 'dates' => $dateSession);
+                            }
+                        }  else {
+                            $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                            return array('form' => $form->createView(), 'dates' => $dateSession);
+                        }
+                    }
+
                     $session->addDates($dateSession);
                     $session->setUpdatedAt(new \DateTime('now'));
                     $session->getTraining()->setUpdatedAt(new \DateTime('now'));
@@ -196,6 +274,84 @@ class SessionController extends AbstractSessionController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
+                // Test si un nombre d'heures est bien renseigné
+                if (($dates->getHournumbermorn()==null) && ($dates->getHournumberafter()==null)) {
+                    $form->get('hournumbermorn')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                    return array('form' => $form->createView(), 'dates' => $dates);
+                }
+
+                // Test validité du format des horaires
+                $cptHor=0;
+                $horMod=[];
+                // Horaires matin
+                if ($dates->getSchedulemorn()!=null) {
+                    if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $dates->getSchedulemorn(), $matchesMorn)) {
+                        foreach ($matchesMorn[0] as $hor) {
+                            $horMod[$cptHor] = $hor;
+                            $cptHor++;
+                        }
+                        switch (sizeof($horMod)) {
+                            case 2:
+                                // 2 horaires dans le tableau
+                                // Conversion en date pour comparaison
+                                $heureBegin = \DateTime::createFromFormat('H:i', $horMod[0]);
+                                $heureEnd = \DateTime::createFromFormat('H:i', end($horMod));
+                                // Vérif l'heure de fin est bien > à l'heure de début
+                                if ($heureBegin>=$heureEnd) {
+                                    $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                                    return array('form' => $form->createView(), 'dates' => $dates);
+                                }
+                                // Test si un nombre d'heures est bien renseigné
+                                if ($dates->getHournumbermorn()==null) {
+                                    $form->get('hournumbermorn')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                                    return array('form' => $form->createView(), 'dates' => $dates);
+                                }
+                                break;
+                            default:
+                                $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                                return array('form' => $form->createView(), 'dates' => $dates);
+                        }
+                    } else {
+                        $form->get('schedulemorn')->addError(new FormError('Erreur format des horaires de session'));
+                        return array('form' => $form->createView(), 'dates' => $dates);
+                    }
+                }
+                // Horaires après-midi
+                $cptHor=0;
+                $horMod=[];
+                if ($dates->getScheduleafter()!=null) {
+                    if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $dates->getScheduleafter(), $matchesAfter)) {
+                        foreach ($matchesAfter[0] as $hor) {
+                            $horMod[$cptHor] = $hor;
+                            $cptHor++;
+                        }
+                        switch (sizeof($horMod)) {
+                            case 2:
+                                // 2 horaires dans le tableau
+                                // Conversion en date pour comparaison
+                                $heureBegin = \DateTime::createFromFormat('H:i', $horMod[0]);
+                                $heureEnd = \DateTime::createFromFormat('H:i', end($horMod));
+                                // Vérif l'heure de fin est bien > à l'heure de début
+                                if ($heureBegin>=$heureEnd) {
+                                    $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                                    return array('form' => $form->createView(), 'dates' => $dates);
+                                }
+                                // Test si un nombre d'heures est bien renseigné
+                                if ($dates->getHournumberafter()==null) {
+                                    $form->get('hournumberafter')->addError(new FormError('Vous devez renseigner un nombre d\'heures'));
+                                    return array('form' => $form->createView(), 'dates' => $dates);
+                                }
+                                break;
+                            default:
+                                $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                                return array('form' => $form->createView(), 'dates' => $dates);
+                        }
+                    }  else {
+                        $form->get('scheduleafter')->addError(new FormError('Erreur format des horaires de session'));
+                        return array('form' => $form->createView(), 'dates' => $dates);
+                    }
+                }
+
                 //Mise à jour date
                 $em = $doctrine->getManager();
                 $em->flush();
@@ -216,7 +372,6 @@ class SessionController extends AbstractSessionController
                         $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
                         $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
                     }
-
                 }
 
                 // Tri des tableaux de dates
