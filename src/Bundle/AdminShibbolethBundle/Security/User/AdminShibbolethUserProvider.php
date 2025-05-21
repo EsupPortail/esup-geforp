@@ -18,10 +18,7 @@ final readonly class AdminShibbolethUserProvider implements AdminShibbolethUserP
 
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
-dump($identifier);
         $entityManager = $this->managerRegistry->getManagerForClass(User::class);
-        $us =  $entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
-	dump($us);
         return $entityManager->getRepository(User::class)->findOneBy(['username' => $identifier]);
     }
 

@@ -3,10 +3,13 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Core\AbstractTrainee;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
+use App\Form\Type\AbstractTrainingType;
+use App\Service\TrainingBalanceSheet;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
@@ -18,7 +21,7 @@ use Symfony\Bundle\SecurityBundle\Security;
 use JMS\Serializer\SerializationContext;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
 use App\Repository\TrainingRepository;
@@ -26,27 +29,31 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route(path: '/training')]
 abstract class AbstractTrainingController extends AbstractController
 {
     protected $sessionClass = AbstractSession::class;
 
+    private TrainingBalanceSheet $trainingBalanceSheet;
     /**
      * @var int[]
      */
-    private const ALL_SEMESTERS = [1, 2];
+    private const array ALL_SEMESTERS = [1, 2];
     /**
      * @var int[]
      */
-    private const ALL_PROMOTE = [0, 1];
+    private const array ALL_PROMOTE = [0, 1];
+
     public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
     }
 
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/search', name: 'training.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry)
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->all('filters');
@@ -75,7 +82,7 @@ abstract class AbstractTrainingController extends AbstractController
 
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create/{type}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry, $type): array
+    public function create(Request $request, ManagerRegistry $managerRegistry): array
     {
         $class = Internship::class;
         /** @var AbstractTraining $training */
@@ -109,11 +116,11 @@ abstract class AbstractTrainingController extends AbstractController
         //return new Response(json_encode(array('training' => $training, 'form' => $form->createView())));
 
     }
-
-    #[Route(path: '/{id}/view', name: 'training.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[Groups(['Default', 'training'])]
+    #[Route(path: '/{id}/view', name: 'training.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['GET'])]
     #[IsGranted('VIEW', subject: 'training')]
-    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
-    public function view(Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): array|View
+    #[Rest\View(serializerGroups: ["Default", "training"] ,serializerEnableMaxDepthChecks: true)]
+    public function view(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): array|View
     {
         $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
         if (!$training) {
@@ -127,7 +134,7 @@ abstract class AbstractTrainingController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $form = $this->createForm($training::getFormType(), $training);
+        $form = $this->createForm(AbstractTrainingType::class, $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
@@ -153,7 +160,6 @@ abstract class AbstractTrainingController extends AbstractController
 
     #[Route(path: '/{id}/remove', name: 'training.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['POST'])]
     #[IsGranted('DELETE', subject: 'training')]
-    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     public function remove(ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
@@ -168,9 +174,8 @@ abstract class AbstractTrainingController extends AbstractController
         return $this->redirectToRoute('training.search');
     }
 
-    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/choosetypeduplicate', name: 'training.choosetypeduplicate', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function chooseTypeDuplicate(Request $request): array
+    public function chooseTypeDuplicate(SerializerInterface $serializer, Request $request): JsonResponse
     {
         $typeChoices = [];
         foreach ($this->get('sygefor_training.type.registry')->getTypes() as $type => $entity) {
@@ -183,17 +188,18 @@ abstract class AbstractTrainingController extends AbstractController
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                return ['type' => $form->get('duplicatedType')->getData()];
+                return new JsonResponse(['type' => $form->get('duplicatedType')->getData()]);
             }
         }
+        $dataTb = ['form' => $form->createView()];
+        $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+        return new JsonResponse($json, 200, [], true);
 
-        return ['form' => $form->createView()];
     }
 
 
     #[Route(path: '/duplicate/{id}/{type}', name: 'training.duplicate', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
-    public function duplicate(Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, $type, int $id): array
+    public function duplicate(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, $type, int $id): JsonResponse
     {
         $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
         if (!$training) {
@@ -267,11 +273,15 @@ abstract class AbstractTrainingController extends AbstractController
 
                 $this->mergeArrayCollectionsAndFlush($cloned, $training);
 
-                return ['form' => $form->createView(), 'training' => $cloned];
+                $dataTb = ['form' => $form->createView(), 'training' => $cloned];
+                $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+                return new JsonResponse($json, 200, [], true);
             }
         }
 
-        return ['form' => $form->createView()];
+        $dataTb = ['form' => $form->createView()];
+        $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+        return new JsonResponse($json, 200, [], true);
     }
 
     protected function mergeArrayCollectionsAndFlush(AbstractTraining $dest, AbstractTraining $source): void
@@ -297,15 +307,14 @@ abstract class AbstractTrainingController extends AbstractController
     }
 
     #[Route(path: '/{id}/bilan.{_format}', name: 'training.balancesheet', requirements: ['_format' => 'csv|xls|xlsx'], options: ['expose' => true], defaults: ['_format' => 'xls'], methods: 'GET')]
-    public function balanceSheet(AbstractTraining $training, ManagerRegistry $managerRegistry, int $id)
+    public function balanceSheet(AbstractTraining $training, ManagerRegistry $managerRegistry, int $id, trainingBalanceSheet $trainingBalanceSheet): Response
     {
         $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
         if (!$training) {
             throw new NotFoundHttpException();
         }
-        $trainingBalanceSheet = new TrainingBalanceSheet($training, $this->get('phpexcel'), $this->container);
 
-        return $trainingBalanceSheet->getResponse();
+        return $trainingBalanceSheet->getCsvResponse($training);
     }
 
     private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainingRepository $trainingRepository)

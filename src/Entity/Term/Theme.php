@@ -19,12 +19,12 @@ class Theme extends AbstractTerm implements VocabularyInterface
      *
      * @var bool
      */
-    static $replacementRequired = true;
+    static bool $replacementRequired = true;
 
     /**
      * @return mixed
      */
-    public function getVocabularyName(): mixed
+    public function getVocabularyName(): string
     {
         return 'Thématiques de formation';
     }

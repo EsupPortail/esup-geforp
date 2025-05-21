@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,12 +12,10 @@ use App\Entity\Core\Material;
 use App\Entity\Term\Supervisor;
 use App\Entity\Term\Tag;
 use App\Entity\Term\Trainingcategory;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\AccessRight\SerializedAccessRights;
 
-/**
- * @method getMaterials()
- */
 #[ORM\Table(name: 'training')]
 #[ORM\UniqueConstraint(name: 'organization_number', columns: ['number', 'organization_id'])]
 #[ORM\Entity]
@@ -32,30 +31,34 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    private ?int $id = null;
+    private int $id;
 
     /**
      * @var AbstractOrganization
      * @Serializer\Groups({"Default", "training", "api"})
      */
+    #[Groups(["Default", "api", "training"])]
     #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank]
-    protected $organization;
+    protected AbstractOrganization $organization;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractSession>
      * @Serializer\Groups({"training", "api.training"})
      */
-    #[ORM\OneToMany(targetEntity: 'AbstractSession', mappedBy: 'training', cascade: ['persist', 'remove'])]
+    #[Groups(["api.training", "training"])]
+    #[ORM\OneToMany(mappedBy: 'training', targetEntity: 'AbstractSession', cascade: ['persist', 'remove'])]
     protected \Doctrine\Common\Collections\Collection $sessions;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'number', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $number = null;
 
@@ -63,6 +66,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     #[Assert\NotBlank(message: 'Vous devez renseigner un intitulé.')]
     protected ?string $name = null;
@@ -70,6 +74,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"training", "session", "inscription", "api"})
      */
+    #[Groups(["Default", "api", "training", "session", "inscription"])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Theme::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'Vous devez renseigner une thématique.')]
@@ -79,6 +84,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\Column(name: 'program', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $program = null;
 
@@ -86,6 +92,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\Column(name: 'description', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $description = null;
 
@@ -93,6 +100,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\Column(name: 'teaching_methods', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $teachingmethods = null;
 
@@ -100,6 +108,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
     protected ?\App\Entity\Core\AbstractInstitution $institution = null;
@@ -107,12 +116,14 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @Serializer\Groups({"training", "api.training", "session"})
      */
+    #[Groups(["training", "api", "api.training", "session"])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Supervisor::class)]
     protected ?\App\Entity\Term\Supervisor $supervisor = null;
 
     /**
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Trainingcategory::class)]
     #[ORM\JoinColumn]
     protected ?\App\Entity\Term\Trainingcategory $category = null;
@@ -121,6 +132,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Tag>
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\JoinTable(name: 'training__training_tag')]
     #[ORM\JoinColumn(name: 'training_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'tag_id', referencedColumnName: 'id', onDelete: 'cascade')]
@@ -131,13 +143,15 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
-    #[ORM\Column(name: 'interventionType', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    #[Groups(['training', 'api'])]
+    #[ORM\Column(name: 'interventionType', type: 'string', length: 255, nullable: true)]
     protected ?string $interventiontype = null;
 
     /**
      *
      * @Serializer\Groups({"training"})
      */
+    #[Groups(["training"])]
     #[ORM\Column(name: 'externalInitiative', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
     protected ?bool $externalinitiative = null;
 
@@ -145,22 +159,25 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups(["training", "api"])]
     #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[Assert\NotNull]
-    protected int $firstsessionperiodsemester;
+    protected int $firstsessionperiodsemester = 1;
 
     /**
      *
      * @Serializer\Groups({"training", "api"})
      */
-    #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[Groups(['training', 'api'])]
+    #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
     #[Assert\NotNull]
-    protected ?int $firstsessionperiodyear = null;
+    protected ?int $firstsessionperiodyear;
 
     /**
      *
      * @Serializer\Groups({"training"})
      */
+    #[Groups(["training"])]
     #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $comments = null;
 
@@ -168,6 +185,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
+    #[Groups(["training", "session", "api.attendance"])]
     #[ORM\OneToMany(mappedBy: 'training', targetEntity: \App\Entity\Core\Material::class, cascade: ['remove', 'persist'])]
     #[ORM\JoinColumn]
     protected \Doctrine\Common\Collections\Collection $materials;
@@ -189,7 +207,6 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      */
     public function __clone()
     {
-        $this->id = null;
         $this->setCreatedat(new \DateTime());
 
         //sessions are not copied.
@@ -248,7 +265,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return int|null
      */
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -561,6 +578,11 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
         $this->materials = $materials;
     }
 
+    public function getMaterials (): Collection
+    {
+        return $this->materials;
+    }
+
     /**
      * @param Material $material
      */
@@ -592,6 +614,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     public static function getTypeLabel(): string
     {
         return 'Formation';
@@ -610,6 +633,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Groups(['session', 'training'])]
     public function getLastsession(): mixed
     {
 
@@ -632,6 +656,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Groups(['session', 'training'])]
     public function getNextsession(): mixed
     {
 
@@ -655,6 +680,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Groups(['session', 'training'])]
     public function getSessionscount(): int
     {
         return count($this->sessions);
@@ -665,20 +691,23 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Groups(['session', 'training'])]
     public function getTrainers(): array
     {
         $trainers = [];
         if ($this->sessions) {
             foreach ($this->sessions as $session) {
-                if (!$session->getParticipations()) {
+                $participations = $session->getParticipations();
+                if (!$participations->isEmpty()) {
                     continue;
                 }
-                if ($session->getParticipations()->count() <= 0) {
-                    continue;
-                }
-                foreach ($session->getParticipations() as $participation) {
-                    // do not add several times the same trainer
-                    $trainers[$participation->getTrainer()->getId()] = $participation->getTrainer();
+
+                foreach ($participations as $participation) {
+                    $trainer = $participation->getTrainer();
+                    if($trainer && !in_array($trainer, $trainers, true)) {
+                        // do not add several times the same trainer
+                        $trainers[] = $trainer;
+                    }
                 }
             }
         }

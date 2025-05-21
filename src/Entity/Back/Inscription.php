@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
 class Inscription extends AbstractInscription implements \Stringable
 {
 
-    public $isPaying;
+    public bool $isPaying;
     /**
      * @Serializer\Groups({"Default", "api"})
      */
@@ -226,5 +226,11 @@ class Inscription extends AbstractInscription implements \Stringable
     function __toString(): string
     {
         return (string) $this->getId();
+    }
+
+    #[Groups(['inscription'])]
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 }

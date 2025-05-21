@@ -10,17 +10,17 @@ interface VocabularyInterface
     /**
      * @var int
      */
-    public const VOCABULARY_NATIONAL = 0;
+    public const int VOCABULARY_NATIONAL = 0;
 
     /**
      * @var int
      */
-    public const VOCABULARY_LOCAL = 1;
+    public const int VOCABULARY_LOCAL = 1;
 
     /**
      * @var int
      */
-    public const VOCABULARY_MIXED = 2;
+    public const int VOCABULARY_MIXED = 2;
 
     /**
      * @return bool
@@ -30,12 +30,12 @@ interface VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyId();
+    public function getVocabularyId(): mixed;
 
     /**
      * @param string $id
      */
-    public function setVocabularyId($id);
+    public function setVocabularyId(string $id);
 
     /**
      * @return mixed

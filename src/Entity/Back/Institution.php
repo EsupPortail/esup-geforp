@@ -33,4 +33,5 @@ class Institution extends AbstractInstitution
         $classMetadata->addPropertyConstraint('zip', new Assert\NotBlank(['message' => 'Vous devez renseigner un code postal.']));
         $classMetadata->addPropertyConstraint('city', new Assert\NotBlank(['message' => 'Vous devez renseigner une ville.']));
     }
+
 }

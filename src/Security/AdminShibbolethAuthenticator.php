@@ -78,8 +78,8 @@ class AdminShibbolethAuthenticator extends AbstractAuthenticator implements Even
     public function authenticate(Request $request): Passport
     {
         $id = $request->server->get('eppn');
-dump($request->server);
-dump($id);
+//dump($request->server);
+//dump($id);
         return new Passport(
             new UserBadge($id, function ($userIdentifier) {
                 // optionally pass a callback to load the User manually
@@ -87,7 +87,7 @@ dump($id);
                 if (!$user) {
                     throw new UserNotFoundException();
                 }
-dump($user);
+//dump($user);
                 return $user;
             }),
             new CustomCredentials(fn($credentials, $user) => true, $id),
@@ -104,7 +104,7 @@ dump($user);
         }
 
         $redirectTo = $this->urlGenerator->generate('shib_logout', [
-            'return' => $this->idpUrl . 'geforp-test.univ-amu.fr',
+            'return' => $this->idpUrl . '/profile/Logout',
         ]);
         $logoutEvent->setResponse(new RedirectResponse($redirectTo));
     }

@@ -3,6 +3,7 @@
 namespace App\Entity\Back;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 use JMS\Serializer\Annotation as Serializer;
@@ -14,6 +15,7 @@ class EvaluationNotedCriterion
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups([ 'Default','api'])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,6 +30,7 @@ class EvaluationNotedCriterion
     /**
      * @Serializer\Groups({"Default", "api.attendance"})
      */
+    #[Groups([ 'Default','api.attendance'])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Evaluationcriterion::class)]
     #[ORM\JoinColumn(name: 'criterion_id', onDelete: 'CASCADE')]
     protected ?\App\Entity\Term\Evaluationcriterion $criterion = null;
@@ -35,13 +38,14 @@ class EvaluationNotedCriterion
     /**
      * @Serializer\Groups({"Default", "api.attendance"})
      */
+    #[Groups([ 'Default','api.attendance'])]
     #[ORM\Column(name: 'note', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $note = null;
 
     /**
      * @return mixed
      */
-    public function getId(): mixed
+    public function getId()
     {
         return $this->id;
     }
@@ -54,7 +58,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getInscription(): mixed
+    public function getInscription()
     {
         return $this->inscription;
     }
@@ -67,7 +71,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getCriterion(): mixed
+    public function getCriterion()
     {
         return $this->criterion;
     }
@@ -80,7 +84,7 @@ class EvaluationNotedCriterion
     /**
      * @return mixed
      */
-    public function getNote(): mixed
+    public function getNote()
     {
         return $this->note;
     }

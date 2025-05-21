@@ -84,7 +84,7 @@ class Session extends AbstractSession
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\DateSession> $dates
      * @Serializer\Groups({"session", "api.session"})
      */
-    #[Groups(['session', 'api.session'])]
+    #[Groups(['api.session'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\DateSession::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
     #[MaxDepth(1)]
@@ -135,7 +135,7 @@ class Session extends AbstractSession
         return $this->teachingcost;
     }
 
-    public function setTeachingcost(mixed $teachingCost): void
+    public function setTeachingcost(?float $teachingCost): void
     {
         $this->teachingcost = $teachingCost;
     }
@@ -314,6 +314,7 @@ class Session extends AbstractSession
     {
         $this->dates          = new ArrayCollection();
         $this->alerts          = new ArrayCollection();
+        parent::__Construct();
     }
 
     public function __clone()

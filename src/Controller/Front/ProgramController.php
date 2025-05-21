@@ -36,7 +36,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 
@@ -353,10 +353,10 @@ class ProgramController extends AbstractController
             }
 
 
-            return ['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc, $this->render('Front/Public/program/inscription.html.twig')];
+            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
         } else {
             //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
-            return ['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc, $this->render('Front/Public/program/inscription.html.twig')];
+            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
         }
     }
 
@@ -893,7 +893,7 @@ class ProgramController extends AbstractController
      * @param $trainee
      * @return bool
      */
-    protected function isMultiEtab($trainee): bool
+    protected function isMultiEtab($trainee)
     {
         $multiEtab = false;
         // Récupération des établissements liés

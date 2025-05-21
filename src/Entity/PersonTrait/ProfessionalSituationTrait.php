@@ -38,12 +38,14 @@ trait ProfessionalSituationTrait
     #[Groups(["trainee", "trainer", "inscription", "api.profile"])]
     protected ?string $status;
 
+
     /**
      * Copy professional situation information from another entity
      *
      * @param ProfessionalSituationTrait $entity
      * @param boolean $force
      */
+
     public function copyProfessionalSituation($entity, bool $force = true): void
     {
         $propertyAccessor = new PropertyAccessor();

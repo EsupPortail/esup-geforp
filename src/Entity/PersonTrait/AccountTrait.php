@@ -88,7 +88,7 @@ trait AccountTrait
      */
     public function getUsername(): string
     {
-        return $this->email;
+        return $this->getUserIdentifier();
     }
 
     /**

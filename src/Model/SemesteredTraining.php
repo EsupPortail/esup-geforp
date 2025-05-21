@@ -27,7 +27,7 @@ final class SemesteredTraining
      * @param int $semester
      * @param AbstractTraining $training
      */
-    public function __construct(private $year, private $semester, private $training, ?array $sessions = null)
+    public function __construct(private int $year, private int $semester, private AbstractTraining $training, ?array $sessions = null)
     {
         $this->setSessions($sessions);
     }
@@ -35,7 +35,7 @@ final class SemesteredTraining
     /**
      * @param int $semester
      */
-    public function setSemester($semester): void
+    public function setSemester(int $semester): void
     {
         $this->semester = $semester;
     }
@@ -43,7 +43,7 @@ final class SemesteredTraining
     /**
      * @return int
      */
-    public function getSemester()
+    public function getSemester(): int
     {
         return $this->semester;
     }
@@ -75,9 +75,9 @@ final class SemesteredTraining
     }
 
     /**
-     * @return mixed
+     * @return AbstractTraining
      */
-    public function getTraining()
+    public function getTraining(): AbstractTraining
     {
         return $this->training;
     }
@@ -85,7 +85,7 @@ final class SemesteredTraining
     /**
      * @param int $year
      */
-    public function setYear($year): void
+    public function setYear(int $year): void
     {
         $this->year = $year;
     }
@@ -93,7 +93,7 @@ final class SemesteredTraining
     /**
      * @return int
      */
-    public function getYear()
+    public function getYear(): int
     {
         return $this->year;
     }
@@ -106,10 +106,10 @@ final class SemesteredTraining
     /**
      * @return AbstractSession
      */
-    public function getLastSession()
+    public function getLastSession(): AbstractSession|null
     {
         if (empty($this->sessions)) {
-            return;
+            return null;
         }
 
         $dateTime = new \DateTime();
@@ -128,25 +128,26 @@ final class SemesteredTraining
     }
 
     /**
-     * @return AbstractSession
+     * @return AbstractSession|null
      */
-    public function getNextSession()
+    public function getNextSession(): AbstractSession|null
     {
         if (empty($this->sessions)) {
-            return;
+            return null;
         }
 
         $dateTime = new \DateTime();
 
         $result = null;
         $maxdif = 9_999_999_999;
-        foreach ($this->sessions as $session) {
-            $dif = $session->getDatebegin()->getTimestamp() - $dateTime->getTimeStamp();
-            if (($dif > 0) && ($dif < $maxdif)) {
-                $result = $session;
-                $maxdif = $dif;
+
+            foreach ($this->sessions as $session) {
+                $dif = $session->getDatebegin()->getTimestamp() - $dateTime->getTimeStamp();
+                if (($dif > 0) && ($dif < $maxdif)) {
+                    $result = $session;
+                    $maxdif = $dif;
+                }
             }
-        }
 
         return $result;
     }
@@ -262,6 +263,10 @@ final class SemesteredTraining
         // no session found : we build a single semestered training on first session year/semester.
         $year = $training->getFirstSessionPeriodYear();
         $semester = $training->getFirstSessionPeriodSemester();
+        if ($year === null || $semester === null) {
+            $year = date('Y');
+            $semester = (date('n') <= 6) ? 1 : 2;
+        }
         $semTraining = new self($year, $semester, $training, []);
         return [$semTraining];
     }
@@ -269,9 +274,9 @@ final class SemesteredTraining
     /**
      * Return an array of training and remove duplicates from semestered training list.
      *
-     * @param array         $excludedTypes
+     * @param array $excludedTypes
      */
-    public static function getTrainingsByIds(array $idList, EntityManager $entityManager, $excludedTypes)
+    public static function getTrainingsByIds(array $idList, EntityManager $entityManager, array $excludedTypes): array
     {
         $arrayIds = [];
         foreach ($idList as $semesteredTrainingId) {
@@ -299,7 +304,7 @@ final class SemesteredTraining
      *
      * @return SemesteredTraining[]
      */
-    public static function getSemesteredTrainingsByIds(array $idList, EntityManager $entityManager)
+    public static function getSemesteredTrainingsByIds(array $idList, EntityManager $entityManager): array
     {
         //building DQL query to get needed sessions objects
         $queryBuilder = $entityManager->createQueryBuilder()
@@ -354,20 +359,24 @@ final class SemesteredTraining
         foreach ($idList as $id) {
             $params = explode('_', (string) $id);
 
-            /*
-            if (count($params) === 3) {
-                if (!empty($sessions[$params[0]][$params[1]][$params[2]])) {
-                    //getting sessions
-                    $tmpSessions = $sessions[$params[0]][$params[1]][$params[2]];
-                    $semTrains[] = new self($params[1], $params[2], $tmpSessions[0]->getTraining(), $tmpSessions);
-                } else {
-                    $semTrains[] = new self($params[1], $params[2], $em->getRepository(AbstractTraining::class)->find($params[0]), array());
-                }
-            }*/
 
-            // Construction semestered training
-            $train = $entityManager->getRepository(AbstractTraining::class)->find($params[0]);
-            $semTrains[] = new self($train->getFirstsessionperiodyear(), $train->getFirstsessionperiodsemester(), $entityManager->getRepository(AbstractTraining::class)->find($params[0]), []);
+            if (count($params) === 3) {
+                $trainingId = $params[0];
+                $year = $params[1];
+                $semester = $params[2];
+
+                if (!empty($sessions[$trainingId][$year][$semester])) {
+                    //getting sessions
+                    $tmpSessions = $sessions[$trainingId][$year][$semester];
+                    $semTrains[] = new self($year, $semester, $tmpSessions[0]->getTraining(), $tmpSessions);
+                } else {
+                    $train = $entityManager->getRepository(AbstractTraining::class)->find($trainingId);
+
+                    if($train){
+                        $semTrains[] = new self($year, $semester, $train, []);
+                    }
+                }
+            }
 
         }
 

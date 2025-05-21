@@ -13,6 +13,9 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use JMS\Serializer\SerializationContext;
@@ -29,6 +32,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route(path: '/training/session')]
 abstract class AbstractSessionController extends AbstractController
@@ -46,7 +50,7 @@ abstract class AbstractSessionController extends AbstractController
      * @return array{total: int, pageSize: mixed, items: array<int, array{availablePlaces?: mixed, datebegin?: mixed, dateend?: mixed, daynumber?: mixed, displayonline?: mixed, hournumber?: mixed, id: mixed, inscriptions?: array<int, array{id: mixed}>, inscriptionStats?: array<int, array{id: mixed, name: mixed, status: mixed, count: int}>, limitRegistrationDate?: mixed, maximumnumberofregistrations?: mixed, name?: mixed, numberofacceptedregistrations?: mixed, numberofparticipants?: mixed, numberofregistrations?: mixed, participations?: array<int, array{id: mixed}>, promote?: mixed, registrable?: mixed, registration?: mixed, semester?: mixed, semesterLabel?: mixed, sessiontype?: mixed, status?: mixed, theme?: mixed, training?: array{id: mixed, type: mixed, name: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed}, year?: mixed}>, aggs: mixed}
      */
     #[Route(path: '/search', name: 'session.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry): array
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry): JsonResponse
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->all('filters');
@@ -72,17 +76,19 @@ abstract class AbstractSessionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        return $ret;
+        $json = $serializer->serialize($ret, 'json', ['groups' => ['session']]);
+        return new JsonResponse($json, 200, [], true);
     }
 
     /**
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
+    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create/{training}', name: 'session.create', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('EDIT', subject: 'training')]
-    public function create(Request $request, ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): array
+    public function create(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, AbstractTraining $training): array
     {
-        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($training);
         if(!$training) {
             throw new NotFoundHttpException();
         }
@@ -122,8 +128,10 @@ abstract class AbstractSessionController extends AbstractController
      *
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
+    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Groups(['"Default", "session"'])]
     #[Route(path: '/{id}/view', name: 'session.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function view(Request $request, ManagerRegistry $managerRegistry, AbstractSession $session, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|array
+    public function view(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, int $id):\Symfony\Component\HttpFoundation\RedirectResponse|array
     {
         $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
         if(!$session){
@@ -148,6 +156,7 @@ abstract class AbstractSessionController extends AbstractController
             }
         }
 
+
         $url = 'https://' . $_ENV['front_host'] . '/program/training/' . $session->getTraining()->getId() . '/' . $session->getId();
         return ['form' => $form->createView(), 'session' => $session, 'front_url' => $url];
     }
@@ -159,8 +168,9 @@ abstract class AbstractSessionController extends AbstractController
      *
      * @return array
      */
-    #[Route(path: '/duplicate/{id}/{inscriptionIds}', name: 'session.duplicate', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function duplicate(Request $request, ManagerRegistry $managerRegistry,  int $id, mixed $inscriptionIds = null, AbstractSession $session = null): array
+    #[Rest\View(['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/duplicate/{id}/{inscriptionIds}', name: 'session.duplicate', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json', 'inscriptionIds'=> []])]
+    public function duplicate(Request $request, ManagerRegistry $managerRegistry,  int $id, array $inscriptionIds = [], AbstractSession $session = null): array
     {
         $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
         if (!$session) {

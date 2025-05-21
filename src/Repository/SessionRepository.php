@@ -255,7 +255,9 @@ final class SessionRepository extends ServiceEntityRepository
                 $sessionES['numberofregistrations'] = $session->getNumberofregistrations();
                 $sessionES['numberofacceptedregistrations'] = $session->getNumberofacceptedregistrations();
                 $sessionES['maximumnumberofregistrations'] = $session->getMaximumnumberofregistrations();
-                $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
+                if (method_exists($session, 'getNumberofparticipants')) {
+                    $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
+                }
                 $sessionES['registrable'] = $session->isRegistrable();
                 $sessionES['registration'] = $session->getRegistration();
                 $sessionES['status'] = $session->getStatus();

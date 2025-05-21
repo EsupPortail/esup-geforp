@@ -39,12 +39,14 @@ abstract class AbstractInscription implements SerializedAccessRights
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
+    #[Groups(['Default', 'api'])]
     protected ?int $id = null;
 
     /**
      * @var AbstractTrainee
      * @Serializer\Groups({"inscription", "session"})
      */
+    #[Groups(['inscription', 'session'])]
     #[ORM\ManyToOne(targetEntity: 'AbstractTrainee', inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'trainee_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
@@ -58,20 +60,21 @@ abstract class AbstractInscription implements SerializedAccessRights
     #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'session_id', referencedColumnName: 'id')]
     #[Assert\NotNull]
-    #[MaxDepth(1)]
     protected AbstractSession $session;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Inscriptionstatus::class)]
     #[ORM\JoinColumn(name: 'inscription_status_id')]
     #[Assert\NotNull(message: "Vous devez spécifier un status d'inscription.")]
-    protected ?\App\Entity\Term\Inscriptionstatus $inscriptionstatus = null;
+    protected ?\App\Entity\Term\Inscriptionstatus $inscriptionstatus;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Presencestatus::class)]
     #[ORM\JoinColumn(name: 'presence_status_id')]
     protected ?\App\Entity\Term\Presencestatus $presencestatus = null;
@@ -100,7 +103,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param Inscriptionstatus
      */
-    public function setInscriptionstatus($inscriptionStatus): void
+    public function setInscriptionstatus(?Inscriptionstatus $inscriptionStatus): void
     {
         $this->inscriptionstatus = $inscriptionStatus;
     }

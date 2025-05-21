@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\AccessRight\SerializedAccessRights;
@@ -12,6 +13,7 @@ use App\Entity\PersonTrait\PersonTrait;
 use App\Entity\PersonTrait\ProfessionalSituationTrait;
 use App\Entity\Term\Trainertype;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -40,58 +42,68 @@ abstract class AbstractTrainer implements SerializedAccessRights
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    protected ?int $id = null;
+    #[Groups(["Default", "trainer", "session", "api.training"])]
+    protected ?int $id;
+
 
     /**
-     * @var AbstractOrganization
+     * @var ?AbstractOrganization
      * @Serializer\Groups({"trainer"})
      */
     #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
-    #[ORM\JoinColumn]
-    protected AbstractOrganization $organization;
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(["trainer"])]
+    protected ?AbstractOrganization $organization;
 
     /**
-     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractParticipation>
+     * @var Collection<AbstractParticipation>
      * @Serializer\Exclude
      */
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
-    protected \Doctrine\Common\Collections\Collection $participations;
+    protected Collection $participations;
 
     /**
      * @Serializer\Groups({"trainer"})
      */
-    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Trainertype::class)]
-    #[ORM\JoinColumn(name: 'trainer_type_id')]
-    protected ?\App\Entity\Term\Trainertype $trainertype = null;
+    #[Serializer\Groups(['trainer'])]
+    #[ORM\ManyToOne(targetEntity: Trainertype::class)]
+    #[ORM\JoinColumn(name: 'trainer_type_id', nullable: true)]
+    #[Groups(["trainer"])]
+    protected ?Trainertype $trainertype = null;
 
     /**
      * @Serializer\Groups({"trainer"})
      */
     #[ORM\Column(name: 'is_archived', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    #[Groups(["trainer"])]
     protected ?bool $isarchived = null;
 
     /**
      * @Serializer\Groups({"trainer", "api.training", "api.trainer"})
      */
     #[ORM\Column(name: 'is_allow_send_mail', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    #[Groups(["trainer", "api.training", "api.trainer"])]
     protected ?bool $isallowsendmail = false;
 
     /**
      * @Serializer\Groups({"trainer"})
      */
     #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    #[Groups(["trainer"])]
     protected ?bool $isorganization = null;
 
     /**
      * @Serializer\Groups({"trainer"})
      */
     #[ORM\Column(name: 'is_public', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
-    protected ?bool $ispublic = null;
+    #[Groups(["trainer"])]
+    protected bool $ispublic;
 
     /**
      * @Serializer\Groups({"trainer"})
      */
     #[ORM\Column(name: 'comments', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    #[Groups(["trainer"])]
     protected ?string $comments = null;
 
     public function __construct()
@@ -104,6 +116,11 @@ abstract class AbstractTrainer implements SerializedAccessRights
      */
     public function changePropertiesOrganization(): void
     {
+    }
+
+    public function setId(int $id): void
+    {
+        $this->id = $id;
     }
 
     /**
@@ -133,7 +150,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return ArrayCollection
      */
-    public function getParticipations(): ArrayCollection|\Doctrine\Common\Collections\Collection
+    public function getParticipations(): ArrayCollection|Collection
     {
         return $this->participations;
     }
@@ -229,7 +246,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * @return bool
      */
-    public function isIspublic(): ?bool
+    public function isIspublic(): bool
     {
         return $this->ispublic;
     }
@@ -251,9 +268,9 @@ abstract class AbstractTrainer implements SerializedAccessRights
     }
 
     /**
-     * @param string $comments
+     * @param ?string $comments
      */
-    public function setComments(string $comments): void
+    public function setComments(?string $comments): void
     {
         $this->comments = $comments;
     }

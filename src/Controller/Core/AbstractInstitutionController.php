@@ -12,7 +12,7 @@ use JMS\Serializer\Serializer;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,8 +31,9 @@ abstract class AbstractInstitutionController extends AbstractController
     protected string $institutionClass = AbstractInstitution::class;
 
     #[Groups(['Default', 'institution'])]
+    #[Rest\View(serializerGroups: ['Default', 'institution'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/search', name: 'institution.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): JsonResponse
+    public function search(Request $request, ManagerRegistry $managerRegistry, InstitutionRepository $institutionRepository): array
     {
         $keywords = $request->request->get('keywords', '');
         $filters = $request->request->all('filters') ?: [];
@@ -48,12 +49,13 @@ abstract class AbstractInstitutionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        return new JsonResponse($ret);
+        return $ret;
     }
 
+    #[Rest\View(serializerGroups: ['Default', 'institution'], serializerEnableMaxDepthChecks: true)]
     #[Groups(['Default', 'institution'])]
     #[Route(path: '/create', name: 'institution.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry, SerializerInterface $serializer): JsonResponse
+    public function create(Request $request, ManagerRegistry $managerRegistry, SerializerInterface $serializer): array
     {
         /** @var AbstractInstitution $institution */
         $institution = new $this->institutionClass();
@@ -74,16 +76,15 @@ abstract class AbstractInstitutionController extends AbstractController
                 $objectManager->flush();
             }
         }
-        $data = $serializer->serialize($institution, 'json', ['groups' => 'institution']);
-        return new JsonResponse([$data, 200 ]);
+        return ['form' => $form->createView(), 'institution' => $institution];
     }
 
     #[Route(path: '/{id}/view', name: 'institution.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('VIEW', subject: 'institution')]
-    #[Groups(['Default', 'institution'])]
-    public function view(Request $request, ManagerRegistry $managerRegistry, AbstractInstitution $institution, int $id): array
+    #[Rest\View(serializerGroups: ['Default', 'institution'], serializerEnableMaxDepthChecks: true)]
+    public function view(Institution $institution, Request $request, ManagerRegistry $managerRegistry, int $id): array
     {
-        $institution = $managerRegistry->getRepository(Institution::class, $id);
+        $institution = $managerRegistry->getRepository(Institution::class)->find($id);
         if (!$institution) {
             throw new NotFoundHttpException('Institution not found');
         }
@@ -103,20 +104,31 @@ abstract class AbstractInstitutionController extends AbstractController
         return ['form' => $form->createView(), 'institution' => $institution];
     }
 
-    #[Route(path: '/{id}/remove', name: 'institution.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: "POST")]
+    #[Route(path: '/{id}/remove', name: 'institution.remove', requirements: ['id' => '\d+'], options: ['expose' => true], methods: ["POST"])]
     #[IsGranted('DELETE', subject: 'institution')]
-    #[Groups(['Default', 'institution'])]
-    public function remove(AbstractInstitution $institution, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function remove(AbstractInstitution $institution, ManagerRegistry $managerRegistry): JsonResponse
     {
-        $institution = $managerRegistry->getRepository(Institution::class, $id);
+        $entityManager = $managerRegistry->getManager();
+
         if (!$institution) {
             throw new NotFoundHttpException('Institution not found');
         }
-        $objectManager = $managerRegistry->getManager();
-        $objectManager->remove($institution);
-        $objectManager->flush();
 
-        return $this->redirectToRoute('institution.search');
+        //Recherche tous les domaines associés aux institutions et les enlève de leurs associations
+        foreach ($institution->getDomains() as $domain) {
+            $institution->removeDomain($domain);
+        }
+
+        //Recherche tous les autres établissements associés aux institutions et les enlève de leurs associations
+        foreach ($institution->getVisuinstitutions() as $visuInstitution) {
+            $institution->removeVisuinstitution($visuInstitution);
+        }
+
+        $entityManager->flush();
+        $entityManager->remove($institution);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'success', 'message' => 'Institution deleted']);
     }
 
     private function constructAggs($aggs, $keyword, $query_filters, \App\Repository\InstitutionRepository $institutionRepository): array

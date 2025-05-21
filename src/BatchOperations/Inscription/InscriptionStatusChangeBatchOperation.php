@@ -22,10 +22,13 @@ use App\Entity\Term\Presencestatus;
 use App\Entity\Back\DateSession;
 use App\Entity\Back\Presence;
 use Doctrine\Persistence\ManagerRegistry;
+use JetBrains\PhpStorm\NoReturn;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use function PHPUnit\Framework\isEmpty;
 
 /**
  * Class MailingBatchOperation.
@@ -35,10 +38,11 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
     /**
      * @var string
      */
-    protected $targetClass = AbstractInscription::class;
+    protected string $targetClass = AbstractInscription::class;
 
-    public function __construct(private readonly TokenStorageInterface $tokenStorage, private readonly VocabularyRegistry $vocabularyRegistry, private readonly EmailingBatchOperation $emailingBatchOperation, private readonly MailingBatchOperation $mailingBatchOperation)
+    public function __construct(private readonly Security $Security, private readonly VocabularyRegistry $vocabularyRegistry, private readonly EmailingBatchOperation $emailingBatchOperation, private readonly MailingBatchOperation $mailingBatchOperation)
     {
+        parent::__construct();
     }
 
     public function execute(array $idList = [], array $options = []): int
@@ -105,7 +109,6 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
                                 }
                             else
                                 $presence->setAfternoon("");
-
                             $presence->setInscription($inscription);
                             $inscription->addPresence($presence);
                             $inscription->setUpdatedAt(new \DateTime('now'));
@@ -178,15 +181,18 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
     }
 
     /**
-     * @param $options
+     * @param array $options
      *
      * @return array{ccResolvers: null, templates: object[], attachmentTemplates: \App\Vocabulary\VocabularyInterface[]}
      */
     public function getModalConfig($options = []): array
     {
-        $userOrg = $this->tokenStorage->getToken($options['user']);
-        if ($userOrg === '' || $userOrg === '0'){
-            throw new \Exception("Token is missing");
+        $token = $this->Security->getToken();
+        $user = $token?->getUser();
+        $userOrg = null;
+
+        if ($user && method_exists($user, 'getOrganization')) {
+            $userOrg = $user->getOrganization()->getId();
         }
 
         $templateTerm = $this->vocabularyRegistry->getVocabularyById(5); // vocabulary_email_template
@@ -201,18 +207,18 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
 
         if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
-            $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionstatus']);
+            $inscriptionStatus = $repoInscriptionStatus->find($options['inscriptionstatus']);
             $findCriteria = ['inscriptionstatus' => $inscriptionStatus];
-            if ($userOrg !== '' && $userOrg !== '0') {
+            if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
             }
 
             $templates = $repo->findBy($findCriteria);
         } elseif (!empty($options['presencestatus'])) {
             $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
-            $presenceStatus = $repoInscriptionStatus->findById($options['presencestatus']);
+            $presenceStatus = $repoInscriptionStatus->find($options['presencestatus']);
             $findCriteria = ['presencestatus' => $presenceStatus];
-            if ($userOrg !== '' && $userOrg !== '0') {
+            if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
             }
 

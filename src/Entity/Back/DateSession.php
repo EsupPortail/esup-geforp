@@ -23,6 +23,7 @@ class DateSession
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,6 +32,7 @@ class DateSession
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
     protected ?\DateTimeInterface $datebegin = null;
@@ -38,6 +40,7 @@ class DateSession
     /**
      * @Serializer\Groups({"Default", "session", "api"})
      */
+    #[Groups(["Default", "api", "session"])]
     #[ORM\Column(name: 'dateEnd', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $dateend = null;
 
@@ -60,7 +63,7 @@ class DateSession
      * @var Session
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      */
-    #[Groups([ 'inscription', 'trainee', 'trainer', 'api'])]
+    #[Groups([ 'inscription', 'trainee', 'trainer', 'api', 'api.session'])]
     #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'dates')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
     #[MaxDepth(1)]

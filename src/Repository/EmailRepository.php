@@ -16,7 +16,7 @@ final class EmailRepository extends ServiceEntityRepository
         parent::__construct($managerRegistry, Email::class);
     }
 
-    public function getEmailsList($keyword, $filters)
+    public function getEmailsList($keyword, $filters, int $limit = 100)
     {
         $queryBuilder = $this->createQueryBuilder('e');
         $queryBuilder
@@ -25,7 +25,9 @@ final class EmailRepository extends ServiceEntityRepository
             // FILTRE KEYWORD
             ->where('e.subject LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%')
+
+            ->setMaxResults($limit);
 
 
         // FILTRE TRAINEE

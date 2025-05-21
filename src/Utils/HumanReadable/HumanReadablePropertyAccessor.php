@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 final class HumanReadablePropertyAccessor implements \Stringable
 {
     /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
-    private $accessorFactory;
+    private HumanReadablePropertyAccessorFactory $accessorFactory;
 
     /**
      * @param $object
@@ -64,11 +64,11 @@ final class HumanReadablePropertyAccessor implements \Stringable
     /**
      * magic getter for property path.
      *
-     * @param $property a string on the form 'myObjectAlias.MypropertyAlias'
+     * @param string $property a string on the form 'myObjectAlias.MypropertyAlias'
      *
      * @return mixed|null
      */
-    public function __get($property)
+    public function __get(string $property)
     {
         $path = null;
         switch ($property) {
@@ -185,7 +185,11 @@ final class HumanReadablePropertyAccessor implements \Stringable
 
     private function accessProperty($property): ?string
     {
-        return $this->accessorFactory->getPropertyForAlias($this->object::class, $property);
+        if (is_object($this->object)) {
+            return $this->accessorFactory->getPropertyForAlias(get_class($this->object), $property);
+        }
+
+        return $property;
     }
 
     public function setAccessorFactory(mixed $accessorFactory): void

@@ -52,7 +52,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
      *
      * @var bool
      */
-    public static bool $replacementRequired = true;
+    //public static bool $replacementRequired = true;
 
     /**
      * @Serializer\Groups({"Default", "api"})

@@ -12,6 +12,7 @@ namespace App\Entity\Term;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\PresenceStatusVocabularyType;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Statut de présense.
@@ -41,6 +42,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $status = self::STATUS_ABSENT;
 
@@ -63,7 +65,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @return int
      */
-    public function getStatus(): int
+    public function getStatus()
     {
         return $this->status;
     }

@@ -29,6 +29,7 @@ abstract class AbstractBatchOperationController extends AbstractController
     /**
      * @Rest\View
      */
+    #[Rest\View()]
     #[Route(path: '/batchoperation/{id}/execute', name: 'sygefor_core.batch_operation.execute', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function execute(Request $request, $id)
     {
@@ -82,6 +83,7 @@ abstract class AbstractBatchOperationController extends AbstractController
     /**
      * @Rest\View
      */
+    #[Rest\View()]
     #[Route(path: '/batchoperation/modalconfig/{service}', name: 'sygefor_core.batch_operation.modal_config', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function modalConfig(Request $request, $service)
     {
@@ -89,7 +91,7 @@ abstract class AbstractBatchOperationController extends AbstractController
 
         //we try to read option list as a JSON string (case of multipart form type)
         if (is_string($options)) {
-            $decodeOptions = json_decode($options, $assoc = true, 512, JSON_THROW_ON_ERROR);
+            $decodeOptions = json_decode($options, true, 512, JSON_THROW_ON_ERROR);
             if (is_array($decodeOptions)) {
                 $options = $decodeOptions;
             }
@@ -108,6 +110,7 @@ abstract class AbstractBatchOperationController extends AbstractController
      *
      * @Rest\View
      */
+    #[Rest\View()]
     #[Route(path: '/batchoperation/{service}/get/{file}/as/{filename}', name: 'sygefor_core.batch_operation.get_file', options: ['expose' => true], defaults: ['_format' => 'json', 'filename' => null])]
     public function fileDownload(Request $request, $service, $file, $filename = null)
     {

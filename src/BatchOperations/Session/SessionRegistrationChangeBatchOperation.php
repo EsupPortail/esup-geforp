@@ -24,7 +24,7 @@ final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperati
     /**
      * @var string
      */
-    protected $targetClass = AbstractSession::class;
+    protected string $targetClass = AbstractSession::class;
     private ManagerRegistry $managerRegistry;
     private Security $security;
 
@@ -32,6 +32,7 @@ final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperati
     {
         $this->managerRegistry = $managerRegistry;
         $this->security = $security;
+        parent::__construct();
     }
 
     /**
@@ -53,5 +54,7 @@ final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperati
         }
 
         $em->flush();
+
+        return $em;
     }
 }

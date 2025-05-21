@@ -11,6 +11,7 @@ namespace App\Entity\Back;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -22,6 +23,7 @@ class Corps
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,24 +32,28 @@ class Corps
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(["Default", "api", "trainee"])]
     #[ORM\Column(name: 'corps', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $corps = null;
 
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(["Default", "api", "trainee"])]
     #[ORM\Column(name: 'libelle_court', type: \Doctrine\DBAL\Types\Types::STRING)]
     protected ?string $libelleCourt = null;
 
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(["Default", "api", "trainee"])]
     #[ORM\Column(name: 'libelle_long', type: \Doctrine\DBAL\Types\Types::STRING)]
     protected ?string $libelleLong = null;
 
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(["Default", "api", "trainee"])]
     #[ORM\Column(name: 'category', type: \Doctrine\DBAL\Types\Types::STRING)]
     protected ?string $category = null;
 
@@ -56,7 +62,7 @@ class Corps
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }

@@ -1,4 +1,4 @@
-<form sf-xeditable-form="form" sf-href='institution.view({id: institution.id})' on-success="onSuccess(data)">
+<form ng-if="institution.id" sf-xeditable-form="form"  sf-href='institution.view({id: institution.id})' on-success="onSuccess(data)">
     <div class="row">
         <div class="col-md-8">
 

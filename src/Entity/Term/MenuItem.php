@@ -10,6 +10,7 @@
 namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\AbstractTerm;
@@ -28,6 +29,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'link', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     #[Assert\NotBlank]
     private ?string $link = null;
@@ -35,7 +37,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getLink(): string
+    public function getLink(): ?string
     {
         return $this->link;
     }
@@ -43,7 +45,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $link
      */
-    public function setLink($link): void
+    public function setLink(string $link): void
     {
         $this->link = $link;
     }
@@ -60,7 +62,7 @@ class MenuItem extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): mixed
+    public function getVocabularyName(): string
     {
         return 'Onglet de menu';
     }

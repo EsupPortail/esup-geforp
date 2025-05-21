@@ -4,6 +4,7 @@ namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Material.
@@ -20,6 +21,7 @@ abstract class Material
      *
      * @Serializer\Groups({"Default", "api.attendance"})
      */
+    #[Groups(["Default", "api.attendance"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -28,6 +30,7 @@ abstract class Material
     /**
      * @Serializer\Groups({"Default", "api.attendance"})
      */
+    #[Groups(["Default", "api.attendance"])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     protected ?string $name = null;
 
@@ -52,7 +55,7 @@ abstract class Material
      *
      * @return int
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -64,7 +67,7 @@ abstract class Material
      *
      * @return self
      */
-    public function setName($name): \App\Entity\Core\Material
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -76,15 +79,15 @@ abstract class Material
      *
      * @return string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param AbstractTraining $training
+     * @param AbstractTraining|null $training
      */
-    public function setTraining($training = null): void
+    public function setTraining(AbstractTraining $training = null): void
     {
         $this->training = $training;
     }
@@ -106,9 +109,9 @@ abstract class Material
     }
 
     /**
-     * @param AbstractSession $session
+     * @param AbstractSession|null $session
      */
-    public function setSession($session = null): void
+    public function setSession(AbstractSession $session = null): void
     {
         $this->session = $session;
     }

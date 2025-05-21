@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\UserRepository;
 use App\Entity\Core\AbstractOrganization;
@@ -27,6 +28,7 @@ class User implements UserInterface
     private ?string $email = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['Default', 'trainer'])]
     private string $username;
 
     /**
@@ -48,10 +50,9 @@ class User implements UserInterface
      * @var AbstractOrganization
      *
      */
-    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization', inversedBy: 'users', cascade: ['persist', 'merge'])]
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization', cascade: ['persist', 'merge'], inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: true)]
     #[Assert\NotNull(message: 'Vous devez renseigner un centre de rattachement.', groups: ['organization'])]
-    #[MaxDepth(2)]
     protected \App\Entity\Core\AbstractOrganization $organization;
 
     /**
@@ -68,7 +69,7 @@ class User implements UserInterface
         $this->accessRights = [];
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -92,7 +93,7 @@ class User implements UserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
     public function setUsername(string $username): self
@@ -107,7 +108,7 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return $this->getUserIdentifier();
     }
 
     /**

@@ -32,7 +32,7 @@ trait UploadableTrait
     /**
      * @var File
      */
-    protected $file;
+    protected File $file;
 
     /**
      * used to force file update when changing file.
@@ -44,7 +44,7 @@ trait UploadableTrait
     /**
      * @var
      */
-    static protected $maxFileSize = 50_000_000;
+    static protected int $maxFileSize = 50_000_000;
 
     public function __clone()
     {
@@ -61,7 +61,7 @@ trait UploadableTrait
     /**
      * @param string $filePath
      */
-    public function setFilepath($filePath): void
+    public function setFilepath(string $filePath): void
     {
         $this->filepath = $filePath;
     }
@@ -89,7 +89,7 @@ trait UploadableTrait
     /**
      * @param string $fileName
      */
-    public function setFilename($fileName): void
+    public function setFilename(string $fileName): void
     {
         $this->filename = $fileName;
     }
@@ -132,9 +132,9 @@ trait UploadableTrait
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getUploaded(): \DateTime
+    public function getUploaded()
     {
         return $this->uploaded;
     }
@@ -142,7 +142,7 @@ trait UploadableTrait
     /**
      * @param \DateTime $uploaded
      */
-    public function setUploaded($uploaded): void
+    public function setUploaded(\DateTime $uploaded): void
     {
         $this->uploaded = $uploaded;
     }
@@ -160,9 +160,6 @@ trait UploadableTrait
     #[ORM\PostUpdate]
     public function upload(): void
     {
-        if (null === $this->file) {
-            return;
-        }
 
         $this->file->move($this->getTemplatesRootDir(), $this->filepath);
 
@@ -191,7 +188,7 @@ trait UploadableTrait
     /**
      * @return mixed
      */
-    public static function getMaxFileSize(): mixed
+    public static function getMaxFileSize()
     {
         return self::$maxFileSize;
     }

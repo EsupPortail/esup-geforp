@@ -6,11 +6,18 @@ use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
+use App\Entity\Core\AbstractInstitution;
+use App\Entity\Core\AbstractTraining;
+use App\Form\Type\AbstractTrainerType;
 use App\Repository\TrainerRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Form\Type\ChangeOrganizationType;
 use App\Entity\Core\AbstractTrainer;
 use Doctrine\Persistence\ManagerRegistry;
@@ -29,35 +36,36 @@ abstract class AbstractTrainerController extends AbstractController
     /**
      * @var int[]
      */
-    private const ALL_STATUS = [0, 1];
+    private const array ALL_STATUS = [0, 1];
     /**
      * @var int[]
      */
-    private const ALL_PUB = [0, 1];
+    private const array ALL_PUB = [0, 1];
     /**
      * @var int[]
      */
-    private const ALL_ARCH = [0, 1];
+    private const array ALL_ARCH = [0, 1];
 
     #[Route(path: '/search', name: 'trainer.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
-    public function search(Request $request, ManagerRegistry $managerRegistry, TrainerRepository $trainerRepository, AccessRightRegistry $accessRightRegistry): array
+    #[Groups(["Default", "trainer"])]
+    #[Rest\View(serializerGroups: ['Default', 'trainer'], serializerEnableMaxDepthChecks: true)]
+    public function search(Request $request, SerializerInterface $serializer, ManagerRegistry $managerRegistry, TrainerRepository $trainerRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all('aggs', 'NO AGGS');
-        $query = $request->request->get('query', 'NO QUERY');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->all('sorts', 'NO SORTS');
-        $fields = $request->request->all('fields', 'NO FIELDS');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters') ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?: [];
+        $query = $request->request->all('query') ?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ?? [];
+        $fields = $request->request->all('fields') ?? [];
 
         // security check : trainer : 'sygefor_trainer.rights.inscription.all.view' -> id=33
-        if(!$accessRightRegistry->hasAccessRight(33)) {
+       if (!$accessRightRegistry->hasAccessRight(33)) {
             // restriction to user's organization
             $filters['organization.name.source'] = $this->getUser()->getOrganization()->getName();
-        }
+       }
 
         // Recherche avec les filtres
         $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $sorts, $fields);
@@ -73,14 +81,14 @@ abstract class AbstractTrainerController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
+
         return $ret;
-
-
     }
 
-    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create', name: 'trainer.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry): array
+    #[Groups(["Default", "trainee"])]
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    public function create(Request $request, ManagerRegistry $managerRegistry, SerializerInterface $serializer): array
     {
         /** @var AbstractTrainer $trainer */
         $trainer = new $this->trainerClass();
@@ -106,14 +114,15 @@ abstract class AbstractTrainerController extends AbstractController
         return ['form' => $form->createView(), 'trainer' => $trainer];
     }
 
-    /**
-     * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
-     */
+
     #[Route(path: '/{id}/view', name: 'trainer.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('VIEW', subject: 'trainer')]
-    public function view(AbstractTrainer $trainer, Request $request, ManagerRegistry $managerRegistry, int $id): array
+    #[Rest\View(serializerGroups: ['Default', 'trainer'], serializerEnableMaxDepthChecks: true)]
+    #[Groups(["Default", "trainer"])]
+    public function view(AbstractTrainer $trainer, Request $request, ManagerRegistry $managerRegistry, SerializerInterface $serializer, int $id): array
     {
-        $trainer = $managerRegistry->getRepository(\App\Entity\Core\AbstractTrainer::class)->find($id);
+        $trainer = $managerRegistry->getRepository(AbstractTrainer::class)->find($id);
+
         if (!$trainer) {
             throw new NotFoundHttpException();
         }
@@ -125,10 +134,10 @@ abstract class AbstractTrainerController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $form = $this->createForm($trainer::getFormType(), $trainer);
+        $form = $this->createForm(AbstractTrainerType::class, $trainer);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
+            if ($form->isSubmitted() &&$form->isValid()) {
                 $managerRegistry->getManager()->flush();
             }
         }
@@ -138,22 +147,22 @@ abstract class AbstractTrainerController extends AbstractController
 
     #[Route(path: '/{id}/changeorg', name: 'trainer.changeorg', options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('EDIT', subject: 'trainer')]
-    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
-    public function changeOrganization(Request $request, AbstractTrainer $trainer, ManagerRegistry $managerRegistry, int $id): array
+    #[Rest\View(serializerGroups: ['Default', 'trainer'], serializerEnableMaxDepthChecks: true)]
+    public function changeOrganization(SerializerInterface $serializer, Request $request, AbstractTrainer $trainer, ManagerRegistry $managerRegistry, int $id): array
     {
         $trainer = $managerRegistry->getRepository(\App\Entity\Core\AbstractTrainer::class)->find($id);
         if (!$trainer) {
             throw new NotFoundHttpException();
         }
         // security check
-/*        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainer.all.update')) {
-            throw new AccessDeniedException();
-        } */
+        /*        if (!$this->get('sygefor_core.access_right_registry')->hasAccessRight('sygefor_core.access_right.trainer.all.update')) {
+                    throw new AccessDeniedException();
+                } */
 
         $form = $this->createForm(ChangeOrganizationType::class, $trainer);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $managerRegistry->getManager()->flush();
             }
         }
@@ -176,20 +185,21 @@ abstract class AbstractTrainerController extends AbstractController
 
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainerRepository $trainerRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainerRepository $trainerRepository): array
     {
         $tabAggs = [];
 
         // CONSTRUCTION CENTRES
-        if(isset( $aggs['organization.name.source'])){
+        if (isset($aggs['organization.name.source'])) {
             $allOrganizations = $managerRegistry->getRepository(Organization::class)->findAll();
 
-            $i = 0; $tabOrg = [];
+            $i = 0;
+            $tabOrg = [];
             //Pour chaque centre on teste la requête
-            foreach($allOrganizations as $allOrganization){
+            foreach ($allOrganizations as $allOrganization) {
                 $nbTrOrg = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $allOrganization->getName());
                 if ($nbTrOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbTrOrg];
+                    $tabOrg[$i] = ['key' => $allOrganization->getName(), 'doc_count' => $nbTrOrg];
                     ++$i;
                 }
             }
@@ -198,15 +208,16 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         // CONSTRUCTION ETABLISSEMENT
-        if(isset( $aggs['institution.name.source'])){
+        if (isset($aggs['institution.name.source'])) {
             $allInstitutions = $managerRegistry->getRepository(Institution::class)->findAll();
 
-            $i = 0; $tabInst = [];
+            $i = 0;
+            $tabInst = [];
             //Pour chaque etablissement on teste la requête
-            foreach($allInstitutions as $allInstitution){
+            foreach ($allInstitutions as $allInstitution) {
                 $nbTrInst = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $allInstitution->getName());
                 if ($nbTrInst > 0) {
-                    $tabInst[$i] = [ 'key' => $allInstitution->getName(), 'doc_count' => $nbTrInst];
+                    $tabInst[$i] = ['key' => $allInstitution->getName(), 'doc_count' => $nbTrInst];
                     ++$i;
                 }
             }
@@ -215,12 +226,13 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         // CONSTRUCTION STATUT
-        if(isset( $aggs['isOrganization'])){
-            $i = 0; $tabSta = [];
-            foreach(self::ALL_STATUS as $status){
-                $nbTrSt= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $status);
+        if (isset($aggs['isOrganization'])) {
+            $i = 0;
+            $tabSta = [];
+            foreach (self::ALL_STATUS as $status) {
+                $nbTrSt = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $status);
                 if ($nbTrSt > 0) {
-                    $tabSta[$i] = [ 'key' => $status, 'doc_count' => $nbTrSt];
+                    $tabSta[$i] = ['key' => $status, 'doc_count' => $nbTrSt];
                     ++$i;
                 }
             }
@@ -229,12 +241,13 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         // CONSTRUCTION PUBLIE
-        if(isset( $aggs['isPublic'])){
-            $i = 0; $tabPub = [];
-            foreach(self::ALL_PUB as $pub){
-                $nbTrPub= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $pub);
+        if (isset($aggs['isPublic'])) {
+            $i = 0;
+            $tabPub = [];
+            foreach (self::ALL_PUB as $pub) {
+                $nbTrPub = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $pub);
                 if ($nbTrPub > 0) {
-                    $tabPub[$i] = [ 'key' => $pub, 'doc_count' => $nbTrPub];
+                    $tabPub[$i] = ['key' => $pub, 'doc_count' => $nbTrPub];
                     ++$i;
                 }
             }
@@ -243,12 +256,13 @@ abstract class AbstractTrainerController extends AbstractController
         }
 
         // CONSTRUCTION ARCHIVE
-        if(isset( $aggs['isArchived'])){
-            $i = 0; $tabArch = [];
-            foreach(self::ALL_ARCH as $arch){
-                $nbTrArch= $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $arch);
+        if (isset($aggs['isArchived'])) {
+            $i = 0;
+            $tabArch = [];
+            foreach (self::ALL_ARCH as $arch) {
+                $nbTrArch = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $arch);
                 if ($nbTrArch > 0) {
-                    $tabArch[$i] = [ 'key' => $arch, 'doc_count' => $nbTrArch];
+                    $tabArch[$i] = ['key' => $arch, 'doc_count' => $nbTrArch];
                     ++$i;
                 }
             }

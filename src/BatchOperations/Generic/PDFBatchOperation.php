@@ -31,25 +31,27 @@ final class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @var string
      */
-    private $defaultTemplate;
+    private string $defaultTemplate = 'PDF/attestation.pdf.twig';
 
     /**
      * @var string
      */
-    private $templates;
+    private string $templates;
 
     /**
      * @var string
      */
-    private $templateDiscriminator;
+    private string $templateDiscriminator;
 
     /**
      * PDFBatchOperation constructor.
      *
      * @param             $parameterBag
      */
-    public function __construct(protected Pdf $pdf, protected Security $security, protected Environment $twigEnvironment, protected $parameterBag)
+    public function __construct( protected Pdf $pdf, protected Security $security, protected Environment $twigEnvironment, protected $parameterBag)
     {
+
+        parent::__construct();
         /*        $this->pdf->getInternalGenerator()
             ->setTemporaryFolder(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR);*/
     }
@@ -57,7 +59,7 @@ final class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @param string $defaultTemplate
      */
-    public function setDefaultTemplate($defaultTemplate): void
+    public function setDefaultTemplate(string $defaultTemplate): void
     {
         $this->defaultTemplate = $defaultTemplate;
     }
@@ -65,7 +67,7 @@ final class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @param string $templates
      */
-    public function setTemplates($templates): void
+    public function setTemplates(string $templates): void
     {
         $this->templates = $templates;
     }
@@ -73,7 +75,7 @@ final class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @param string $templateDiscriminator
      */
-    public function setTemplateDiscriminator($templateDiscriminator): void
+    public function setTemplateDiscriminator(string $templateDiscriminator): void
     {
         $this->templateDiscriminator = $templateDiscriminator;
     }
@@ -254,5 +256,6 @@ final class PDFBatchOperation extends AbstractBatchOperation
                 }
             }
         }
+        return ['fileUrl'=>null];
     }
 }

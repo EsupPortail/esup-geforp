@@ -24,23 +24,23 @@ trait CoordinatesTrait
      */
     #[ORM\Column(name: 'address', type: 'string', length: 512, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
-    protected string $address;
+    protected ?string $address;
 
     /**
-     * @var string zip
+     * @var ?string zip
      *
      */
     #[ORM\Column(name: 'zip', type: 'string', length: 512, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
-    protected string $zip;
+    protected ?string $zip;
 
     /**
-     * @var string city
+     * @var ?string city
      *
      */
     #[ORM\Column(name: 'city', type: 'string', length: 128, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'api.profile'])]
-    protected string $city;
+    protected ?string $city;
 
     /**
      * @var string
@@ -48,7 +48,7 @@ trait CoordinatesTrait
     #[ORM\Column(name: 'email', type: 'string', length: 128, nullable: true)]
     #[Groups(['trainee', 'institution', 'inscription', 'trainer', 'session', 'api.profile', 'api.inscription' , 'api.token'])]
     #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
-    protected ?string $email = null;
+    protected ?string $email;
 
     /**
      * @var string
@@ -56,7 +56,7 @@ trait CoordinatesTrait
      */
     #[ORM\Column(name: 'phone_number', type: 'string', length: 255, nullable: true)]
     #[Groups(['trainee', 'inscription', 'trainer', 'api.profile'])]
-    protected string $phonenumber;
+    protected ?string $phonenumber;
 
     /**
      * @var string
@@ -71,7 +71,7 @@ trait CoordinatesTrait
      */
     #[ORM\Column(name: 'website', type: 'string', length: 512, nullable: true)]
     #[Groups(['organization', 'trainee', 'trainer', 'institution' , 'api.profile'])]
-    protected string $website;
+    protected ?string $website = null;
 
     /**
      * Copy coordinates from another entity.
@@ -108,49 +108,49 @@ trait CoordinatesTrait
     }
 
     /**
-     * @param string $address
+     * @param ?string $address
      */
-    public function setAddress(string $address): void
+    public function setAddress(?string $address): void
     {
         $this->address = $address;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getAddress(): string
+    public function getAddress(): ?string
     {
         return $this->address;
     }
 
     /**
-     * @param string $zip
+     * @param ?string $zip
      */
-    public function setZip(string $zip): void
+    public function setZip(?string $zip): void
     {
         $this->zip = $zip;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getZip(): string
+    public function getZip(): ?string
     {
         return $this->zip;
     }
 
     /**
-     * @param string $city
+     * @param ?string $city
      */
-    public function setCity(string $city): void
+    public function setCity(?string $city): void
     {
         $this->city = $city;
     }
 
     /**
-     * @return string
+     * @return ?string
      */
-    public function getCity(): string
+    public function getCity(): ?string
     {
         return $this->city;
     }
@@ -179,7 +179,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getPhonenumber(): string
+    public function getPhonenumber(): ?string
     {
         return $this->phonenumber;
     }
@@ -203,7 +203,7 @@ trait CoordinatesTrait
     /**
      * @param string $website
      */
-    public function setWebsite(string $website): void
+    public function setWebsite(?string $website): void
     {
         $this->website = $website;
     }
@@ -211,7 +211,7 @@ trait CoordinatesTrait
     /**
      * @return string
      */
-    public function getWebsite(): string
+    public function getWebsite(): ?string
     {
         return $this->website;
     }

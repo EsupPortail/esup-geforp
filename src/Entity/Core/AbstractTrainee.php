@@ -16,6 +16,7 @@ use App\AccessRight\SerializedAccessRights;
 use App\Entity\PersonTrait\ProfessionalSituationTrait;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\Type\AbstractTraineeType;
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
  * Trainee.
  *
  */
-#[AllowDynamicProperties] #[ORM\Table(name: 'trainee')]
+#[ORM\Table(name: 'trainee')]
 #[ORM\UniqueConstraint(name: 'emailUnique', columns: ['email'])]
 #[ORM\Entity(repositoryClass: TraineeRepository::class)]
 #[ORM\InheritanceType('SINGLE_TABLE')]
@@ -49,14 +50,16 @@ use Symfony\Component\Serializer\Attribute\Ignore;
      * @Serializer\Groups({"trainee", "session", "api.profile", "api.token"})})
      * @Assert\NotNull(message="Vous devez renseigner un établissement ou une entreprise.", groups="api.profile")
      */
-    #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
+    #[ORM\ManyToOne(targetEntity: AbstractInstitution::class)]
     #[Assert\NotNull(message: 'Vous devez renseigner un établissement.')]
+    #[Groups(['trainee', 'session', 'api.profile', 'api.token', 'inscription'])]
     protected AbstractInstitution $institution;
 
     /**
      * @Serializer\Groups({"trainee"})
      * @var Collection<int, AbstractInscription>|AbstractInscription[]
      */
+    #[Groups(['trainee'])]
     #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: AbstractInscription::class, cascade: ['remove'])]
     protected array|Collection $inscriptions;
 
@@ -71,6 +74,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
         $this->password = md5(uniqid('', true));
         $this->addresstype = 0;
         $this->lastname = '';
+        $this->phonenumber = '';
+        $this->firstname = '';
+        $this->institution = new Institution();
     }
 
     public function setId(int $id): void
@@ -96,12 +102,12 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     /**
      * @param void $institution
      */
-    public function setInstitution($institution): void
+    public function setInstitution(Institution $institution): void
     {
         $this->institution = $institution;
     }
 
-    public function getInstitution(): AbstractInstitution
+    public function getInstitution(): Institution
     {
         return $this->institution;
     }

@@ -17,7 +17,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     #[ORM\Column(name: 'subject', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     private ?string $subject = null;
 
-    #[ORM\Column(name: 'cc', type: \Doctrine\DBAL\Types\Types::ARRAY, nullable: true)]
+    #[ORM\Column(name: 'cc', type: 'simple_array', nullable: true)]
     private array $cc = [];
 
     #[ORM\Column(name: 'body', type: \Doctrine\DBAL\Types\Types::TEXT)]
@@ -29,11 +29,11 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
      */
     #[ORM\ManyToOne(targetEntity: 'Inscriptionstatus')]
     #[ORM\JoinColumn(name: 'inscription_status_id')]
-    protected $inscriptionstatus;
+    protected Inscriptionstatus $inscriptionstatus;
 
     #[ORM\ManyToOne(targetEntity: 'Presencestatus')]
     #[ORM\JoinColumn(name: 'presence_status_id')]
-    protected $presencestatus;
+    protected Presencestatus $presencestatus;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\PublipostTemplate>
@@ -47,7 +47,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @param ArrayCollection $attachmentTemplates
      */
-    public function setAttachmentTemplates($attachmentTemplates): void
+    public function setAttachmentTemplates(ArrayCollection $attachmentTemplates): void
     {
         $this->attachmentTemplates = $attachmentTemplates;
     }
@@ -55,7 +55,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return ArrayCollection
      */
-    public function getAttachmentTemplates(): ArrayCollection
+    public function getAttachmentTemplates(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->attachmentTemplates;
     }
@@ -68,7 +68,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getBody(): string
+    public function getBody(): ?string
     {
         return $this->body;
     }
@@ -76,15 +76,15 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $subject
      */
-    public function setSubject($subject): void
+    public function setSubject(string $subject): void
     {
         $this->subject = $subject;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getSubject(): mixed
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -100,7 +100,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @param array $cc
      */
-    public function setCc($cc): void
+    public function setCc(array $cc): void
     {
         $this->cc = $cc;
     }
@@ -108,7 +108,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @param Inscriptionstatus $inscriptionStatus
      */
-    public function setInscriptionstatus($inscriptionStatus): void
+    public function setInscriptionstatus(Inscriptionstatus $inscriptionStatus): void
     {
         $this->inscriptionstatus = $inscriptionStatus;
     }
@@ -124,7 +124,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @param Presencestatus $presenceStatus
      */
-    public function setPresencestatus($presenceStatus): void
+    public function setPresencestatus(Presencestatus $presenceStatus): void
     {
         $this->presencestatus = $presenceStatus;
     }
@@ -140,7 +140,7 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): mixed
+    public function getVocabularyName(): string
     {
         return 'Modèles d\'emails';
     }

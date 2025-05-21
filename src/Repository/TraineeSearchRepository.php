@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Core\AbstractTrainee;
 use App\Entity\Term\Publictype;
 use App\Entity\Term\Title;
 use App\Entity\Back\Institution;
@@ -89,7 +90,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         // FILTRE ETABLISSEMENT
         if( isset($filters['institution.name.source']) ) {
             $qb
-                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
+                ->innerJoin('trainee.institution', 'institution')
                 ->andWhere('institution.name in (:institution)')
                 ->setParameter('institution', $filters['institution.name.source']);
         }
@@ -118,10 +119,10 @@ final class TraineeSearchRepository extends ServiceEntityRepository
 
             $qb->addOrderBy('pt.name', $sort['publicType.source']);
         } elseif ((is_array($sort)) && (array_key_exists('institution.name.source', $sort))) {
-            if(!isset($filters['institution.name.source']))
-                $qb->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution');
+                $qb->innerJoin('trainee.institution', 'institution');
 
             $qb->addOrderBy('institution.name', $sort['institution.name.source']);
+             $qb->addSelect('institution');
         } elseif ((is_array($sort)) && (array_key_exists('createdAt', $sort)))
             $qb->addOrderBy('trainee.createdat', $sort['createdAt']);
         else
@@ -183,12 +184,12 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         //FILTRE ETABLISSEMENT
         if(isset( $aggs['institution.name.source'])) {
             $qb
-                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
+                ->innerJoin('trainee.institution', 'institution')
                 ->andWhere('institution.name = :institution')
                 ->setParameter('institution', $name);
         } elseif (isset($query_filters['institution.name.source'])) {
             $qb
-                ->innerJoin('trainee.institution', 'institution', 'WITH', 'trainee.institution = institution')
+                ->innerJoin('trainee.institution', 'institution')
                 ->andWhere('institution.name in (:institutions)')
                 ->setParameter('institutions', $query_filters['institution.name.source']);
         }
@@ -212,7 +213,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         return count($paginator);
     }
 
-    private function sanitizeTrainee($trainee):array
+    private function sanitizeTrainee(AbstractTrainee $trainee):array
     {
         //Récupération des propriétés de l'objet Trainee en tableau associatif
         return [

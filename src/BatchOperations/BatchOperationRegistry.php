@@ -15,10 +15,14 @@ use App\BatchOperations\Generic\MailingBatchOperation;
 use App\BatchOperations\Generic\PDFBatchOperation;
 use App\BatchOperations\Inscription\InscriptionStatusChangeBatchOperation;
 use App\BatchOperations\SemesteredTraining\SemesteredTrainingCSVBatchOperation;
+use App\Entity\Back\Internship;
+use App\Entity\Term\Trainingcategory;
 use App\Kernel;
+use App\Model\SemesteredTraining;
 use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Knp\Snappy\Pdf;
+use phpDocumentor\Reflection\Types\Parent_;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -32,7 +36,7 @@ final class BatchOperationRegistry
 {
     private array $operations = [];
 
-    public function __construct(Security $security, ParameterBagInterface $parameterBag, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $managerRegistry, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $humanReadablePropertyAccessorFactory, Pdf $pdf, Environment $twigEnvironment)
+    public function __construct( Security $security, ParameterBagInterface $parameterBag, VocabularyRegistry $vocabularyRegistry, ManagerRegistry $managerRegistry, MailerInterface $mailer, HumanReadablePropertyAccessorFactory $humanReadablePropertyAccessorFactory, Pdf $pdf, Environment $twigEnvironment)
     {
         // Construction de la liste des batch operations 'en dur'
         $i=0;
@@ -52,6 +56,14 @@ final class BatchOperationRegistry
         $mailingBatch->setDoctrine($managerRegistry);
         $mailingBatch->setTargetClass(\App\Entity\Back\Session::class);
         $mailingBatch->setOptions($confMail['session']);
+        $this->addBatchOperation($mailingBatch, $i);
+        ++$i;
+
+        // operation batch : publipostage training
+        $mailingBatch = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $humanReadablePropertyAccessorFactory, $managerRegistry);
+        $mailingBatch->setDoctrine($managerRegistry);
+        $mailingBatch->setTargetClass(Internship::class);
+        $mailingBatch->setOptions($confMail['training']);
         $this->addBatchOperation($mailingBatch, $i);
         ++$i;
 
@@ -84,6 +96,14 @@ final class BatchOperationRegistry
         $inscriptionStatusChangeBatchOperation->setDoctrine($managerRegistry);
         $this->addBatchOperation($inscriptionStatusChangeBatchOperation, $i);
         ++$i;
+
+        // operation batch : publipostage semestered_training
+      //  $mailingBatchTraining = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $humanReadablePropertyAccessorFactory, $managerRegistry);
+       // $mailingBatchTraining->setDoctrine($managerRegistry);
+       // $mailingBatchTraining->setTargetClass(\App\Entity\Core\AbstractTraining::class);
+       // $mailingBatchTraining->setOptions($confMail['semestered_training']);
+      //  $this->addBatchOperation($mailingBatchTraining, $i);
+       // ++$i;
 
         // Recuperation conf CSV
         $confCSV = $conf['csv'];
@@ -138,7 +158,7 @@ final class BatchOperationRegistry
         // Recuperation conf PDF
         $confPDF = $conf['pdf'];
         // operation batch : export CSV pour les sessions
-        $pdfBatchOperation = new PDFBatchOperation($pdf, $security, $twigEnvironment, $parameterBag);
+        $pdfBatchOperation = new PDFBatchOperation( $pdf, $security, $twigEnvironment, $parameterBag);
         $pdfBatchOperation->setDoctrine($managerRegistry);
         $pdfBatchOperation->setTargetClass(\App\Entity\Back\Inscription::class);
         $pdfBatchOperation->setOptions($confPDF['inscription.attestation']);
@@ -181,55 +201,30 @@ final class BatchOperationRegistry
      *
      * @return mixed
      */
-    public function getByName($servicename): mixed
+    public function getByName(string $servicename): ?BatchOperationInterface
     {
-        $id = 100000;
-        switch ($servicename) {
-            case 'sygefor_core.batch.email':
-                $id = 0;
-                break;
-            case 'sygefor_core.batch.publipost.session':
-                $id = 1;
-                break;
-            case 'sygefor_core.batch.publipost.trainee':
-                $id = 2;
-                break;
-            case 'sygefor_core.batch.publipost.trainer':
-                $id = 3;
-                break;
-            case 'sygefor_core.batch.publipost.inscription':
-                $id = 4;
-                break;
-            case 'sygefor_inscription.batch.inscription_status_change':
-                $id = 5;
-                break;
-            case 'sygefor_core.batch.csv.session':
-                $id = 6;
-                break;
-            case 'sygefor_core.batch.csv.semestered_training':
-                $id = 7;
-                break;
-            case 'sygefor_core.batch.csv.inscription':
-                $id = 8;
-                break;
-            case 'sygefor_core.batch.csv.trainee':
-                $id = 9;
-                break;
-            case 'sygefor_core.batch.csv.institution':
-                $id = 10;
-                break;
-            case 'sygefor_core.batch.csv.trainer':
-                $id = 11;
-                break;
-            case 'sygefor_core.batch.pdf.inscription.attestation':
-                $id = 12;
-                break;
 
-        }
+        $map = [
+            'sygefor_core.batch.email' => 0,
+            'sygefor_core.batch.publipost.session' => 1,
+            'sygefor_core.batch.publipost.training' => 2,
+            'sygefor_core.batch.publipost.trainee' => 3,
+            'sygefor_core.batch.publipost.trainer' => 4,
+            'sygefor_core.batch.publipost.inscription' => 5,
+            'sygefor_core.batch.publipost.semestered_training' => 6,
+            'sygefor_inscription.batch.inscription_status_change' => 7,
+            'sygefor_core.batch.csv.session' => 8,
+            'sygefor_core.batch.csv.semestered_training' => 9,
+            'sygefor_core.batch.csv.inscription' => 10,
+            'sygefor_core.batch.csv.trainee' => 11,
+            'sygefor_core.batch.csv.institution' => 12,
+            'sygefor_core.batch.csv.trainer' => 13,
+            'sygefor_core.batch.pdf.inscription.attestation' => 14,
+        ];
 
-        if (isset($this->operations[$id])) {
-            return $this->operations[$id];
-        }
-        return $id;
+            if (isset($map[$servicename]) && isset($this->operations[$map[$servicename]])) {
+                return $this->operations[$map[$servicename]];
+            }
+    return null;
     }
 }

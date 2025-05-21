@@ -32,11 +32,12 @@ use Symfony\Component\Mime\Part\DataPart;
 final class EmailingBatchOperation extends AbstractBatchOperation
 {
 
-    protected $targetClass = AbstractTrainee::class;
+    protected string $targetClass = AbstractTrainee::class;
     private Security $Security;
 
     public function __construct(protected Security $security, protected ParameterBagInterface $parameterBag, protected VocabularyRegistry $vocabularyRegistry, protected MailerInterface $mailer, protected HumanReadablePropertyAccessorFactory $humanReadablePropertyAccessorFactory)
     {
+        parent::__construct();
     }
 
     public function setSecurity(Security $security): void
@@ -46,9 +47,9 @@ final class EmailingBatchOperation extends AbstractBatchOperation
 
     /**
      *
-     * @return mixed
+     * @return array[]
      */
-    public function execute(array $idList = [], array $options = []): mixed
+    public function execute(array $idList = [], array $options = []): array
     {
         //setting alternate targetclass if provided in options
         if (isset($options['targetClass'])) {
@@ -58,7 +59,10 @@ final class EmailingBatchOperation extends AbstractBatchOperation
         $targetEntities = $this->getObjectList($idList);
 
         if (isset($options['preview']) && $options['preview']) {
-            return $this->parseAndSendMail($targetEntities[0], $options['subject'] ?? '', $options['message'] ?? '', null, $preview = true);
+            if (empty($targetEntities)) {
+                return [['error' => 'Aucune entité à prévisualiser.'], Response::HTTP_BAD_REQUEST];
+            }
+            return $this->parseAndSendMail($targetEntities[0], $options['subject'] ?? '', $options['message'] ?? '', [],true);
         }
 
         // check if user has access
@@ -71,9 +75,9 @@ final class EmailingBatchOperation extends AbstractBatchOperation
             }
         }
 
-        $this->parseAndSendMail($targetEntities, $options['subject'] ?? '', $options['message'] ?? '', $options['attachment'] ?? null, false, $options['ical'] ?? false, $options['format'] ?? 0);
+        $this->parseAndSendMail($targetEntities, $options['subject'] ?? '', $options['message'] ?? '', $options['attachment'] ?? [], false, $options['ical'] ?? false, $options['format'] ?? 0);
 
-        return new Response('', \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT);
+        return ['', \Symfony\Component\HttpFoundation\Response::HTTP_NO_CONTENT];
     }
 
     /**
@@ -112,12 +116,12 @@ final class EmailingBatchOperation extends AbstractBatchOperation
      * @param array $attachments
      * @param bool $preview
      *
-     * @return array
+     * @return array[]
      */
-    public function parseAndSendMail($entities, $subject, $body, $attachments = [], $preview = false, $ical = false, $format = 0): array
+    public function parseAndSendMail($entities, $subject, $body, array $attachments = [], bool $preview = false, $ical = false, $format = 0): array
     {
         $em = null;
-        $last = "";
+        $last = [];
         $doClear = true;
         if (!is_array($entities)) {
             $entities = [$entities];
@@ -125,7 +129,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
         }
 
         if ($entities === []) {
-            return array();
+            return [];
         }
 
         if ($preview) {
@@ -146,7 +150,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                 if (get_parent_class($entity) === \App\Entity\Core\AbstractTrainee::class)
                     $organization = $this->security->getUser()->getOrganization();
                 else
-                    $organization = $entity->getOrganization();
+                    $organization = $this->security->getUser()->getOrganization();
 
                 $hrpa = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
                 $email = $hrpa->email;
@@ -182,6 +186,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                         $msg->attachFromPath($path, $originalName);
                     }
                 }
+
 
                 // Dans le cas des stagiaires
                 if ((get_parent_class($entity) === \App\Entity\Core\AbstractTrainee::class)||(get_parent_class($entity) === \App\Entity\Core\AbstractInscription::class)) {
@@ -237,8 +242,6 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                             // inline it
                             $attachment = new DataPart($ics, 'inline.ics', 'text/calendar', 'quoted-printable');
                             $attachment->asInline();
-                            $attachment->getHeaders()->addParameterizedHeader('Content-Type', 'text/calendar', ['charset' => 'utf-8', 'method' => 'REQUEST']);
-                            $msg->attachPart($attachment);
                         } else {
                             // plusieurs dates -> fichier attaché
                             $calendarExport->addCalendar($calendar);
@@ -250,7 +253,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                 }
 
                 // Envoi message
-                $last = $this->mailer->send($msg);
+                $last[] = $this->mailer->send($msg);
 
                 // save email in db
                 $email = new \App\Entity\Core\Email();
@@ -288,7 +291,11 @@ final class EmailingBatchOperation extends AbstractBatchOperation
         if ($doClear) {
             $em->clear();
         }
-        return $last;
+
+        if(empty($last)){
+            return [];
+        }
+        return array($last) ? $last : [$last];
     }
 
     /**

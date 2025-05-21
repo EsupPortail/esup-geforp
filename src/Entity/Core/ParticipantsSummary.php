@@ -5,6 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\Publictype;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Participants summary for a session.
@@ -27,6 +28,7 @@ class ParticipantsSummary
     /**
      * @Serializer\Groups({"session"})
      */
+    #[Groups(["session"])]
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Publictype::class)]
     protected ?\App\Entity\Term\Publictype $publictype = null;
@@ -37,7 +39,7 @@ class ParticipantsSummary
     /**
      * @return mixed
      */
-    public function getCount(): mixed
+    public function getCount()
     {
         return $this->count;
     }
@@ -50,7 +52,7 @@ class ParticipantsSummary
     /**
      * @return AbstractSession
      */
-    public function getSession(): AbstractSession
+    public function getSession()
     {
         return $this->session;
     }
@@ -66,7 +68,7 @@ class ParticipantsSummary
     /**
      * @return Publictype
      */
-    public function getPublictype(): Publictype
+    public function getPublictype()
     {
         return $this->publictype;
     }

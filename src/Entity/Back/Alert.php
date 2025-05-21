@@ -14,6 +14,7 @@ use App\Entity\Core\AbstractTrainee;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Table(name: 'alert')]
@@ -24,6 +25,7 @@ class Alert
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -32,6 +34,7 @@ class Alert
     /**
      * @Serializer\Groups({"session"})
      */
+    #[Groups(["session"])]
     #[ORM\ManyToOne(targetEntity: 'Trainee', inversedBy: 'alerts')]
     #[ORM\JoinColumn(name: 'trainee_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
@@ -40,6 +43,7 @@ class Alert
     /**
      * @Serializer\Groups({"trainee"})
      */
+    #[Groups(["trainee"])]
     #[ORM\ManyToOne(targetEntity: 'Session', inversedBy: 'alerts')]
     #[ORM\JoinColumn(name: 'session_id')]
     #[Assert\NotNull]
@@ -48,6 +52,7 @@ class Alert
     /**
      * @Serializer\Groups({"inscription", "session", "trainee", "trainer", "api"})
      */
+    #[Groups(["inscription", "session", "trainee", "trainer", "api"])]
     #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
     protected ?\DateTimeInterface $createdat = null;
 

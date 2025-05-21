@@ -33,11 +33,13 @@ class Presence
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    protected ?int $id = null;
+    #[Groups(['Default', 'api'])]
+    protected int $id;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
     protected ?\DateTimeInterface $datebegin = null;
@@ -70,7 +72,7 @@ class Presence
     /**
      * @return int
      */
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }

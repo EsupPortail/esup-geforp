@@ -45,16 +45,15 @@ abstract class AbstractTraineeController extends AbstractController
     #[Route(path: '/search', name: 'trainee.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(Request $request, ManagerRegistry $managerRegistry, TraineeSearchRepository $traineeSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $tabFilters = [];
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->all('filters')  ?: [];
         $query_filters = $request->request->all('query_filters') ?: [];
-        $aggs = $request->request->all('aggs') ?: [];
-        $query = $request->request->get('query' ) ?: [];
+        $aggs = $request->request->all('aggs') ?:[] ;
+        $query = $request->request->all('query') ?:[];
         $page = $request->request->get('page', 1);
         $size = $request->request->get('size', 10);
-        $sorts = $request->request->all('sorts', 'NO SORTS');
-        $fields = $request->request->all('fields', 'NO FIELDS');
+        $sorts = $request->request->all('sorts') ?:[];
+        $fields = $request->request->all('fields') ?:[];
 
         // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17
         if(!$accessRightRegistry->hasAccessRight(17)) {
@@ -127,6 +126,7 @@ abstract class AbstractTraineeController extends AbstractController
 
         return $ret;
     }
+
 
     #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create', name: 'trainee.create', options: ['expose' => true], defaults: ['_format' => 'json'])]

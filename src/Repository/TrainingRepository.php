@@ -124,7 +124,9 @@ final class TrainingRepository extends ServiceEntityRepository
             $qb->addOrderBy('training.name');
 
         // PAGINATION
-        $offset = ($page-1) * $pageSize;
+        $page = (int) $page;
+        $pageSize = (int) $pageSize;
+        $offset = ($page -1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 

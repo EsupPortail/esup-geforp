@@ -30,17 +30,18 @@ class CSVBatchOperation extends AbstractBatchOperation
     /**
      * @var array
      */
-    protected $options = ['volcanus_config' => ['delimiter' => ';', 'enclose' => true, 'enclosure' => '"', 'escape' => '"', 'inputEncoding' => 'UTF-8', 'outputEncoding' => 'ISO-8859-1', 'writeHeaderLine' => true, 'responseFilename' => 'export.csv']];
+    protected array $options = ['volcanus_config' => ['delimiter' => ';', 'enclose' => true, 'enclosure' => '"', 'escape' => '"', 'inputEncoding' => 'UTF-8', 'outputEncoding' => 'ISO-8859-1', 'writeHeaderLine' => true, 'responseFilename' => 'export.csv']];
     // Création de la requête de récupération des tags
     /**
      * @var string
      */
-    private const SQL = <<<SQL
+    private const string SQL = <<<SQL
         SELECT t.name FROM tag t, training__training_tag i_t, training train WHERE train.id = :trainingId and i_t.training_id = train.id and i_t.tag_id = t.id 
 SQL;
 
     public function __construct(protected Security $security)
     {
+        parent::__construct();
         $this->options['tempDir'] = sys_get_temp_dir() . '/sygefor/';
         if (!file_exists($this->options['tempDir'])) {
             mkdir($this->options['tempDir'], 0777);
@@ -682,18 +683,18 @@ SQL;
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
 
-        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', (string) $this->options['volcanus_config']['responseFilename']);
+        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', (string) ($volcanusConfig['responseFilename'] ?? 'default.csv'));
 
         // encodage fichier
         $charsetConverter = (new CharsetConverter())
-            ->inputEncoding($this->options['volcanus_config']['inputEncoding'])
-            ->outputEncoding($this->options['volcanus_config']['outputEncoding']);
+            ->inputEncoding($volcanusConfig['inputEncoding'] ?? 'UTF-8')
+            ->outputEncoding($volcanusConfig['outputEncoding'] ?? 'UTF-8');
 
         $writer = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
         // Mise en forme fichier
-        $writer->setDelimiter($this->options['volcanus_config']['delimiter']);
-        $writer->setEnclosure($this->options['volcanus_config']['enclosure']);
-        $writer->setEscape($this->options['volcanus_config']['escape']);
+        $writer->setDelimiter($volcanusConfig['delimiter'] ?? ';');
+        $writer->setEnclosure($volcanusConfig['enclosure'] ?? '"');
+        $writer->setEscape($volcanusConfig['escape'] ?? '\\');
         $writer->addFormatter($charsetConverter);
 
         $writer->getInputBOM();

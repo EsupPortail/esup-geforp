@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Controller\Back;
+use App\Entity\Core\AbstractSession;
+use DoctrineExtensions\Query\Mysql\Date;
+use FOS\RestBundle\Controller\Annotations as Rest;
 use http\Env\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -24,157 +27,164 @@ use Symfony\Component\Form\FormError;
 
      private static string $DATE_CLASS = DateSession::class;
 
-     #[Route("/adddates/{session}", name: "dates.add", requirements: ["id" => "\d+"], options: ["expose"=> true], defaults: ["_format" => "json"])]
-    public function adddates(Session $session, Request $request, ManagerRegistry $managerRegistry, int $id): JsonResponse
+     #[Rest\View(serializerGroups: ['Default', 'api.session'], serializerEnableMaxDepthChecks: true)]
+     #[Route("/adddates/{session}", name: "dates.add", requirements: ["session" => "\d+"], options: ["expose"=> true], defaults: ["_format" => "json"])]
+    public function adddates(Session $session, Request $request, ManagerRegistry $managerRegistry): array
      {
-        $session = $managerRegistry->getRepository(Session::class)->find($id);
+
         if (!$session) {
             throw new NotFoundHttpException();
         }
-        $dateSession = new self::$DATE_CLASS;
+        $dateSession = new (self::$DATE_CLASS);
         $dateSession->setSession($session);
 
         $daysSum =0;
         $hoursSum = 0;
-
         $form        = $this->createForm(DateSessionType::class, $dateSession);
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                $existingDate = null;
-                $datesBegin = [];
-                $datesEnd = [];
-                /** @var DateSession $existingDate */
-                foreach ($session->getDates() as $existingDate) {
-                    if ($existingDate->getDatebegin() == $dateSession->getDatebegin()) {
-                        $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
-                        return new JsonResponse(['form' => $form->createView(), 'dates' => $dateSession, 'groups' => 'session']);
+         $form->handleRequest($request);
+         if ($form->isSubmitted()) {
+             if ($request->getMethod() === 'POST') {
+                 if ($form->isValid()) {
+                     $existingDate = null;
+                     $datesBegin = [];
+                     $datesEnd = [];
+                     /** @var DateSession $existingDate */
 
-                    }
+                     foreach ($session->getDates() as $existingDate) {
+                         if ($existingDate->getDatebegin() == $dateSession->getDatebegin()) {
+                             $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
 
-                    $datesBegin[] = $existingDate->getDatebegin();
-                    $datesEnd[] = $existingDate->getDateend();
+                             return ['form' => $form->createView(), 'dates' => $dateSession, 'groups' => 'session'];
+                         }
 
-                    if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
-                        ++$daysSum;
-                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
-                    }
-                    else {
-                        $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
-                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
-                    }
-                }
+                         $datesBegin[] = $existingDate->getDatebegin();
+                         $datesEnd[] = $existingDate->getDateend();
 
-                if (!$existingDate instanceof \App\Entity\Back\DateSession || ($existingDate->getDatebegin() !== $dateSession->getDatebegin())) {
-                    $session->addDates($dateSession);
-                    $session->setUpdatedAt(new \DateTime('now'));
-                    $session->getTraining()->setUpdatedAt(new \DateTime('now'));
-                    $em = $managerRegistry->getManager();
-                    $em->persist($dateSession);
-                    $em->flush();
-                    $datesBegin[] = $dateSession->getDatebegin();
-                    $datesEnd[] = $dateSession->getDateend();
+                         if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
+                             ++$daysSum;
+                             $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
+                         } else {
+                             $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                             $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
+                         }
+                     }
 
-                    // Calcul nombre de jours
-                    if (($dateSession->getDatebegin() == $dateSession->getDateend()) || ($dateSession->getDateend() == null)) {
-                        ++$daysSum;
-                        $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter());
-                    }
-                    else {
-                        $daysSum += $dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1;
-                        $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter()) * ($dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1);
-                    }
-                }
+                     if (!$existingDate instanceof \App\Entity\Back\DateSession || ($existingDate->getDatebegin() !== $dateSession->getDatebegin())) {
+                         $session->addDates($dateSession);
+                         $session->setUpdatedAt(new \DateTime('now'));
+                         $session->getTraining()->setUpdatedAt(new \DateTime('now'));
+                         $em = $managerRegistry->getManager();
+                         $em->persist($dateSession);
+                         $em->flush();
+                         $datesBegin[] = $dateSession->getDatebegin();
+                         $datesEnd[] = $dateSession->getDateend();
 
-                // Tri des tableaux de dates
-                usort($datesBegin, static fn($a, $b): int => $a < $b ? -1: 1);
-                usort($datesEnd, static fn($a, $b): int => $a < $b ? -1: 1);
+                         // Calcul nombre de jours
+                         if (($dateSession->getDatebegin() == $dateSession->getDateend()) || ($dateSession->getDateend() == null)) {
+                             ++$daysSum;
+                             $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter());
+                         } else {
+                             $daysSum += $dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1;
+                             $hoursSum += ($dateSession->getHournumbermorn() + $dateSession->getHournumberafter()) * ($dateSession->getDatebegin()->diff($dateSession->getDateend())->format('%a') + 1);
+                         }
+                     }
 
-                // Renseigner le lieu
-                $session->setPlace($session->getDates()[0]->getPlace());
+                     // Tri des tableaux de dates
+                     usort($datesBegin, static fn($a, $b): int => $a < $b ? -1 : 1);
+                     usort($datesEnd, static fn($a, $b): int => $a < $b ? -1 : 1);
 
-                // Renseigner le nombre d'heures
-                $session->setHournumber($hoursSum);
+                     // Renseigner le lieu
+                     $session->setPlace($session->getDates()[0]->getPlace());
 
-                // Renseigner le nombre de jours
-                $session->setDaynumber($daysSum);
+                     // Renseigner le nombre d'heures
+                     $session->setHournumber($hoursSum);
 
-                // Récupérer les dates min et max début et fin pour les caler dans les dates de session
-                $session->setDatebegin($datesBegin[0]);
-                $session->setDateend($datesEnd[count($datesEnd)-1]);
-                $em = $managerRegistry->getManager();
-                $em->persist($session);
-                $em->flush();
+                     // Renseigner le nombre de jours
+                     $session->setDaynumber($daysSum);
 
+                     // Récupérer les dates min et max début et fin pour les caler dans les dates de session
+                     $session->setDatebegin($datesBegin[0]);
+                     $session->setDateend($datesEnd[count($datesEnd) - 1]);
+                     $em = $managerRegistry->getManager();
+                     $em->persist($session);
+                     $em->flush();
+
+                 }
              }
-        }
-        return new JsonResponse($form, $dateSession, ['groups' => ['session', 'api.session'], 'enable_max_depth' => true]);
+         }
+         return ['form' => $form->createView(),
+             'dateSession' => $dateSession,];
     }
 
-      #[Route("/{session}/remove/{dates}", name: "dates.remove", options: ["expose" => true], defaults: ["_format" => "json"])]
-      #[Route("POST")]
+     #[Rest\View(serializerGroups: ['Default', 'api.session'], serializerEnableMaxDepthChecks: true)]
+     #[Route("/{session}/remove/{dates}", name: "dates.remove", options: ["expose" => true], defaults: ["_format" => "json"])]
+     public function removedates(Session $session, DateSession $dates, ManagerRegistry $managerRegistry): array
+     {
 
-    public function removedates(Session $session, DateSession $dateSession, ManagerRegistry $managerRegistry, SerializerInterface $serializer, int $id): JsonResponse
-    {
-        $sessions = $managerRegistry->getRepository(Session::class, $id);
-        if (!$sessions) {
-            throw new NotFoundHttpException();
-        }
-        $dateSession = $managerRegistry->getRepository(DateSession::class, $id);
-        if (!$dateSession) {
-            throw new NotFoundHttpException();
-        }
-        $session->removeDate($dateSession);
-        $session->setUpdatedAt(new \DateTime('now'));
-        $session->getTraining()->setUpdatedAt(new \DateTime('now'));
-        $managerRegistry->getManager()->remove($dateSession);
-        $managerRegistry->getManager()->flush();
+         $session->removeDate($dates);
+         $session->setUpdatedAt(new \DateTime('now'));
+         $session->getTraining()->setUpdatedAt(new \DateTime('now'));
+         $managerRegistry->getManager()->remove($dates);
+         $managerRegistry->getManager()->flush();
 
-        // Traitement des dates min et max
-        $datesBegin = [];
-        $datesEnd = [];
-        $hoursSum = 0;
-        $daysSum = 0;
+         // Traitement des dates min et max
+         $datesBegin = [];
+         $datesEnd = [];
+         $hoursSum = 0;
+         $daysSum = 0;
 
-        /** @var DateSession $existingDate */
-        foreach ($session->getDates() as $existingDate) {
-            $datesBegin[] = $existingDate->getDatebegin();
-            $datesEnd[] = $existingDate->getDateend();
+         /** @var DateSession $existingDate */
+         foreach ($session->getDates() as $existingDate) {
+             $datesBegin[] = $existingDate->getDatebegin();
+             $datesEnd[] = $existingDate->getDateend();
 
-            if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
-                ++$daysSum;
-                $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
-            }
-            else {
-                $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
-                $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
-            }
-        }
+             if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
+                 ++$daysSum;
+                 $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
+             }
+             else {
+                 $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
+                 $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
+             }
+         }
 
-        // Tri des tableaux de dates
-        usort($datesBegin, static fn($a, $b): int => $a < $b ? -1: 1);
-        usort($datesEnd, static fn($a, $b): int => $a < $b ? -1: 1);
+         // Tri des tableaux de dates
+         usort($datesBegin, static fn($a, $b): int => $a < $b ? -1: 1);
+         usort($datesEnd, static fn($a, $b): int => $a < $b ? -1: 1);
 
-        // Récupérer les dates min et max début et fin pour les caler dans les dates de session
-        if ($datesBegin !== []) {
-            $session->setDatebegin($datesBegin[0]);
-            $session->setDateend($datesEnd[count($datesEnd) - 1]);
-            $session->setHournumber($hoursSum);
-            $session->setDaynumber($daysSum);
-            $em = $managerRegistry->getManager();
-            $em->persist($session);
-            $em->flush();
-        }
+         // Récupérer les dates min et max début et fin pour les caler dans les dates de session
+         if ($datesBegin !== []) {
+             $session->setDatebegin($datesBegin[0]);
+             $session->setDateend($datesEnd[count($datesEnd) - 1]);
+             $session->setHournumber($hoursSum);
+             $session->setDaynumber($daysSum);
 
-        $data = $serializer->serialize($session, 'json', ['groups' => ['session', 'api.session'],'enable_max_depth' => true]);
-        return new JsonResponse($data, ResponseAlias::HTTP_OK, [], true);
+             if(count($datesBegin) > 0){
+                 $session->setDatebegin($datesBegin[0]);
+                 $session->setDateend($datesEnd[count($datesEnd) -1]);
+                 $session->setHournumber($hoursSum);
+                 $session->setDaynumber($daysSum);
+             } else {
+                 $session->setDatebegin(null);
+                 $session->setDateend(null);
+                 $session->setHournumber(0);
+                 $session->setPlace(null);
+             }
 
-    }
+             $em = $managerRegistry->getManager();
+             $em->persist($session);
+             $em->flush();
 
+         }
+         return ['session' => $session, 'dates' => $datesBegin, 'groups' => 'session'];
+
+     }
+
+    #[Rest\View(serializerGroups: ['session', 'api.session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/editdates/{dates}', name: 'dates.edit', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function editdates(DateSession $dateSession, Request $request, ManagerRegistry $managerRegistry, int $id): array
+    public function editdates(Request $request, ManagerRegistry $managerRegistry, int $dates): array
     {
-        $dateSession = $managerRegistry->getRepository(DateSession::class)->find($id);
+        $dateSession = $managerRegistry->getRepository(DateSession::class)->find($dates);
         if (!$dateSession) {
             throw new NotFoundHttpException();
         }
@@ -185,7 +195,7 @@ use Symfony\Component\Form\FormError;
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 //Mise à jour date
                 $em = $managerRegistry->getManager();
                 $em->flush();
@@ -231,13 +241,13 @@ use Symfony\Component\Form\FormError;
             }
         }
 
-        return ['form' => $form->createView(), 'dates' => $dateSession, 'groups' => ['session', 'api.session'], 'enable_max_depth' => true];
+        return ['form' => $form->createView(), 'dates' => $dateSession];
     }
 
     #[Route(path: '/viewdates/{dates}', name: 'dates.view', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function viewdates(DateSession $dateSession, Request $request, ManagerRegistry $managerRegistry, int $id): array
+    public function viewdates( Request $request, ManagerRegistry $managerRegistry, DateSession $dates): array
     {
-        $dateSession = $managerRegistry->getRepository(DateSession::class)->find($id);
+        $dateSession = $managerRegistry->getRepository(DateSession::class)->find($dates);
         if (!$dateSession) {
             throw new NotFoundHttpException();
         }
@@ -249,7 +259,7 @@ use Symfony\Component\Form\FormError;
                 $objectManager->flush();
             }
         }
-        return ['form' => $form->createView(), 'dates' => $dateSession, ['groups' => ['session', 'api.session'], 'enable_max_depth' => true]];
+        return ['form' => $form->createView(), 'dates' => $dateSession];
     }
 
 }

@@ -14,17 +14,20 @@ use App\Form\Type\InscriptionType;
 use App\Form\Type\BaseInscriptionType;
 use App\Repository\InscriptionSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractInscription;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Term\Inscriptionstatus;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class InscriptionController.
@@ -33,27 +36,29 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 #[Route(path: '/inscription')]
 abstract class AbstractInscriptionController extends AbstractController
 {
-    protected $inscriptionClass = AbstractInscription::class;
+    protected string $inscriptionClass = AbstractInscription::class;
     /**
      * @var int[]
      */
-    private const ALL_SEMESTERS = [1, 2];
+    private const array ALL_SEMESTERS = [1, 2];
 
     /**
      * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return array
      */
     #[Route(path: '/search', name: 'inscription.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\JsonResponse
+    #[Groups(['Default', 'inscription'])]
+    #[Rest\View(serializerGroups: ["Default", "inscription"] ,serializerEnableMaxDepthChecks: true)]
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all('aggs', 'NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->all('sorts', 'NO SORTS');
-        $fields = $request->request->all('fields', 'NO FIELDS');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters') ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts')?: [];
+        $fields = $request->request->all('fields')?: [];
 
         // security check : inscirption : 'sygefor_inscription.rights.inscription.all.view' -> id=25
         if(!$accessRightRegistry->hasAccessRight(25)) {
@@ -67,19 +72,15 @@ abstract class AbstractInscriptionController extends AbstractController
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
-
-        return $this->json($ret, 200, [], [
-            'circular_reference_handler' => function ($object) {
-                return $object->getId();
-            }
-        ]);
+        return $ret;
     }
 
+    #[Rest\View(serializerGroups: ["Default", "inscription"] ,serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create/{session}', name: 'inscription.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[Groups(['Default', 'inscription'])]
-    public function create(Request $request, AbstractSession $session, ManagerRegistry $managerRegistry, int $id): array
+    public function create(Request $request, AbstractSession $session, ManagerRegistry $managerRegistry): array
     {
-        $sessions = $managerRegistry->getRepository(AbstractSession::class, $id);
+        $sessions = $managerRegistry->getRepository(AbstractSession::class)->find($session);
         if (!$sessions) {
             throw new NotFoundHttpException();
         }
@@ -90,6 +91,7 @@ abstract class AbstractInscriptionController extends AbstractController
         /** @var AbstractInscription $inscription */
         $inscription = $this->createInscription($session, $managerRegistry);
         /** @var BaseInscriptionType $inscriptionClass */
+        $inscriptionClass = '';
         $inscriptionClass = BaseInscriptionType::class;
 
         $form = $this->createForm($inscriptionClass , $inscription,
@@ -106,18 +108,17 @@ abstract class AbstractInscriptionController extends AbstractController
             }
         }
 
-        return ['form' => $form->createView(), 'inscription' => $inscription];
+        return ['form' => $form->createView(), 'sessions' => $sessions];
     }
 
-    /**
-     * @Rest\View(serializerGroups={"Default", "inscription"}, serializerEnableMaxDepthChecks=true)
-     */
+
     #[Route(path: '/{id}/view', name: 'inscription.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('VIEW', subject: 'inscription')]
+    #[Rest\view(serializerGroups: ['inscription', 'Default'], serializerEnableMaxDepthChecks: true)]
     public function view(AbstractInscription $inscription, Request $request, ManagerRegistry $managerRegistry, int $id): array
     {
-        $inscriptions = $managerRegistry->getRepository(AbstractSession::class, $id);
-        if (!$inscriptions) {
+        $inscription = $managerRegistry->getRepository(AbstractInscription::class)->find($id);
+        if (!$inscription) {
             throw new NotFoundHttpException();
         }
         if (!$this->isGranted('EDIT', $inscription)) {
@@ -150,7 +151,6 @@ abstract class AbstractInscriptionController extends AbstractController
     #[Rest\View(true)]
     public function delete(AbstractInscription $inscription, ManagerRegistry $managerRegistry, int $id): array
     {
-        $inscription = $managerRegistry->getRepository(AbstractInscription::class, $id);
         if (!$inscription) {
             throw new NotFoundHttpException();
         }

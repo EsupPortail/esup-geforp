@@ -45,11 +45,14 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      *
      * @internal param $path
      */
-    public function __construct(/**
+    public function __construct(
+        /**
      * @var Security security
      */
+
     private readonly Security $security, protected ParameterBagInterface $parameterBag, protected VocabularyRegistry $vocabularyRegistry, protected HumanReadablePropertyAccessorFactory $humanReadablePropertyAccessorFactory)
     {
+        parent::__construct();
         $this->options['tempDir'] = sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR;
         if (!file_exists($this->options['tempDir'])) {
             mkdir($this->options['tempDir'], 0777);
@@ -180,11 +183,11 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
     /**
      * @param string|PublipostTemplate $template $template
-     * @param array                    $entities
+     * @param array $entities
      *
      * @return array
      */
-    public function parseFile(string|\App\Entity\Term\PublipostTemplate $template, $entities, $getFile = false, $outputFileName = '', $getPdf = false): array
+    public function parseFile(string|\App\Entity\Term\PublipostTemplate $template, array $entities, $getFile = false, $outputFileName = '', $getPdf = false): array
     {
         /*
         list($TBS, $classCatalog) = $this->initializeOpenTbs($template, $entities);
@@ -228,15 +231,15 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         $fileTest6 = stripos((string) $fileName, "ListeAttente");
 
         if ($fileTest === false) {
-            if ($fileTest2 == false) {
-                if ($fileTest3 == false) {
-                    if ($fileTest4 == false) {
-                        if ($fileTest5 == false) {
-                            if ($fileTest6 == false) {
+            if (!$fileTest2) {
+                if (!$fileTest3) {
+                    if (!$fileTest4) {
+                        if (!$fileTest5) {
+                            if (!$fileTest6) {
                                 //tous les autres cas
                                 $tabRes = $this->dataForTBS($entities);
-                                $lines = $tabRes['lines'];
-                                $entityName = $tabRes['entityName'];
+                                $lines = $tabRes['lines'] ?? [];
+                                $entityName = ($tabRes['entityName'][0] ?? '');
 
                             } else {
                                 // Cas de la liste des personnes en liste d'attente
@@ -306,6 +309,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         $entityName = 'formateur';
                     }
                 } else {
+
                     $data = $this->humanReadablePropertyAccessorFactory->getAccessor($entities[0]);
 
                     $lines[0]['civilite'] = $data->civilite;
@@ -495,7 +499,8 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         reset($lines);
 
-        $clsTinyButStrong->MergeBlock($entityName, $lines);
+
+       // $clsTinyButStrong->MergeBlock('inscriptions', $lines['inscriptions']);
 
         $error = ob_get_flush();
 
@@ -503,8 +508,8 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             return ['error' => $error];
         }
 
-        $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
-        $clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
+       // $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
+       // $clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
 
         //do we want the file or just infos about it ?
         if ($getFile) {
@@ -724,11 +729,11 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      *
      * @return never[]|array{entityName: string, lines: array<int, array{centre.nom: mixed, dateDebut: mixed, domaine: mixed, inscriptions?: array<int, array{stagiaire.nom: mixed, stagiaire.prenom: mixed, stagiaire.nomComplet: mixed, stagiaire.mail: mixed, stagiaire.unite: mixed, stagiaire.service: mixed, stagaire.corps: mixed, stagiaire.bap: mixed, stagiaire.fonction: mixed, statutInscription: mixed, statutPresence: mixed, refus: mixed, motivation: mixed}>&mixed[], listeFormateurs: mixed, nom: mixed}>}|array{entityName: string, lines: array<int, array{centreNom: mixed, dateDebut: mixed, dates?: array<int, array{dateDebut: mixed, dateFin: mixed, horairesMatin: mixed, horairesAprem: mixed, nbHeuresMatin: mixed, nbHeuresApr: mixed, lieu: mixed}>&mixed[], domaine: mixed, listeFormateurs: mixed, motivation: mixed, nom: mixed, refus: mixed, sessionCommentaires: mixed, sessionDescription: mixed, stagiaireBap: mixed, stagiaireCivilite: mixed, stagiaireCorps: mixed, stagiaireFonction: mixed, stagiaireMail: mixed, stagiaireNom: mixed, stagiaireNomComplet: mixed, stagiairePrenom: mixed, stagiaireService: mixed, stagiaireUnite: mixed, statutInscription?: mixed, statutPresence?: mixed, typeaction: mixed}>}
      */
-    private function dataForTBS($entities): array
+    private function dataForTBS(array $entities = []): array
     {
         $dataRes = [];
         $lines = [];
-        if ($entities[0]::class == \App\Entity\Back\Inscription::class) {
+        if ($entities == \App\Entity\Back\Inscription::class) {
             $dataRes['entityName'] = 'inscription';
             // Construction des lignes
             $i = 0;
@@ -772,7 +777,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             }
 
             $dataRes['lines'] = $lines;
-        } elseif ($entities[0]::class == \App\Entity\Back\Session::class) {
+        } elseif ($entities == \App\Entity\Back\Session::class) {
             $dataRes['entityName'] = 's';
             // Construction des lignes
             $i = 0;

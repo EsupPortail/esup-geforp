@@ -601,7 +601,7 @@ dump($this->getUser());
      * @return array
      */
     #[Route(path: '/logout/{return}', name: 'front.account.logout', requirements: ['return' => '.+'])]
-    public function logout(Request $request, string $return = null): array
+    public function logout(Request $request, string $return = null): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         $this->get('security.context')->setToken(null);
         $this->get('request')->getSession()->invalidate();

@@ -138,7 +138,9 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
         label: 'Ajouter une inscription',
         execute: function () {
             $dialog.open('inscription.create', {session: session}).then(function (data) {
-                $scope.search.search();
+                $scope.$apply(function (){
+                    $scope.search.search();
+                })
             });
         },
         available: function () {

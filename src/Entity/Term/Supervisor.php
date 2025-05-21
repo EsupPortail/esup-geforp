@@ -13,6 +13,7 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\VocabularyInterface;
 use App\Form\Type\SupervisorType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -26,12 +27,14 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'first_name', type: \Doctrine\DBAL\Types\Types::STRING, length: 50, nullable: true)]
     protected ?string $firstName = null;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
     #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
     protected ?string $email = null;
@@ -40,13 +43,14 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'phone_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     protected ?string $phoneNumber = null;
 
     /**
      * @return string
      */
-    public function getFirstName(): string
+    public function getFirstName(): ?string
     {
         return $this->firstName;
     }
@@ -54,7 +58,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $firstName
      */
-    public function setFirstName($firstName): void
+    public function setFirstName(string $firstName): void
     {
         $this->firstName = $firstName;
     }
@@ -62,7 +66,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -70,7 +74,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $email
      */
-    public function setEmail($email): void
+    public function setEmail(string $email): void
     {
         $this->email = $email;
     }
@@ -78,7 +82,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }
@@ -86,7 +90,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $phoneNumber
      */
-    public function setPhoneNumber($phoneNumber): void
+    public function setPhoneNumber(string $phoneNumber): void
     {
         $this->phoneNumber = $phoneNumber;
     }
@@ -95,6 +99,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     public function getFullName(): string
     {
         return $this->firstName . ' ' . $this->getName();
@@ -117,7 +122,7 @@ class Supervisor extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): mixed
+    public function getVocabularyName(): string
     {
         return 'Responsable pédagogique';
     }

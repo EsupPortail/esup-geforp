@@ -32,7 +32,7 @@ sygeforApp.controller('TraineeDetailViewController', ['$scope', '$taxonomy', '$d
             $scope.trainee = data.trainee;
 
             angular.forEach($scope.search.result.items, function (result) {
-                if ($scope.trainee.id == result.id) {
+                if ($scope.trainee.id === result.id) {
                     result.isactive = $scope.trainee.isactive;
                     result.class = $scope.trainee.isactive ? '' : 'alert-danger';
                 }

@@ -31,18 +31,18 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
 
     use CoordinatesTrait;
 
-    #[Groups(['Default', 'api'])]
+    #[Groups(['Default', 'institution'])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
     protected ?int $id = null;
 
-    #[Groups(['Default', 'api'])]
+    #[Groups(['Default', 'api', 'institution', 'trainer'])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 512)]
     #[Assert\NotBlank(message: "Vous devez renseigner un nom d'établissement.")]
     protected ?string $name = null;
 
-    #[Groups(['Default', 'api'])]
+    #[Groups(['Default', 'api', 'institution'])]
     #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $idp = null;
 
@@ -58,7 +58,7 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     #[ORM\JoinTable(name: 'institution__visuinstitutions')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
     #[ORM\InverseJoinColumn(name: 'visu_institution_id', referencedColumnName: 'id', onDelete: 'cascade')]
-    #[ORM\ManyToMany(targetEntity: AbstractInstitution::class)]
+    #[ORM\ManyToMany(targetEntity: AbstractInstitution::class, cascade: ["persist", "remove"])]
     protected Collection $visuinstitutions;
 
     public function __construct()
@@ -110,9 +110,9 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getDomains(): mixed
+    public function getDomains(): ArrayCollection|Collection
     {
         return $this->domains;
     }

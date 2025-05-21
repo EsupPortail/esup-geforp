@@ -7,6 +7,7 @@ use App\Entity\Core\Material;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\UploadableTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * FileMaterial.
@@ -28,6 +29,7 @@ class FileMaterial extends Material
      *
      * @return string
      */
+    #[Groups([ 'Default','api.attendance'])]
     public function getName(): string
     {
         return $this->filename;

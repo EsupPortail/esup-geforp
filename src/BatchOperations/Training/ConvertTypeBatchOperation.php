@@ -35,6 +35,7 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
     protected TrainingTypeRegistry $trainingTypeRegistry,
                                 SearchService $searchService, Type $semesteredTrainingType)
     {
+        parent::__construct();
         $this->semesteredTrainingSearch = $searchService;
         $this->semesteredTrainingType = $semesteredTrainingType;
     }

@@ -47,9 +47,9 @@ final class TrainerRepository extends ServiceEntityRepository
         //FILTRE ETABLISSEMENT
         if( isset($filters['institution.name.source'])) {
             $qb
-                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
-                ->andWhere('i.name in (:inst)')
-                ->setParameter('inst', $filters['institution.name.source']);
+                ->innerJoin('trainer.institution', 'i')
+                ->andWhere('i.name in (:i)')
+                ->setParameter('i', $filters['institution.name.source']);
         }
 
         //FILTRE STATUT (true,false) = (0,1)
@@ -82,7 +82,7 @@ final class TrainerRepository extends ServiceEntityRepository
             $qb->addOrderBy('o.name', $sorts['organization.name']);
         } elseif ((is_array($sorts)) && (array_key_exists('institution.name', $sorts))) {
             if(!isset($filters['institution.name.source']))
-                $qb->innerJoin('trainer.institution', 'i', 'WITH', 'i = trainer.institution');
+                $qb->innerJoin('trainer.institution', 'i');
 
             $qb->addOrderBy('i.name', $sorts['institution.name']);
         } elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
@@ -114,15 +114,12 @@ final class TrainerRepository extends ServiceEntityRepository
 
         $c = count($paginator);
         $tabTrainers = [];
-        var_dump($tabTrainers);
-        die();
         foreach($paginator as $tr) {
             if ((is_array($fields)) && (in_array("_id", $fields))) {
                 $tabTrainers[]['id'] = $tr->getId();
             } else {
                 $tabTrainers[] = $tr;
             }
-            var_dump($tabTrainers);
         }
 
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainers];
@@ -157,14 +154,14 @@ final class TrainerRepository extends ServiceEntityRepository
         // FILTRE ETABLISSEMENT
         if (isset($aggs['institution.name.source'])) {
             $qb
-                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
-                ->andWhere('i.name = :inst')
-                ->setParameter('inst', $name);
+                ->innerJoin('trainer.institution', 'i')
+                ->andWhere('i.name = :i')
+                ->setParameter('i', $name);
         } elseif (isset($query_filters['institution.name.source'])) {
             $qb
-                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
-                ->andWhere('i.name in (:inst)')
-                ->setParameter('inst', $query_filters['institution.name.source']);
+                ->innerJoin('trainer.institution', 'i')
+                ->andWhere('i.name in (:i)')
+                ->setParameter('i', $query_filters['institution.name.source']);
         }
 
         //FILTRE STATUT (true,false) = (0,1)

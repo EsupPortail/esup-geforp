@@ -22,6 +22,7 @@ use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Gedmo\Tree\Entity\Repository\NestedTreeRepository;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractOrganization;
@@ -35,6 +36,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Doctrine\ORM\EntityManager;
 use App\Entity\Term\AbstractTerm;
@@ -211,8 +213,8 @@ use App\Entity\Term\AbstractTerm;
         if ($count > 0) {
             $required = !empty($abstractVocabulary::$replacementRequired);
             $formBuilder
-                ->add('term', 'entity',
-                    ['class' => $termClass, 'expanded' => true, 'label' => 'Terme de substitution', 'required' => $required, 'constraints' => $required ? $notBlank : null, 'query_builder' => $queryBuilder, 'empty_value' => $required ? null : '- Aucun -']
+                ->add('term', EntityType::class,
+                    ['class' => $termClass, 'expanded' => true, 'label' => 'Terme de substitution', 'required' => $required, 'constraints' => $required ? [new NotBlank()]: [], 'query_builder' => $queryBuilder, 'empty_data' => $required ? null : '- Aucun -']
                 );
         }
 
@@ -282,7 +284,7 @@ use App\Entity\Term\AbstractTerm;
         $objectManager->flush();
     }
 
-    private function getRootTerms(ManagerRegistry $managerRegistry, $vocabulary, null $organization, $isAdmin=null)
+    private function getRootTerms(ManagerRegistry $managerRegistry, $vocabulary, $organization, $isAdmin=null)
     {
         $class = $vocabulary::class;
         $objectRepository = $managerRegistry->getManager()->getRepository($class);
@@ -354,7 +356,7 @@ use App\Entity\Term\AbstractTerm;
 	}
 
     #[Route(path: '/get_terms/{vocabularyId}', name: 'taxonomy.get', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function getTerms(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId,  $isAdmin=null)
+    public function getTerms(SerializerInterface $serializer, ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, $vocabularyId,  $isAdmin=null): JsonResponse
     {
         /*
          * @var AbstractTerm
@@ -367,7 +369,13 @@ use App\Entity\Term\AbstractTerm;
         $userOrg = $this->getUser()->getOrganization() ?? null;
         $isAdmin = $this->getUser()->isAdmin();
 
-       $terms = $this->getRootTerms($managerRegistry, $vocabulary, $userOrg = null, $isAdmin);
-        return new JsonResponse($terms);
+       $terms = $this->getRootTerms($managerRegistry, $vocabulary, $userOrg, $isAdmin);
+        $jsonData = $serializer->normalize($terms, null, [
+            'circular_reference_handler' => function ($object) {
+                return $object->getId();
+            }
+        ]);
+
+        return new JsonResponse($jsonData);
     }
 }

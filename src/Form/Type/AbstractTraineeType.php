@@ -35,9 +35,9 @@ final class AbstractTraineeType extends AbstractType
     {
     }
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formBuilder
+        $builder
             ->add('title', null, ['label' => 'Civilité'])
             ->add('lastname', null, ['label' => 'Nom'])
             ->add('firstname', null, ['label' => 'Prénom'])
@@ -70,7 +70,7 @@ final class AbstractTraineeType extends AbstractType
             ->add('isActive', CheckboxType::class, ['label' => 'Validé', 'required' => false]);
 
         // add listeners to handle conditionals fields
-        $this->addEventListeners($formBuilder);
+        $this->addEventListeners($builder);
 
     }
 
@@ -125,8 +125,8 @@ final class AbstractTraineeType extends AbstractType
 
     }
 
-	public function configureOptions(OptionsResolver $optionsResolver): void
+	public function configureOptions(OptionsResolver $resolver): void
 	{
-		$optionsResolver->setDefaults(['data_class' => AbstractTrainee::class, 'validation_groups' => ['Default', 'trainee', 'organization'], 'enable_security_check' => true]);
+		$resolver->setDefaults(['data_class' => AbstractTrainee::class, 'validation_groups' => ['Default', 'trainee', 'organization'], 'enable_security_check' => true]);
 	}
 }

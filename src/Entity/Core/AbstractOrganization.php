@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\PersonTrait\CoordinatesTrait;
 use App\Form\Type\AbstractOrganizationType;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
@@ -40,6 +41,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'address', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $address = null;
 
@@ -47,6 +49,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'zip', type: \Doctrine\DBAL\Types\Types::STRING, length: 32, nullable: true)]
     protected ?string $zip = null;
 
@@ -54,12 +57,14 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'city', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
     protected ?string $city = null;
 
     /**
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[Assert\Email(message: 'Vous devez renseigner un email valide.')]
     #[ORM\Column(name: 'email', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
     protected ?string $email = null;
@@ -68,6 +73,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'phone_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     protected ?string $phonenumber = null;
 
@@ -75,12 +81,14 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'fax_number', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
     protected ?string $faxnumber = null;
 
     /**
      * @Serializer\Groups({"api"})
      */
+    #[Groups(['api'])]
     #[ORM\Column(name: 'website', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $website = null;
 

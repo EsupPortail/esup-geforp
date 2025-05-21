@@ -11,6 +11,7 @@ namespace App\Entity\Back;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
@@ -22,6 +23,7 @@ class SupannCodeEntite
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(['Default', 'api'])]
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,19 +32,21 @@ class SupannCodeEntite
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'supannCodeEntite', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $supannCodeEntite = null;
 
     /**
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
+    #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'Description', type: \Doctrine\DBAL\Types\Types::STRING)]
     protected ?string $description = null;
 
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId()
     {
         return $this->id;
     }

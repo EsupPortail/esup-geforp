@@ -7,6 +7,7 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\VocabularyInterface;
 use App\Form\Type\TrainingcategoryType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,6 +21,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'trainingType', type: \Doctrine\DBAL\Types\Types::STRING, length: 256, nullable: true)]
     #[Assert\NotNull(message: 'Vous devez renseigner un type de formation')]
     private ?string $trainingType = null;
@@ -27,7 +29,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return string
      */
-    public function getTrainingType(): string
+    public function getTrainingType(): ?string
     {
         return $this->trainingType;
     }
@@ -43,7 +45,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName(): mixed
+    public function getVocabularyName(): string
     {
         return 'Catégorie de formation';
     }

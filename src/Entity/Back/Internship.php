@@ -8,6 +8,7 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractTraining;
 use App\Form\Type\InternshipType;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Stage.
@@ -21,6 +22,7 @@ class Internship extends AbstractTraining
      * @Serializer\Groups({"training", "inscription", "api"})
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Publictype>
      */
+    #[Groups([ 'training','inscription', 'api'])]
     #[ORM\JoinTable(name: 'internship__internship_publictype')]
     #[ORM\JoinColumn(name: 'intership_id')]
     #[ORM\InverseJoinColumn(name: 'publictype_id', referencedColumnName: 'id')]
@@ -31,6 +33,7 @@ class Internship extends AbstractTraining
      * @Serializer\Groups({"training", "inscription", "api"})
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Publictype>
      */
+    #[Groups([ 'training','inscription', 'api'])]
     #[ORM\JoinTable(name: 'internship__internship_publictyperestrict')]
     #[ORM\JoinColumn(name: 'intership_id')]
     #[ORM\InverseJoinColumn(name: 'publictyperestrict_id', referencedColumnName: 'id')]
@@ -40,6 +43,7 @@ class Internship extends AbstractTraining
     /**
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups([ 'training','inscription', 'api'])]
     #[ORM\Column(name: 'prerequisites', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
     protected ?string $prerequisites = null;
 
@@ -47,6 +51,7 @@ class Internship extends AbstractTraining
      *
      * @Serializer\Groups({"training", "api"})
      */
+    #[Groups([ 'training', 'api'])]
     #[ORM\Column(name: 'designated_public', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
     protected ?bool $designatedpublic = null;
 
@@ -75,7 +80,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypes(): mixed
+    public function getPublictypes(): \Doctrine\Common\Collections\Collection
     {
         return $this->publictypes;
     }
@@ -123,7 +128,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypesrestrict(): mixed
+    public function getPublictypesrestrict(): \Doctrine\Common\Collections\Collection
     {
         return $this->publictypesrestrict;
     }
@@ -166,7 +171,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPrerequisites(): mixed
+    public function getPrerequisites(): ?string
     {
         return $this->prerequisites;
     }
@@ -179,7 +184,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getDesignatedpublic(): mixed
+    public function getDesignatedpublic(): ?bool
     {
         return $this->designatedpublic;
     }

@@ -34,6 +34,7 @@ abstract class AbstractCoreController extends AbstractController
      *
      * @todo : blaise, security
      */
+    #[Rest\View(serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/search', name: 'core.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(Request $request)
     {
@@ -46,6 +47,7 @@ abstract class AbstractCoreController extends AbstractController
     /**
      * @Rest\View(serializerEnableMaxDepthChecks=true)
      */
+    #[Rest\View(serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/entity', name: 'core.entity', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function entity(Request $request): View
     {

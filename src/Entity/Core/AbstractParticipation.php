@@ -6,8 +6,9 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\AbstractParticipationType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 /**
  * Participation.
  *
@@ -22,6 +23,7 @@ abstract class AbstractParticipation
     /**
      * @Serializer\Groups({"Default", "api", "session", "participation"})
      */
+    #[Groups(["Default", "api", "session", "participation"])]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,23 +33,28 @@ abstract class AbstractParticipation
      * @var AbstractTrainer
      * @Serializer\Groups({"participation", "session", "api.training", "api"})
      */
+    #[Groups(["api.training", "api", "session", "participation"])]
     #[ORM\ManyToOne(targetEntity: 'AbstractTrainer', inversedBy: 'participations')]
     #[ORM\JoinColumn(name: 'trainer_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un intervenant')]
-    protected $trainer;
+    #[MaxDepth(1)]
+    protected AbstractTrainer $trainer;
 
     /**
      * @var AbstractSession
      * @Serializer\Groups({"participation", "session", "trainer", "api"})
      */
+    #[Groups([ "api", "session", "participation", "trainer"])]
     #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'participations')]
     #[ORM\JoinColumn(name: 'session_id')]
     #[Assert\NotNull]
-    protected $session;
+    #[MaxDepth(1)]
+    protected AbstractSession $session;
 
     /**
      * @Serializer\Groups({"participation"})
      */
+    #[Groups(["participation"])]
     #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
     protected ?bool $isOrganization = null;
 
@@ -56,14 +63,16 @@ abstract class AbstractParticipation
      * @Serializer\Groups({"Default", "api"})
      * @Serializer\Groups({"participation"})
      */
+    #[Groups(["participation", "Default", "api"])]
     #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
     #[ORM\JoinColumn]
-    protected $organization;
+    #[MaxDepth(1)]
+    protected AbstractOrganization $organization;
 
     /**
      * @return int
      */
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -93,17 +102,17 @@ abstract class AbstractParticipation
     }
 
     /**
-     * @param AbstractSession
+     * @param AbstractSession $session
      */
-    public function setSession($session): void
+    public function setSession(AbstractSession $session): void
     {
         $this->session = $session;
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getIsOrganization(): mixed
+    public function getIsOrganization(): ?bool
     {
         return $this->isOrganization;
     }
@@ -114,9 +123,9 @@ abstract class AbstractParticipation
     }
 
     /**
-     * @return mixed
+     * @return AbstractOrganization
      */
-    public function getOrganization(): mixed
+    public function getOrganization(): AbstractOrganization
     {
         return $this->organization;
     }
@@ -127,9 +136,9 @@ abstract class AbstractParticipation
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getFormType(): mixed
+    public static function getFormType(): string
     {
         return AbstractParticipationType::class;
     }

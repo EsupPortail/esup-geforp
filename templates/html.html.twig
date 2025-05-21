@@ -30,7 +30,7 @@
 {% if app.user is not null %}
     {% set array_user = {
         'id':  app.user.id ,
-        'username':  app.user.username ,
+        'username':  app.user.getUserIdentifier ,
         'email':  app.user.email ,
         'roles':  app.user.roles ,
         'organization': {

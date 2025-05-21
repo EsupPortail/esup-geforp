@@ -5,6 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Timestampable Trait
@@ -18,7 +19,8 @@ trait TimestampableTrait
      */
     #[Gedmo\Timestampable(on: 'create')]
     #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
-    protected $createdat;
+    #[Groups(['institution', 'trainer', 'inscription'])]
+    protected \DateTimeInterface $createdat;
 
     /**
      * @var \DateTimeInterface
@@ -26,7 +28,8 @@ trait TimestampableTrait
      */
     #[Gedmo\Timestampable(on: 'update')]
     #[ORM\Column(name: 'updated_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
-    protected $updatedat;
+    #[Groups(['institution', 'trainer', 'inscription'])]
+    protected \DateTimeInterface $updatedat;
 
     /**
      * Sets createdAt.
@@ -43,9 +46,9 @@ trait TimestampableTrait
     /**
      * Returns createdAt.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getCreatedat(): \DateTime
+    public function getCreatedat(): \DateTimeInterface
     {
         return $this->createdat;
     }
@@ -65,9 +68,9 @@ trait TimestampableTrait
     /**
      * Returns updatedAt.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getUpdatedat(): \DateTime
+    public function getUpdatedat(): \DateTimeInterface
     {
         return $this->updatedat;
     }

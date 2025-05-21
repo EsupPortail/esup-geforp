@@ -97,12 +97,13 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
-    protected Collection $participations;
+    protected ArrayCollection|Collection $participations ;
 
     /**
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\AbstractInscription>
      */
+    #[Groups('session')]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractInscription', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdat' => 'DESC'])]
     protected Collection $inscriptions;
@@ -132,7 +133,7 @@ abstract class AbstractSession implements SerializedAccessRights
     protected ?\DateTimeInterface $dateend = null;
 
     #[ORM\Column(name: 'registration', type: \Doctrine\DBAL\Types\Types::INTEGER)]
-    protected ?int $registration = self::REGISTRATION_CLOSED;
+    protected int $registration = self::REGISTRATION_CLOSED;
 
     /**
      * @Serializer\Groups({"session", "training", "inscription", "api"})
@@ -436,7 +437,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return int|null
      */
-    public function getRegistration(): ?int
+    public function getRegistration(): int
     {
         return $this->registration;
     }
@@ -840,36 +841,6 @@ abstract class AbstractSession implements SerializedAccessRights
     public function setAllMaterials(ArrayCollection $allMaterials): void
     {
         $this->allMaterials = $allMaterials;
-    }
-
-    /**
-     * @return mixed
-     * @Serializer\VirtualProperty
-     * @Serializer\Groups({"session", "training"})
-     */
-    public function getNumberofparticipants(): mixed
-    {
-        $count = 0;
-        if ($this->registration === self::REGISTRATION_DEACTIVATED) {
-            if ($this->participantsSummaries != null) {
-                foreach ($this->participantsSummaries as $participantSummary) {
-                    $count += $participantSummary->getCount();
-                }
-            }
-        } elseif ($this->inscriptions != null) {
-            /** @var AbstractInscription $inscription */
-            foreach ($this->inscriptions as $inscription) {
-                if (!$inscription->getPresencestatus()) {
-                    continue;
-                }
-                if ($inscription->getPresencestatus()->getStatus() !== PresenceStatus::STATUS_PRESENT) {
-                    continue;
-                }
-                ++$count;
-            }
-        }
-
-        return $count;
     }
 
     /**

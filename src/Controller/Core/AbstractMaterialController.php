@@ -32,6 +32,7 @@ abstract class AbstractMaterialController extends AbstractController
      * @Rest\View(serializerEnableMaxDepthChecks=true)
      * @throws \Exception
      */
+    #[Rest\View(serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/{entity_id}/add/{type_entity}/{material_type}/', name: 'material.add', options: ['expose' => true], defaults: ['_format' => 'json', 'material_type' => 'file'])]
     public function add($entity_id, $type_entity, $material_type, Request $request, ManagerRegistry $managerRegistry): array
     {
@@ -114,6 +115,7 @@ abstract class AbstractMaterialController extends AbstractController
                     $material->$setEntityMethod($entity);
 
                     $em = $managerRegistry->getManager();
+
                     $em->persist($material);
                     $em->flush();
 
@@ -128,10 +130,11 @@ abstract class AbstractMaterialController extends AbstractController
     /**
      * @Rest\View
      */
+    #[Rest\View()]
     #[Route(path: '/{id}/remove/', name: 'material.remove', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function delete(Material $material, ManagerRegistry $managerRegistry, int $id): array
     {
-        $material = $managerRegistry->getRepository(Material::class, $id);
+        $material = $managerRegistry->getRepository(Material::class)->find($id);
         if (!$material) {
             throw $this->createNotFoundException();
         }
@@ -157,10 +160,11 @@ abstract class AbstractMaterialController extends AbstractController
     /**
      * @Rest\View
      */
+    #[Rest\View()]
     #[Route(path: '/{id}/get/', name: 'material.get', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function getAction(ManagerRegistry $managerRegistry, $material, int $id)
+    public function getAction(ManagerRegistry $managerRegistry, int $id)
     {
-        $material = $managerRegistry->getRepository(Material::class, $id);
+        $material = $managerRegistry->getRepository(Material::class)->find($id);
         if (!$material) {
             throw $this->createNotFoundException();
         }

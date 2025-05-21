@@ -8,5 +8,5 @@ use Symfony\Component\Routing\Attribute\Route;
 
  #[Route("/participation")]final class ParticipationController extends AbstractParticipationController
 {
-    protected $participationClass = Participation::class;
+    protected string $participationClass = Participation::class;
 }

@@ -17,9 +17,9 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 final class InscriptionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formBuilder
+        $builder
             ->add('trainee', EntityHiddenType::class, ['label' => 'Stagiaire', 'class' => AbstractTrainee::class])
             ->add('session', EntityHiddenType::class, ['label' => 'Session', 'class' => AbstractSession::class])
             ->add('motivation', TextareaType::class, ['label' => 'Motivation', 'attr' => ['placeholder' => 'Expliquez les raisons pour lesquelles vous souhaitez vous inscrire à cette session.']])
@@ -28,8 +28,8 @@ final class InscriptionType extends AbstractType
             ->add('authorization', CheckboxType::class, ['label' => 'Envoyer une demande d\'autorisation à mon supérieur hiérarchique', 'mapped' => false, 'required' => false, 'disabled' => true, 'attr' => ['checked'   => 'checked']]);
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['data_class' => Inscription::class]);
+        $resolver->setDefaults(['data_class' => Inscription::class]);
     }
 }

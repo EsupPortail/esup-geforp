@@ -40,9 +40,9 @@ final class ShibbolethUser implements UserInterface, EquatableInterface, Stringa
         return null;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
-        return $this->username;
+        return $this->getUserIdentifier();
     }
 
     public function getCredentials(): array

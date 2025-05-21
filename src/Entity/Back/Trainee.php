@@ -44,7 +44,7 @@ class Trainee extends AbstractTrainee
     #[ORM\Column(name: 'campus', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
     protected ?string $campus = null;
 
-    #[Groups(['Default', 'trainee', 'api'])]
+    #[Groups(['Default', 'trainee', 'api', 'inscription'])]
     #[ORM\Column(name: 'first_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $firstnamesup = null;
 

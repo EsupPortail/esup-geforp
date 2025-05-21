@@ -13,28 +13,31 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @var string
      */
-    private $id;
+    private string $id;
 
     /**
      * @var string
      */
-    private $label;
+    private string $label;
 
     /**
      * @var string
      */
-    protected $targetClass;
+    protected string $targetClass;
 
     /**
      * @var ManagerRegistry
      */
-    protected $doctrine;
+    protected ManagerRegistry $doctrine;
 
     /**
      * @var array
      */
-    protected $options = [];
+    protected array $options;
 
+    public function __construct(){
+        $this->options = [];
+    }
     /**
      * @param $id
      */
@@ -54,7 +57,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @param string $class
      */
-    public function setTargetClass($class): void
+    public function setTargetClass(string $class): void
     {
         $this->targetClass = $class;
     }
@@ -93,7 +96,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @param array $options
      */
-    public function setOptions($options): void
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->options, $options);
     }
@@ -125,7 +128,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * Re-order a list by keys.
      */
-    protected function reorderByKeys(&$items, $keys)
+    protected function reorderByKeys(&$items, $keys): void
     {
         usort($items, static function ($a, $b) use ($keys) : int {
             $position_a = array_search($a->getId(), $keys, true);

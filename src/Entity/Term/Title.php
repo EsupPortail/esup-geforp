@@ -24,7 +24,7 @@ class Title extends AbstractTerm implements VocabularyInterface
      *
      * @var bool
      */
-    public static $replacementRequired = true;
+    public static bool $replacementRequired = true;
 
     /**
      * @return mixed
