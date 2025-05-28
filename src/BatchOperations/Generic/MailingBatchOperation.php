@@ -399,12 +399,18 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             // On crée le tableau de dates correspondant au tableau des présences
                             $tabDates = array();
                             foreach ($session->getDates() as $dateSes) {
-                                // Conversion date de début de session
-                                $dateDeb = strtotime(str_replace("/", "-", $dateSes->getDatebegin()->format('d/m/Y')));
+                                $dateDeb = $dateSes->getDateBegin();
+                                $dateNewS = $dateDeb->format('d/m/Y');
+                                $tab = explode('/', $dateNewS);
+                                $dateNew = new \DateTime();
+                                $dateNew->setDate($tab[2], $tab[1], $tab[0]);
+
+                                $nbJoursDate2 = date_diff($dateSes->getDateEnd(), $dateSes->getDateBegin());
+                                $nbJoursDate = $nbJoursDate2->format('%a');
                                 // création du tableau des dates suivant le nombre de jours à afficher
-                                for ($j = 0; $j < $session->getDaynumber() + 1; $j++) {
-                                    $dateNew = date('d/m/Y', $dateDeb + $j * 86400);
-                                    $tabDates[] = array("dateDeb" => $dateNew, "nbHeuresMatin" => $dateSes->getHournumbermorn(), "nbHeuresApr" => $dateSes->getHournumberafter());
+                                for ($j = 0; $j < $nbJoursDate + 1; $j++) {
+                                    $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
+                                    $dateNew->modify('+ 1 days');
                                 }
                             }
 
