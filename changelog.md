@@ -1,5 +1,17 @@
 # Geforp changelog :
 
+## 2.3.19 (2025-06-02)
+
+### Ajouts
+- Prise en compte des horaires dans l'envoi de l'invitation ical
+-> Nouveau format à respecter lors de la saisie du calendrier des dates 
+- Ajout type de formation dans l'export de session
+
+### Corrections
+- Correction export des évaluations sur une session
+- Correction bug nombre d'heures fiche formation stagiaire
+- Correction coquille espace stagiaire
+
 ## 2.3.18 (2025-03-25)
 
 ### Ajouts
