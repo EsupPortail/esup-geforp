@@ -103,7 +103,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     /**
      * @ORM\Column(name="status", type="integer")
-     * @Serializer\Groups({"session", "training", "inscription", "api"})
+     * @Serializer\Groups({"session", "training", "inscription", "api", "trainer"})
      */
     protected $status = self::STATUS_OPEN;
 
