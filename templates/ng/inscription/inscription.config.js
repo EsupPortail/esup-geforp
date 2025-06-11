@@ -267,7 +267,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 rights: ['sygefor_inscription.rights.inscription.own.view'],
                 state: 'inscription.table',
                 title: 'Derniers avis favorables du N+1',
-                size: 5,
+                size: 10,
                 filters:{
                     'inscriptionStatus.name.source': 'Avis favorable du N+1',
                     "inscriptionStatusUpdatedAt": {
