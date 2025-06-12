@@ -297,7 +297,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
         }
     });
 
-    $widgetProvider.widget("session", /* @ngInject */ {
+    $widgetProvider.widget("pastsession", /* @ngInject */ {
         controller: 'WidgetListController',
         templateUrl: 'training/session/widget/pastsession.html',
         options: function($user) {
@@ -305,9 +305,9 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 route: 'session.search',
                 rights: ['sygefor_training.rights.training.own.view', 'sygefor_training.rights.training.all.view'],
                 state: 'session.table',
-                title: 'Dernières sessions',
+                title: 'Dernières sessions terminées',
                 size: 10,
-                sorts: {'dateend': 'desc'},
+                sorts: {'datebegin': 'desc'},
                 filters: {
                     'training.organization.name.source': $user.organization.name,
                     'dateend': moment().subtract('years', 1).format('DD/MM/YYYY') + ' - ' + moment().subtract('days', 1).format('DD/MM/YYYY')

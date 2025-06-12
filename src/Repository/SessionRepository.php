@@ -146,7 +146,7 @@ class SessionRepository extends ServiceEntityRepository
                 ->setParameter('monthTo', $monthTo);
         }
 
-        //FILTRE DATE
+        //FILTRE DATE DE DEBUT
         if( isset($filters['datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
             $dates = explode('-', $filters["datebegin"]);
@@ -160,6 +160,24 @@ class SessionRepository extends ServiceEntityRepository
             $qb
                 /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo);
+        }
+
+        //FILTRE DATE DE FIN
+        if( isset($filters['dateend']) ) {
+            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
+            $dates = explode('-', $filters["dateend"]);
+            /* on retire les caractères non utiles */
+            $from = str_replace('/','-', $dates[0]);
+            $to = str_replace('/', '-', $dates[1]);
+            /* on convertit au même format qu'en base de données */
+            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
+            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
+
+            $qb
+                /* si la date de fin d'une session est entre les 2 dates envoyées dans le formulaire */
+                ->andWhere("s.dateend BETWEEN :dateFrom AND :dateTo")
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
         }
