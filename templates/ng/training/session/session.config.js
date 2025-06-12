@@ -307,7 +307,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
                 state: 'session.table',
                 title: 'Dernières sessions terminées',
                 size: 10,
-                sorts: {'datebegin': 'desc'},
+                sorts: {'dateend': 'desc'},
                 filters: {
                     'training.organization.name.source': $user.organization.name,
                     'dateend': moment().subtract('years', 1).format('DD/MM/YYYY') + ' - ' + moment().subtract('days', 1).format('DD/MM/YYYY')
