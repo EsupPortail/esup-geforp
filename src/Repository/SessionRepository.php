@@ -236,6 +236,8 @@ class SessionRepository extends ServiceEntityRepository
             $qb->addOrderBy('s.name', $sorts['training.name.source']);
         elseif (isset($sorts['datebegin']))
             $qb->addOrderBy('s.datebegin', $sorts['datebegin']);
+        elseif (isset($sorts['dateend']))
+            $qb->addOrderBy('s.dateend', $sorts['dateend']);
         else
             $qb->addOrderBy('s.datebegin')
                 ->addOrderBy('s.name');
