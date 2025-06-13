@@ -24,6 +24,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
             'format': config.templates[i]['position'],
+            'send_resp': config.templates[i]['machine_name'],
             'attachmentTemplates': config.templates[i]['attachment_templates']
         };
     }
@@ -37,6 +38,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $scope.message.attachmentTemplates = $scope.templates[0].attachmentTemplates;
         $scope.message.ical = $scope.templates[0].ical;
         $scope.message.format = $scope.templates[0].format;
+        $scope.message.send_resp = $scope.templates[0].send_resp;
     }
     $scope.message.attachments = [];
 
@@ -223,12 +225,14 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 oldValue.body = $scope.message.body;
                 oldValue.ical = $scope.message.ical;
                 oldValue.format = $scope.message.format;
+                oldValue.send_resp = $scope.message.send_resp;
             }
             //replacing values
             $scope.message.subject = newValue.subject;
             $scope.message.body = newValue.body;
             $scope.message.ical = newValue.ical;
             $scope.message.format = newValue.format;
+            $scope.message.send_resp = newValue.send_resp;
             $scope.attCheckList = newValue.attachmentTemplates;
         }
     });
