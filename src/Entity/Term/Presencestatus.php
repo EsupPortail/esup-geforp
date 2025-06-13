@@ -25,19 +25,19 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @var int
      */
-    final public const STATUS_ABSENT = 0;
+    final public const int STATUS_ABSENT = 0;
 
     /**
      * @var int
      */
-    final public const STATUS_PRESENT = 1;
+    final public const int STATUS_PRESENT = 1;
 
     /**
      * This term is required during term replacement.
      *
      * @var bool
      */
-    public static $replacementRequired = true;
+    public static bool $replacementRequired = true;
 
     /**
      * @Serializer\Groups({"Default", "api"})
@@ -49,7 +49,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @param int $status
      */
-    public function __construct($status = self::STATUS_ABSENT)
+    public function __construct(int $status = self::STATUS_ABSENT)
     {
         $this->setStatus($status);
     }
@@ -57,7 +57,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @param int $status
      */
-    public function setStatus($status): void
+    public function setStatus(int $status): void
     {
         $this->status = $status;
     }
@@ -65,7 +65,7 @@ class Presencestatus extends AbstractTerm implements VocabularyInterface
     /**
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): ?int
     {
         return $this->status;
     }

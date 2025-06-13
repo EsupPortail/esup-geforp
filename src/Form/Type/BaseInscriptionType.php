@@ -21,14 +21,14 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 final class BaseInscriptionType extends AbstractType
 {
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $options['data']->getSession();
 
         /** @var AbstractOrganization $organization */
         $organization = $options['attr']['organization'];
 
-        $formBuilder
+        $builder
             ->add('trainee', EntityHiddenType::class, ['label'           => 'Stagiaire', 'class'           => AbstractTrainee::class, 'invalid_message' => ''])
             ->add('session', EntityHiddenType::class, ['label'           => 'Session', 'class'           => AbstractSession::class, 'invalid_message' => 'Session non reconnue'])
             ->add('inscriptionstatus', EntityType::class, ['label'         => "Status d'inscription", 'class'         => Inscriptionstatus::class, 'query_builder' => static function (EntityRepository $entityRepository) use ($organization) : \Doctrine\ORM\QueryBuilder {
@@ -47,8 +47,8 @@ final class BaseInscriptionType extends AbstractType
             }]);
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['data_class' => AbstractInscription::class]);
+        $resolver->setDefaults(['data_class' => AbstractInscription::class]);
     }
 }

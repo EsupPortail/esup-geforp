@@ -86,6 +86,10 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getLastLoginFormatted(): ?string
+    {
+        return $this->lastLogin ? $this->lastLogin->format('Y-m-d H:i:s') : null;
+    }
     /**
      * A visual identifier that represents this user.
      *

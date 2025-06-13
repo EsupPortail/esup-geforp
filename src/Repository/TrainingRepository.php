@@ -62,11 +62,20 @@ final class TrainingRepository extends ServiceEntityRepository
 
             // FILTRE SEMESTRE
             if( isset($filters['semester']) ) {
-                if ($filters['semester']  == 1) {
-                    $monthFrom = 1; $monthTo = 6;
+                $sessionDate = new \DateTime($filters['year']);
+                $month = (int) $sessionDate->format('m');
+
+                if ($month > 1 && $month < 12) {
+                    $semester = 1;
+                    $monthFrom = 0;
+                    $monthTo = 6;
                 } else {
-                    $monthFrom = 7; $monthTo = 12;
+                    $semester = 2;
+                    $monthFrom = 7;
+                    $monthTo = 12;
                 }
+
+                $filters['semester'] = $semester;
 
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
@@ -123,72 +132,111 @@ final class TrainingRepository extends ServiceEntityRepository
         } else
             $qb->addOrderBy('training.name');
 
+
+
         // PAGINATION
-        $page = (int) $page;
-        $pageSize = (int) $pageSize;
-        $offset = ($page -1) * $pageSize;
+        $page = max(1, (int)$page);
+        $pageSize = max(1, (int)$pageSize);
+        $offset = ($page - 1) * $pageSize;
+
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
+
         $query = $qb->getQuery();
-
         $paginator = new Paginator($query, $fetchJoinCollection = true);
-
         $c = count($paginator);
-        $tabTrainings = [];
 
-        foreach($paginator as $training) {
-            $trainingES = [];
-            // On ne garde que les infos du stage dont on a besoin
-            $trainingES['sessionscount'] = $training->getSessionscount();
-            $trainingES['id'] = $training->getId();
-            $trainingES['number'] = $training->getNumber();
-            $trainingES['name'] = $training->getName();
+        $items = [];
 
+        foreach ($paginator as $training) {
+            // Préparation de la liste des formateurs + chaîne de noms concaténés
+            $trainerList = [];
+            $trainerNames = [];
 
-            $trainingES['training']['id'] = $training->getId();
-            $trainingES['training']['type'] = $training->getType();
-            $trainingES['training']['typeLabel'] = $training->getTypeLabel();
-            $trainingES['training']['organization'] =$training->getOrganization();
-            $trainingES['training']['number'] = $training->getNumber();
-            $trainingES['training']['theme'] = $training->getTheme();
-            $trainingES['training']['tags'] = $training->getTags();
-            $trainingES['training']['name'] = $training->getName();
-            $trainingES['training']['program'] = $training->getProgram();
-            $trainingES['training']['description'] = $training->getDescription();
-            $trainingES['training']['interventionType'] = $training->getInterventionType();
-            $trainingES['training']['externalInitiative'] = $training->isExternalInitiative();
-            $trainingES['training']['category'] = $training->getCategory();
-            $trainingES['training']['comments'] = $training->getComments();
-            $trainingES['training']['firstSessionPeriodSemester'] = $training->getFirstSessionPeriodSemester();
-            $trainingES['training']['firstSessionPeriodYear'] = $training->getFirstSessionPeriodSemester();
-            $trainingES['training']['publictypes'] = $training->getPublicTypes();
-
-            $trainingES['training']['trainers'] = "";
-            $i=0;
             foreach ($training->getTrainers() as $trainer) {
-                $trainingES['trainers'][]['id'] = $trainer->getId();
-                $trainingES['trainers'][]['fullname'] = $trainer->getFullname();
-                if($i>0)
-                    $trainingES['training']['trainers'] .= ', ' . $trainer->getFullname();
-                else
-                    $trainingES['training']['trainers'] .= $trainer->getFullname();
-
-                ++$i;
+                $trainerList[] = [
+                    'id' => $trainer->getId(),
+                    'fullName' => $trainer->getFullname(),
+                ];
+                $trainerNames[] = $trainer->getFullname();
             }
 
+            // Tentative de récupération de la prochaine session
+            $nextSession = $training->getNextsession();
 
-            $trainingES['nextsession'] = $training->getNextsession();
-            $trainingES['lastsession'] = $training->getLastsession();
+            // Si elle existe, on récupère le semestre depuis cette session
+            $semester = null;
+            $years = null;
+            if ($nextSession && method_exists($nextSession, 'getSemesterLabel')) {
+                $semester = $nextSession->getSemesterLabel();
+            }
 
-            $trainingES['theme'] = $training->getTheme();
+            if ($nextSession && method_exists($nextSession, 'getYear') && $nextSession->getYear()) {
+                $years = $nextSession->getYear();
+            }
 
-            $trainingES['inscriptionsStats'] = [];
+            $sessionData = [];
+            $totalParticipants = 0;
 
-            $tabTrainings[] = $trainingES;
-        }
+            foreach ($training->getSessions() as $session) {
+                $participants = $session->getNumberofregistrations();
+                $totalParticipants += $participants;
 
-        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabTrainings];
+                $sessionData[] = [
+                    'id' => $session->getId(),
+                    'datebegin' => $session->getDatebegin(),
+                    'dateend' => $session->getDateend(),
+                    'numberofregistrations' => $participants,
+                    'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
+                    'limitregistrationdate' => $session->getLimitregistrationdate(),
+                    'maximumNumberOfRegistrations' => $session->getMaximumNumberOfRegistrations(),
+                    'status' => $session->getStatus(),
+                    'year' => $session->getYear(),
+                    'semester' => $session->getSemester(),
+                ];
+            }
+
+            $items[] = [
+                'id' => $training->getId(),
+                'number' => $training->getNumber(),
+                'name' => $training->getName(),
+                'theme' => $training->getTheme(),
+                'sessionscount' => $training->getSessionscount(),
+                'numberofregistrations' => $totalParticipants,
+                'semester' => $semester,
+                'nextsession' => $training->getNextsession(),
+                'lastsession' => $training->getLastsession(),
+                'trainers' => $trainerList,
+                'sessions' => $sessionData,
+                'inscriptionsStats' => [], // à compléter si nécessaire
+                'training' => [
+                    'id' => $training->getId(),
+                    'type' => $training->getType(),
+                    'typeLabel' => $training->getTypeLabel(),
+                    'organization' => $training->getOrganization(),
+                    'number' => $training->getNumber(),
+                    'name' => $training->getName(),
+                    'theme' => $training->getTheme(),
+                    'tag' => $training->getTags(),
+                    'program' => $training->getProgram(),
+                    'description' => $training->getDescription(),
+                    'interventionType' => $training->getInterventionType(),
+                    'externalInitiative' => $training->isExternalInitiative(),
+                    'category' => $training->getCategory(),
+                    'comments' => $training->getComments(),
+                    'firstSessionPeriodSemester' => $training->getFirstSessionPeriodSemester(),
+                    'firstSessionPeriodYear' => $training->getFirstSessionPeriodYear(),
+                    'publictypes' => $training->getPublicTypes(),
+                    'trainers' => implode(', ', $trainerNames),
+                ],
+            ];
+
+
+    }
+
+
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $items];
     }
 
     public function getNbTrainings($query_filters, $keyword, $aggs, $name): int

@@ -27,7 +27,7 @@ trait PersonTrait
      */
     #[ORM\Column(name: 'first_name', type: 'string', length: 50, nullable: true)]
     #[Groups(['Default', 'api'])]
-    protected string $firstname;
+    protected ?string $firstname = null;
 
     /**
      * @var string
@@ -62,7 +62,7 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getFirstname(): string
+    public function getFirstname(): ?string
     {
         return $this->firstname;
     }
@@ -83,16 +83,16 @@ trait PersonTrait
         return $this->lastname;
     }
 
-
+    #[Groups(['Default', 'trainer', 'session', 'api.training', 'inscription'])]
     public function getFullname(): string
     {
-        return $this->getFirstname().' '.$this->getLastname();
+        return $this->getFirstname() . ' ' . $this->getLastname();
     }
 
 
     public function getReverseFullName(): string
     {
-        return $this->getLastName().' '.$this->getFirstName();
+        return $this->getLastname() . ' ' . $this->getFirstname();
     }
 
     /**

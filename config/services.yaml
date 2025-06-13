@@ -407,9 +407,16 @@ services:
     App\Service\TrainingBalanceSheet:
         arguments:
             $doctrine: '@doctrine'
-    App\BatchOperations\Generic\PDFBatchOperation:
+    sygefor_core.batch.pdf.inscription.attestation:
+        class: App\BatchOperations\Generic\PDFBatchOperation
         arguments:
-            $defaultTemplate: '%app.default_pdf_template%'
+                - '@knp_snappy.pdf'
+                - '@security.helper'
+                - '@twig'
+                - '@parameter_bag'
+        tags:
+                - { name: sygefor.batch_operation, type:
+                              inscription, label: 'PDF : Attestation', domain: 'sygefor_core' }
     # default configuration for services in *this* file
     Symfony\Component\Security\Core\Security: '@Symfony\Bundle\SecurityBundle\Security'
     Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'

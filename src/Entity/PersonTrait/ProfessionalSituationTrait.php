@@ -4,6 +4,7 @@ namespace App\Entity\PersonTrait;
 
 use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractInstitution;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\ORM\Mapping as ORM;
@@ -19,7 +20,7 @@ trait ProfessionalSituationTrait
     #[ORM\ManyToOne(targetEntity: 'App\Entity\Core\AbstractInstitution')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups(['trainee', 'trainer', 'inscription', 'session', 'api.profile'])]
-    protected AbstractInstitution $institution;
+    protected ?AbstractInstitution $institution = null;
 
     #[ORM\ManyToOne(targetEntity: Publictype::class)]
     #[ORM\JoinColumn(nullable: true)]

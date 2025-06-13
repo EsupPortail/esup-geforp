@@ -4,6 +4,7 @@ namespace App\Entity\Core;
 
 use AllowDynamicProperties;
 use App\Entity\Back\Institution;
+use App\Entity\PersonTrait\PersonTrait;
 use App\Repository\TraineeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,11 +37,11 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     use TimestampableTrait;
     use AccountTrait;
     use ProfessionalSituationTrait;
-
     /**
      * @var int id
      *
      */
+
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -53,7 +54,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     #[ORM\ManyToOne(targetEntity: AbstractInstitution::class)]
     #[Assert\NotNull(message: 'Vous devez renseigner un établissement.')]
     #[Groups(['trainee', 'session', 'api.profile', 'api.token', 'inscription'])]
-    protected AbstractInstitution $institution;
+    protected ?AbstractInstitution $institution = null;
 
     /**
      * @Serializer\Groups({"trainee"})
@@ -102,12 +103,12 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     /**
      * @param void $institution
      */
-    public function setInstitution(Institution $institution): void
+    public function setInstitution(AbstractInstitution $institution): void
     {
         $this->institution = $institution;
     }
 
-    public function getInstitution(): Institution
+    public function getInstitution(): ?AbstractInstitution
     {
         return $this->institution;
     }

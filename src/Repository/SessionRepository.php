@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Core\AbstractSession;
 use App\Entity\Back\Session;
+use App\Entity\Term\Presencestatus;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
@@ -96,16 +97,20 @@ final class SessionRepository extends ServiceEntityRepository
         $qb
             ->select(' s');
 
-            // FILTRE KEYWORD
+        // FILTRE KEYWORD
         $qb
             ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string)$keyword, '%_') . '%');
 
+
+        $qb->leftJoin('s.participations', 'p')
+            ->leftJoin('p.trainer', 'trainer')
+            ->addSelect('p, trainer');
 
         if ((isset($filters['training.organization.name.source'])) ||
-            ( isset($filters['theme.name']))
-            ){
+            (isset($filters['theme.name']))
+        ) {
             // join sur training
             $qb->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training');
 
@@ -118,7 +123,7 @@ final class SessionRepository extends ServiceEntityRepository
             }
 
             //FILTRE THEME
-            if( isset($filters['theme.name'])) {
+            if (isset($filters['theme.name'])) {
                 $qb
                     ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
                     ->andWhere('th.name in (:themes)')
@@ -136,11 +141,13 @@ final class SessionRepository extends ServiceEntityRepository
         }
 
         // FILTRE SEMESTRE
-        if( isset($filters['semester']) ) {
-            if ($filters['semester']  == 1) {
-                $monthFrom = 1; $monthTo = 6;
+        if (isset($filters['semester'])) {
+            if ($filters['semester'] == 1) {
+                $monthFrom = 1;
+                $monthTo = 6;
             } else {
-                $monthFrom = 7; $monthTo = 12;
+                $monthFrom = 7;
+                $monthTo = 12;
             }
 
             $qb
@@ -150,15 +157,15 @@ final class SessionRepository extends ServiceEntityRepository
         }
 
         //FILTRE DATE
-        if( isset($filters['datebegin']) ) {
+        if (isset($filters['datebegin'])) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', (string) $filters["datebegin"]);
+            $dates = explode('-', (string)$filters["datebegin"]);
             /* on retire les caractères non utiles */
-            $from = str_replace('/','-', $dates[0]);
+            $from = str_replace('/', '-', $dates[0]);
             $to = str_replace('/', '-', $dates[1]);
             /* on convertit au même format qu'en base de données */
-            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
-            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
+            $dateFrom = date('Y/m/d 00:00:00', strtotime($from));
+            $dateTo = date('Y/m/d 00:00:00', strtotime($to));
 
             $qb
                 /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
@@ -168,44 +175,44 @@ final class SessionRepository extends ServiceEntityRepository
         }
 
         // FILTRE INSCRIPTION (0,1,2,3)
-        if( isset($filters['registration']) ) {
+        if (isset($filters['registration'])) {
             $qb
                 ->andWhere('s.registration in (:registrations)')
                 ->setParameter('registrations', $filters['registration']);
         }
 
         // FILTRE STATUT (0,1,2)
-        if( isset($filters['status']) ){
+        if (isset($filters['status'])) {
             $qb
                 ->andWhere('s.status in (:status)')
                 ->setParameter('status', $filters['status']);
         }
 
         // FILTRE DISPLAYONLINE (F,T) ou (0,1) ?
-        if( isset($filters['displayOnline']) ){
+        if (isset($filters['displayOnline'])) {
             $qb
                 ->andWhere('s.displayonline = :displayOnline')
                 ->setParameter('displayOnline', $filters['displayOnline']);
         }
 
         // FILTRE FORMATION (nom de la formation)
-        if( isset($filters['training.name.source']) ) {
+        if (isset($filters['training.name.source'])) {
             $qb
                 ->andWhere('s.name in (:trainings)')
                 ->setParameter('trainings', $filters['training.name.source']);
         }
 
         //FILTRE PROMOTION (true,false) = (0,1)
-        if( isset($filters['promote']) ) {
+        if (isset($filters['promote'])) {
             $qb
                 ->andWhere('s.promote = :promote')
                 ->setParameter('promote', $filters['promote']);
         }
 
         // FILTRE FORMATEUR
-        if( isset($filters['participations.trainer.fullName']) ) {
+        if (isset($filters['participations.trainer.fullName'])) {
             /* le front envoie un full name (prénom+nom), je le découpe et ne récupère que le nom de famille */
-            $fullName = explode(" ", (string) $filters['participations.trainer.fullName']);
+            $fullName = explode(" ", (string)$filters['participations.trainer.fullName']);
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
@@ -226,103 +233,140 @@ final class SessionRepository extends ServiceEntityRepository
                 ->addOrderBy('s.name');
 
         // PAGINATION
-        $offset = ($page-1) * $pageSize;
+        $offset = ($page - 1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
         $query = $qb->getQuery();
 
-        $paginator = new Paginator($query, $fetchJoinCollection = true);
+        $paginator = new Paginator($query, true);
 
         $c = count($paginator);
         $tabSession = [];
-        $sessionES = [];
-        foreach($paginator as $session) {
-            if ((is_array($fields)) && (in_array("_id", $fields))) {
-                $tabSession[]['id'] = $session->getId();
+
+        foreach ($paginator as $session) {
+            if (is_array($fields) && in_array("_id", $fields)) {
+                // Si on ne veut que les IDs
+                $tabSession[] = ['id' => $session->getId()];
             } else {
-                // On ne garde que les infos de la session dont on a besoin
-                $sessionES['id'] = $session->getId();
-                $sessionES['name'] = $session->getName();
-                $sessionES['datebegin'] = $session->getDatebegin();
-                $sessionES['dateend'] = $session->getDateend();
-                $sessionES['hournumber'] = $session->getHournumber();
-                $sessionES['daynumber'] = $session->getDaynumber();
-                $sessionES['year'] = $session->getYear();
-                $sessionES['semester'] = $session->getSemester();
-                $sessionES['semesterLabel'] = $session->getSemesterLabel();
-                $sessionES['limitRegistrationDate'] = $session->getLimitregistrationdate();
-                $sessionES['numberofregistrations'] = $session->getNumberofregistrations();
-                $sessionES['numberofacceptedregistrations'] = $session->getNumberofacceptedregistrations();
-                $sessionES['maximumnumberofregistrations'] = $session->getMaximumnumberofregistrations();
+                // Extraire les infos principales de la session
+                $sessionES = [
+                    'id' => $session->getId(),
+                    'name' => $session->getName(),
+                    'datebegin' => $session->getDatebegin(),
+                    'dateend' => $session->getDateend(),
+                    'hournumber' => $session->getHournumber(),
+                    'daynumber' => $session->getDaynumber(),
+                    'year' => $session->getYear(),
+                    'semester' => $session->getSemester(),
+                    'semesterLabel' => $session->getSemesterLabel(),
+                    'limitRegistrationDate' => $session->getLimitregistrationdate(),
+                    'maximumNumberOfRegistrations' => $session->getMaximumNumberOfRegistrations(),
+                    'numberofregistrations' => $session->getMaximumNumberOfRegistrations(),
+                    'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
+                    'registrable' => $session->isRegistrable(),
+                    'registration' => $session->getRegistration(),
+                    'status' => $session->getStatus(),
+                    'displayonline' => $session->getDisplayonline(),
+                    'sessiontype' => $session->getSessiontype(),
+                    'availablePlaces' => $session->getAvailablePlaces(),
+                    'promote' => $session->getPromote(),
+                    'theme' => $session->getTraining()->getTheme(),
+                    'numberofparticipants' => $session->getNumberofregistrations(),
+                ];
+
+                if (method_exists($session, 'getStatus')) {
+                    $sessionES['status'] = $session->getStatus();
+                }
+
                 if (method_exists($session, 'getNumberofparticipants')) {
-                    $sessionES['numberofparticipants'] = $session->getNumberofparticipants();
+                    $sessionES['numberofparticipants'] = $session->getNumberofregistrations();
                 }
-                $sessionES['registrable'] = $session->isRegistrable();
-                $sessionES['registration'] = $session->getRegistration();
-                $sessionES['status'] = $session->getStatus();
-                $sessionES['displayonline'] = $session->getDisplayonline();
-                $sessionES['sessiontype'] = $session->getSessiontype();
-                $sessionES['availablePlaces'] = $session->getAvailablePlaces();
-                $sessionES['promote'] = $session->getPromote();
 
-                $sessionES['training']['id'] = $session->getTraining()->getId();
-                $sessionES['training']['type'] = $session->getTraining()->getType();
-                $sessionES['training']['name'] = $session->getTraining()->getName();
-                $sessionES['training']['typeLabel'] = $session->getTraining()->getTypeLabel();
-                $sessionES['training']['organization'] = $session->getTraining()->getOrganization();
-                $sessionES['training']['number'] = $session->getTraining()->getNumber();
-                $sessionES['training']['theme'] = $session->getTraining()->getTheme();
-                $sessionES['training']['tags'] = $session->getTraining()->getTags();
-                $sessionES['training']['program'] = $session->getTraining()->getProgram();
-                $sessionES['training']['description'] = $session->getTraining()->getDescription();
-                $sessionES['training']['interventionType'] = $session->getTraining()->getInterventionType();
-                $sessionES['training']['externalInitiative'] = $session->getTraining()->isExternalInitiative();
-                $sessionES['training']['category'] = $session->getTraining()->getCategory();
-                $sessionES['training']['comments'] = $session->getTraining()->getComments();
-                $sessionES['training']['firstSessionPeriodSemester'] = $session->getTraining()->getFirstSessionPeriodSemester();
-                $sessionES['training']['firstSessionPeriodYear'] = $session->getTraining()->getFirstSessionPeriodSemester();
-                $sessionES['training']['publictypes'] = $session->getTraining()->getPublicTypes();
+                if (method_exists($session, 'getMaximumNumberOfRegistrations')) {
+                    $sessionES['maximumNumberOfRegistrations'] = $session->getMaximumNumberOfRegistrations();
+                }
 
+                $inscriptions = $session->getInscriptions();
+                $sessionES['inscriptions'] = [];
+
+                foreach ($inscriptions as $insc) {
+                    $sessionES['inscriptions'][] = [
+                        'id' => $insc->getId(),
+                        'presencestatus' => $insc->getPresencestatus()?->getStatus() ?? null,
+                    ];
+                }
+
+                // Infos training
+                $training = $session->getTraining();
+                $sessionES['training'] = [
+                    'id' => $training->getId(),
+                    'type' => $training->getType(),
+                    'name' => $training->getName(),
+                    'typeLabel' => $training->getTypeLabel(),
+                    'organization' => $training->getOrganization(),
+                    'number' => $training->getNumber(),
+                    'theme' => $training->getTheme(),
+                    'tags' => $training->getTags(),
+                    'program' => $training->getProgram(),
+                    'description' => $training->getDescription(),
+                    'interventionType' => $training->getInterventionType(),
+                    'externalInitiative' => $training->isExternalInitiative(),
+                    'category' => $training->getCategory(),
+                    'comments' => $training->getComments(),
+                    'firstSessionPeriodSemester' => $training->getFirstSessionPeriodSemester(),
+                    'firstSessionPeriodYear' => $training->getFirstSessionPeriodYear(),
+                    'publictypes' => $training->getPublicTypes(),
+                ];
+
+                // Statistiques des inscriptions
                 $statsInsc = [];
+                $sessionES['inscriptions'] = [];
                 foreach ($session->getInscriptions() as $insc) {
-                    $sessionES['inscriptions'][]['id'] = $insc->getId();
-
-                    // création des stats de statut d'inscription
-                    $flagExiste = 0;
-                    $i=0;
-                    // On parcourt le tableau des stats
-                    foreach ($statsInsc as $statInsc) {
-                        // si le statut de l'inscription est trouvé dans le tableau
-                        if ($statInsc['id'] == $insc->getInscriptionStatus()->getId()) {
-                            // on incrémente le compteur
-                            ++$statsInsc[$i]['count'];
-                            $flagExiste = 1;
+                    $sessionES['inscriptions'][] = ['id' => $insc->getId()];
+                    $statusId = $insc->getInscriptionStatus()->getId();
+                    $found = false;
+                    foreach ($statsInsc as &$statInsc) {
+                        if ($statInsc['id'] === $statusId) {
+                            $statInsc['count']++;
+                            $found = true;
+                            break;
                         }
-
-                        ++$i;
                     }
-
-                    // si on n'a pas trouvé le statut de l'inscription dans le tableau, on l'ajoute
-                    if ($flagExiste == 0) {
-                        $statsInsc [] = ['id' => $insc->getInscriptionStatus()->getId(), 'name' => $insc->getInscriptionStatus()->getName(), 'status' => $insc->getInscriptionStatus()->getStatus(), 'count' => 1];
+                    unset($statInsc);
+                    if (!$found) {
+                        $statsInsc[] = [
+                            'id' => $statusId,
+                            'name' => $insc->getInscriptionStatus()->getName(),
+                            'status' => $insc->getInscriptionStatus()->getStatus(),
+                            'count' => 1,
+                        ];
                     }
                 }
-
-                foreach ($session->getParticipations() as $part) {
-                    $sessionES['participations'][]['id'] = $part->getId();
-                }
-
-                $sessionES['theme'] = $session->getTraining()->getTheme();
-
                 $sessionES['inscriptionStats'] = $statsInsc;
 
+                // Trainers
+                $participations = [];
+                foreach ($session->getParticipations() as $participation) {
+                    $trainer = $participation->getTrainer();
+                    $participations[] = [
+                        'id' => $participation->getId(),
+                        'fullname' => $participation->getTrainer()->getFullname(),
+
+                        'trainer' => [
+                            'id' => $trainer->getId(),
+                            'firstname' => $trainer->getFirstname(),
+                            'lastname' => $trainer->getLastname(),
+                            'fullname' => $trainer->getFullName(),
+                        ],
+                    ];
+                }
+                $sessionES['participations'] = $participations;
                 $tabSession[] = $sessionES;
             }
         }
 
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabSession];
-
     }
 
     public function getNbSessions($query_filters, $keyword, $aggs, $name): int

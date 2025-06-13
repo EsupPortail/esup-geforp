@@ -18,6 +18,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 /**
  * Class InscriptionStatusChangeBatchOperation.
  */
+
 final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperation
 {
 
@@ -30,21 +31,26 @@ final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperati
 
     public function __construct(ManagerRegistry $managerRegistry, Security $security)
     {
+        parent::__construct();
         $this->managerRegistry = $managerRegistry;
         $this->security = $security;
-        parent::__construct();
     }
 
     /**
      *
      * @return mixed
      */
-    public function execute(array $idList = [], array $options = []): mixed
+    public function execute(array $idList = [], array $options = []): bool
     {
         $em = $this->managerRegistry->getManager();
         /* @var AbstractInscription[] $inscriptions */
         $sessions     = $this->getObjectList($idList);
-        $registration = $options['registration'];
+
+        $registration = $options['registration'] ?? null;
+        if ($registration === null) {
+            // Vous pouvez lever une exception ou retourner false selon votre logique
+            return false;
+        }
         //changing status
         /** @var AbstractSession $session */
         foreach ($sessions as $session) {
@@ -55,6 +61,6 @@ final class SessionRegistrationChangeBatchOperation extends AbstractBatchOperati
 
         $em->flush();
 
-        return $em;
+        return true;
     }
 }

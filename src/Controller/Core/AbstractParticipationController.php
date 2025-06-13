@@ -53,7 +53,7 @@ abstract class AbstractParticipationController extends AbstractController
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
         $filters = $request->request->all('filters') ?: [];
-        $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $request->request->all('query_filters')  ?? [];
         $request->request->all('aggs') ?? [];
 
 
@@ -76,7 +76,7 @@ abstract class AbstractParticipationController extends AbstractController
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      * @return JsonResponse
      */
-    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Rest\View(serializerGroups: ['Default', 'session', 'participation'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/{session}/add', name: 'participation.add', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function addParticipation(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, AbstractSession $session): array
     {
@@ -161,13 +161,12 @@ abstract class AbstractParticipationController extends AbstractController
     #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/{session}/remove/{participation}', name: 'participation.remove', options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('EDIT', subject: 'session')]
-    public function removeParticipation(AbstractSession $session, ManagerRegistry $managerRegistry, AbstractParticipation $participation, int $id): void
+    public function removeParticipation(AbstractSession $session, ManagerRegistry $managerRegistry, AbstractParticipation $participation): void
     {
-        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
         if (!$session){
             throw new AccessDeniedException('Aucune session trouvé');
         }
-        $participation = $managerRegistry->getRepository(AbstractParticipation::class)->find($id);
+
         if (!$participation){
             throw new AccessDeniedException('Aucune participation trouvé');
         }

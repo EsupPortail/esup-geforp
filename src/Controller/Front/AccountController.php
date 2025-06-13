@@ -31,6 +31,7 @@ final class AccountController extends AbstractController
         $this->logger = $logger;
     }
 
+
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {

@@ -51,7 +51,7 @@ abstract class AbstractInscriptionController extends AbstractController
     #[Rest\View(serializerGroups: ["Default", "inscription"] ,serializerEnableMaxDepthChecks: true)]
     public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = $request->request->get('keywords', '');
+        $keywords = (string)$request->request->get('keywords', '');
         $filters = $request->request->all('filters') ?: [];
         $query_filters = $request->request->all('query_filters') ?: [];
         $aggs = $request->request->all('aggs') ?: [];
@@ -67,7 +67,7 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $inscriptionSearchRepository->getInscriptionsList($keywords, $filters, $page, $size, $sorts, $fields);
+        $ret = $inscriptionSearchRepository->getInscriptionsList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sorts: $sorts, fields: $fields);
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $inscriptionSearchRepository);
 
         // Concatenation des resultats
@@ -142,7 +142,7 @@ abstract class AbstractInscriptionController extends AbstractController
             }
         }
 
-        return ['form' => $form->createView(), 'inscription' => $inscription];
+        return ['form' => $form->createView(), 'inscription' => $inscription,  'fullname' => $inscription->getTrainee()?->getFullname()];
     }
 
     #[Route(path: '/{id}/remove', name: 'inscription.delete', options: ['expose' => true], defaults: ['_format' => 'json'], methods: 'POST')]

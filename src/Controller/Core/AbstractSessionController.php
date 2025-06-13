@@ -49,17 +49,18 @@ abstract class AbstractSessionController extends AbstractController
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      * @return array{total: int, pageSize: mixed, items: array<int, array{availablePlaces?: mixed, datebegin?: mixed, dateend?: mixed, daynumber?: mixed, displayonline?: mixed, hournumber?: mixed, id: mixed, inscriptions?: array<int, array{id: mixed}>, inscriptionStats?: array<int, array{id: mixed, name: mixed, status: mixed, count: int}>, limitRegistrationDate?: mixed, maximumnumberofregistrations?: mixed, name?: mixed, numberofacceptedregistrations?: mixed, numberofparticipants?: mixed, numberofregistrations?: mixed, participations?: array<int, array{id: mixed}>, promote?: mixed, registrable?: mixed, registration?: mixed, semester?: mixed, semesterLabel?: mixed, sessiontype?: mixed, status?: mixed, theme?: mixed, training?: array{id: mixed, type: mixed, name: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed}, year?: mixed}>, aggs: mixed}
      */
+    #[Rest\View(['Default','session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/search', name: 'session.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry): JsonResponse
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all('aggs', 'NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->all('sorts', 'NO SORTS');
-        $fields = $request->request->all('fields', 'NO FIELDS');
+        $filters = $request->request->all('filters') ?? [];
+        $query_filters = $request->request->all('query_filters') ?? [];
+        $aggs = $request->request->all('aggs') ?? [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ?? [];
+        $fields = $request->request->all('fields') ?? [];
 
         // security check : session : 'sygefor_training.rights.inscription.all.view' -> id=9
         if(!$accessRightRegistry->hasAccessRight(9)) {
@@ -76,8 +77,7 @@ abstract class AbstractSessionController extends AbstractController
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
-        $json = $serializer->serialize($ret, 'json', ['groups' => ['session']]);
-        return new JsonResponse($json, 200, [], true);
+        return $ret;
     }
 
     /**
@@ -129,7 +129,6 @@ abstract class AbstractSessionController extends AbstractController
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
     #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
-    #[Groups(['"Default", "session"'])]
     #[Route(path: '/{id}/view', name: 'session.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function view(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, int $id):\Symfony\Component\HttpFoundation\RedirectResponse|array
     {

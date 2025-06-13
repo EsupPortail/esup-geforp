@@ -2,7 +2,9 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Back\Session;
 use App\Form\Type\BaseInscriptionType;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
@@ -46,10 +48,11 @@ abstract class AbstractInscription implements SerializedAccessRights
      * @var AbstractTrainee
      * @Serializer\Groups({"inscription", "session"})
      */
-    #[Groups(['inscription', 'session'])]
+    #[Groups(['inscription', 'session', 'Default'])]
     #[ORM\ManyToOne(targetEntity: 'AbstractTrainee', inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'trainee_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
+    #[MaxDepth(1)]
     protected AbstractTrainee $trainee;
 
     /**
@@ -57,7 +60,7 @@ abstract class AbstractInscription implements SerializedAccessRights
      * @Serializer\Groups({"inscription", "trainee", "api"})
      */
     #[Groups(['inscription', 'trainee', 'api'])]
-    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'inscriptions')]
+    #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'session_id', referencedColumnName: 'id')]
     #[Assert\NotNull]
     protected AbstractSession $session;
@@ -83,6 +86,12 @@ abstract class AbstractInscription implements SerializedAccessRights
      * @var bool
      */
     protected bool $sendinscriptionstatusmail = false;
+
+
+    public function __construct()
+    {
+        $this->presencestatus = new Presencestatus();
+    }
 
     /**
      * @param int $id
@@ -119,7 +128,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     /**
      * @param Presencestatus
      */
-    public function setPresencestatus($presenceStatus): void
+    public function setPresencestatus(?Presencestatus $presenceStatus): void
     {
         $this->presencestatus = $presenceStatus;
     }

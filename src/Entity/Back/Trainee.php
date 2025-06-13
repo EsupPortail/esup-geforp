@@ -4,6 +4,7 @@ namespace App\Entity\Back;
 
 
 use App\Entity\Core\AbstractInscription;
+use App\Entity\PersonTrait\PersonTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Form\Type\AbstractTraineeType;
@@ -20,6 +21,8 @@ use App\Entity\Core\User;
 #[UniqueEntity(fields: ['email', 'institution'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainee'])]
 class Trainee extends AbstractTrainee
 {
+    
+    use PersonTrait;
     #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'birth_date', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $birthdate = null;
@@ -44,7 +47,7 @@ class Trainee extends AbstractTrainee
     #[ORM\Column(name: 'campus', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
     protected ?string $campus = null;
 
-    #[Groups(['Default', 'trainee', 'api', 'inscription'])]
+    #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'first_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $firstnamesup = null;
 

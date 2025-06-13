@@ -58,6 +58,8 @@ SQL;
 
         // accessor
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+
         // lines
         $lines = [];
         foreach ($entities as $entity) {
@@ -645,7 +647,7 @@ SQL;
                         $rvalue = str_replace("\n", "|", (string) $rvalue);
 
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', (string) $key);
+                        $key = str_replace('.', '__', (string) $key);
                         $data[$key] = $rvalue ?: '';
                     }
                 } catch (UnexpectedTypeException) {

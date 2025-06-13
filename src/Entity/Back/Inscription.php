@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
 class Inscription extends AbstractInscription implements \Stringable
 {
 
-    public bool $isPaying;
+    public bool $isPaying = false;
     /**
      * @Serializer\Groups({"Default", "api"})
      */
@@ -80,6 +80,7 @@ class Inscription extends AbstractInscription implements \Stringable
     {
         $this->criteria = new ArrayCollection();
         $this->presences = new ArrayCollection();
+        $this->isPaying = false;
     }
 
     /**
@@ -90,7 +91,7 @@ class Inscription extends AbstractInscription implements \Stringable
     #[Groups(['api'])]
     public function getPrice(): float|int|null
     {
-        return $this->isPaying ? $this->getSession()->getPrice() : 0;
+        return isset($this->isPaying) && $this->isPaying ? $this->getSession()->getPrice() : 0;
     }
 
     /**

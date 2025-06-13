@@ -4,6 +4,7 @@ namespace App\Entity\Core;
 
 
 use App\AccessRight\SerializedAccessRights;
+use App\Entity\Back\Organization;
 use App\Entity\Core\AbstractOrganization;
 use App\Entity\PersonTrait\CoordinatesTrait;
 use App\Entity\Term\Domain;
@@ -14,6 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Attribute\Groups;
+use App\Entity\Term\AbstractTerm;
 
 /**
  * Institution.
@@ -35,12 +37,12 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    protected ?int $id = null;
+    protected int $id;
 
     #[Groups(['Default', 'api', 'institution', 'trainer'])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 512)]
     #[Assert\NotBlank(message: "Vous devez renseigner un nom d'établissement.")]
-    protected ?string $name = null;
+    protected string $name;
 
     #[Groups(['Default', 'api', 'institution'])]
     #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
@@ -65,8 +67,8 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     {
         $this->domains = new ArrayCollection();
         $this->visuinstitutions = new ArrayCollection();
+        $this->organizations = new ArrayCollection();
     }
-
 
     /**
      * @return int

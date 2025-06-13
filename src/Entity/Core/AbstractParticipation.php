@@ -2,6 +2,7 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Back\Trainer;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\AbstractParticipationType;
@@ -34,7 +35,7 @@ abstract class AbstractParticipation
      * @Serializer\Groups({"participation", "session", "api.training", "api"})
      */
     #[Groups(["api.training", "api", "session", "participation"])]
-    #[ORM\ManyToOne(targetEntity: 'AbstractTrainer', inversedBy: 'participations')]
+    #[ORM\ManyToOne(targetEntity: AbstractTrainer::class, inversedBy: 'participations')]
     #[ORM\JoinColumn(name: 'trainer_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un intervenant')]
     #[MaxDepth(1)]
@@ -56,6 +57,7 @@ abstract class AbstractParticipation
      */
     #[Groups(["participation"])]
     #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    #[MaxDepth(1)]
     protected ?bool $isOrganization = null;
 
     /**

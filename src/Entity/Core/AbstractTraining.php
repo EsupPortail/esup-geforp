@@ -52,7 +52,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\Groups({"training", "api.training"})
      */
     #[Groups(["api.training", "training"])]
-    #[ORM\OneToMany(mappedBy: 'training', targetEntity: 'AbstractSession', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(mappedBy: 'training', targetEntity: AbstractSession::class, cascade: ['persist', 'remove'])]
     protected \Doctrine\Common\Collections\Collection $sessions;
 
     /**
@@ -162,7 +162,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     #[Groups(["training", "api"])]
     #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[Assert\NotNull]
-    protected int $firstsessionperiodsemester = 1;
+    protected int $firstsessionperiodsemester;
 
     /**
      *
@@ -171,7 +171,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     #[Groups(['training', 'api'])]
     #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
     #[Assert\NotNull]
-    protected ?int $firstsessionperiodyear;
+    protected ?int $firstsessionperiodyear = null;
 
     /**
      *
@@ -698,9 +698,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
         if ($this->sessions) {
             foreach ($this->sessions as $session) {
                 $participations = $session->getParticipations();
-                if (!$participations->isEmpty()) {
-                    continue;
-                }
+
 
                 foreach ($participations as $participation) {
                     $trainer = $participation->getTrainer();

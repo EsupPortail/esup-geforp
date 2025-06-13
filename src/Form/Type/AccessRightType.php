@@ -28,10 +28,10 @@ final class AccessRightType extends AbstractType
     {
     }
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($formBuilder, $options);
-        $formBuilder->addEventListener(FormEvents::PRE_SUBMIT, $this->preSubmit(...));
+        parent::buildForm($builder, $options);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->preSubmit(...));
     }
 
     /**
@@ -82,7 +82,7 @@ final class AccessRightType extends AbstractType
         $formEvent->setData($rights);
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
         $choices = [];
         $rightsGroups = $this->accessRightRegistry->getGroups();
@@ -96,7 +96,7 @@ final class AccessRightType extends AbstractType
             }
         }
 
-        $optionsResolver->setDefaults(['expanded' => true, 'multiple' => true, 'choices' => $choices]);
+        $resolver->setDefaults(['expanded' => true, 'multiple' => true, 'choices' => $choices]);
     }
 
     /**

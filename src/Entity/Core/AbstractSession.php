@@ -2,6 +2,8 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Back\Inscription;
+use App\Entity\Back\Participation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
@@ -17,6 +19,7 @@ use App\Entity\Core\ParticipantsSummary;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -96,15 +99,15 @@ abstract class AbstractSession implements SerializedAccessRights
      * @var Collection<AbstractParticipation>
      */
     #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
-    #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
-    protected ArrayCollection|Collection $participations ;
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: Participation::class, cascade: ['remove'])]
+    protected Collection $participations ;
 
     /**
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\AbstractInscription>
      */
     #[Groups('session')]
-    #[ORM\OneToMany(mappedBy: 'session', targetEntity: 'AbstractInscription', cascade: ['remove'], fetch: 'EXTRA_LAZY')]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: Inscription::class, cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdat' => 'DESC'])]
     protected Collection $inscriptions;
 
@@ -122,7 +125,7 @@ abstract class AbstractSession implements SerializedAccessRights
     #[Groups(['Default', 'session', 'api'])]
     #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
     #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
-    protected ?\DateTimeInterface $datebegin = null;
+    protected \DateTimeInterface $datebegin;
 
     /**
      *
@@ -155,15 +158,14 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     #[Ignore]
     #[ORM\Column(name: 'numberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
-    protected ?int $numberofregistrations = null;
+    protected int $numberofregistrations;
 
     /**
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      */
     #[Groups(['session', 'training', 'inscription', 'api'])]
-    #[ORM\Column(name: 'maximumNumberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER)]
-    #[Assert\NotBlank]
-    protected ?int $maximumnumberofregistrations = 20;
+    #[ORM\Column(name: 'maximumNumberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
+    protected ?int $maximumNumberOfRegistrations  = 0;
 
     /**
      * @Serializer\Groups({"session", "training", "api"})
@@ -247,10 +249,12 @@ abstract class AbstractSession implements SerializedAccessRights
 
     public function __construct()
     {
+        $this->maximumNumberOfRegistrations = intval($this->maximumNumberOfRegistrations);
         $this->inscriptions = new ArrayCollection();
         $this->participations = new ArrayCollection();
         $this->participantsSummaries = new ArrayCollection();
         $this->materials = new ArrayCollection();
+        $this->datebegin = new \DateTime();
     }
 
     public function __clone()
@@ -297,7 +301,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return ArrayCollection|Collection
      */
-    public function getParticipations(): ArrayCollection|Collection
+    public function getParticipations(): Collection
     {
         return $this->participations;
     }
@@ -377,9 +381,9 @@ abstract class AbstractSession implements SerializedAccessRights
     }
 
     /**
-     * @return ArrayCollection|Collection
+     * @return Collection
      */
-    public function getInscriptions(): ArrayCollection|Collection
+    public function getInscriptions(): Collection
     {
         return $this->inscriptions;
     }
@@ -483,18 +487,18 @@ abstract class AbstractSession implements SerializedAccessRights
      * @return int
      * @Serializer\VirtualProperty
      */
-    public function getYear(): ?int
+    public function getYear(): int
     {
-        return $this->datebegin?->format('Y');
+        return $this->datebegin->format('Y');
     }
 
     /**
      * @return int
      * @Serializer\VirtualProperty
      */
-    public function getSemester(): ?int
+    public function getSemester(): int
     {
-        return $this->datebegin ? ceil($this->datebegin->format('m') / 6) : null;
+        return ceil($this->datebegin->format('m') / 6);
     }
 
     /**
@@ -504,7 +508,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getSemesterLabel(): int|string
     {
-        return $this->getYear().' - '.($this->getSemester() < 2 ? '1er' : '2nd').' semestre ';
+        return ($this->getSemester() < 2 ? '1er' : '2nd').' semestre ';
     }
 
     public function setDatebegin(mixed $dateBegin): void
@@ -617,14 +621,15 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return int|null
      */
-    public function getMaximumnumberofregistrations(): ?int
+    #[SerializedName('maximum_number_of_registrations')]
+    public function getMaximumNumberOfRegistrations(): ?int
     {
-        return $this->maximumnumberofregistrations;
+        return $this->maximumNumberOfRegistrations;
     }
 
-    public function setMaximumnumberofregistrations(mixed $maximumNumberOfRegistrations): void
+    public function setMaximumnumberofregistrations(?int $maximumNumberOfRegistrations): void
     {
-        $this->maximumnumberofregistrations = $maximumNumberOfRegistrations;
+        $this->maximumNumberOfRegistrations = $maximumNumberOfRegistrations;
     }
 
     /**
@@ -714,7 +719,7 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     public function getAvailablePlaces(): ?int
     {
-        return $this->maximumnumberofregistrations - $this->getNumberofacceptedregistrations();
+        return $this->maximumNumberOfRegistrations - $this->getNumberofacceptedregistrations();
     }
 
     /**
@@ -722,17 +727,15 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberofregistrations(): ?int
+    public function getNumberofregistrations(): int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
         }
 
-        if (empty($this->inscriptions)) {
-            return 0;
-        }
+        $inscriptions = $this->getInscriptions();
 
-        return $this->inscriptions->count();
+        return $inscriptions->count();
     }
 
     public function setNumberofregistrations(mixed $numberOfRegistrations): void
@@ -745,7 +748,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
-    public function getNumberofacceptedregistrations(): ?int
+    public function getNumberofacceptedregistrations(): int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;

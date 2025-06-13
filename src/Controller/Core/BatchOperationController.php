@@ -10,6 +10,10 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class BatchOperationController.
@@ -18,7 +22,7 @@ final class BatchOperationController extends AbstractController
 {
     private string $defaultTemplate;
 
-    public function __construct(ParameterBagInterface $params)
+    public function __construct(ParameterBagInterface $params, private readonly NormalizerInterface $normalizer)
     {
         $this->defaultTemplate = $params->get('app.default_pdf_template');
     }
@@ -79,14 +83,8 @@ final class BatchOperationController extends AbstractController
         $batchOperation = $batchOperationRegistry->getByName($id);
 
 
-
-        if (!$batchOperation || !is_object($batchOperation)) {
-            throw new NotFoundHttpException('Operation not found or invalid: ' . $id);
-        }
-
-
         if (!$batchOperation) {
-            throw new NotFoundHttpException('Operation not found : ' . $id);
+            throw new NotFoundHttpException('Operation not found: ' . $id);
         }
 
         $options = is_array($options) ? $options : [];
@@ -98,11 +96,9 @@ final class BatchOperationController extends AbstractController
     /**
      * @Rest\View
      */
-    #[Rest\View()]
     #[Route(path: '/batchoperation/modalconfig/{service}', name: 'sygefor_core.batch_operation.modal_config', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function modalConfig(string $service, BatchOperationRegistry $batchOperationRegistry, Request $request): array
+    public function modalConfig($service, BatchOperationRegistry $batchOperationRegistry, Request $request): array
     {
-
         $options = $request->get('options');
 
         //we try to read option list as a JSON string (case of multipart form type)
@@ -113,16 +109,32 @@ final class BatchOperationController extends AbstractController
             }
         }
 
-        //$batchOperation = $batchOperationRegistry->getByName('sygefor_core.batch_operation_registry')->get($service);
+        //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($service);
         $batchOperation = $batchOperationRegistry->getByName($service);
-        if(!$batchOperation){
-            throw new \RuntimeException('Operation not found or invalid: ' . $service);
+
+        if (!$batchOperation) {
+            throw new NotFoundHttpException("Batch operation service '$service' not found.");
         }
+
+
         if (method_exists($batchOperation, 'getModalConfig')) {
             return $batchOperation->getModalConfig($options);
         }
 
         return [];
+    }
+
+    private function normalize($data)
+    {
+        if ($data instanceof \JsonSerializable) {
+            return $data->jsonSerialize();
+        }
+
+        if (is_object($data)) {
+            return method_exists($data, 'toArray') ? $data->toArray() : get_object_vars($data);
+        }
+
+        return $data;
     }
 
     /**

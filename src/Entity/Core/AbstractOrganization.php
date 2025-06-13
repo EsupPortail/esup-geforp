@@ -267,6 +267,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected string $name;
 
