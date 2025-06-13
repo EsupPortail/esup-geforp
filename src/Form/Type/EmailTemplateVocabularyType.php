@@ -115,6 +115,14 @@ class EmailTemplateVocabularyType extends VocabularyType
                 },
                 'required' => false,
             ))
+            ->add('machine_name', ChoiceType::class, array(
+                'label' => 'Envoyer une copie au N+1 et correspondant formation',
+                'choices'  => [
+                    'OUI' => 1,
+                    'NON' => 0,
+                ],
+                'placeholder' => false
+            ))
             ->add('private', CheckboxType::class, array(
                 'label' => 'Lien calendrier',
                 'required' => false
@@ -124,14 +132,6 @@ class EmailTemplateVocabularyType extends VocabularyType
                 'choices'  => [
                     'NON' => 0,
                     'OUI' => 1,
-                ],
-                'placeholder' => false
-            ))
-            ->add('machine_name', ChoiceType::class, array(
-                'label' => 'Envoyer une copie au N+1 et correspondant formation',
-                'choices'  => [
-                    'OUI' => 1,
-                    'NON' => 0,
                 ],
                 'placeholder' => false
             ));
