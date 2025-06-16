@@ -2,6 +2,7 @@
 
 namespace App\Entity\PersonTrait;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use App\EventListener\Serializer;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -83,6 +84,7 @@ trait PersonTrait
         return $this->lastname;
     }
 
+    #[VirtualProperty]
     #[Groups(['Default', 'trainer', 'session', 'api.training', 'inscription'])]
     public function getFullname(): string
     {

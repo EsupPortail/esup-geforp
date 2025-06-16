@@ -261,7 +261,7 @@ final class SessionRepository extends ServiceEntityRepository
                     'semester' => $session->getSemester(),
                     'semesterLabel' => $session->getSemesterLabel(),
                     'limitRegistrationDate' => $session->getLimitregistrationdate(),
-                    'maximumNumberOfRegistrations' => $session->getMaximumNumberOfRegistrations(),
+                    'maximumnumberofregistrations' => $session->getMaximumNumberOfRegistrations(),
                     'numberofregistrations' => $session->getMaximumNumberOfRegistrations(),
                     'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
                     'registrable' => $session->isRegistrable(),
@@ -285,16 +285,6 @@ final class SessionRepository extends ServiceEntityRepository
 
                 if (method_exists($session, 'getMaximumNumberOfRegistrations')) {
                     $sessionES['maximumNumberOfRegistrations'] = $session->getMaximumNumberOfRegistrations();
-                }
-
-                $inscriptions = $session->getInscriptions();
-                $sessionES['inscriptions'] = [];
-
-                foreach ($inscriptions as $insc) {
-                    $sessionES['inscriptions'][] = [
-                        'id' => $insc->getId(),
-                        'presencestatus' => $insc->getPresencestatus()?->getStatus() ?? null,
-                    ];
                 }
 
                 // Infos training
@@ -322,8 +312,19 @@ final class SessionRepository extends ServiceEntityRepository
                 // Statistiques des inscriptions
                 $statsInsc = [];
                 $sessionES['inscriptions'] = [];
+
                 foreach ($session->getInscriptions() as $insc) {
-                    $sessionES['inscriptions'][] = ['id' => $insc->getId()];
+                    $trainee = $insc->getTrainee();
+                    $sessionES['inscriptions'][] = [
+                        'id' => $insc->getId(),
+                        'trainee' => $trainee ? [
+                            'id' => $trainee->getId(),
+                            'firstname' => $trainee->getFirstname(),
+                            'lastname' => $trainee->getLastname(),
+                            'fullname' => trim($trainee->getFirstname() . ' ' . $trainee->getLastname()),
+                        ] : null,
+                    ];
+
                     $statusId = $insc->getInscriptionStatus()->getId();
                     $found = false;
                     foreach ($statsInsc as &$statInsc) {
@@ -343,7 +344,8 @@ final class SessionRepository extends ServiceEntityRepository
                         ];
                     }
                 }
-                $sessionES['inscriptionStats'] = $statsInsc;
+                dump($sessionES['inscriptions']);
+                $sessionES['inscriptions_stats'] = $statsInsc;
 
                 // Trainers
                 $participations = [];
@@ -351,7 +353,6 @@ final class SessionRepository extends ServiceEntityRepository
                     $trainer = $participation->getTrainer();
                     $participations[] = [
                         'id' => $participation->getId(),
-                        'fullname' => $participation->getTrainer()->getFullname(),
 
                         'trainer' => [
                             'id' => $trainer->getId(),

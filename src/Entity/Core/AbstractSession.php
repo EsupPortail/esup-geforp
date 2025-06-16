@@ -16,6 +16,7 @@ use App\Entity\Term\Inscriptionstatus;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Core\ParticipantsSummary;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
@@ -621,7 +622,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return int|null
      */
-    #[SerializedName('maximum_number_of_registrations')]
+    #[VirtualProperty]
     public function getMaximumNumberOfRegistrations(): ?int
     {
         return $this->maximumNumberOfRegistrations;
@@ -665,6 +666,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api"})
      */
+    #[VirtualProperty]
     public function isPublic(): ?int
     {
         return $this->registration === self::REGISTRATION_PUBLIC;
@@ -706,6 +708,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training", "api.training"})
      */
+    #[VirtualProperty]
     public function registrable(): ?int
     {
         return $this->isRegistrable();
@@ -717,6 +720,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api.training"})
      */
+    #[VirtualProperty]
     public function getAvailablePlaces(): ?int
     {
         return $this->maximumNumberOfRegistrations - $this->getNumberofacceptedregistrations();
@@ -727,6 +731,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[VirtualProperty]
     public function getNumberofregistrations(): int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
@@ -748,6 +753,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[VirtualProperty]
     public function getNumberofacceptedregistrations(): int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {

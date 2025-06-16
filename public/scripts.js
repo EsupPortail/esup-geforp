@@ -70666,6 +70666,7 @@ $.each( { show: "fadeIn", hide: "fadeOut" }, function( method, defaultEffect ) {
  * The underlying implementation of `ZeroClipboard.Client.prototype.clip`.
  * @private
  */
+    if (!handlers) return;
   var _clientClip = function(elements) {
     elements = _prepClip(elements);
     for (var i = 0; i < elements.length; i++) {

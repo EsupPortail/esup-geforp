@@ -181,7 +181,7 @@ final class TrainingRepository extends ServiceEntityRepository
 
             foreach ($training->getSessions() as $session) {
                 $participants = $session->getNumberofregistrations();
-                $totalParticipants += $participants;
+
 
                 $sessionData[] = [
                     'id' => $session->getId(),

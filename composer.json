@@ -59,7 +59,8 @@
         "twbs/bootstrap": "^5.1",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/string-extra": "^3.4",
-        "twig/twig": "3.19.0.0"
+        "twig/twig": "3.19.0.0",
+      "ext-fileinfo": "*"
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "4.0",

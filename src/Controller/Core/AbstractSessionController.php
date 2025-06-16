@@ -155,7 +155,6 @@ abstract class AbstractSessionController extends AbstractController
             }
         }
 
-
         $url = 'https://' . $_ENV['front_host'] . '/program/training/' . $session->getTraining()->getId() . '/' . $session->getId();
         return ['form' => $form->createView(), 'session' => $session, 'front_url' => $url];
     }
