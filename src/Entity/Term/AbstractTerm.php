@@ -59,6 +59,7 @@ abstract class AbstractTerm implements VocabularyInterface
     /**
      * @var string
      * @ORM\Column(name="machine_name", type="string", length=255, nullable=true)
+     * @Serializer\Groups({"Default", "api"})
      */
     protected $machinename;
 
