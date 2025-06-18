@@ -24,7 +24,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
             'format': config.templates[i]['position'],
-            'send_resp': config.templates[i]['machine_name'],
+            'sendresp': config.templates[i]['machinename'],
             'attachmentTemplates': config.templates[i]['attachment_templates']
         };
     }
@@ -38,7 +38,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
         $scope.message.attachmentTemplates = $scope.templates[0].attachmentTemplates;
         $scope.message.ical = $scope.templates[0].ical;
         $scope.message.format = $scope.templates[0].format;
-        $scope.message.send_resp = $scope.templates[0].send_resp;
+        $scope.message.sendresp = $scope.templates[0].sendresp;
     }
     $scope.message.attachments = [];
 
@@ -74,7 +74,7 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 message: $scope.message.body,
                 ical: $scope.message.ical,
                 format: $scope.message.format,
-                send_resp: $scope.message.send_resp,
+                sendresp: $scope.message.sendresp,
                 attachmentTemplates: attTemplates,
                 objects: {'App\\Entity\\Session': ($dialogParams.session) ? $dialogParams.session.id : 0}
             },
@@ -226,14 +226,14 @@ sygeforApp.controller('InscriptionStatusChange', ['$scope', '$http', '$window', 
                 oldValue.body = $scope.message.body;
                 oldValue.ical = $scope.message.ical;
                 oldValue.format = $scope.message.format;
-                oldValue.send_resp = $scope.message.send_resp;
+                oldValue.sendresp = $scope.message.sendresp;
             }
             //replacing values
             $scope.message.subject = newValue.subject;
             $scope.message.body = newValue.body;
             $scope.message.ical = newValue.ical;
             $scope.message.format = newValue.format;
-            $scope.message.send_resp = newValue.send_resp;
+            $scope.message.sendresp = newValue.sendresp;
             $scope.attCheckList = newValue.attachmentTemplates;
         }
     });

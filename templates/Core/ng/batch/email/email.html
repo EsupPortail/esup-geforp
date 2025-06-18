@@ -32,7 +32,7 @@
         <div class="form-group" >
             <label for="format" class="col-sm-2 control-label">Envoyer une copie au N+1 et au correspondant formation </label>
             <div class="col-sm-10">
-                <select type="text" class="form-control" id="send_resp" ng-options="opt.val as opt.name for opt in [{val:1,name:'OUI'}, {val:0,name:'NON'}]" ng-model="message.send_resp">
+                <select type="text" class="form-control" id="sendresp" ng-options="opt.val as opt.name for opt in [{val:1,name:'OUI'}, {val:0,name:'NON'}]" ng-model="message.sendresp">
                     <option value="" ng-disabled="true">Envoyer une copie au N+1 et correspondant formation</option>
                 </select>
             </div>
