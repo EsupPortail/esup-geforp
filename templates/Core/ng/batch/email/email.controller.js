@@ -20,7 +20,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
             'format': config.templates[i]['position'],
-            'send_resp': config.templates[i]['machine_name'],
+            'send_resp': config.templates[i]['machinename'],
             'templateAttachments': config.templates[i]['attachmentTemplates'],
             'templateAttachmentChecklist': []
         };
@@ -41,7 +41,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             subject: $scope.templates[0]['subject'],
             body: $scope.templates[0]['body'],
             format: $scope.templates[0]['format'],
-            send_resp: $scope.templates[0]['send_resp'],
+            sendresp: $scope.templates[0]['sendresp'],
             templateAttachments: $scope.templates[0]['templateAttachments'],
             templateAttachmentChecklist: []
         };
@@ -78,7 +78,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
                 message: $scope.message.body,
                 templateAttachments: null,
                 format: $scope.message.format,
-                send_resp: $scope.message.send_resp,
+                sendresp: $scope.message.sendresp,
             },
             attachments: $scope.message.attachments,
             ids: $scope.items.join(",")
@@ -144,7 +144,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
                 oldValue.templateAttachments = $scope.message.templateAttachments;
                 oldValue.templateAttachmentChecklist = $scope.message.templateAttachmentChecklist;
                 oldValue.format = $scope.message.format;
-                oldValue.send_resp = $scope.message.send_resp;
+                oldValue.sendresp = $scope.message.sendresp;
             }
             //replacing values
             $scope.message.subject = newValue.subject;
@@ -152,7 +152,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             $scope.message.templateAttachments = newValue.templateAttachments;
             $scope.message.templateAttachmentChecklist = [];
             $scope.message.format = newValue.format;
-            $scope.message.send_resp = newValue.send_resp;
+            $scope.message.sendresp = newValue.sendresp;
             angular.forEach (newValue.templateAttachments, function(templateAttachment) {
                 $scope.message.templateAttachmentChecklist[templateAttachment['id']] = true;
             });

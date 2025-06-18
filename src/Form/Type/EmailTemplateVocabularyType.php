@@ -115,7 +115,7 @@ class EmailTemplateVocabularyType extends VocabularyType
                 },
                 'required' => false,
             ))
-            ->add('machine_name', ChoiceType::class, array(
+            ->add('machinename', ChoiceType::class, array(
                 'label' => 'Envoyer une copie au N+1 et correspondant formation',
                 'choices'  => [
                     'OUI' => 1,

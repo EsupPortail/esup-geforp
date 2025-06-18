@@ -88,7 +88,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['send_resp']) ? $options['send_resp'] : 0);
+        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 0);
 
         return new Response('', 204);
     }
@@ -133,7 +133,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return array
      */
-    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false, $ical = false, $format = 0, $send_resp = 0)
+    public function parseAndSendMail($entities, $subject, $body, $attachments = array(), $preview = false, $ical = false, $format = 0, $sendresp = 0)
     {
         $last = "";
         $doClear = true;
@@ -208,7 +208,7 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         $flagSup = 0;
 
                         // Envoyer une copie au N+1 et/ou correspondant formation si l'option est activée
-                        if ($send_resp == 1) {
+                        if ($sendresp == 1) {
                             if ($hrpa->emailSup != null) {
                                 $emailSup = $hrpa->emailSup;
                                 $flagSup = 1;
