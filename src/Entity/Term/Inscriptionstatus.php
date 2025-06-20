@@ -57,6 +57,7 @@ class Inscriptionstatus extends AbstractTerm implements VocabularyInterface
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups(["Default", "api"])]
     #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $status = self::STATUS_PENDING;
 

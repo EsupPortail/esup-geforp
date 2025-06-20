@@ -12,6 +12,7 @@ use App\Entity\Core\Material;
 use App\Entity\Term\Supervisor;
 use App\Entity\Term\Tag;
 use App\Entity\Term\Trainingcategory;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\AccessRight\SerializedAccessRights;

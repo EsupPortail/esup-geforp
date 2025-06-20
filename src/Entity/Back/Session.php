@@ -10,6 +10,7 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\SessionType;
 use App\Entity\Back\DateSession;
 use App\Entity\Back\Alert;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 

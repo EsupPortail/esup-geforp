@@ -37,9 +37,9 @@ class ParticipantsSummary
     protected ?int $count = null;
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getCount()
+    public function getCount(): ?int
     {
         return $this->count;
     }
@@ -52,7 +52,7 @@ class ParticipantsSummary
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): ?AbstractSession
     {
         return $this->session;
     }
@@ -60,7 +60,7 @@ class ParticipantsSummary
     /**
      * @param AbstractSession $session
      */
-    public function setSession($session): void
+    public function setSession(AbstractSession $session): void
     {
         $this->session = $session;
     }
@@ -68,7 +68,7 @@ class ParticipantsSummary
     /**
      * @return Publictype
      */
-    public function getPublictype()
+    public function getPublictype(): ?Publictype
     {
         return $this->publictype;
     }
@@ -76,7 +76,7 @@ class ParticipantsSummary
     /**
      * @param Publictype $Publictype
      */
-    public function setPublictype($Publictype): void
+    public function setPublictype(Publictype $Publictype): void
     {
         $this->publictype = $Publictype;
     }

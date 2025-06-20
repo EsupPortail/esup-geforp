@@ -159,14 +159,14 @@ abstract class AbstractSession implements SerializedAccessRights
      */
     #[Ignore]
     #[ORM\Column(name: 'numberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
-    protected int $numberofregistrations;
+    protected ?int $numberofregistrations;
 
     /**
      * @Serializer\Groups({"session", "training", "inscription", "api"})
      */
     #[Groups(['session', 'training', 'inscription', 'api'])]
     #[ORM\Column(name: 'maximumNumberOfRegistrations', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
-    protected ?int $maximumNumberOfRegistrations  = 0;
+    protected ?int $maximumnumberofregistrations  = null;
 
     /**
      * @Serializer\Groups({"session", "training", "api"})
@@ -250,7 +250,7 @@ abstract class AbstractSession implements SerializedAccessRights
 
     public function __construct()
     {
-        $this->maximumNumberOfRegistrations = intval($this->maximumNumberOfRegistrations);
+        $this->maximumnumberofregistrations = intval($this->maximumnumberofregistrations);
         $this->inscriptions = new ArrayCollection();
         $this->participations = new ArrayCollection();
         $this->participantsSummaries = new ArrayCollection();
@@ -270,6 +270,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return int
      */
+    #[VirtualProperty]
     public function getId(): ?int
     {
         return $this->id;
@@ -302,6 +303,8 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return ArrayCollection|Collection
      */
+    #[Groups(["session", "inscription", "trainee", "trainer", "api"])]
+    #[VirtualProperty]
     public function getParticipations(): Collection
     {
         return $this->participations;
@@ -488,6 +491,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @return int
      * @Serializer\VirtualProperty
      */
+    #[VirtualProperty]
     public function getYear(): int
     {
         return $this->datebegin->format('Y');
@@ -497,6 +501,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @return int
      * @Serializer\VirtualProperty
      */
+    #[VirtualProperty]
     public function getSemester(): int
     {
         return ceil($this->datebegin->format('m') / 6);
@@ -507,6 +512,8 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups("api")
      */
+    #[VirtualProperty]
+    #[Groups(["api"])]
     public function getSemesterLabel(): int|string
     {
         return ($this->getSemester() < 2 ? '1er' : '2nd').' semestre ';
@@ -622,15 +629,15 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @return int|null
      */
-    #[VirtualProperty]
+    #[Groups(["session", "training", "Default"])]
     public function getMaximumNumberOfRegistrations(): ?int
     {
-        return $this->maximumNumberOfRegistrations;
+        return $this->maximumnumberofregistrations;
     }
 
     public function setMaximumnumberofregistrations(?int $maximumNumberOfRegistrations): void
     {
-        $this->maximumNumberOfRegistrations = $maximumNumberOfRegistrations;
+        $this->maximumnumberofregistrations = $maximumNumberOfRegistrations;
     }
 
     /**
@@ -644,7 +651,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param Sessiontype $sessionType
      */
-    public function setSessiontype(Sessiontype $sessionType): void
+    public function setSessiontype(?Sessiontype $sessionType): void
     {
         $this->sessiontype = $sessionType;
     }
@@ -667,6 +674,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"api"})
      */
     #[VirtualProperty]
+    #[Groups(["api"])]
     public function isPublic(): ?int
     {
         return $this->registration === self::REGISTRATION_PUBLIC;
@@ -709,6 +717,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session", "training", "api.training"})
      */
     #[VirtualProperty]
+    #[Groups(["session", "training", "api.training"])]
     public function registrable(): ?int
     {
         return $this->isRegistrable();
@@ -721,9 +730,10 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"api.training"})
      */
     #[VirtualProperty]
+    #[Groups(["api.training"])]
     public function getAvailablePlaces(): ?int
     {
-        return $this->maximumNumberOfRegistrations - $this->getNumberofacceptedregistrations();
+        return $this->maximumnumberofregistrations - $this->getNumberofacceptedregistrations();
     }
 
     /**
@@ -731,16 +741,14 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Groups(["session", "training"])]
     #[VirtualProperty]
-    public function getNumberofregistrations(): int
+    public function getNumberofregistrations(): ?int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
         }
-
-        $inscriptions = $this->getInscriptions();
-
-        return $inscriptions->count();
+        return $this->getInscriptions()?->count();
     }
 
     public function setNumberofregistrations(mixed $numberOfRegistrations): void
@@ -754,7 +762,8 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session", "training"})
      */
     #[VirtualProperty]
-    public function getNumberofacceptedregistrations(): int
+    #[Groups(["session", "training"])]
+    public function getNumberofacceptedregistrations(): ?int
     {
         if ($this->registration === self::REGISTRATION_DEACTIVATED) {
             return $this->numberofregistrations;
@@ -772,6 +781,32 @@ abstract class AbstractSession implements SerializedAccessRights
         }
 
         return $nAccepted;
+    }
+
+    #[VirtualProperty]
+    #[Groups(["session", "training"])]
+    public function getNumberofparticipants(): int
+    {
+        $count = 0;
+
+        if ($this->getRegistration() === self::REGISTRATION_DEACTIVATED) {
+            if ($this->getParticipantsSummaries() !== null) {
+                foreach ($this->getParticipantsSummaries() as $summary) {
+                    $count += $summary->getCount();
+                }
+            }
+        } else {
+            foreach ($this->getInscriptions() ?? [] as $inscription) {
+                if (
+                    $inscription->getPresencestatus() &&
+                    $inscription->getPresencestatus()->getStatus() === PresenceStatus::STATUS_PRESENT
+                ) {
+                    ++$count;
+                }
+            }
+        }
+
+        return $count;
     }
 
     /**
@@ -918,6 +953,7 @@ abstract class AbstractSession implements SerializedAccessRights
      *
      * @return string
      */
+    #[VirtualProperty]
     public function getDateRange(): string
     {
         if ( ! $this->datebegin) {

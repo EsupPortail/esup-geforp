@@ -92,11 +92,11 @@ final class EmailingBatchOperation extends AbstractBatchOperation
 
         if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $this->doctrine->getRepository(\App\Entity\Term\Inscriptionstatus::class);
-            $inscriptionStatus = $repoInscriptionStatus->findById($options['inscriptionstatus']);
+            $inscriptionStatus = $repoInscriptionStatus->findBy($options['inscriptionstatus']);
             $templates = $repo->findBy(['inscriptionstatus' => $inscriptionStatus, 'organization' => $this->security->getUser()->getOrganization()]);
         } elseif (!empty($options['presencestatus'])) {
             $repoPresenceStatus = $this->doctrine->getRepository(\App\Entity\Term\Presencestatus::class);
-            $presenceStatus = $repoPresenceStatus->findById($options['presencestatus']);
+            $presenceStatus = $repoPresenceStatus->findBy($options['presencestatus']);
             $templates = $repo->findBy(['presenceStatus' => $presenceStatus, 'organization' => $this->security->getUser()->getOrganization()]);
         } else {
             //if no presence/inscription status is found, we get all organization templates
@@ -308,7 +308,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
         /** @var HumanReadablePropertyAccessor $HRPA */
         $HRPA = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
 
-        return preg_replace_callback('#\[(.*?)\]#',
+        return preg_replace_callback('#\[(.*?)]#',
             function ($matches) use ($HRPA, $entity, $format) {
                 $newline = $format ? "<br>" : "\n";
 

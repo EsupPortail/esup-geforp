@@ -168,23 +168,43 @@ abstract class AbstractSessionController extends AbstractController
      */
     #[Rest\View(['Default', 'session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/duplicate/{id}/{inscriptionIds}', name: 'session.duplicate', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json', 'inscriptionIds'=> []])]
-    public function duplicate(Request $request, ManagerRegistry $managerRegistry,  int $id, array $inscriptionIds = [], AbstractSession $session = null): array
+    public function duplicate(Request $request, ManagerRegistry $managerRegistry,  int $id): array
     {
-        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
-        if (!$session) {
-            throw new NotFoundHttpException();
-        }
-        // we need at least one of both arguments
-        if (!$session && empty($inscriptionIds)) {
-            throw new MissingOptionsException('You have to pass a session id or an inscription array of ids');
-        }
+        $inscriptionIdsRaw = $request->attributes->get('inscriptionIds', '');
+        $inscriptionIds = [];
 
-        // get inscriptions and session
+        if (!empty($inscriptionIdsRaw)) {
+            // Cas : URL encode JSON (ex: [54678,54679])
+            if (str_starts_with($inscriptionIdsRaw, '[')) {
+                $decoded = json_decode($inscriptionIdsRaw, true);
+                if (is_array($decoded)) {
+                    $inscriptionIds = array_filter($decoded, fn($id) => is_numeric($id));
+                }
+            } else {
+                $inscriptionIds = array_filter(
+                    explode(',', $inscriptionIdsRaw),
+                    fn($id) => ctype_digit($id)
+                );
+            }
+        }
+        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
+
+// get inscriptions and session
         $inscriptions = [];
         $this->retrieveInscriptions($inscriptionIds, $inscriptions);
-        if (!$session instanceof \App\Entity\Core\AbstractSession) {
-            // get session
-            $session = $inscriptions[0]->getSession();
+
+// Cas où aucune session n’a été trouvée directement et on essaie de la deviner via une inscription
+        if (!$session && !empty($inscriptions)) {
+            $firstInscription = $inscriptions[0] ?? null;
+
+            if (!$firstInscription instanceof AbstractInscription || !$firstInscription->getSession()) {
+                throw new MissingOptionsException('Les inscriptions ne permettent pas de déterminer une session valide');
+            }
+
+            $session = $firstInscription->getSession();
+        }
+        if (!$session) {
+            throw new MissingOptionsException('Vous devez fournir un ID de session ou une liste d\'inscriptions valides');
         }
 
         // new session can't be created if user has no rights for it
@@ -248,21 +268,20 @@ abstract class AbstractSessionController extends AbstractController
         if ($inscriptionIds) {
             $inscriptions = $this->managerRegistry->getManager()
                 ->getRepository(AbstractInscription::class)
-                ->find($inscriptionIds);
+                ->findBy(['id' => $inscriptionIds]);
 
             if (empty($inscriptions)) {
                 throw new MissingOptionsException('You have to pass a session id or an inscription array of ids');
             }
 
             // check if all inscription come from a unique session
-            $arraySessionIds = [];
-            /** @var AbstractInscription $inscription */
-            foreach ($inscriptions as $inscription) {
-                $arraySessionIds[] = $inscription->getSession()->getId();
-            }
+            $sessionIds = array_unique(array_map(
+                fn(AbstractInscription $inscription) => $inscription->getSession()?->getId(),
+                $inscriptions
+            ));
 
-            $arraySessionIds = array_unique($arraySessionIds);
-            if (count($arraySessionIds) > 1) {
+
+            if (count($sessionIds) > 1) {
                 throw new InvalidOptionException('The inscriptions come from several sessions');
             }
         }

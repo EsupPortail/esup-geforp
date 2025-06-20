@@ -657,7 +657,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
     {
         $i = 0;
         if (isset($classCatalog['shorcuts'])) {
-            $aliases = $classCatalog['shorcuts'];
+            $aliases[] = $classCatalog['shorcuts'];
 
             $propertyAccessor = new PropertyAccessor();
             foreach ($aliases as $alias => $params) {

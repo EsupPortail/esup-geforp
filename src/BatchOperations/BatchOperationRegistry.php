@@ -179,11 +179,11 @@ final class BatchOperationRegistry
         // Recuperation conf PDF training
         $confPDF = $conf['pdf'];
         // operation batch : export CSV pour les sessions
-        $pdfBatchOperation = new PDFBatchOperation( $pdf, $security, $twigEnvironment, $parameterBag);
-        $pdfBatchOperation->setDoctrine($managerRegistry);
-        $pdfBatchOperation->setTargetClass(Session::class);
-        $pdfBatchOperation->setOptions($confPDF['training']);
-        $this->addBatchOperation($pdfBatchOperation, $i);
+        $pdfBatchTraining = new PDFBatchOperation( $pdf, $security, $twigEnvironment, $parameterBag);
+        $pdfBatchTraining->setDoctrine($managerRegistry);
+        $pdfBatchTraining->setTargetClass(AbstractTraining::class);
+        $pdfBatchTraining->setOptions($confPDF['training']);
+        $this->addBatchOperation($pdfBatchTraining, $i);
         ++$i;
 
 

@@ -26,9 +26,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
  */
 class AbstractSessionType extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formBuilder
+        $builder
             ->add('training', EntityHiddenType::class, ['label' => 'Formation', 'class' => AbstractTraining::class, 'required' => true])
             ->add('datebegin', DateType::class, ['label' => 'Date de début', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'html5' => false, 'required' => true])
             ->add('dateend', DateType::class, ['label' => 'Date de fin', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'html5' => false, 'required' => false])
@@ -46,9 +46,9 @@ class AbstractSessionType extends AbstractType
             ->add('comments', null, ['required' => false, 'label' => 'Commentaires']) ;
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['data_class' => AbstractSession::class]
+        $resolver->setDefaults(['data_class' => AbstractSession::class]
         );
     }
 

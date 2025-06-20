@@ -192,19 +192,19 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             $firstname = trim($trainee?->getFirstname() ?? '');
             $lastname = trim($trainee?->getLastname() ?? '');
 
-            $fullname = trim("$firstname $lastname");
+            $fullname = trim(" $firstname $lastname");
             if ($fullname === '') {
                 $fullname = 'Non renseigné';
             }
 
             $items[] = [
                 'id' => $insc->getId(),
-                'createdat' => $insc->getCreatedAt()?->format('Y-m-d'),
+                'createdat' => $insc->getCreatedAt()?->format('d-m-y H:m'),
                 'isPaying' => $insc?->getPrice(),
                 'presencestatus' => $insc->getPresencestatus(),
                 'inscriptionstatus' => $insc->getInscriptionstatus(),
 
-
+                //inscription.trainee.organization.name
 
                 // Entités séparées
                 'trainee' => [
@@ -219,14 +219,25 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                         'name' => $institution?->getName() ?? 'Non renseignée',
                         'city' => $institution?->getCity() ?? 'Non renseignée',
                     ],
+                    'organization' => ($insc->getOrganization()) ? [
+                        'id' => $insc->getOrganization()->getId(),
+                        'name' => $insc->getOrganization()->getName() ?? 'Non renseignée',
+                    ] : [
+                        'id' => null,
+                        'name' => 'Non renseignée'
+                    ],
                 ],
                 'session' => [
                     'id' => $session?->getId(),
                     'datebegin' => $session?->getDatebegin()?->format('Y-m-d'),
                     'dateend' => $session?->getDateend()?->format('Y-m-d'),
-                    'maximumNumberOfRegistrations' => $session?->getMaximumNumberOfRegistrations(),
+                    'maximumnumberofregistrations' => $session?->getMaximumNumberOfRegistrations(),
                     'price' => $session?->getPrice(),
                     'fullname' => $fullname,
+                    'training' => [
+                        'id' => $training?->getId(),
+                        'name' => $training?->getName() ?? 'Non renseigné',
+                    ],
                 ],
                 'training' => [
                     'id' => $training?->getId(),

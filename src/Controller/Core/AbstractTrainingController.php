@@ -16,6 +16,7 @@ use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Bundle\SecurityBundle\Security;
 use JMS\Serializer\SerializationContext;
@@ -117,10 +118,10 @@ abstract class AbstractTrainingController extends AbstractController
 
     }
     #[Groups(['Default', 'training'])]
-    #[Route(path: '/{id}/view', name: 'training.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['GET'])]
+    #[Route(path: '/{id}/view', name: 'training.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[IsGranted('VIEW', subject: 'training')]
     #[Rest\View(serializerGroups: ["Default", "training"] ,serializerEnableMaxDepthChecks: true)]
-    public function view(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): array|View
+    public function view(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): view|array
     {
         $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
         if (!$training) {
@@ -134,7 +135,7 @@ abstract class AbstractTrainingController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $form = $this->createForm(AbstractTrainingType::class, $training);
+        $form = $this->createForm($training::getFormType(), $training);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {

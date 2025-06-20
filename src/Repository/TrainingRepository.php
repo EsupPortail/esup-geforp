@@ -22,8 +22,23 @@ final class TrainingRepository extends ServiceEntityRepository
     /**
      * @return array{total: int, pageSize: mixed, items: array<int, array{id: mixed, name: mixed, number: mixed, sessionscount: mixed, trainers?: array{fullname: mixed}[]|array{id: mixed}[]&mixed[], training: array{id: mixed, type: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, name: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed, trainers: string}, nextsession: mixed, lastsession: mixed, theme: mixed, inscriptionsStats: never[]}>}
      */
-    public function getTrainingsList($keyword, $filters, $page, $pageSize, $sorts): array
+    public function getTrainingsList($keyword,
+                                     array $filters = [],
+                                     int $page = 1,
+                                     int $pageSize = 1,
+                                     array $sorts = ['createdat' => 'DESC']): array
     {
+
+        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
+        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
+
+        $isExport = isset($filters['_export']) && $filters['_export'] === true;
+
+        $pageSize = max(1, (int) $pageSize);
+        $pageSize = $isExport
+            ? min($pageSize, $MAX_EXPORT_LIMIT)
+            : min($pageSize, $MAX_PAGE_SIZE);
+
         /* addcslashes empêchera des manipulations malveillantes éventuelles */
         $keywordPr = '%' . addcslashes((string) $keyword, '%_') . '%';
         $qb = $this->createQueryBuilder('training');
@@ -166,6 +181,24 @@ final class TrainingRepository extends ServiceEntityRepository
             $nextSession = $training->getNextsession();
 
             // Si elle existe, on récupère le semestre depuis cette session
+
+
+            $sessionData = [];
+            foreach ($training->getSessions() as $session) {
+                $sessionData[] = [
+                    'id' => $session->getId(),
+                    'datebegin' => $session->getDatebegin(),
+                    'dateend' => $session->getDateend(),
+                    'year' => $session->getYear(),
+                    'semester' => $session->getSemester(),
+                    'type' => 'session',
+                    'numberofregistrations' => $session->getNumberofregistrations(),
+                    'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
+                    'maximumnumberofregistrations' => $session->getMaximumnumberofregistrations(),
+                    'numberofparticipants' => $session->getParticipations(),
+                ];
+            }
+
             $semester = null;
             $years = null;
             if ($nextSession && method_exists($nextSession, 'getSemesterLabel')) {
@@ -176,40 +209,22 @@ final class TrainingRepository extends ServiceEntityRepository
                 $years = $nextSession->getYear();
             }
 
-            $sessionData = [];
-            $totalParticipants = 0;
-
-            foreach ($training->getSessions() as $session) {
-                $participants = $session->getNumberofregistrations();
-
-
-                $sessionData[] = [
-                    'id' => $session->getId(),
-                    'datebegin' => $session->getDatebegin(),
-                    'dateend' => $session->getDateend(),
-                    'numberofregistrations' => $participants,
-                    'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
-                    'limitregistrationdate' => $session->getLimitregistrationdate(),
-                    'maximumNumberOfRegistrations' => $session->getMaximumNumberOfRegistrations(),
-                    'status' => $session->getStatus(),
-                    'year' => $session->getYear(),
-                    'semester' => $session->getSemester(),
-                ];
-            }
-
             $items[] = [
                 'id' => $training->getId(),
                 'number' => $training->getNumber(),
                 'name' => $training->getName(),
                 'theme' => $training->getTheme(),
                 'sessionscount' => $training->getSessionscount(),
-                'numberofregistrations' => $totalParticipants,
                 'semester' => $semester,
                 'nextsession' => $training->getNextsession(),
                 'lastsession' => $training->getLastsession(),
                 'trainers' => $trainerList,
                 'sessions' => $sessionData,
                 'inscriptionsStats' => [], // à compléter si nécessaire
+                'year' => $years,
+                'description' => $training->getDescription(),
+                'program' => $training->getProgram(),
+                'tags' => $training->getTags(),
                 'training' => [
                     'id' => $training->getId(),
                     'type' => $training->getType(),

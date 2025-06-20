@@ -37,7 +37,8 @@ trait PersonTrait
      */
     #[ORM\Column(name: 'last_name', type: 'string', length: 50)]
     #[Groups(['Default', 'api'])]
-    protected string $lastname;
+    protected string $lastname = '';
+    
 
     public function setTitle(mixed $title): void
     {

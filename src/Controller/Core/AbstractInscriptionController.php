@@ -105,10 +105,11 @@ abstract class AbstractInscriptionController extends AbstractController
                 $objectManager = $managerRegistry->getManager();
                 $objectManager->persist($inscription);
                 $objectManager->flush();
+                $objectManager->refresh($session);
             }
         }
 
-        return ['form' => $form->createView(), 'sessions' => $sessions];
+        return ['form' => $form->createView(), 'sessions' => $sessions, 'inscription' => $inscription, ];
     }
 
 
