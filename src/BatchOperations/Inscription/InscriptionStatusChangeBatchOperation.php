@@ -188,7 +188,7 @@ class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation imple
                     $tabAllAttach[] = $att;
 
                 //sending with e-mail service
-                $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 0);
+                $this->emailBatch->parseAndSendMail($inscription, $options['subject'], $options['message'], $attachments, (isset($options['preview'])) ? $options['preview'] : false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
 
             }
 
