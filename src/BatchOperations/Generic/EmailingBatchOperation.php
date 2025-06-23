@@ -208,7 +208,9 @@ class EmailingBatchOperation extends AbstractBatchOperation
                         $flagSup = 0;
 
                         // Envoyer une copie au N+1 et/ou correspondant formation si l'option est activée
-                        if ($sendresp == 1) {
+                        if ($sendresp == 0) {
+                            // si option à 'NON', on ne fait rien
+                        } else {
                             if ($hrpa->emailSup != null) {
                                 $emailSup = $hrpa->emailSup;
                                 $flagSup = 1;
