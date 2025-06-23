@@ -20,7 +20,7 @@ sygeforApp.controller('BatchEMailController', ['$scope', '$http', '$window', '$m
             'body': config.templates[i]['body'],
             'ical': config.templates[i]['private'],
             'format': config.templates[i]['position'],
-            'send_resp': config.templates[i]['machinename'],
+            'sendresp': config.templates[i]['machinename'],
             'templateAttachments': config.templates[i]['attachmentTemplates'],
             'templateAttachmentChecklist': []
         };

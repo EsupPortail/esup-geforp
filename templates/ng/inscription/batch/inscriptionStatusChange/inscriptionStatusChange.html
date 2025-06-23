@@ -53,9 +53,8 @@
         <div class="form-group" ng-show='send.Mail'>
             <label for="sendresp" class="col-sm-3 control-label">Envoyer une copie au N+1 et au correspondant formation</label>
             <div class="col-sm-9">
-                <select type="text" ng-disabled='!send.Mail' class="form-control" id="sendresp" ng-options="opt.val as opt.name for opt in [{val:1,name:'OUI'}, {val:0,name:'NON'}]" ng-model="message.sendresp" ng-init="message.sendresp = 1" ng-if="message.sendresp==null">
-                </select>
-                <select type="text" ng-disabled='!send.Mail' class="form-control" id="sendresp" ng-options="opt.val as opt.name for opt in [{val:1,name:'OUI'}, {val:0,name:'NON'}]" ng-model="message.sendresp" ng-if="message.sendresp!=null" >
+                <select type="text" ng-disabled='!send.Mail' class="form-control" id="sendresp" ng-options="opt.val as opt.name for opt in [{val:'1',name:'OUI'}, {val:'0',name:'NON'}]" ng-model="message.sendresp" >
+                    <option value="" ng-disabled="true">Choisir l'envoi d'une copie au N+1 et au correspondant formation</option>
                 </select>
 
             </div>
