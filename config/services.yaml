@@ -52,6 +52,7 @@ parameters:
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
+                    training.number: "Numéro de stage"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
                     training.theme.name: "Thématique"
