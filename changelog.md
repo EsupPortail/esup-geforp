@@ -1,5 +1,17 @@
 # Geforp changelog :
 
+## 2.3.20 (2025-06-25)
+
+### Ajouts
+- Affichage 'session annulée' dans la vue intervenants
+- Inscriptions privées avec le lien
+- Ajout de panneaux sur le dashboard : inscriptions en avis favorable et dernières sessions terminées
+- Ajout numéro du stage dans export des sessions
+- Ajout choix d'envoyer les mails en copie ou non au N+1 et correspondant formation
+
+### Corrections
+- Correction bug suppression d'un stage
+
 ## 2.3.19 (2025-06-02)
 
 ### Ajouts
