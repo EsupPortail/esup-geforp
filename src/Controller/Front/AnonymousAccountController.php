@@ -114,6 +114,7 @@ class AnonymousAccountController extends AbstractController
             $trainee->setZip($codepostal);
         }
         $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
+        $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
