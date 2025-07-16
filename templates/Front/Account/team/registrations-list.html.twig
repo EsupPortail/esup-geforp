@@ -29,6 +29,9 @@
                                 Accepter ou refuser la demande
                             </a>
                         {% endif %}
+                        {% if registration.upcoming and (registration.inscriptionstatus.machinename == 'defavorable') %}
+                            {{ registration.refuse }}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
