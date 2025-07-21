@@ -1,5 +1,14 @@
 # Geforp changelog :
 
+## 2.3.21 (2025-07-21)
+
+### Ajouts
+- Affichage motif d'avis défavorable côté stagiaire et côté espace agent du N+1
+- Ajout coû individuel dans les exports des sessions
+
+### Corrections
+- Prise en compte de la casse dans la remontée LDAP du type de personnel
+
 ## 2.3.20 (2025-06-25)
 
 ### Ajouts
