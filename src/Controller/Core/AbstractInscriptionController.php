@@ -67,7 +67,7 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $inscriptionSearchRepository->getInscriptionsList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sorts: $sorts, fields: $fields);
+        $ret = $inscriptionSearchRepository->getInscriptionsList(keyword: $keywords, filters: $filters, formatCreatedAt: 'd-m-y', page: (int)$page, pageSize: (int)$size, sorts: $sorts, fields: $fields);
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $inscriptionSearchRepository);
 
         // Concatenation des resultats

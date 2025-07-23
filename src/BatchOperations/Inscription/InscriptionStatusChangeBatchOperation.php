@@ -145,6 +145,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
 
         //if asked, a mail sent to user
         if (isset($options['sendMail']) && ($options['sendMail'] === true) && ($arrayInscriptionsGranted !== [])) {
+            $tabAllAttach = [];
             foreach ($arrayInscriptionsGranted as $arrayInscriptionGranted) {
                 $attachments = [];
 
@@ -168,10 +169,13 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
 
             }
 
-            if ((isset($tabAllAttach)) && ($tabAllAttach != null)) {
-                foreach ($tabAllAttach as $att) {
-                    if (file_exists($att->getPathname()))
-                        unlink($att->getPathname());
+            $flatAttachments = iterator_to_array(new \RecursiveIteratorIterator(new \RecursiveArrayIterator($tabAllAttach)));
+            foreach ($flatAttachments as $att) {
+                if ($att instanceof \Symfony\Component\HttpFoundation\File\File) {
+                    $path = $att->getPathname();
+                    if (file_exists($path)) {
+                        unlink($path);
+                    }
                 }
             }
 

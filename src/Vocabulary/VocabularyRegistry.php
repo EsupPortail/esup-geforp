@@ -233,38 +233,36 @@ final class VocabularyRegistry
      */
     public function replaceTermInUsages(EntityManager $entityManager, $vocTermFrom, $vocTermTo): void
     {
-        $usages       = $this->getTermUsages($entityManager, $vocTermFrom, $count = false);
+        $usages = $this->getTermUsages($entityManager, $vocTermFrom, false);
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
         foreach ($usages as $class => $classUsage) {
             foreach ($classUsage['entities'] as $entity) {
-                $ent = $entityManager->getRepository($class)->findBy(['id' => $entity->getId()]);
-                $ent = $ent[0];
+                $ent = $entityManager->getRepository($class)->find($entity->getId());
+                if (!$ent) {
+                    continue;
+                }
                 $value = $propertyAccessor->getValue($ent, $classUsage['fieldName']);
 
-                $vocClass = $vocTermTo::class;
+                $vocClass = get_class($vocTermTo);
                 if ($value instanceof $vocClass) {
-
-                    $propertyAccessor->setValue($entity, $classUsage['fieldName'], $vocTermTo);
-                }
-                else {
-
+                    $propertyAccessor->setValue($ent, $classUsage['fieldName'], $vocTermTo);
+                } else {
                     $termInCollection = $this->checkTermIsInCollection($vocTermTo, $value);
+
                     if (is_array($value)) {
-                        $valueCount = count($value);
-                        for ($pos = 0; $pos < $valueCount; ++$pos) {
-                            if (method_exists($value[$pos], 'getId') && ($value[$pos]->getId() === $vocTermFrom->getId())) {
-                                //if destination element is not already present in collection, we can do a replacement
+                        foreach ($value as $pos => $val) {
+                            if (method_exists($val, 'getId') && $val->getId() === $vocTermFrom->getId()) {
                                 if ($termInCollection) {
-                                    $value = array_splice($value, $pos);
-                                    break;
+                                    // Remove element if destination is already present
+                                    array_splice($value, $pos, 1);
                                 } else {
                                     $value[$pos] = $vocTermTo;
                                 }
+                                break;
                             }
                         }
-                        
-                        $propertyAccessor->setValue($entity, $classUsage['fieldName'], $value);
+                        $propertyAccessor->setValue($ent, $classUsage['fieldName'], $value);
                     } elseif ($value instanceof \Traversable) {
                         foreach ($value as $key => $val) {
                             if (!method_exists($val, 'getId')) {
@@ -274,15 +272,13 @@ final class VocabularyRegistry
                                 continue;
                             }
                             if ($termInCollection) {
-                                $value->remove($key);
-                                break;
-                            }
-                            else {
+                                $value->removeElement($val);
+                            } else {
                                 $value->offsetSet($key, $vocTermTo);
                             }
+                            break;
                         }
-                        
-                        $propertyAccessor->setValue($entity, $classUsage['fieldName'], $value);
+                        $propertyAccessor->setValue($ent, $classUsage['fieldName'], $value);
                     }
                 }
             }

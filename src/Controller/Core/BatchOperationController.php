@@ -50,7 +50,7 @@ final class BatchOperationController extends AbstractController
     #[Route(path: '/batchoperation/{id}/execute', name: 'sygefor_core.batch_operation.execute', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function execute(string $id, BatchOperationRegistry $batchOperationRegistry, Request $request)
     {
-        $ids = $request->get('ids');
+        $idsRaw = $request->get('ids');
         $options = $request->get('options');
 
         //we try to read option list as a JSON string (case of multipart form type)
@@ -71,13 +71,32 @@ final class BatchOperationController extends AbstractController
             $options['attachment'] = $attachments;
         }
 
-        //also need to decode id list
-        $decodeIds = json_decode($ids, true, 512, JSON_THROW_ON_ERROR);
-        if (is_string($decodeIds)) {
-            $ids = $decodeIds;
-        }
+        if (is_array($idsRaw)) {
+            $ids = $idsRaw;
+        } else {
+            // Sinon on tente de le parser
+            $idsString = (string) $idsRaw;
 
-        $ids = explode(',', (string) $ids);
+            try {
+                $decodedIds = json_decode($idsString, true, 512, JSON_THROW_ON_ERROR);
+
+                // Si json_decode donne un tableau
+                if (is_array($decodedIds)) {
+                    $ids = $decodedIds;
+                }
+                // Si ça donne une string "1,2,3", on explose
+                elseif (is_string($decodedIds)) {
+                    $ids = explode(',', $decodedIds);
+                }
+                // Autres cas : on essaie en CSV direct
+                else {
+                    $ids = explode(',', $idsString);
+                }
+            } catch (\JsonException) {
+                // Si pas un JSON valide, on traite comme CSV "1,2,3"
+                $ids = explode(',', $idsString);
+            }
+        }
 
         //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($id);
         $batchOperation = $batchOperationRegistry->getByName($id);

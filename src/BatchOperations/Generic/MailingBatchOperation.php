@@ -131,7 +131,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      *
      * @internal param bool $pdf
      */
-    public function sendFile($fileName, $outputFileName = null, array $options = ['pdf' => false, 'return' => false]): string|Response
+    public function sendFile(string $fileName, ?string $outputFileName = null, array $options = ['pdf' => false, 'return' => false]): string|Response|File
     {
         $fullPath = $this->options['tempDir'] . $fileName;
 
@@ -139,39 +139,43 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             return '';
         }
 
-        $realDir = realpath(pathinfo($fullPath, PATHINFO_DIRNAME));
-        if ($realDir !== $this->options['tempDir']) {
-            return new Response('Accès non autorisé : ' . $realDir, 403);
+        // Check directory to avoid arbitrary file access
+        if (realpath(dirname($fullPath)) !== realpath($this->options['tempDir'])) {
+            return new Response('Accès non autorisé : ' . dirname($fullPath), 403);
         }
 
-        $outputFileName = $outputFileName ?: $fileName;
+        // Determine final path and output name
+        $finalPath = $fullPath;
+        $outputFileName ??= $fileName;
 
-        // PDF conversion
+        // Convert to PDF if required
         if (!empty($options['pdf'])) {
             $pdfName = $this->toPdf($fileName);
-            $fullPath = $this->options['tempDir'] . $pdfName;
+            $finalPath = $this->options['tempDir'] . $pdfName;
 
-            $parts = explode('.', $outputFileName);
-            $parts[count($parts) - 1] = 'pdf';
-            $outputFileName = implode('.', $parts);
+            // Force output file extension to .pdf
+            $outputFileName = preg_replace('/\.[^.]+$/', '.pdf', $outputFileName);
         }
 
+        // Return the file for internal use (ex: attachment)
         if (!empty($options['return'])) {
-            $file = new File($fullPath);
-            return $file->move($file->getFileInfo()->getPath(), $outputFileName);
+            return new File($finalPath, false); // false = don't check existence again
         }
 
+        // Otherwise, send it as a response to browser
+        $mimeType = mime_content_type($finalPath);
         $response = new Response();
-        $response->headers->set('Cache-Control', 'private');
-        $response->headers->set('Content-type', mime_content_type($fullPath));
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $outputFileName . '";');
-        $response->headers->set('Content-length', filesize($fullPath));
-        $response->setContent(file_get_contents($fullPath));
-        $response->sendHeaders();
-        $response->sendContent();
 
-        // Attention : supprimer ici peut être risqué
-        unlink($fullPath);
+        $response->headers->set('Cache-Control', 'private');
+        $response->headers->set('Content-Type', $mimeType);
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $outputFileName . '"');
+        $response->headers->set('Content-Length', (string) filesize($finalPath));
+
+        $response->setContent(file_get_contents($finalPath));
+        $response->send();
+
+        // Clean up
+        unlink($finalPath);
 
         return $response;
     }
@@ -184,17 +188,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      */
     public function parseFile(string|\App\Entity\Term\PublipostTemplate $template, array $entities, $getFile = false, $outputFileName = '', $getPdf = false): array
     {
-        /*
-        list($TBS, $classCatalog) = $this->initializeOpenTbs($template, $entities);
-        $lines = $this->getTemplateLines($entities);
-        $errors = $this->mergeLinesWithPublipostTemplate($TBS, $lines);
-        if (count($errors) > 0) {
-            return $errors;
-        }
-        $this->computeShorcutsAndMerge($TBS, $entities, $classCatalog);
-        $fileName = $this->generateFinalFile($TBS, $template);
-
-        return array('fileUrl' => $fileName); */
         //getting the file generator
         $clsTinyButStrong = new clsTinyButStrong;
         $clsTinyButStrong->Plugin(TBS_INSTALL, 'clsOpenTBS');
@@ -210,7 +203,15 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         $lines = [];
 
         $uid = substr(md5(random_int(0, mt_getrandmax())), 0, 5);
-        $fileName = $this->removeAccents($uid . '_' . ((empty($this->currentTemplateFileName) ? $template->getFileName() : $this->currentTemplateFileName)));
+
+        if ($template instanceof \App\Entity\Term\PublipostTemplate) {
+            $baseFileName = $template->getFileName();
+        } else {
+            // $template est un chemin de fichier
+            $baseFileName = basename($template);
+        }
+
+        $fileName = $this->removeAccents($uid . '_' . ($this->currentTemplateFileName ?: $baseFileName));
 
         // Mise en page spécifique pour feuille émargement pour une session
         $fileTest = stripos((string) $fileName, "EmargementSession");
@@ -241,7 +242,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                 // Cas de la liste des inscrits à une session acceptés
                                 $data = $this->humanReadablePropertyAccessorFactory->getAccessor($entities[0]);
 
-                                $lines[0]['dateDebut'] = $data->dateDebut;
+                                $lines[0]['dateDebut'] = $data->dateDebut->format('Y-m-d H:i:s');
                                 $lines[0]['nom'] = $data->nom;
 
                                 $inscriptions = $entities[0]->getInscriptions();
@@ -312,7 +313,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     $lines[0]['civilite'] = $data->civilite;
                     $lines[0]['nomComplet'] = $data->nomComplet;
                     $lines[0]['corps'] = $data->corps;
-                    $lines[0]['dateJour'] = date("d/m/Y");
+                    $lines[0]['dateJour'] = date("d/m/y");
                     $lines[0]['date1insc'] = "";
 
                     // Tri des inscriptions par date de session
@@ -439,31 +440,37 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             $formateurs = $entities[0]->getTrainers();
 
             $i = 0;
+            $dateDebuts = [];
+            $dateFins = [];
             foreach ($Dates as $date) {
                 // Test sur le nombre de jours à afficher
-                $dateDeb = strtotime(str_replace("/", "-", (string) $date->getDatebegin()->format('d/m/Y')));
-                $dateFin = strtotime(str_replace("/", "-", (string) $date->getDateend()->format('d/m/Y')));
-                $diff = abs($dateFin - $dateDeb) / 86400;
+                $dateDebuts[] = $date->getDatebegin()->getTimestamp();
+                $dateFins[] = $date->getDateend()->getTimestamp();
+                $diffJours = (int) floor(($date->getDateend()->getTimestamp() - $date->getDatebegin()->getTimestamp()) / 86400);;
 
-                for ($j = 0; $j < $diff + 1; ++$j) {
-                    $lines[$i]['dateDebut'] = date('d/m/Y', $dateDeb + $j * 86400);
-                    $lines[$i]['dateFin'] = date('d/m/Y', $dateDeb + $j * 86400);
+                for ($j = 0; $j < $diffJours + 1; ++$j) {
+                    $timestampJour = $date->getDatebegin()->getTimestamp() + $j * 86400;
+                    $lines[$i]['dateDebut'] = date('d/m/Y', $timestampJour);
+                    $lines[$i]['dateFin'] = date('d/m/Y', $timestampJour);
                     $lines[$i]['horairesMatin'] = $date->getScheduleMorn();
                     $lines[$i]['horairesAprem'] = $date->getScheduleAfter();
                     $lines[$i]['lieu'] = $date->getPlace();
                     $lines[$i]['nom'] = $data->nom;
 
+                    $lines[$i]['formateurs'] = [];
                     foreach ($formateurs as $formateur) {
                         $lines[$i]['formateurs'][] = ['nom' => $formateur->getLastname(), 'prenom' => $formateur->getFirstname()];
                     }
 
+                    $lines[$i]['inscriptions'] = [];
                     foreach ($inscriptions as $inscription) {
                         if ($inscription->getInscriptionstatus() == 'Convoqué') {
-                            $lines[$i]['inscriptions'][] = ['nom' => $inscription->getTrainee()->getLastname(), 'prenom' => $inscription->getTrainee()->getFirstname(), 'nomComplet' => $inscription->getTrainee()->getFullname(), 'mail' => $inscription->getTrainee()->getEmail(), 'unite' => $inscription->getTrainee()->getInstitution() ? $inscription->getTrainee()->getInstitution()->getName() : '', 'service' => $inscription->getTrainee()->getService()];
+                            $trainee = $inscription->getTrainee();
+                            $lines[$i]['inscriptions'][] = ['nom' => $trainee->getLastname(), 'prenom' => $trainee->getFirstname(), 'nomComplet' => $trainee->getFullname(), 'mail' => $trainee->getEmail(), 'unite' => $trainee->getInstitution() ? $trainee->getInstitution()->getName() : '', 'service' => $trainee->getService()];
                         }
                     }
 
-                    if ((isset($lines[$i]['inscriptions'])) && ($lines[$i]['inscriptions'] !== null)) {
+                    if ((isset($lines[$i]['inscriptions']))) {
                         usort($lines[$i]['inscriptions'], static fn($a, $b): int => strcasecmp((string) $a['nom'], (string) $b['nom']));
                     }
 
@@ -476,37 +483,23 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         ob_start();
 
-
         // merge all fields from the first object
         //fields are merged one by one, so that we dont have to recall a enity name for global names
         if (!empty($lines)) {
-//            $vals = current($lines)->toArray();
-//            //var_dump($vals);die();
-//            foreach ($vals as $fieldName => $prop){
-//                $TBS->MergeField($fieldName,$prop);
-//            }
-            //var_dump(current($lines));
 
-/*            if (($fileTest === false) && ($fileTest2 === false) && ($fileTest3 === false) && ($fileTest4 === false) && ($fileTest5 === false) && ($fileTest6 === false)) {
-                $TBS->MergeField('global', current($lines)->toArray());
-            }
-            else {*/
                 $clsTinyButStrong->MergeField('global', current($lines));
-//            }
         }
-
         reset($lines);
 
-        ob_start();
-        if (!isset($lines['inscriptions'])) {
-            return ['error' => 'Le tableau $lines ne contient pas de clé "inscriptions"'];
-        }
-        $clsTinyButStrong->MergeBlock('inscriptions', $lines['inscriptions']);
-
-        $error = ob_get_clean();
-
+     //$clsTinyButStrong->MergeBlock('inscriptions', $lines['inscriptions']);
+        $clsTinyButStrong->MergeBlock($entityName, $lines);
+        $error = ob_get_flush();
         if ($error) {
             return ['error' => $error];
+        }
+
+        if (!$fileName) {
+            return ['error' => 'Nom de fichier invalide (null ou vide).'];
         }
 
         $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
@@ -514,7 +507,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         //do we want the file or just infos about it ?
         if ($getFile) {
-            return $this->sendFile($fileName, $outputFileName, ['pdf' => $getPdf, 'return' => true]);
+            return ['file' => $this->sendFile($fileName, $outputFileName, ['pdf' => $getPdf, 'return' => true])];
         }
         // file can then be taken using senFile.
         return ['fileUrl' => $fileName];
@@ -574,16 +567,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             $process->run();
         } catch (RuntimeException) {
             // unoconv somtimes returns 8 (SIGFPE) error code but still produces a correct output,
-            // so we can ignore it.
-//            if ($exception->getCode() !== 8) {
-//                throw $exception;
-//            }
         }
-
-        // Suppression du test car renvoie les erreurs et les warnings (deprecated)
-/*        if (!empty($process->getErrorOutput())) {
-            throw new RuntimeException('The PDF file has not been generated : '.$process->getErrorOutput());
-        }*/
 
         return $outputFileName;
     }
@@ -675,7 +659,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         $val = $propertyAccessor->getValue($entities[$keys[$i]], $params['path']);
                         // create an array collection to simplify work in foreach
                         $collection = new ArrayCollection();
-                        if (is_object($val) && $val instanceof ArrayCollection) {
+                        if ($val instanceof ArrayCollection) {
                             $collection = $val;
                         } else {
                             $collection->add($val);
@@ -727,14 +711,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
     /**
      * @param $str
-     * @param string $charset
      *
-     * @return mixed|string
+     * @return string|array
      */
-    private function removeAccents(string $str, $charset = 'utf-8'): mixed
-    {
-        //converting to html elements
-        $str = htmlentities($str, ENT_NOQUOTES, $charset);
+    private function removeAccents(string $str): string|array
+    {//converting to html elements
+        $str = htmlentities($str, ENT_NOQUOTES, 'utf-8');
 
         //keeping only first char after '&', so that &eacute becomes e for example
         $str = preg_replace('#&([A-Za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
@@ -764,88 +746,132 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         if ($class === \App\Entity\Back\Inscription::class) {
             $dataRes['entityName'] = ['inscription'];
-            $i = 0;
-            foreach ($entities as $entity) {
-                $lines[$i]['typeaction'] = $entity->getActiontype();
-                $lines[$i]['motivation'] = $entity->getMotivation();
-                $lines[$i]['refus'] = $entity->getRefuse();
+            foreach ($entities as $i => $entity) {
+                $session = $entity->getSession();
+                $training = $session->getTraining();
+                $organization = $training->getOrganization();
+                $theme = $training->getTheme();
+                $trainee = $entity->getTrainee();
 
-                $lines[$i]['dateDebut'] = $entity->getSession()->getDatebegin();
-                $lines[$i]['centreNom'] = $entity->getSession()->getTraining()->getOrganization()->getName();
-                $lines[$i]['domaine'] = $entity->getSession()->getTraining()->getTheme()->getName();
-                $lines[$i]['nom'] = $entity->getSession()->getName();
-                $lines[$i]['sessionDescription'] = $entity->getSession()->getTraining()->getDescription();
-                $lines[$i]['sessionCommentaires'] = $entity->getSession()->getComments();
-                $lines[$i]['listeFormateurs'] = $entity->getSession()->getTrainersListString();
+                $lines[$i] = [
+                    'typeAction' => $entity->getActiontype(),
+                    'motivation' => $entity->getMotivation(),
+                    'refus' => $entity->getRefuse(),
+                    'datesString' => $session->getDatesString(),
+                    'date.debut' => $session->getDatebegin()?->format('d/m/Y'),
+                    'session.nom' => $session->getName(),
+                    'session.description' => $training->getDescription(),
+                    'session.commentaires' => $session->getComments(),
+                    'listeFormateurs' => $session->getTrainersListString(),
 
-                $lines[$i]['stagiaireNom'] = $entity->getTrainee()->getLastname();
-                $lines[$i]['stagiairePrenom'] = $entity->getTrainee()->getFirstname();
-                $lines[$i]['stagiaireNomComplet'] = $entity->getTrainee()->getFullName();
-                $lines[$i]['stagiaireMail'] = $entity->getTrainee()->getEmail();
-                $lines[$i]['stagiaireUnite'] = $entity->getTrainee()->getInstitution() ? $entity->getTrainee()->getInstitution()->getName() : '';
-                $lines[$i]['stagiaireCivilite'] = $entity->getTrainee()->getTitle()->getName();
-                $lines[$i]['stagiaireService'] = $entity->getTrainee()->getService();
-                $lines[$i]['stagiaireCorps'] = $entity->getTrainee()->getCorps();
-                $lines[$i]['stagiaireBap'] = $entity->getTrainee()->getBap();
-                $lines[$i]['stagiaireFonction'] = $entity->getTrainee()->getFonction();
+                    'centre.nom' => $organization?->getName(),
+                    'domaine' => $theme?->getName(),
 
-                if ($entity->getInscriptionStatus() !== null) {
-                    $lines[$i]['statutInscription'] = $entity->getInscriptionStatus()->getName();
-                }
+                    'stagiaire.nom' => $trainee?->getLastname(),
+                    'stagiaire.prenom' => $trainee?->getFirstname(),
+                    'stagiaire.nomComplet' => $trainee?->getFullName(),
+                    'stagiaire.mail' => $trainee?->getEmail(),
+                    'stagiaire.unite' => $trainee?->getInstitution()?->getName() ?? '',
+                    'stagiaire.service' => $trainee?->getService(),
+                    'stagiaire.corps' => $trainee?->getCorps(),
+                    'stagiaire.bap' => $trainee?->getBap(),
+                    'stagiaire.fonction' => $trainee?->getFonction(),
+                    'stagiaire.civilite' => $trainee?->getTitle()?->getName() ?? '',
 
-                if ($entity->getPresenceStatus() !== null) {
-                    $lines[$i]['statutPresence'] = $entity->getPresenceStatus()->getName();
-                }
+                    'statutInscription' => $entity->getInscriptionStatus()?->getName() ?? '',
+                    'statutPresence' => $entity->getPresenceStatus()?->getName() ?? '',
+                    'dates' => [],
+                ];
 
-                $datesSess = $entity->getSession()->getDates();
-                foreach ($datesSess as $dateSess) {
+                foreach ($session->getDates() as $dateSess) {
                     $lines[$i]['dates'][] = [
-                        'dateDebut' => $dateSess->getDatebegin()->format('d/m/Y'),
-                        'dateFin' => $dateSess->getDateend()->format('d/m/Y'),
+                        'dateDebut' => $dateSess->getDatebegin()?->format('d/m/Y') ?? '',
+                        'dateFin' => $dateSess->getDateend()?->format('d/m/Y') ?? '',
                         'horairesMatin' => $dateSess->getSchedulemorn(),
                         'horairesAprem' => $dateSess->getScheduleafter(),
                         'nbHeuresMatin' => $dateSess->getHournumbermorn(),
-                        'nbHeuresApr' => $dateSess->getHournumberafter(),
+                        'nbHeuresAprem' => $dateSess->getHournumberafter(),
                         'lieu' => $dateSess->getPlace(),
                     ];
                 }
-                ++$i;
             }
+        } elseif ($class === \App\Entity\Back\Trainer::class) {
+            $dataRes['entityName'] = ['formation'];
+
+            foreach ($entities as $i => $entity) {
+                $lines[$i] = [
+                    'civilite' => $entity->getTitle() ?? '',
+                    'formateur.nom' => $entity->getLastname(),
+                    'formateur.prenom' => $entity->getFirstname(),
+                    'formateur.nomComplet' => $entity->getFullname(),
+                    'formateur.email' => $entity->getEmail(),
+                    'formateur.adresse' => $entity->getAddress(),
+                    'formateur.codePostal' => $entity->getZip(),
+                    'formateur.ville' => $entity->getCity(),
+                    'formateur.fax' => $entity->getFaxnumber(),
+                    'formateur.site' => $entity->getWebsite(),
+                    'formateur.etablissement' => $entity->getInstitution(),
+                    'formateur.service' => $entity->getService(),
+                    'formateur.statut' => $entity->getStatus(),
+                ];
+            }
+
             $dataRes['lines'] = $lines;
+
         } elseif ($class === \App\Entity\Back\Session::class) {
-            $dataRes['entityName'] = ['s'];
-            $i = 0;
-            foreach ($entities as $entity) {
-                $data = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
+            $dataRes['entityName'] = ['session'];
+            foreach ($entities as $i => $entity) {
+                $training = $entity->getTraining();
+                $organization = $entity->getOrganization();
+                $theme = $training->getTheme();
+                $lines[$i] = [
+                    'datesString' => $entity->getDatesString(),
+                    'dateDebut' => $entity->getDatebegin()?->format('d/m/Y'),
+                    'name' => $entity->getName(),
+                    dump($entity->getName()),
+                    'centre.nom' => $organization?->getName(),
+                    'domaine' => $theme?->getName(),
+                    'listeFormateurs' => $entity->getTrainersListString(),
+                    'inscriptions' => [],
+                    'dates' => [],
+                ];
 
-                $lines[$i]['dateDebut'] = $data->dateDebut;
-                $lines[$i]['nom'] = $data->nom;
-                $lines[$i]['centre.nom'] = $entity->getOrganization()->getName();
-                $lines[$i]['domaine'] = $entity->getTraining()->getTheme()->getName();
-                $lines[$i]['listeFormateurs'] = $entity->getTrainersListString();
-
-                $inscriptions = $entity->getInscriptions();
-                foreach ($inscriptions as $inscription) {
-                    $lines[$i]['inscriptions'][] = [
-                        'stagiaire.nom' => $inscription->getTrainee()->getLastname(),
-                        'stagiaire.prenom' => $inscription->getTrainee()->getFirstname(),
-                        'stagiaire.nomComplet' => $inscription->getTrainee()->getFullname(),
-                        'stagiaire.mail' => $inscription->getTrainee()->getEmail(),
-                        'stagiaire.unite' => $inscription->getTrainee()->getInstitution() ? $inscription->getTrainee()->getInstitution()->getName() : '',
-                        'stagiaire.service' => $inscription->getTrainee()->getService(),
-                        'stagiaire.corps' => $inscription->getTrainee()->getCorps(),
-                        'stagiaire.bap' => $inscription->getTrainee()->getBap(),
-                        'stagiaire.fonction' => $inscription->getTrainee()->getFonction(),
-                        'statutInscription' => $inscription->getInscriptionStatus()->getName(),
-                        'statutPresence' => $inscription->getPresenceStatus()->getName(),
-                        'refus' => $inscription->getRefuse(),
-                        'motivation' => $inscription->getMotivation(),
+                foreach ($entity->getDates() as $dateSess) {
+                    $lines[$i]['dates'][] = [
+                        'dateDebut' => $dateSess->getDatebegin()?->format('d/m/Y') ?? '',
+                        'dateFin' => $dateSess->getDateend()?->format('d/m/Y') ?? '',
+                        'horairesMatin' => $dateSess->getSchedulemorn(),
+                        'horairesAprem' => $dateSess->getScheduleafter(),
+                        'nbHeuresMatin' => $dateSess->getHournumbermorn(),
+                        'nbHeuresAprem' => $dateSess->getHournumberafter(),
+                        'lieu' => $dateSess->getPlace(),
                     ];
                 }
 
-                usort($lines[0]['inscriptions'], static fn($a, $b): int => strcasecmp((string)$a['nom'], (string)$b['nom']));
-                ++$i;
+                foreach ($entity->getInscriptions() as $inscription) {
+                    $trainee = $inscription->getTrainee();
+                    $lines[$i]['inscriptions'][] = [
+                        'stagiaire.nom' => $trainee?->getLastname(),
+                        'stagiaire.prenom' => $trainee?->getFirstname(),
+                        'fullname' => $trainee?->getFullName(),
+                        'stagiaire.mail' => $trainee?->getEmail(),
+                        'stagiaire.unite' => $trainee?->getInstitution()?->getName() ?? '',
+                        'stagiaire.service' => $trainee?->getService(),
+                        'stagiaire.corps' => $trainee?->getCorps(),
+                        'stagiaire.bap' => $trainee?->getBap(),
+                        'stagiaire.fonction' => $trainee?->getFonction(),
+                        'stagiaire.civilite' => $trainee?->getTitle()?->getName() ?? '',
+
+                        'statutInscription' => $inscription->getInscriptionStatus()?->getName() ?? '',
+                        'statutPresence' => $inscription->getPresenceStatus()?->getName() ?? '',
+                        'motivation' => $inscription->getMotivation(),
+                        'refus' => $inscription->getRefuse(),
+                    ];
+                }
+
+                usort($lines[$i]['inscriptions'], static fn ($a, $b): int => strcasecmp($a['stagiaire.nom'], $b['stagiaire.nom']));
             }
+
             $dataRes['lines'] = $lines;
         } else {
             $dataRes['lines'] = [];
@@ -854,4 +880,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
         return $dataRes;
     }
+
+
 }

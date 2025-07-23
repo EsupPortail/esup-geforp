@@ -219,6 +219,28 @@ class Session extends AbstractSession
         $this->taking = $taking;
     }
 
+    public function getDatesString(): string
+    {
+        if ($this->dates->isEmpty()) {
+            return '';
+        }
+
+        $formattedDates = [];
+
+        foreach ($this->dates as $date) {
+            $start = $date->getDatebegin()?->format('d/m/Y');
+            $end = $date->getDateend()?->format('d/m/Y');
+
+            if ($start && $end) {
+                $formattedDates[] = "du $start au $end";
+            } elseif ($start) {
+                $formattedDates[] = $start;
+            }
+        }
+
+        return implode(', ', $formattedDates);
+    }
+
     /**
      * @return ArrayCollection|Collection
      */

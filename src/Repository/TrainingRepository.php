@@ -76,7 +76,7 @@ final class TrainingRepository extends ServiceEntityRepository
             }
 
             // FILTRE SEMESTRE
-            if( isset($filters['semester']) ) {
+            if( isset($filters['semester']) && isset($filters['year']) ) {
                 $sessionDate = new \DateTime($filters['year']);
                 $month = (int) $sessionDate->format('m');
 
@@ -179,6 +179,17 @@ final class TrainingRepository extends ServiceEntityRepository
 
             // Tentative de récupération de la prochaine session
             $nextSession = $training->getNextsession();
+            $year = null;
+            $semester = null;
+
+            if ($nextSession) {
+                if (method_exists($nextSession, 'getYear') && $nextSession->getYear()) {
+                    $year = $nextSession->getYear();
+                }
+                if (method_exists($nextSession, 'getSemesterLabel')) {
+                    $semester = $nextSession->getSemesterLabel();
+                }
+            }
 
             // Si elle existe, on récupère le semestre depuis cette session
 
@@ -195,7 +206,7 @@ final class TrainingRepository extends ServiceEntityRepository
                     'numberofregistrations' => $session->getNumberofregistrations(),
                     'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
                     'maximumnumberofregistrations' => $session->getMaximumnumberofregistrations(),
-                    'numberofparticipants' => $session->getParticipations(),
+                    'numberofparticipants' => count($session->getParticipations()),
                 ];
             }
 
@@ -258,7 +269,7 @@ final class TrainingRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('training');
         $qb
-            ->select('training')
+            ->select('COUNT(DISTINCT training.id)')
 
             // FILTRE KEYWORD
             ->where('training.name LIKE :keyword')
@@ -291,11 +302,7 @@ final class TrainingRepository extends ServiceEntityRepository
             if (isset($aggs['year'])) {
                 $qb
                     ->andWhere('YEAR(s.datebegin) = :year')
-                    ->setParameter('year', $name);
-            } elseif (isset($query_filters['year'])) {
-                $qb
-                    ->andWhere('YEAR(s.datebegin) in (:years)')
-                    ->setParameter('years', $query_filters['year']);
+                    ->setParameter('year', $aggs['year']);
             }
 
             // FILTRE SEMESTRE
@@ -369,9 +376,7 @@ final class TrainingRepository extends ServiceEntityRepository
         }
 
         // On compte le nb de sessions en résultat
-        $paginator = new Paginator($qb->getQuery());
-
-        return count($paginator);
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
 }

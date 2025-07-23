@@ -9,6 +9,6 @@ final class SemesteredTrainingConvertTypeBatchOperation extends BaseConvertTypeB
 {
     protected function getObjectList($idList = []): array
     {
-        return SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager());
+        return SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager(), excludedTypes: []);
     }
 }

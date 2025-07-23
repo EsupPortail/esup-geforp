@@ -71,8 +71,6 @@ final class HumanReadablePropertyAccessorFactory
      */
     public function getEntityAlias($class = null): void
     {
-        if (!isset($this->termCatalog[$this->getClassName($class)]['alias'])) {
-        }
     }
 
     /**
@@ -82,7 +80,7 @@ final class HumanReadablePropertyAccessorFactory
      *
      * @return array
      */
-    public function getKnownEntities($includeExcludedEntities = true)
+    public function getKnownEntities(bool $includeExcludedEntities = true): array
     {
         $entityTypes = [];
         foreach ($this->termCatalog as $entity) {
@@ -113,7 +111,7 @@ final class HumanReadablePropertyAccessorFactory
      *
      * @return bool
      */
-    public function hasEntry($className)
+    public function hasEntry(string $className): bool
     {
         $class = $this->getClassName($className);
 
@@ -144,15 +142,15 @@ final class HumanReadablePropertyAccessorFactory
     public function getMailPath($class): ?string
     {
         $class = $this->getClassName($class);
-        if (isset($this->termCatalog[$class]) && isset($this->termCatalog[$class]['emailPath'])) {
+        if (isset($this->termCatalog[$class]['emailPath'])) {
             return $this->termCatalog[$class]['emailPath'];
         }
         $parentClass = get_parent_class($class);
-        if (isset($this->termCatalog[$parentClass]) && isset($this->termCatalog[$parentClass]['emailPath'])) {
+        if ($parentClass && isset($this->termCatalog[$parentClass]['emailPath'])) {
             return $this->termCatalog[$parentClass]['emailPath'];
         }
 
-        return $this->getMailPath($class);
+        return null;
     }
 
     /**
@@ -165,11 +163,16 @@ final class HumanReadablePropertyAccessorFactory
     public function getPropertyForAlias($class, $alias): ?string
     {
         $class = $this->getClassName($class);
-        if (isset($this->termCatalog[$class]) && isset($this->termCatalog[$class]['fields'][$alias])) {
+        if (isset($this->termCatalog[$class]['fields'][$alias])) {
             return $this->termCatalog[$class]['fields'][$alias]['property'];
         }
 
-        return $this->getPropertyForAlias($class, $alias);
+        $parentClass = get_parent_class($class);
+        if ($parentClass && isset($this->termCatalog[$parentClass]['fields'][$alias])) {
+            return $this->termCatalog[$parentClass]['fields'][$alias]['property'];
+        }
+
+        return null;
     }
 
     /**
@@ -182,14 +185,12 @@ final class HumanReadablePropertyAccessorFactory
     public function getFormatForAlias($class, $alias): ?string
     {
         $class = $this->getClassName($class);
-        if (isset($this->termCatalog[$class]) &&
-            isset($this->termCatalog[$class]['fields'][$alias]) &&
-            isset($this->termCatalog[$class]['fields'][$alias]['format'])
+        if (isset($this->termCatalog[$class]['fields'][$alias]['format'])
         ) {
             return $this->termCatalog[$class]['fields'][$alias]['format'];
         }
 
-        return $this->getFormatForAlias($class, $alias);
+        return null;
     }
 
     /**
@@ -211,7 +212,7 @@ final class HumanReadablePropertyAccessorFactory
         if (!isset($this->termCatalog[$class]['fields'][$alias]['type'])) {
             return null;
         }
-        return $this->termCatalog[$class]['fields'][$alias]['type'];
+        return null;
     }
 
     /**
@@ -221,7 +222,7 @@ final class HumanReadablePropertyAccessorFactory
      *
      * @return string
      */
-    private function getClassName($className)
+    private function getClassName($className): string
     {
         try {
             $absClassName = $this->objectManager->getClassMetadata($className)->getName();

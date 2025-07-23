@@ -12,7 +12,7 @@ interface VocabularyInterface
     /**
      * @var int
      */
-    public const VOCABULARY_NATIONAL = 1;
+    public const VOCABULARY_NATIONAL = 0;
 
     /**
      * @var int

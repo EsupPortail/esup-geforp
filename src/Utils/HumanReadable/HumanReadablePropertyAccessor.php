@@ -19,6 +19,14 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 final class HumanReadablePropertyAccessor implements \Stringable
 {
+    /**
+     * @var ArrayCollection|mixed|string|null
+     */
+    public mixed $emailCorr;
+    /**
+     * @var ArrayCollection|mixed|string|null
+     */
+    public mixed $emailSup;
     /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
     private HumanReadablePropertyAccessorFactory $accessorFactory;
 
@@ -116,7 +124,11 @@ final class HumanReadablePropertyAccessor implements \Stringable
                 //trying to get property for path suffix
                 try {
                     $accessor = PropertyAccess::createPropertyAccessor();
+                    if (empty($path)) {
+                        return null;
+                    }
                     $value = $accessor->getValue($this->object, $path);
+
 
                 }
                 catch (NoSuchPropertyException|UnexpectedTypeException) {
@@ -170,8 +182,12 @@ final class HumanReadablePropertyAccessor implements \Stringable
      */
     public function __isset($name)
     {
-        //@todo hm: refine this
-        return true;
+        try {
+            $this->__get($name);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**

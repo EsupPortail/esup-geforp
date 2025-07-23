@@ -97,12 +97,12 @@ final class BatchOperationRegistry
         ++$i;
 
         // operation batch : publipostage semestered_training
-      //  $mailingBatchTraining = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $humanReadablePropertyAccessorFactory, $managerRegistry);
-      //  $mailingBatchTraining->setDoctrine($managerRegistry);
-       // $mailingBatchTraining->setTargetClass(\App\Entity\Core\AbstractTraining::class);
-      //  $mailingBatchTraining->setOptions($confMail['training']);
-      //  $this->addBatchOperation($mailingBatchTraining, $i);
-     //   ++$i;
+        $mailingBatchTraining = new MailingBatchOperation($security, $parameterBag, $vocabularyRegistry, $humanReadablePropertyAccessorFactory, $managerRegistry);
+        $mailingBatchTraining->setDoctrine($managerRegistry);
+        $mailingBatchTraining->setTargetClass(\App\Entity\Core\AbstractTraining::class);
+        $mailingBatchTraining->setOptions($confMail['training']);
+        $this->addBatchOperation($mailingBatchTraining, $i);
+        ++$i;
 
         // operation batch : changement de statut d'inscription
         $inscriptionStatusChangeBatchOperation = new InscriptionStatusChangeBatchOperation($security, $vocabularyRegistry, $emailingBatchOperation, $mailingBatchInscription);
@@ -233,17 +233,17 @@ final class BatchOperationRegistry
             'sygefor_core.batch.publipost.trainee' => 3,
             'sygefor_core.batch.publipost.trainer' => 4,
             'sygefor_core.batch.publipost.inscription' => 5,
-            //'sygefor_core.batch.publipost.semestered_training' => 6,
-            'sygefor_inscription.batch.inscription_status_change' => 6,
-            'sygefor_core.batch.csv.session' => 7,
-            'sygefor_core.batch.csv.semestered_training' => 8,
-            'sygefor_core.batch.csv.inscription' => 9,
-            'sygefor_core.batch.csv.trainee' => 10,
-            'sygefor_core.batch.csv.institution' => 11,
-            'sygefor_core.batch.csv.trainer' => 12,
-            'sygefor_core.batch.pdf.inscription.attestation' => 13,
-            'sygefor_training.batch.session_registration_change' => 14,
-            'sygefor_core.batch.pdf.training' => 15,
+            'sygefor_core.batch.publipost.semestered_training' => 6,
+            'sygefor_inscription.batch.inscription_status_change' => 7,
+            'sygefor_core.batch.csv.session' => 8,
+            'sygefor_core.batch.csv.semestered_training' => 9,
+            'sygefor_core.batch.csv.inscription' => 10,
+            'sygefor_core.batch.csv.trainee' => 11,
+            'sygefor_core.batch.csv.institution' => 12,
+            'sygefor_core.batch.csv.trainer' => 13,
+            'sygefor_core.batch.pdf.inscription.attestation' => 14,
+            'sygefor_training.batch.session_registration_change' => 15,
+            'sygefor_core.batch.pdf.training' => 16,
         ];
 
             if (isset($map[$servicename]) && isset($this->operations[$map[$servicename]])) {

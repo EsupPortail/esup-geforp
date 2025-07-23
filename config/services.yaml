@@ -177,10 +177,9 @@ parameters:
                     dif: { label: "CPF", type: "boolean" }
             institution:
                 class: 'App\Entity\Core\AbstractInstitution'
-                filename: 'unite.csv'
+                filename: 'test.csv'
                 fields:
                     name: "Nom"
-                    organization.name: "Centre"
                     createdAt: { label: "Date de création", type: "date" }
                     address: "Adresse"
                     zip: "Code postal"
@@ -211,7 +210,7 @@ parameters:
                     presences: { property: presences }
                     statutInscription: { property: inscriptionstatus.name }
                     statutPresence: { property: presencestatus.name }
-                    dates: { property: session.dates }
+                    dates: { property: session.datesString }
                     dateDebut: { property: session.dateDebut }
                     domaine: { property: session.formation.theme }
                     typeAction: { property: actiontype }
@@ -283,7 +282,7 @@ parameters:
                     id: { property: "id" }
                     dateDebut: { property: "datebegin", type: "date" }
                     dateFin: { property: "dateend", type: "date" }
-                    dates: { property: "dates" }
+                    dates: { property: "datesString" }
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
@@ -341,7 +340,7 @@ parameters:
                     id: { property: id }
                     formateur: { property: trainer }
                     session: { property: session }
-                    dates: { property: session.dates }
+                    dates: { property: session.datesString }
             internship:
                 class: 'App\Entity\Back\Internship'
                 parent: training

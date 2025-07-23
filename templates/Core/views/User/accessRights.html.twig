@@ -17,7 +17,7 @@
         <div class="panel-body">
         <div class="row">
             <div class="col-xs-12">
-                {{ form_widget(right) }}
+                {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
             </div>
         </div>
     {% elseif right.vars.value == 2 %}
@@ -28,7 +28,7 @@
     <div class="panel-body">
     <div class="row">
         <div class="col-xs-12">
-            {{ form_widget(right) }}
+            {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
         </div>
     </div>
     {% elseif right.vars.value == 5 %}
@@ -39,7 +39,7 @@
     <div class="panel-body">
     <div class="row">
         <div class="col-xs-12">
-            {{ form_widget(right) }}
+            {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
         </div>
     </div>
     {% elseif right.vars.value == 13 %}
@@ -50,7 +50,7 @@
     <div class="panel-body">
     <div class="row">
         <div class="col-xs-12">
-            {{ form_widget(right) }}
+            {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
         </div>
     </div>
     {% elseif right.vars.value == 21 %}
@@ -61,7 +61,7 @@
     <div class="panel-body">
     <div class="row">
         <div class="col-xs-12">
-            {{ form_widget(right) }}
+            {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
         </div>
     </div>
     {% elseif right.vars.value == 29 %}
@@ -72,13 +72,13 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-xs-12">
-                        {{ form_widget(right) }}
+                        {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
                     </div>
                 </div>
                 {% else %}
                     <div class="row">
                         <div class="col-xs-12">
-                            {{ form_widget(right) }}
+                            {{ form_widget(right, {'attr': {'name': form.accessRights.vars.full_name ~ '[]'}}) }}
                         </div>
                     </div>
                 {% endif %}

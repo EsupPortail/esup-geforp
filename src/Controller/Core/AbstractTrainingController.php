@@ -56,13 +56,13 @@ abstract class AbstractTrainingController extends AbstractController
     #[Route(path: '/search', name: 'training.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('filters');
-        $query_filters = $request->request->all('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->all('aggs', 'NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->all('sorts', 'NO SORTS');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters') ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ?: [];
 
 
         // security check : training : 'sygefor_training.rights.inscription.all.view' -> id=9

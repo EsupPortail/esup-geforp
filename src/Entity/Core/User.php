@@ -59,7 +59,7 @@ class User implements UserInterface
      * @var string
      */
     #[ORM\Column(name: 'access_rights', type: 'simple_array', nullable: true)]
-    protected string|array $accessRights;
+    protected array $accessRights = [];
 
     /**
      * Constructor.
@@ -201,12 +201,12 @@ class User implements UserInterface
 
     public function getAccessRights(): array
     {
-        return is_array($this->accessRights) ? $this->accessRights : explode(',', (string) $this->accessRights);
+        return $this->accessRights;
     }
 
     public function setAccessRights(array  $accessRights): void
     {
-        $this->accessRights = implode(',', $accessRights);
+        $this->accessRights = $accessRights;
     }
 
     public function isAdmin(): bool

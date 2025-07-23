@@ -2,6 +2,7 @@
 
 namespace App\EventListener;
 
+use Doctrine\ORM\Event\PostPersistEventArgs;
 use Doctrine\ORM\Events;
 use Doctrine\Common\EventSubscriber;
 use Doctrine\ORM\Event\LifecycleEventArgs;
@@ -37,19 +38,19 @@ final class PasswordEncoderSubscriber implements EventSubscriber
         return [Events::prePersist, Events::preUpdate];
     }
 
-    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
+    public function prePersist(PostPersistEventArgs $args): void
     {
-        $this->preUpdate($lifecycleEventArgs);
+        $this->preUpdate($args);
     }
 
-    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
+    public function preUpdate(PostPersistEventArgs $args): void
     {
-        $object = $lifecycleEventArgs->getObject();
+        $object = $args->getObject();
         if (!($object instanceof UserInterface)) {
             return;
         }
 
-        $plainPassword = $object->getPlainPassword();
+        $plainPassword = $object->getPassword();
         if (!empty($plainPassword)) {
             $encoder = $this->encoderFactory->getEncoder($object);
             $object->setPassword($encoder->encodePassword($plainPassword, $object->getSalt()));

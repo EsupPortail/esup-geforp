@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 
+use AllowDynamicProperties;
 use App\AccessRight\SerializedAccessRights;
 use App\Entity\Back\Organization;
 use App\Entity\Core\AbstractOrganization;
@@ -12,6 +13,7 @@ use App\Form\Type\BaseInstitutionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -21,7 +23,7 @@ use App\Entity\Term\AbstractTerm;
  * Institution.
  *
  */
-#[ORM\Table(name: 'institution')]
+#[AllowDynamicProperties] #[ORM\Table(name: 'institution')]
 #[ORM\Entity]
 #[ORM\InheritanceType('SINGLE_TABLE')]
 #[ORM\MappedSuperclass]
@@ -67,7 +69,6 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     {
         $this->domains = new ArrayCollection();
         $this->visuinstitutions = new ArrayCollection();
-        $this->organizations = new ArrayCollection();
     }
 
     /**

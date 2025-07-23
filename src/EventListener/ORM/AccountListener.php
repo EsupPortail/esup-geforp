@@ -2,12 +2,14 @@
 
 namespace App\EventListener\ORM;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Events;
-use Html2Text\Html2Text;
 use App\Entity\Core\AbstractTrainee;
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\Common\EventSubscriber;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Mime\Address;
+use Twig\Environment;
+use Html2Text\Html2Text;
 
 /**
  * This listener :
@@ -17,7 +19,11 @@ use Symfony\Component\DependencyInjection\Container;
  */
 final class AccountListener implements EventSubscriber
 {
-    public function __construct(protected Container $container)
+    public function __construct(private readonly MailerInterface $mailer,
+                                private readonly Environment $twig,
+                                private readonly UrlGeneratorInterface $router,
+                                private readonly string $frontUrl,
+                                private readonly string $mailerFrom)
     {
     }
 
@@ -67,95 +73,91 @@ final class AccountListener implements EventSubscriber
     /**
      * prePersist.
      */
-    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
-    {
-        $this->preProcess($lifecycleEventArgs->getEntity(), true);
-    }
+
 
     /**
      * preUpdate.
      */
-    public function preUpdate(LifecycleEventArgs $lifecycleEventArgs): void
-    {
-        $this->preProcess($lifecycleEventArgs->getEntity(), false);
-    }
+
 
     /**
      * postPersist.
      */
-    public function postPersist(LifecycleEventArgs $lifecycleEventArgs): void
-    {
-        $this->postProcess($lifecycleEventArgs->getEntity(), true);
-    }
+
 
     /**
      * postUpdate.
      */
-    public function postUpdate(LifecycleEventArgs $lifecycleEventArgs): void
-    {
-        $this->postProcess($lifecycleEventArgs->getEntity(), false);
-    }
+
 
     /**
      * sendMail.
      */
-    private function sendCredentialsMail(AbstractTrainee $trainee, $new): void
+    public function sendCredentialsMail(AbstractTrainee $trainee, bool $new): void
     {
-        // prepare the body
-        $parameters = ['trainee' => $trainee, 'password' => $trainee->getPlainPassword(), 'new' => $new, 'url' => $this->container->getParameter('front_url')];
+        $template = $trainee->getShibbolethpersistentid()
+            ? 'trainee/welcome.shibboleth.html.twig'
+            : 'trainee/welcome.html.twig';
 
-        $template = 'welcome.html.twig';
-        if ($trainee->getShibbolethpersistentid()) {
-            // if shibboleth, send special message
-            $template = 'welcome.shibboleth.html.twig';
-        }
+        $params = [
+            'trainee' => $trainee,
+            'password' => $trainee->getPlainPassword(),
+            'new' => $new,
+            'url' => $this->frontUrl,
+        ];
 
-        $body = $this->container->get('templating')->render('trainee/'.$template, $parameters);
+        $htmlBody = $this->twig->render($template, $params);
+        $textBody = (new Html2Text($htmlBody))->getText();
 
-        // send the mail
-        $message = \Swift_Message::newInstance(null, null, 'text/html', null)
-          ->setFrom($this->container->getParameter('mailer_from'), $trainee->getOrganization()->getName())
-          ->setReplyTo($trainee->getOrganization()->getEmail())
-          ->setSubject('Bienvenue sur la plateforme SYGEFOR !')
-          ->setTo($trainee->getEmail())
-          ->setBody($body);
-        $message->addPart(Html2Text::convert($message->getBody()), 'text/plain');
-        $this->container->get('mailer')->send($message);
+        $email = (new Email())
+            ->from(new Address($this->mailerFrom, $trainee->getOrganization()->getName()))
+            ->replyTo($trainee->getOrganization()->getEmail())
+            ->to($trainee->getEmail())
+            ->subject('Bienvenue sur la plateforme SYGEFOR !')
+            ->text($textBody)
+            ->html($htmlBody);
+
+        $this->mailer->send($email);
         $trainee->setSendCredentialsMail(false);
     }
 
     /**
      * sendMail.
      */
-    private function sendActivationMail(AbstractTrainee $trainee, $new): void
+    public function sendActivationMail(AbstractTrainee $trainee, bool $new): void
     {
         $options = $trainee->getSendActivationMail();
 
-        // generate token & url
-        $token = hash('sha256', $trainee->getId());
-        $params = ['id' => $trainee->getId(), 'token' => $token, 'email' => $trainee->getEmail()];
+        $params = [
+            'id' => $trainee->getId(),
+            'token' => hash('sha256', $trainee->getId()),
+            'email' => $trainee->getEmail(),
+        ];
+
         if (!empty($options['redirect'])) {
             $params['redirect'] = $options['redirect'];
         }
 
-        $url = $this->container->get('router')->generate('api.account.activate', $params, true);
+        $url = $this->router->generate('api.account.activate', $params, UrlGeneratorInterface::ABSOLUTE_URL);
 
-        // prepare the body
-        $parameters = ['trainee' => $trainee, 'new' => $new, 'url' => $url];
+        $templateVars = [
+            'trainee' => $trainee,
+            'new' => $new,
+            'url' => $url,
+        ];
 
-        // generate body
-        $body = $this->container->get('templating')->render('trainee/activation.html.twig', $parameters);
+        $htmlBody = $this->twig->render('trainee/activation.html.twig', $templateVars);
+        $textBody = (new Html2Text($htmlBody))->getText();
 
-        // send the mail
-        $message = \Swift_Message::newInstance(null, null, 'text/html', null)
-          ->setFrom($this->container->getParameter('mailer_from'), $trainee->getOrganization()->getName())
-          ->setReplyTo($trainee->getOrganization()->getEmail())
-          ->setSubject('SYGEFOR : Activation de votre compte')
-          ->setTo($trainee->getEmail())
-          ->setBody($body);
-        $message->addPart(Html2Text::convert($message->getBody()), 'text/plain');
+        $email = (new Email())
+            ->from(new Address($this->mailerFrom, $trainee->getOrganization()->getName()))
+            ->replyTo($trainee->getOrganization()->getEmail())
+            ->to($trainee->getEmail())
+            ->subject('SYGEFOR : Activation de votre compte')
+            ->text($textBody)
+            ->html($htmlBody);
 
-        $this->container->get('mailer')->send($message);
+        $this->mailer->send($email);
         $trainee->setSendActivationMail(false);
     }
 }

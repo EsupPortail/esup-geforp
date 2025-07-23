@@ -29,26 +29,28 @@ final class PublipostTemplateVocabularyType extends AbstractType
      * Construit le formulaire.
      *
      */
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($formBuilder, $options);
-
+        $builder->add('name', null, [
+            'label' => 'Nom',
+            'required' => true,
+        ]);
         // Construction du tableau d'options de l'entité
         $tab = array_flip($this->humanReadablePropertyAccessorFactory->getKnownEntities(false));
 
         // Ajout du champ 'entity'
-        $formBuilder->add('entity', ChoiceType::class, ['label' => 'Entité associée', 'choices' => $tab]);
+        $builder->add('entity', ChoiceType::class, ['label' => 'Entité associée', 'choices' => $tab]);
 
         // Ajout du champ 'file'
-        $formBuilder->add('file', FileType::class, ['label' => 'Fichier du modèle', 'block_name' => 'updatable_file']);
+        $builder->add('file', FileType::class, ['label' => 'Fichier du modèle', 'block_name' => 'updatable_file', 'required' => true]);
     }
 
     /**
      * Configure les options du formulaire.
      *
      */
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['data_class' => Publiposttemplate::class]);
+        $resolver->setDefaults(['data_class' => Publiposttemplate::class]);
     }
 }

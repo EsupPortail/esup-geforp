@@ -3,6 +3,7 @@
 namespace App\Form\DataTransformer;
 
 use App\Entity\AccessRight;
+use App\Entity\Core\User;
 use App\Form\Type\AccessRightType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -10,7 +11,7 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 
 class AccessRightToEntityTransformer implements DataTransformerInterface
 {
-    public function __construct(private EntityManagerInterface $em) {}
+    public function __construct(private readonly EntityManagerInterface $em) {}
 
     public function transform($value): array
     {
@@ -31,7 +32,7 @@ class AccessRightToEntityTransformer implements DataTransformerInterface
 
         $accessRights = [];
         foreach ($value as $id) {
-            $right = $this->em->getRepository(AccessRightType::class)->find($id);
+            $right = $this->em->getRepository(User::class)->find($id);
             if (!$right) {
                 throw new TransformationFailedException(sprintf('Le droit [%s] est introuvable.', $id));
             }

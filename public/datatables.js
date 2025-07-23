@@ -666,7 +666,7 @@
 				.row( nTr )
 				.child( mHtml, sClass )
 				.show()
-				.child()[0];
+                .child()[0];
 		};
 		
 		

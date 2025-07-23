@@ -20,6 +20,8 @@ final class SemesteredTrainingCSVBatchOperation extends BaseCSVBatchOperation
      */
     protected function getObjectList($idList): array
     {
-        return SemesteredTraining::getSemesteredTrainingsByIds($idList, $this->doctrine->getManager());
+        $em = $this->doctrine->getManager();
+
+        return SemesteredTraining::getSemesteredTrainingsByIds($idList, $em);
     }
 }

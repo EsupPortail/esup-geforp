@@ -35,16 +35,16 @@ final class EmailTemplateVocabularyType extends VocabularyType
     {
     }
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        parent::buildForm($formBuilder, $options);
+        parent::buildForm($builder, $options);
 /*        $ccResolvers = $this->ccRegistry->getSupportedResolvers();
         $choices = array();
         foreach ($ccResolvers as $ccResolver) {
             $choices[] = $ccResolver['name'];
         }*/
 
-        $formBuilder
+        $builder
             ->add('subject', TextType::class, ['label' => 'Sujet'])
 /*            ->add('cc', ChoiceType::class, array(
                 'label' => 'CC',
@@ -80,6 +80,16 @@ final class EmailTemplateVocabularyType extends VocabularyType
                 ->where('p.organization = :orgId')
                 ->orWhere('p.organization is null')
                 ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId()), 'required' => false])
+            ->add('cc', ChoiceType::class, [
+                'label' => 'Envoyer une copie au N+1 et correspondant formation ',
+                'choices' => [
+                    'NON' => 0,
+                    'OUI' => 1,
+                ],
+                'expanded' => true,
+                'multiple' => true,
+                'required' => false,
+            ])
             ->add('private', CheckboxType::class, ['label' => 'Lien calendrier', 'required' => false])
             ->add('position', ChoiceType::class, ['label' => 'Format HTML', 'choices'  => [
                 'NON' => 0,
@@ -88,8 +98,8 @@ final class EmailTemplateVocabularyType extends VocabularyType
 
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['data_class' => Emailtemplate::class]);
+        $resolver->setDefaults(['data_class' => Emailtemplate::class]);
     }
 }

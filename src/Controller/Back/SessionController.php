@@ -94,7 +94,8 @@ use Symfony\Component\Form\FormError;
                      usort($datesEnd, static fn($a, $b): int => $a < $b ? -1 : 1);
 
                      // Renseigner le lieu
-                     $session->setPlace($session->getDates()[0]->getPlace());
+					if($session->getDates()[0]->getPlace() !==null)
+	                     $session->setPlace($session->getDates()[0]->getPlace());
 
                      // Renseigner le nombre d'heures
                      $session->setHournumber($hoursSum);

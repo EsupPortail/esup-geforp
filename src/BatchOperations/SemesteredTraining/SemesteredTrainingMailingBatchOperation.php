@@ -16,6 +16,8 @@ use App\Model\SemesteredTraining;
  */
 final class SemesteredTrainingMailingBatchOperation extends BaseMailingBatchOperation
 {
+    private $idList;
+
     /**
      * Getting objects list.
      *

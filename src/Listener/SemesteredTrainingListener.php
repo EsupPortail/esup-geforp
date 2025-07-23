@@ -26,7 +26,7 @@ final class SemesteredTrainingListener extends Listener
     /**
      * @var mixed[]|string[]
      */
-    public $scheduledForDeletion = [];
+    public array $scheduledForDeletion = [];
     public $scheduledForUpdate;
     public $scheduledForInsertion;
     /**
@@ -51,7 +51,7 @@ final class SemesteredTrainingListener extends Listener
      *
      * @return object Entity | Document
      */
-    private function getDoctrineObject(EventArgs $eventArgs)
+    private function getDoctrineObject(EventArgs $eventArgs): object
     {
         if (method_exists($eventArgs, 'getObject')) {
             return $eventArgs->getObject();

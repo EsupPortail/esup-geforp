@@ -27,6 +27,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
      */
     public function getInscriptionsList(string $keyword = '',
                                         array $filters = [],
+                                        string $formatCreatedAt = 'd-m-y H:i',
                                         int $page = 1,
                                         int $pageSize = 1,
                                         array $sorts = ['createdat' => 'DESC'],
@@ -199,7 +200,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
 
             $items[] = [
                 'id' => $insc->getId(),
-                'createdat' => $insc->getCreatedAt()?->format('d-m-y H:m'),
+                'createdat' => $insc->getCreatedAt()?->format($formatCreatedAt ),
                 'isPaying' => $insc?->getPrice(),
                 'presencestatus' => $insc->getPresencestatus(),
                 'inscriptionstatus' => $insc->getInscriptionstatus(),
@@ -275,6 +276,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             'currentPage' => $page,
             'totalPages' => ceil(count($paginator) / $pageSize),
             'items' => $items,
+            'agg' => [],
         ];
     }
 
@@ -292,7 +294,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
     }
 
 
-    public function getNbInscriptions($query_filters, $keyword, $aggs, $name): int
+    public function getNbInscriptions($query_filters, $keyword, $aggs, $name): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -310,10 +312,10 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
 
             // FILTRE KEYWORD
             ->where('
-                trainee.firstname LIKE :keyword OR 
-                trainee.lastname LIKE :keyword OR 
-                tr.name LIKE :keyword OR
-                tag.name LIKE :keyword
+                (trainee.firstname LIKE :keyword OR trainee.firstname IS NULL) OR 
+                (trainee.lastname LIKE :keyword OR trainee.lastname IS NULL) OR 
+                 (tr.name LIKE :keyword OR tr.name IS NULL) OR 
+                 (tag.name LIKE :keyword OR tag.name IS NULL)
             ')
             ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
@@ -368,6 +370,11 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
         // Autres filtres... (je garde la même logique que votre code original)
         // mais en utilisant les alias cohérents
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
+
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 }

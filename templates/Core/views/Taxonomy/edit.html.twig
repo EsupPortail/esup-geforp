@@ -23,7 +23,7 @@
 
 {% block subcontent %}
 
-    {{ form_start(form) }}
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
     {% for child in form.children %}
         {{ form_row(child) }}
     {% endfor %}

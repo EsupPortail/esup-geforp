@@ -16,8 +16,8 @@ class VocabularyType extends AbstractType
      * @var \Symfony\Component\Form\FormFactoryInterface
      */
     public $factory;
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formBuilder->add('name', null, ['label' => 'Nom']);
+        $builder->add('name', null, ['label' => 'Nom']);
     }
 }

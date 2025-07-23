@@ -42,7 +42,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
      *
      */
     #[Route(path: '/register', name: 'front.account.register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): array
     {
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
@@ -327,7 +327,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                     $em->flush();
                     $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
 
-                    return $this->render('Front/Account/profile/account-registration.html.twig');
+                    return [$this->render('Front/Account/profile/account-registration.html.twig')];
                 }
             }
         }

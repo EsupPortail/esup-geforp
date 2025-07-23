@@ -1,4 +1,5 @@
-{% extends "bootstrap_3_horizontal_layout.html.twig" %}
+
+{% extends "bootstrap_5_layout.html.twig" %}
 
 {% block form_row -%}
     {% set widget_form_group_attr = widget_form_group_attr|merge({class: (widget_form_group_attr.class|default('') ~ ' ' ~ block('form_group_container_class'))|trim}) %}
@@ -7,7 +8,6 @@
     <div class="{{ block('form_group_class') }}">
         {{- form_widget(form) -}}
         {{- form_errors(form) -}}
-    </div>
     </div>
 {%- endblock form_row %}
 
@@ -41,6 +41,6 @@
             <li><span class="glyphicon glyphicon-exclamation-sign"></span> {{ error.message }}</li>
         {%- endfor -%}
     </ul>
-        {% if form.parent %}</span>{% else %}</div>{% endif %}
+        {% if form.parent %}</div></span>{% else %}{% endif %}
     {%- endif %}
 {%- endblock form_errors %}

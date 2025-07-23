@@ -59,11 +59,11 @@ use App\Entity\Term\AbstractTerm;
 
 
     #[Route(path: '/{vocabularyId}/view/{organizationId}', name: 'taxonomy.view', defaults: ['organizationId' => null])]
-    public function viewVocabulary(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, int $vocabularyId, AbstractOrganization $organization = null, ?int $id = null): \Symfony\Component\HttpFoundation\Response
+    public function viewVocabulary(ManagerRegistry $managerRegistry, VocabularyRegistry $vocabularyRegistry, int $vocabularyId, ?int $organizationId = null): \Symfony\Component\HttpFoundation\Response
     {
-        $organization = $id ? $managerRegistry->getRepository(AbstractOrganization::class)->find($organization) : null;
-        if ($id && !$organization) {
-            throw new NotFoundHttpException();
+        $organization = null;
+        if ($organizationId !== null) {
+            $organization = $managerRegistry->getRepository(AbstractOrganization::class)->find($organizationId);
         }
         /** @var AbstractTerm $abstractVocabulary */
         $abstractVocabulary = $vocabularyRegistry->getVocabularyById($vocabularyId);

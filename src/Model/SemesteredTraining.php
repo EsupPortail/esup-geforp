@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query\Expr\Join;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use Doctrine\Persistence\ObjectManager;
 
 final class SemesteredTraining
 {
@@ -180,7 +181,7 @@ final class SemesteredTraining
             $year = $date->format('Y');
             $semester = ($date->format('m') <= 6) ? 1 : 2;
 
-            if ($year === $this->year && $semester === $this->semester) {
+            if ($year == $this->year && $semester === $this->semester) {
                 $tmpSessions[] = $session;
             }
         }
@@ -276,7 +277,7 @@ final class SemesteredTraining
      *
      * @param array $excludedTypes
      */
-    public static function getTrainingsByIds(array $idList, EntityManager $entityManager, array $excludedTypes): array
+    public static function getTrainingsByIds(array $idList, ObjectManager $entityManager, array $excludedTypes): array
     {
         $arrayIds = [];
         foreach ($idList as $semesteredTrainingId) {
@@ -304,7 +305,7 @@ final class SemesteredTraining
      *
      * @return SemesteredTraining[]
      */
-    public static function getSemesteredTrainingsByIds(array $idList, EntityManager $entityManager): array
+    public static function getSemesteredTrainingsByIds(array $idList, ObjectManager $entityManager): array
     {
         //building DQL query to get needed sessions objects
         $queryBuilder = $entityManager->createQueryBuilder()

@@ -44,6 +44,11 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     #[ORM\ManyToMany(targetEntity: 'PublipostTemplate')]
     protected \Doctrine\Common\Collections\Collection $attachmentTemplates;
 
+    public function __construct()
+    {
+        $this->attachmentTemplates = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
     /**
      * @param ArrayCollection $attachmentTemplates
      */
@@ -157,9 +162,5 @@ class Emailtemplate extends AbstractTerm implements VocabularyInterface
     public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
-    }
-    public function __construct()
-    {
-        $this->attachmentTemplates = new \Doctrine\Common\Collections\ArrayCollection();
     }
 }

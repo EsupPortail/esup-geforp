@@ -1,44 +1,80 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: erwan
- * Date: 8/8/17
- * Time: 12:47 PM.
- */
 
 namespace App\BatchOperations;
 
+use Psr\Container\ContainerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\Email;
+
 /**
- * Class AttachEmailPublipostAttachment.
+ * Trait AttachEmailPublipostAttachment.
  */
 trait AttachEmailPublipostAttachment
 {
-    /**
-     * @param $message
-     * @param $publipostTemplates
-     * @param array $publipostIdList
-     */
-    protected function attachPublipostAttachment(\Swift_Message $swiftMessage, $publipostTemplates, $publipostIdList)
-    {
-        foreach ($publipostTemplates as $publipostTemplate) {
-            // find specific publipost service suffix
-            $entityType = $publipostTemplate->getEntity();
-            $entityType = explode('\\', (string) $entityType);
-            $entityType = $entityType[count($entityType) - 1];
-            $serviceSuffix = strtolower($entityType);
+    private ?ContainerInterface $container = null;
 
-            // call publipost action and generate pdf
-            $publipostService = $this->container->get('sygefor_core.batch.publipost.'.$serviceSuffix);
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
+    protected function attachPublipostAttachment(Email $email, $publipostTemplates, array $publipostIdList, array $uploadedFiles = []): void
+    {
+        $this->attachUploadedFiles($email, $uploadedFiles);
+        foreach ($publipostTemplates as $publipostTemplate) {
+            $entityType = (string) $publipostTemplate->getEntity();
+            $entityType = strtolower((new \ReflectionClass($entityType))->getShortName());
+            $serviceId = 'sygefor_core.batch.publipost.' . $entityType;
+
+            if (!$this->container->has($serviceId)) {
+                continue;
+            }
+
+            $publipostService = $this->container->get($serviceId);
             $publipostOptions = ['template' => $publipostTemplate->getId()];
             $file = $publipostService->execute($publipostIdList, $publipostOptions);
-            $fileName = $file['fileUrl'];
-            $fileName = $publipostService->getTempDir().$publipostService->toPdf($fileName);
 
-            // attach pdf to mail
-            if (file_exists($fileName)) {
-                $publipostSwiftAttachment = new \Swift_Attachment(file_get_contents($fileName), $publipostTemplate->getName().'.pdf');
-                $swiftMessage->attach($publipostSwiftAttachment);
+            if (empty($file['fileUrl'])) {
+                // fichier non généré
+                continue;
+            }
+
+            // Génère le PDF (chemin relatif)
+            $relativePdfPath = $publipostService->toPdf($file['fileUrl']);
+            if (!$relativePdfPath) {
+                // PDF non généré
+                continue;
+            }
+
+            // Assemble le chemin complet
+            $tempDir = rtrim($publipostService->getTempDir(), '/\\') . DIRECTORY_SEPARATOR;
+            $filePath = $tempDir . ltrim($relativePdfPath, '/\\');
+
+            if (!file_exists($filePath)) {
+                dump("Fichier non trouvé : $filePath");
+                continue;
+            } else {
+                dump("Attachement du fichier : $filePath");
+            }
+
+            // Nom de fichier sécurisé
+            $safeName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $publipostTemplate->getName()) . '.pdf';
+
+            // Attachement
+            $email->attachFromPath($filePath, $safeName, 'application/pdf');
+
+            // DEBUG TEMP : à commenter ou logger avec monolog
+            // dump("Attaché : $filePath => $safeName");
+        }
+    }
+    protected function attachUploadedFiles(Email $email, array $uploadedFiles): void
+    {
+
+        foreach ($uploadedFiles as $file) {
+            if ($file instanceof UploadedFile && $file->isValid()) {
+                $email->attachFromPath($file->getPathname(), $file->getClientOriginalName(), $file->getMimeType());
             }
         }
     }
+
 }

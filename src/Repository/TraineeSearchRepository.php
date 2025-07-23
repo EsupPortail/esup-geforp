@@ -43,10 +43,9 @@ final class TraineeSearchRepository extends ServiceEntityRepository
     {
         // Mise en forme en cas de recherche nom + prénom
 
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée, à adapter selon mémoire/disque/dispo
+        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
         $MAX_PAGE_SIZE = 100; // Limite "normale" pour la navigation
 
-        // Cas normal (pagination UI) vs. export
         $isExport = isset($filters['_export']) && $filters['_export'] === true;
 
         $pageSize = max(1, (int) $pageSize);
@@ -64,7 +63,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
             $tabKey = explode(' ', $keyword, 2);
             if (count($tabKey) === 2) {
                 $qb->andWhere('(trainee.firstname LIKE :keyword AND trainee.lastname LIKE :keyword2)')
-                    ->setParameter('keyword1', '%' . addcslashes($tabKey[0], '%_') . '%')
+                    ->setParameter('keyword', '%' . addcslashes($tabKey[0], '%_') . '%')
                     ->setParameter('keyword2', '%' . addcslashes($tabKey[1], '%_') . '%');
             } else {
                 $qb->andWhere(
@@ -145,8 +144,9 @@ final class TraineeSearchRepository extends ServiceEntityRepository
                 'fullname' => $trainee->getFirstname() . ' ' . $trainee->getLastname(),
                 'institution' => $trainee->getInstitution(),
                 'title' => $trainee->getTitle(),
-                'createdat' => $trainee->getCreatedAt(),
+                'createdat' => $trainee->getCreatedAt()->format('Y-m-d'),
                 'publictype' => $trainee->getPublictype(),
+                'email' => $trainee->getEmail(),
             ];
         }
 

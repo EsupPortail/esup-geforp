@@ -163,7 +163,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     #[Groups(["training", "api"])]
     #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[Assert\NotNull]
-    protected int $firstsessionperiodsemester;
+    protected int $firstsessionperiodsemester = 1;
 
     /**
      *
@@ -172,7 +172,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     #[Groups(['training', 'api'])]
     #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
     #[Assert\NotNull]
-    protected ?int $firstsessionperiodyear = null;
+    protected ?int $firstsessionperiodyear;
 
     /**
      *

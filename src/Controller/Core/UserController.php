@@ -88,23 +88,17 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
      *
      * @Rest\View(serializerEnableMaxDepthChecks=true)
      *
-     * @return array
+     * @return User
      */
     #[Rest\View(serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/{id}', name: 'user.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function view(User $user, ManagerRegistry $managerRegistry, int $id): array
+    public function view(User $user, ManagerRegistry $managerRegistry, int $id): User
     {
         $user = $managerRegistry->getRepository(User::class)->find($id);
         if (!$user) {
             throw new AccessDeniedHttpException();
         }
-        return [
-            'id' => $user->getId(),
-            'username' => $user->getUserIdentifier(),
-            'email' => $user->getEmail(),
-            'lastLogin' => $user->getLastLoginFormatted(),
-            // autres champs si besoin
-        ];
+        return $user;
     }
 
     /**
@@ -154,7 +148,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
                 // Roles
                 $isAdmin = $form['isAdmin']->getData();
-                $roles = $isAdmin ? ['ROLE_ADMIN'] : [];
+                $roles = $isAdmin ? ['ROLE_ADMIN'] : ['a:0:{}'];
 
                 $user->setRoles($roles);
 
@@ -198,8 +192,12 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $keyword = $form['nom']->getData();
                 $filters['institution.name.source'] = $etab;
 
-                $resSearch = $traineeSearchRepository->getTraineesList((string) $keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, (array)self::FIELDS);
+                $resSearch = $traineeSearchRepository->getTraineesList($keyword = "", $filters, self::PAGE, self::PAGE_SIZE, self::SORT, (array)self::FIELDS);
                 $trainees = $resSearch['items'];
+
+                if (!is_string($keyword)) {
+                    return $keyword;
+                }
 
                 // Tableau pour test si trainee est deja gestionnaire
                 $tabTrainees = [];
@@ -207,9 +205,9 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 // On prepare la requete sur les utilisateurs
                 $em = $managerRegistry->getManager();
                 $repository = $em->getRepository(User::class);
-                foreach ($trainees as $trainee) {
-                    // On teste si le trainee est dejà gestionnaire
-                    $rUser = $repository->findOneBy(['email' => $trainee]);
+               foreach ($trainees as $trainee) {
+                   // On teste si le trainee est dejà gestionnaire
+                   $rUser = $repository->findOneBy(['email' => $trainee]);
                     $tabTrainees[] = $rUser ? 1 : 0;
                 }
 
@@ -299,43 +297,33 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
     }
 
     #[Route(path: '/{id}/access-rights', name: 'user.access_rights', requirements: ['id' => '\d+'], options: ['expose' => true])]
-    public function accessRights(Request $request, User $user, ManagerRegistry $managerRegistry, Security $security, int $id): \Symfony\Component\HttpFoundation\Response
+    public function accessRights(Request $request, User $user, ManagerRegistry $managerRegistry, Security $security, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $user = $managerRegistry->getRepository(User::class)->find($id);
 
         if (!$user) {
             throw new AccessDeniedHttpException();
         }
-        // Récupération et conversion des droits si nécessaire
-        $rights = $user->getAccessRights();
-        if (!empty($rights) && !is_object(reset($rights))) {
-            $accessRightRegistry = new AccessRightRegistry($security);
-            $newRights = [];
-
-            foreach ($rights as $right) {
-                $newRights[] = $accessRightRegistry->getByName($right);
-            }
-
-            $user->setAccessRights($newRights);
-        }
-
+        
         $formBuilder = $this->createFormBuilder($user);
         $formBuilder->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès']);
 
-        $form = $this->createFormBuilder($user)
-            ->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès'])
-            ->getForm();
-        $form->handleRequest($request);
+        $form = $formBuilder->getForm();
 
+        $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
+            $selectedRights = $user->getAccessRights();
+            if (!empty($selectedRights) && is_object(reset($selectedRights))) {
+                $user->setAccessRights(array_map(fn($right) => $right->getName(), $selectedRights));
+            }
             $managerRegistry->getManager()->flush();
-            $this->addFlash('success', "Les droits d'accès ont bien été enregistrés.");
+            $this->addFlash('success', "Les droits d'accès ont bien été enregistrés.");//'success', "Les droits d'accès ont bien été enregistrés.";
+
+            return $this->render('Core/views/User/accessRights.html.twig', ['form' => $form->createView(), 'user' => $user]);
         }
 
-        return $this->render('Core/views/User/accessRights.html.twig', [
-            'form' => $form->createView(),
-            'user' => $user,
-        ]);
+
+        return $this->render('Core/views/User/accessRights.html.twig', ['form' => $form->createView(), 'user' => $user]);
     }
 
     #[Route(path: '/{id}/remove', name: 'user.remove', requirements: ['id' => '\d+'])]

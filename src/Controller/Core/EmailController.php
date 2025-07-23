@@ -12,7 +12,7 @@ namespace App\Controller\Core;
 use App\Repository\EmailRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\Email;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -36,9 +36,9 @@ use Symfony\Component\HttpFoundation\Request;
     #[Route(path: '/search', name: 'email.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(Request $request, ManagerRegistry $managerRegistry, EmailRepository $emailRepository): array
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->all('NO FILTERS')?:[];
-        $request->request->get('query_filters', 'NO QUERY FILTERS');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters')?:[];
+        $request->request->all('query_filters' ?: []);
         $request->request->all('aggs') ?? [];
 
         // Recherche avec les filtres

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 
+use App\Entity\Back\Session;
 use App\Entity\Back\Trainee;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractSession;
@@ -27,10 +28,17 @@ readonly class TrainingBalanceSheet
     public function getCsvResponse(AbstractTraining $training): \Symfony\Component\HttpFoundation\Response
     {
         $sessions = $this->doctrine
-            ->getRepository(AbstractSession::class)
+            ->getRepository(Session::class)
             ->findBy(['training' => $training]);
 
         $participants = [];
+        $trainer = [];
+
+        foreach ($sessions as $session) {
+            foreach ($session->getTraining() as $summary) {
+                $trainer[] = $summary;
+            }
+        }
 
         foreach ($sessions as $session) {
             foreach ($session->getParticipantsSummaries() as $summary) {
@@ -38,21 +46,34 @@ readonly class TrainingBalanceSheet
             }
         }
 
-        $response = new StreamedResponse(function () use ($participants) {
+        $response = new StreamedResponse(function () use ($training, $participants, $sessions, $trainer) {
             $handle = fopen('php://output', 'w');
+            fwrite($handle, "\xEF\xBB\xBF");
+            $delimiter = ';';
+            fputcsv($handle, [
+                'Numéro',
+                'Nom de la formation',
+                'Thématique',
+                'Nombre de participants',
+                'Nombre d\'inscriptions',
+                'Total heures de formation',
+                'Total jours de formation',
+                'Superviseur(se)'
+            ], $delimiter);
 
-            fputcsv($handle, ['Nom', 'Email', 'Statut']);
+            // les valeurs
+            fputcsv($handle, [
+                $training->getNumber(),
+                $training->getName(),
+                $training->getTheme()?->getName() ?? 'Non définie',
+                array_sum(array_map(fn($s) => $s->getNumberofparticipants(), $sessions)),
+                array_sum(array_map(fn($s) => $s->getNumberofregistrations(), $sessions)),
+                array_sum(array_map(fn($s) => $s->getHournumber(), $sessions)),
+                array_sum(array_map(fn($s) => $s->getDaynumber(), $sessions)),
+                $training->getSupervisor()->getFullName() ?? 'Non définie',
+            ], $delimiter);
 
-            foreach ($participants as $participantSummary) {
-                $trainee = $participantSummary->getTrainee();
-                fputcsv($handle, [
-                    $trainee?->getFullName() ?? 'Inconnu',
-                    $trainee?->getEmail() ?? 'Inconnu',
-                    $participantSummary->getStatus() ?? 'Non défini',
-                ]);
-            }
             fclose($handle);
-
         });
 
 
@@ -60,7 +81,6 @@ readonly class TrainingBalanceSheet
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Cache-Control', 'private');
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-        $response->sendHeaders();
 
 
         return $response;
