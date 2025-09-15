@@ -12,15 +12,17 @@
             <div class="col-xs-12">
                 <table class="table table-search table-hover">
                     <thead>
-                        <tr>
-                            <th>Vocabulaire</th>
-                            <th>Portée</th>
-                        </tr>
+                    <tr>
+                        <th>Vocabulaire</th>
+                        <th>Portée</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {% for vocabulary in vocabularies %}
                         <tr ng-class="{warning: isSelected(item.id)}">
-                            <td><a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.id, 'organizationId': organization.id }) }}">{{ vocabulary.vocabulary.vocabularyLabel }}</a></td>
+                            <td>
+                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabulary.id, 'organizationId': organization.id }) }}">{{ vocabulary.vocabulary.vocabularyLabel }}</a>
+                            </td>
                             <td><span class="badge">
                                     {% if vocabulary.scope == 0 %}
                                         Nationale

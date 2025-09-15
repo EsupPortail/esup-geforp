@@ -17,5 +17,5 @@ interface BatchOperationModalConfigInterface
     /**
      * @return array modal window modal config options
      */
-    public function getModalConfig();
+    public function getModalConfig(): array;
 }

@@ -11,20 +11,20 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Tag
  *
- * @ORM\Table(name="tag")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'tag')]
+#[ORM\Entity]
 class Tag extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): mixed
     {
         return "Tags";
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }
@@ -32,7 +32,7 @@ class Tag extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public static function orderBy()
+    public static function orderBy(): mixed
     {
         return 'name';
     }

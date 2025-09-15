@@ -2,79 +2,68 @@
 
 namespace App\Entity\Core;
 
+
+use AllowDynamicProperties;
+use App\AccessRight\SerializedAccessRights;
+use App\Entity\Back\Organization;
+use App\Entity\Core\AbstractOrganization;
+use App\Entity\PersonTrait\CoordinatesTrait;
 use App\Entity\Term\Domain;
 use App\Form\Type\BaseInstitutionType;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use JMS\Serializer\Annotation as Serializer;
-use App\Entity\PersonTrait\CoordinatesTrait;
-use App\Entity\Core\AbstractOrganization;
-use App\AccessRight\SerializedAccessRights;
+use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
-use App\Form\Type\BaseInstitutionType as FormType;
+use Symfony\Component\Serializer\Attribute\Groups;
+use App\Entity\Term\AbstractTerm;
 
 /**
  * Institution.
  *
- * @ORM\Table(name="institution")
- * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
  */
-abstract class AbstractInstitution implements SerializedAccessRights
+#[AllowDynamicProperties] #[ORM\Table(name: 'institution')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\MappedSuperclass]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+abstract class AbstractInstitution implements SerializedAccessRights, \Stringable
 {
     // Hook timestampable behavior : updates createdAt, updatedAt fields
     use TimestampableTrait;
 
     use CoordinatesTrait;
 
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $id;
+    #[Groups(['Default', 'institution'])]
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected int $id;
 
-    /**
-     * @var string name
-     * @ORM\Column(name="name", type="string", length=512)
-     * @Assert\NotBlank(message="Vous devez renseigner un nom d'établissement.")
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $name;
+    #[Groups(['Default', 'api', 'institution', 'trainer'])]
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 512)]
+    #[Assert\NotBlank(message: "Vous devez renseigner un nom d'établissement.")]
+    protected string $name;
 
-    /**
-     * @var string idp
-     * @ORM\Column(name="idp", type="string", length=512, nullable=true)
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $idp;
+    #[Groups(['Default', 'api', 'institution'])]
+    #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $idp = null;
 
-    /**
-     * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Domain")
-     * @ORM\JoinTable(name="institution__institution_domain",
-     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="domain_id", referencedColumnName="id", onDelete="cascade")}
-     * )
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $domains;
+    #[Groups(['Default', 'api'])]
+    #[ORM\JoinTable(name: 'institution__institution_domain')]
+    #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
+    #[ORM\InverseJoinColumn(name: 'domain_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Domain::class)]
+    protected Collection $domains;
 
-    /**
-     * @var ArrayCollection
-     * @ORM\ManyToMany(targetEntity="App\Entity\Core\AbstractInstitution")
-     * @ORM\JoinTable(name="institution__visuinstitutions",
-     *      joinColumns={@ORM\JoinColumn(name="institution_id", referencedColumnName="id", onDelete="cascade")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="visu_institution_id", referencedColumnName="id", onDelete="cascade")}
-     * )
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $visuinstitutions;
+
+    #[Groups(['Default', 'api'])]
+    #[ORM\JoinTable(name: 'institution__visuinstitutions')]
+    #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
+    #[ORM\InverseJoinColumn(name: 'visu_institution_id', referencedColumnName: 'id', onDelete: 'cascade')]
+    #[ORM\ManyToMany(targetEntity: AbstractInstitution::class, cascade: ["persist", "remove"])]
+    protected Collection $visuinstitutions;
 
     public function __construct()
     {
@@ -82,11 +71,10 @@ abstract class AbstractInstitution implements SerializedAccessRights
         $this->visuinstitutions = new ArrayCollection();
     }
 
-
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -94,15 +82,16 @@ abstract class AbstractInstitution implements SerializedAccessRights
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
+
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
@@ -110,31 +99,28 @@ abstract class AbstractInstitution implements SerializedAccessRights
     /**
      * @return string
      */
-    public function getIdp()
+    public function getIdp(): ?string
     {
-        return $this->idp;
+            return $this->idp ;
     }
 
     /**
      * @param string $idp
      */
-    public function setIdp($idp)
+    public function setIdp(?string $idp): void
     {
         $this->idp = $idp;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getDomains()
+    public function getDomains(): ArrayCollection|Collection
     {
         return $this->domains;
     }
 
-    /**
-     * @param mixed $domains
-     */
-    public function setDomains($domains)
+    public function setDomains(mixed $domains): void
     {
         $this->domains = $domains;
     }
@@ -144,7 +130,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
      *
      * @return bool
      */
-    public function addDomain($domain)
+    public function addDomain(Domain $domain): bool
     {
         if (!$this->domains->contains($domain)) {
             $this->domains->add($domain);
@@ -160,7 +146,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
      *
      * @return bool
      */
-    public function removeDomain($domain)
+    public function removeDomain(Domain $domain): bool
     {
         if ($this->domains->contains($domain)) {
             $this->domains->removeElement($domain);
@@ -174,15 +160,12 @@ abstract class AbstractInstitution implements SerializedAccessRights
     /**
      * @return mixed
      */
-    public function getVisuinstitutions()
+    public function getVisuinstitutions(): mixed
     {
         return $this->visuinstitutions;
     }
 
-    /**
-     * @param mixed $visuinstitutions
-     */
-    public function setVisuinstitutions($visuinstitutions)
+    public function setVisuinstitutions(mixed $visuinstitutions): void
     {
         $this->visuinstitutions = $visuinstitutions;
     }
@@ -192,7 +175,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
      *
      * @return bool
      */
-    public function addVisuinstitution($institution)
+    public function addVisuinstitution(AbstractInstitution $institution): bool
     {
         if (!$this->visuinstitutions->contains($institution)) {
             $this->visuinstitutions->add($institution);
@@ -208,7 +191,7 @@ abstract class AbstractInstitution implements SerializedAccessRights
      *
      * @return bool
      */
-    public function removeVisuinstitution($institution)
+    public function removeVisuinstitution(AbstractInstitution $institution): bool
     {
         if ($this->visuinstitutions->contains($institution)) {
             $this->visuinstitutions->removeElement($institution);
@@ -219,17 +202,17 @@ abstract class AbstractInstitution implements SerializedAccessRights
         return false;
     }
 
-    function __toString()
+    function __toString(): string
     {
-        return $this->getName();
+        return $this->name;
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return BaseInstitutionType::class;
     }
 
-    public static function getType()
+    public static function getType(): string
     {
         return 'institution';
     }

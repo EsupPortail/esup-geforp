@@ -1,7 +1,7 @@
 /**
  * $history service
  */
-sygeforApp.service('$history', ['$location', '$state', '$session', function($location, $state, $session) {
+sygeforApp.service('$history', ['$location', '$state', '$session', function ($location, $state, $session) {
     var locationChanged = false;
     var currentPath = null;
 
@@ -10,8 +10,8 @@ sygeforApp.service('$history', ['$location', '$state', '$session', function($loc
      * @param stateName
      * @param stateParams
      */
-    this.stateChange = function(stateName, stateParams) {
-        if(locationChanged) {
+    this.stateChange = function (stateName, stateParams) {
+        if (locationChanged) {
             locationChanged = false;
             return;
         }
@@ -30,7 +30,7 @@ sygeforApp.service('$history', ['$location', '$state', '$session', function($loc
      * @param url
      * @returns {promise}
      */
-    this.locationChange = function(url) {
+    this.locationChange = function (url) {
         if (url === currentPath || ($session.history == null)) {
             return;
         }
@@ -49,7 +49,7 @@ sygeforApp.service('$history', ['$location', '$state', '$session', function($loc
      * @param item
      * @returns {*}
      */
-    this.push = function(key, item) {
+    this.push = function (key, item) {
         var history;
         history = $session.history;
         if (history == null) {
@@ -63,7 +63,7 @@ sygeforApp.service('$history', ['$location', '$state', '$session', function($loc
      * getUrl
      * @returns {*}
      */
-    this.getUrl = function() {
+    this.getUrl = function () {
         return ("/dssdfsdfsdf/") + ("" + (Math.random().toString(16)) + "000000000").substr(2, 8);
     }
 }]);

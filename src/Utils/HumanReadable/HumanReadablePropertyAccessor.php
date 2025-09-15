@@ -17,46 +17,51 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  * Accesses an object property using human readable objects and property names given in config
  * Class OpenTBSPropertyAccessor.
  */
-class HumanReadablePropertyAccessor
+final class HumanReadablePropertyAccessor implements \Stringable
 {
-    /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
-    private $accessorFactory;
-
     /**
-     * @var object currently accessed objectg
+     * @var ArrayCollection|mixed|string|null
      */
-    private $object;
+    public mixed $emailCorr;
+    /**
+     * @var ArrayCollection|mixed|string|null
+     */
+    public mixed $emailSup;
+    /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
+    private HumanReadablePropertyAccessorFactory $accessorFactory;
 
     /**
      * @param $object
+     * @param object $object
      */
-    public function __construct($object)
+    public function __construct(
+        /**
+         * @var object currently accessed objectg
+         */
+        private $object
+    )
     {
-        $this->object = $object;
     }
 
     /**
      * Return an array of accessors from the object properties.
      *
-     * @return array
+     * @return array<int|string, mixed>
      */
-    public function toArray()
+    public function toArray(): array
     {
-        $catalog = $this->accessorFactory->getTermCatalog(get_class($this->object));
-        $return = array();
+        $catalog = $this->accessorFactory->getTermCatalog($this->object::class);
+        $return = [];
 
         foreach ($catalog['fields'] as $name => $options) {
 
-            if ((is_object($this->$name)) && $this->accessorFactory->hasEntry(get_class($this->$name))) {
+            if ((is_object($this->$name)) && $this->accessorFactory->hasEntry($this->$name::class)) {
                 $return[$name] = $this->accessorFactory->getAccessor($this->$name)->toArray();
-            }
-            else if (is_object($this->$name) && get_class($this->$name) === get_class($this)) {
+            } elseif (is_object($this->$name) && $this->$name::class === self::class) {
                 $return[$name] = $this->$name->toArray();
-            }
-            else if (empty($this->$name)) {
-                $return[$name] = array();
-            }
-            else {
+            } elseif (empty($this->$name)) {
+                $return[$name] = [];
+            } else {
                 $return[$name] = $this->$name;
             }
         }
@@ -67,34 +72,36 @@ class HumanReadablePropertyAccessor
     /**
      * magic getter for property path.
      *
-     * @param $property a string on the form 'myObjectAlias.MypropertyAlias'
+     * @param string $property a string on the form 'myObjectAlias.MypropertyAlias'
      *
      * @return mixed|null
      */
-    public function __get($property)
+    public function __get(string $property)
     {
+        $path = null;
         switch ($property) {
             case 'email':
                 //specific behaviour for retrieving mail attached to an entity (such as trainee, inscription, trainer, ...)
-                $mailPath = $this->accessorFactory->getMailPath(get_class($this->object));
+                $mailPath = $this->accessorFactory->getMailPath($this->object::class);
                 if ($mailPath !== null) {
                     $accessor = PropertyAccess::createPropertyAccessor();
 
                     return $accessor->getValue($this->object, $mailPath);
                 }
+
                 break;
             case 'emailSup':
-                if(get_parent_class($this->object)=== 'App\Entity\Core\AbstractInscription')
+                if(get_parent_class($this->object)=== \App\Entity\Core\AbstractInscription::class)
                     $path = 'trainee.emailSup';
-                elseif(get_parent_class($this->object)=== 'App\Entity\Core\AbstractTrainee')
+                elseif(get_parent_class($this->object)=== \App\Entity\Core\AbstractTrainee::class)
                     $path='emailSup';
 
                 $accessor = PropertyAccess::createPropertyAccessor();
                 return $accessor->getValue($this->object, $path);
             case 'emailCorr':
-                if(get_parent_class($this->object)=== 'App\Entity\Core\AbstractInscription')
+                if(get_parent_class($this->object)=== \App\Entity\Core\AbstractInscription::class)
                     $path = 'trainee.emailCorr';
-                elseif(get_parent_class($this->object)=== 'App\Entity\Core\AbstractTrainee')
+                elseif(get_parent_class($this->object)=== \App\Entity\Core\AbstractTrainee::class)
                     $path='emailCorr';
 
                 $accessor = PropertyAccess::createPropertyAccessor();
@@ -102,7 +109,7 @@ class HumanReadablePropertyAccessor
             default:
                 //default behaviour
                 //path
-                $expl = explode('.', $property);
+                $expl = explode('.', (string) $property);
                 //path may or may not contains dots. In the former case we need to split it in prefix and suffix parts.
                 if (count($expl) === 1) {
                     $prefix = $property;
@@ -117,16 +124,14 @@ class HumanReadablePropertyAccessor
                 //trying to get property for path suffix
                 try {
                     $accessor = PropertyAccess::createPropertyAccessor();
+                    if (empty($path)) {
+                        return null;
+                    }
                     $value = $accessor->getValue($this->object, $path);
 
+
                 }
-                catch (NoSuchPropertyException $e) {
-                    // asked property was not found in object
-                    // (alias did not correspond to something that actually exits
-                    // thus an explicit mention is returned and is displayed in result file
-                    return 'Non défini';
-                }
-                catch (UnexpectedTypeException $e) {
+                catch (NoSuchPropertyException|UnexpectedTypeException) {
                     // asked property was not found in object
                     // (alias did not correspond to something that actually exits
                     // thus an explicit mention is returned and is displayed in result file
@@ -135,7 +140,7 @@ class HumanReadablePropertyAccessor
 
                 // if suffix is not empty, we continue along path
                 if ($suffix !== '') {
-                    if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
+                    if (is_object($value) && $this->accessorFactory->hasEntry($value::class)) {
                         //new property accessor for object.
 
                         /** @var HumanReadablePropertyAccessor $nextAccessor */
@@ -144,33 +149,29 @@ class HumanReadablePropertyAccessor
                             try {
                                 return $nextAccessor->$suffix;
                             }
-                            catch (\Exception $e) {
+                            catch (\Exception) {
                                 return 'Non défini';
                             }
                         }
                     }
-                } else { //we reached end of path
-                    if (is_object($value) && (get_class($value) === 'DateTime')) {
-                        // Cas des dates : on ne cherche pas la classe
-                    }else {
-                        if (is_object($value) && $this->accessorFactory->hasEntry(get_class($value))) {
-                            return $this->accessorFactory->getAccessor($value);
-                        }
-                        else if ($value instanceof \Traversable) {
-                            $arr = new ArrayCollection();
-                            foreach ($value as $val) {
-                                if ($this->accessorFactory->hasEntry(get_class($val))) {
-                                    $arr->add($this->accessorFactory->getAccessor($val));
-                                }
-                            }
-                            return $arr;
+                } elseif (is_object($value) && ($value::class === 'DateTime')) {
+                    //we reached end of path
+                    // Cas des dates : on ne cherche pas la classe
+                } elseif (is_object($value) && $this->accessorFactory->hasEntry($value::class)) {
+                    return $this->accessorFactory->getAccessor($value);
+                } elseif ($value instanceof \Traversable) {
+                    $arr = new ArrayCollection();
+                    foreach ($value as $val) {
+                        if ($this->accessorFactory->hasEntry($val::class)) {
+                            $arr->add($this->accessorFactory->getAccessor($val));
                         }
                     }
+                    
+                    return $arr;
                 }
 
                 //an attempt of formatting is done
                 return $this->format($prefix, $value);
-                break;
         }
     }
 
@@ -181,29 +182,33 @@ class HumanReadablePropertyAccessor
      */
     public function __isset($name)
     {
-        //@todo hm: refine this
-        return true;
+        try {
+            $this->__get($name);
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /**
      * magic function for string conversion.
      *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return '';
     }
 
-    private function accessProperty($property)
+    private function accessProperty($property): ?string
     {
-        return $this->accessorFactory->getPropertyForAlias(get_class($this->object), $property);
+        if (is_object($this->object)) {
+            return $this->accessorFactory->getPropertyForAlias(get_class($this->object), $property);
+        }
+
+        return $property;
     }
 
-    /**
-     * @param mixed $accessorFactory
-     */
-    public function setAccessorFactory($accessorFactory)
+    public function setAccessorFactory(mixed $accessorFactory): void
     {
         $this->accessorFactory = $accessorFactory;
     }
@@ -216,10 +221,7 @@ class HumanReadablePropertyAccessor
         return $this->accessorFactory;
     }
 
-    /**
-     * @param mixed $object
-     */
-    public function setObject($object)
+    public function setObject(mixed $object): void
     {
         $this->object = $object;
     }
@@ -233,18 +235,19 @@ class HumanReadablePropertyAccessor
      */
     private function format($prefix, $value)
     {
-        $format = $this->accessorFactory->getFormatForAlias(get_class($this->object), $prefix);
-        $type = $this->accessorFactory->getTypeForAlias(get_class($this->object), $prefix);
+        $format = $this->accessorFactory->getFormatForAlias($this->object::class, $prefix);
+        $type = $this->accessorFactory->getTypeForAlias($this->object::class, $prefix);
         if ($value instanceof \DateTime) {
             if ($format) {
                 /* @var \DateTime $value */
                 return $value->format($format);
-            } else {
-                return $value->format('d/m/Y');
             }
-        } elseif (is_bool($value)) {
+            return $value->format('d/m/Y');
+        }
+        if (is_bool($value)) {
             return $value ? 'oui' : 'non';
-        } elseif (is_string($value) && $type === 'ckeditor') {
+        }
+        elseif (is_string($value) && $type === 'ckeditor') {
             return Html2Text::convert($value);
         }
 

@@ -2,58 +2,52 @@
 
 namespace App\Validator\Constraints;
 
+use Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
-use Symfony\Component\Security\Core\Tests\Encoder\PasswordEncoder;
-use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
+//use Symfony\Component\Security\Core\Tests\Encoder\PasswordEncoder;
+//use Symfony\Component\Security\Core\Encoder\EncoderFactoryInterface;
 use Symfony\Component\Validator\Exception\ConstraintDefinitionException;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 /**
  * Class StrongPasswordValidator.
  */
-class StrongPasswordValidator extends ConstraintValidator
+final class StrongPasswordValidator extends ConstraintValidator
 {
-	/**
-	 * @var TokenStorageInterface
-	 */
-	private $tokenStorage;
-	/**
-	 * @var EncoderFactoryInterface
-	 */
-	private $encoderFactory;
+    private $passwordHasher;
 
-	/**
-	 * StrongPasswordValidator constructor.
-	 *
-	 * @param TokenStorageInterface   $tokenStorage
-	 * @param EncoderFactoryInterface $encoderFactory
-	 */
-	public function __construct(TokenStorageInterface $tokenStorage, EncoderFactoryInterface $encoderFactory)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->encoderFactory = $encoderFactory;
-    }
+    /**
+  * StrongPasswordValidator constructor.
+  *
+  */
+ public function __construct(private readonly TokenStorageInterface $tokenStorage)
+ {
+ }
 
     /**
      * {@inheritdoc}
      */
-    public function validate($password, Constraint $constraint)
+    public function validate($value, Constraint $constraint): void
     {
         if (!$constraint instanceof StrongPassword) {
-            throw new UnexpectedTypeException($constraint, __NAMESPACE__.'\StrongPassword');
+            throw new UnexpectedTypeException($constraint, StrongPassword::class);
         }
 
-        $user = $constraint->user ? $constraint->user : $this->tokenStorage->getToken()->getUser();
-
-        if (!$user instanceof UserInterface) {
-            throw new ConstraintDefinitionException('The User object must implement the UserInterface interface.');
+        $user = $constraint->user ?: $this->tokenStorage->getToken()->getUser();
+        if (null === $value) {
+            return;
+        }
+        if ('' === $value) {
+            return;
         }
 
-        if (strlen($password) < $constraint->minLength) {
+        if (strlen((string) $value) < $constraint->minLength) {
             $this->context->buildViolation($constraint->shortMessage)
                 ->setParameter('%minLength%', $constraint->minLength)
                 ->setCode(StrongPassword::TOO_SHORT)
@@ -62,10 +56,15 @@ class StrongPasswordValidator extends ConstraintValidator
             return;
         }
 
-        /** @var PasswordEncoder $passwordEncoder */
-        $passwordEncoder = $this->encoderFactory->getEncoder($user);
-        $maxPasswordLength = $passwordEncoder ? $passwordEncoder::MAX_PASSWORD_LENGTH : $constraint->maxLength;
-        if (strlen($password) > $maxPasswordLength) {
+        if (!$this->passwordHasher->isPasswordValid($user, $value)) {
+            $this->context->buildViolation($constraint->invalidPasswordMessage)
+                ->setCode(StrongPassword::INVALID_PASSWORD)
+                ->addViolation();
+            return;
+        }
+
+        $maxPasswordLength = $constraint->maxLength;
+        if (strlen((string) $value) > $maxPasswordLength) {
             $this->context->buildViolation($constraint->longMessage)
                 ->setParameter('%maxLength%', $maxPasswordLength)
                 ->setCode(StrongPassword::TOO_LONG)
@@ -77,22 +76,22 @@ class StrongPasswordValidator extends ConstraintValidator
         $requirementsCount = 0;
 
         // contenir une lettre minuscule
-        if (preg_match('/[a-z]/', $password)) {
+        if (preg_match('#[a-z]#', (string) $value)) {
             ++$requirementsCount;
         }
 
         // contenir une lettre majuscule
-        if (preg_match('/[A-Z]/', $password)) {
+        if (preg_match('#[A-Z]#', (string) $value)) {
             ++$requirementsCount;
         }
 
         // contenir un nombre
-        if (preg_match('/[0-9]/', $password)) {
+        if (preg_match('#\d#', (string) $value)) {
             ++$requirementsCount;
         }
 
         // contenir un des caractères suivants : + - * / , ; : ? . ! = % $ & " ' ( _ ) @ # { } | \ [ ] ;
-        if (false !== strpbrk($password, '+-*/,;:?.!=%$&"\\\'(_)@#{}|\[]')) {
+        if (false !== strpbrk((string) $value, '+-*/,;:?.!=%$&"\\\'(_)@#{}|\[]')) {
             ++$requirementsCount;
         }
 
@@ -105,20 +104,21 @@ class StrongPasswordValidator extends ConstraintValidator
         }
 
         // ne pas inclure le prénom et/ou le nom de l’utilisateur
-        $accessor = PropertyAccess::createPropertyAccessor();
-        $translitPassword = $this->transliterate($password);
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+        $translitPassword = $this->transliterate($value);
 
-        $values = array();
+        $values = [];
         foreach ($constraint->forbiddenProperties as $name) {
-            $values[] = $accessor->getValue($user, $name);
+            $values[] = $propertyAccessor->getValue($user, $name);
         }
+
         $values = array_filter($values);
 
         foreach ($values as $value) {
             $regex = preg_quote(strtolower($this->transliterate($value)));
             if ($value && preg_match('/'.$regex.'/ui', $translitPassword)) {
                 $this->context->buildViolation($constraint->forbiddenMessage)
-                    ->setParameter('%words%', join(', ', $values))
+                    ->setParameter('%words%', implode(', ', $values))
                     ->setCode(StrongPassword::CONTAINS_FORBIDDEN_PROPERTIES)
                     ->addViolation();
 
@@ -130,9 +130,8 @@ class StrongPasswordValidator extends ConstraintValidator
     /**
      * @param $str
      *
-     * @return string
      */
-    private function transliterate($str)
+    private function transliterate($str): string
     {
         $transliterator = \Transliterator::create(
             'NFD; [:Nonspacing Mark:] Remove; NFC;'

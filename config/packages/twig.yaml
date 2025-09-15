@@ -1,6 +1,6 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
-
+    form_themes: ['bootstrap_5_layout.html.twig']
     # variables globales pour la partie stagiaire
     globals:
         contact_mail: '%contact_mail%'

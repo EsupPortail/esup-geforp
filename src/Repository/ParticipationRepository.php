@@ -11,27 +11,26 @@ use App\Entity\Core\AbstractParticipation;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class ParticipationRepository extends ServiceEntityRepository
+final class ParticipationRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, AbstractParticipation::class);
+        parent::__construct($managerRegistry, AbstractParticipation::class);
     }
 
-    public function getParticipationsList($keyword, $filters)
+    public function getParticipationsList(?string $keyword, array $filters)
     {
-        $qb = $this->createQueryBuilder('p');
-        $qb
-            ->select('p')
-            ->innerJoin('p.trainer', 'trainer', 'WITH', 'trainer = p.trainer')
-            ->innerJoin('p.session', 's', 'WITH', 's = p.session')
-            ->innerJoin('p.organization', 'o', 'WITH', 'o = p.organization')
+        $qb = $this->createQueryBuilder('p')
+            ->select('p', 'trainer', 's', 'o')
+            ->innerJoin('p.trainer', 'trainer')
+            ->innerJoin('p.session', 's')
+            ->innerJoin('p.organization', 'o');
 
-            // FILTRE KEYWORD
-            ->where('trainer.firstname LIKE :keyword')
-            ->orWhere('trainer.lastname LIKE :keyword')
-            /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        if (!empty($keyword)) {
+            $qb
+                ->andWhere('(trainer.firstname LIKE :keyword OR trainer.lastname LIKE :keyword)')
+                ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
+        }
 
 
         // FILTRE CENTRE
@@ -48,12 +47,7 @@ class ParticipationRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['trainer.id']);
         }
 
-
-
-        $query = $qb->getQuery();
-        $result = $query->getResult();
-
-        return $result;
+        return $qb->getQuery()->getResult();
     }
 
 

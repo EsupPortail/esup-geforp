@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Entity\PersonTrait;
-
-use JMS\Serializer\Annotation as Serializer;
+use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation\VirtualProperty;
+use Symfony\Component\Serializer\Attribute\Groups;
+use App\EventListener\Serializer;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Trait PersonTrait.
@@ -11,28 +14,33 @@ trait PersonTrait
 {
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\Term\Title")
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
-    protected $title;
+    #[Ignore]
+    #[ORM\ManyToOne(targetEntity : 'App\Entity\Term\Title')]
+    #[Groups(['Default', 'api'])]
+    protected mixed $title;
 
     /**
      * @var string
      * @ORM\Column(name="first_name", type="string", length=50, nullable=true)
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
-    protected $firstname;
+    #[ORM\Column(name: 'first_name', type: 'string', length: 50, nullable: true)]
+    #[Groups(['Default', 'api'])]
+    protected ?string $firstname = null;
 
     /**
      * @var string
      * @ORM\Column(name="last_name", type="string", length=50)
-     * @Serializer\Groups({"Default", "api"})
+     * @Groups({"Default", "api"})
      */
-    protected $lastname;
+    #[ORM\Column(name: 'last_name', type: 'string', length: 50, nullable: false)]
+    #[Groups(['Default', 'api'])]
+    protected  ?string $lastname = "";
+    
 
-    /**
-     * @param mixed $title
-     */
-    public function setTitle($title)
+    public function setTitle(mixed $title): void
     {
         $this->title = $title;
     }
@@ -40,7 +48,7 @@ trait PersonTrait
     /**
      * @return mixed
      */
-    public function getTitle()
+    public function getTitle(): mixed
     {
         return $this->title;
     }
@@ -48,7 +56,7 @@ trait PersonTrait
     /**
      * @param string $firstName
      */
-    public function setFirstname($firstName)
+    public function setFirstname(?string $firstName): void
     {
         $this->firstname = $firstName;
     }
@@ -56,7 +64,7 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getFirstname()
+    public function getFirstname(): ?string
     {
         return $this->firstname;
     }
@@ -64,7 +72,7 @@ trait PersonTrait
     /**
      * @param string $lastName
      */
-    public function setLastname($lastName)
+    public function setLastname(?string $lastName): void
     {
         $this->lastname = $lastName;
     }
@@ -72,29 +80,22 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getLastname()
+    public function getLastname(): ?string
     {
         return $this->lastname;
     }
 
-    /**
-     * @return string
-     * @Serializer\VirtualProperty
-     * @Serializer\Groups({"Default", "api"})
-     */
-    public function getFullname()
+    #[VirtualProperty]
+    #[Groups(['Default', 'trainer', 'session', 'api.training', 'inscription'])]
+    public function getFullname(): string
     {
-        return $this->getFirstname().' '.$this->getLastname();
+        return $this->getFirstname() . ' ' . $this->getLastname();
     }
 
-    /**
-     * @return string
-     * @Serializer\VirtualProperty
-     * @Serializer\Groups({"Default", "api"})
-     */
-    public function getReverseFullName()
+
+    public function getReverseFullName(): string
     {
-        return $this->getLastName().' '.$this->getFirstName();
+        return $this->getLastname() . ' ' . $this->getFirstname();
     }
 
     /**

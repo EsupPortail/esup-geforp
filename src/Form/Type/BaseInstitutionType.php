@@ -13,61 +13,26 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 /**
  * Class BaseInstitutionType.
  */
 class BaseInstitutionType extends AbstractType
 {
-    /**
-     * @var AccessRightRegistry
-     */
-    private $accessRightsRegistry;
-
-    /**
-     * @var Security
-     */
-    private $security;
-
-    /**
-     * @param AccessRightRegistry $registry
-     */
-    public function __construct(AccessRightRegistry $registry, Security $security)
+    public function __construct()
     {
-        $this->accessRightsRegistry = $registry;
-        $this->security = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-            ->add('name', TextType::class, array(
-                'label' => 'Nom',
-            ))
-            ->add('email', EmailType::class, array(
-                'label' => 'Email',
-            ))
-            ->add('address', TextareaType::class, array(
-                'label' => 'Adresse',
-                'required' => false,
-            ))
-            ->add('zip', TextType::class, array(
-                'label' => 'Code postal',
-                'required' => false,
-            ))
-            ->add('city', TextType::class, array(
-                'label' => 'Ville',
-                'required' => false,
-            ))
-            ->add('website', TextType::class, array(
-                'label' => 'Lien',
-                'required' => false,
-            ));
+        $formBuilder
+            ->add('name', TextType::class, ['label' => 'Nom'])
+            ->add('email', EmailType::class, ['label' => 'Email'])
+            ->add('address', TextareaType::class, ['label' => 'Adresse', 'required' => false])
+            ->add('zip', TextType::class, ['label' => 'Code postal', 'required' => false])
+            ->add('city', TextType::class, ['label' => 'Ville', 'required' => false])
+            ->add('website', TextType::class, ['label' => 'Lien', 'required' => false]);
 
     }
 }

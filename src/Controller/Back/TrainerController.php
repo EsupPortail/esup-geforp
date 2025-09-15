@@ -4,21 +4,9 @@ namespace App\Controller\Back;
 
 use App\Controller\Core\AbstractTrainerController;
 use App\Entity\Back\Trainer;
-use App\Controller\Core\AbstractInstitutionController;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormError;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Routing\Attribute\Route;
 
-
-
-/**
- * @Route("/trainer")
- */
-class TrainerController extends AbstractTrainerController
+#[Route(path: '/trainer')]final class TrainerController extends AbstractTrainerController
 {
     protected $trainerClass = Trainer::class;
 }

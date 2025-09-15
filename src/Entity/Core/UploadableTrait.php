@@ -23,46 +23,37 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
  */
 trait UploadableTrait
 {
-    /**
-     * @ORM\Column(name="file_path", type="string", nullable=false)
-     *
-     * @var string
-     */
-    protected $filepath;
+    #[ORM\Column(name: 'file_path', type: \Doctrine\DBAL\Types\Types::STRING)]
+    protected ?string $filepath = null;
 
-    /**
-     * @ORM\Column(name="file_name", type="string", nullable=false)
-     *
-     * @var string
-     */
-    protected $filename;
+    #[ORM\Column(name: 'file_name', type: \Doctrine\DBAL\Types\Types::STRING)]
+    protected ?string $filename = null;
 
     /**
      * @var File
      */
-    protected $file;
+    protected File $file;
 
     /**
      * used to force file update when changing file.
      *
-     * @var \DateTime
-     * @ORM\Column(type="datetime")
      */
-    protected $uploaded;
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    protected ?\DateTimeInterface $uploaded = null;
 
     /**
      * @var
      */
-    static protected $maxFileSize = 50000000;
+    static protected int $maxFileSize = 50_000_000;
 
     public function __clone()
     {
         $file = $this->getFile();
         if (!empty($file)) {
             $this->id = null;
-            $fs = new Filesystem();
-            $tmpFileName = sha1(uniqid(mt_rand(), true)) . '.' . $file->getFileInfo()->getExtension();
-            $fs->copy($this->getTemplatesRootDir() . '/' . $this->filepath, $this->getTemplatesRootDir() . '/' . $tmpFileName);
+            $filesystem = new Filesystem();
+            $tmpFileName = sha1(uniqid(random_int(0, mt_getrandmax()), true)) . '.' . $file->getFileInfo()->getExtension();
+            $filesystem->copy($this->getTemplatesRootDir() . '/' . $this->filepath, $this->getTemplatesRootDir() . '/' . $tmpFileName);
             $this->setFile(new File($this->getTemplatesRootDir() . '/' . $tmpFileName), $this->getFilename());
         }
     }
@@ -70,7 +61,7 @@ trait UploadableTrait
     /**
      * @param string $filePath
      */
-    public function setFilepath($filePath)
+    public function setFilepath(string $filePath): void
     {
         $this->filepath = $filePath;
     }
@@ -78,7 +69,7 @@ trait UploadableTrait
     /**
      * @return File
      */
-    public function getFile()
+    public function getFile(): File
     {
         if ($this->filepath !== null) {
             $this->file = new File($this->getTemplatesRootDir() . '/' . $this->filepath);
@@ -90,7 +81,7 @@ trait UploadableTrait
     /**
      * @return string
      */
-    public function getFilepath()
+    public function getFilepath(): string
     {
         return $this->filepath;
     }
@@ -98,7 +89,7 @@ trait UploadableTrait
     /**
      * @param string $fileName
      */
-    public function setFilename($fileName)
+    public function setFilename(string $fileName): void
     {
         $this->filename = $fileName;
     }
@@ -106,47 +97,44 @@ trait UploadableTrait
     /**
      * @return string
      */
-    public function getFilename()
+    public function getFilename(): string
     {
         return $this->filename;
     }
 
     /**
-     * @param File $file
      * @param string $name
      */
-    public function setFile(File $file = null, $name = null)
+    public function setFile(File $file = null, $name = null): void
     {
-        if (!empty($file)) {
+        if ($file instanceof \Symfony\Component\HttpFoundation\File\File) {
             $this->uploaded = new \DateTime();
             $this->file = $file;
             if ($this->file instanceof UploadedFile) {
-                $this->filepath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
+                $this->filepath = sha1(uniqid(random_int(0, mt_getrandmax()), true)) . '.' . $this->file->guessClientExtension();
                 $this->filename = $this->file->getClientOriginalName();
             }
             else {
                 $this->filepath = $file->getFileInfo()->getFilename();
-                $this->filename = ($name) ? $name : $file->getFileInfo()->getFilename();
+                $this->filename = $name ?: $file->getFileInfo()->getFilename();
             }
         }
     }
 
-    /**
-     * @ORM\PrePersist()
-     */
-    public function preUpload()
+    #[ORM\PrePersist]
+    public function preUpload(): void
     {
-        if (null !== $this->file && ($this->file instanceof UploadedFile)) {
+        if (($this->file instanceof UploadedFile)) {
             // nom unique du fichier.
-            $this->filepath = sha1(uniqid(mt_rand(), true)) . '.' . $this->file->guessClientExtension();
+            $this->filepath = sha1(uniqid(random_int(0, mt_getrandmax()), true)) . '.' . $this->file->guessClientExtension();
             $this->filename = $this->file->getClientOriginalName();
         }
     }
 
     /**
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getUploaded()
+    public function getUploaded(): \DateTimeInterface
     {
         return $this->uploaded;
     }
@@ -154,68 +142,53 @@ trait UploadableTrait
     /**
      * @param \DateTime $uploaded
      */
-    public function setUploaded($uploaded)
+    public function setUploaded(\DateTime $uploaded): void
     {
         $this->uploaded = $uploaded;
     }
 
-    /**
-     * @param PreUpdateEventArgs $args
-     * @ORM\PreUpdate()
-     */
-    public function preUpdateUpload(PreUpdateEventArgs $args)
+    #[ORM\PreUpdate]
+    public function preUpdateUpload(PreUpdateEventArgs $preUpdateEventArgs): void
     {
         //a new file is set : we delete the old one
-        if ($args->hasChangedField('uploaded')) {//new uploaded file : old one is deleted
-            unlink($this->getTemplatesRootDir() . '/' . $args->getOldValue('filepath'));
+        if ($preUpdateEventArgs->hasChangedField('uploaded')) {//new uploaded file : old one is deleted
+            unlink($this->getTemplatesRootDir() . '/' . $preUpdateEventArgs->getOldValue('filepath'));
         }
     }
 
-    /**
-     * @ORM\PostPersist()
-     * @ORM\PostUpdate()
-     */
-    public function upload()
+    #[ORM\PostPersist]
+    #[ORM\PostUpdate]
+    public function upload(): void
     {
-        if (null === $this->file) {
-            return;
-        }
+
         $this->file->move($this->getTemplatesRootDir(), $this->filepath);
 
         unset($this->file);
     }
 
-    /**
-     * @ORM\PostRemove()
-     */
-    public function removeUpload()
+    #[ORM\PostRemove]
+    public function removeUpload(): void
     {
         if ($file = $this->getAbsolutePath()) {
             unlink($file);
         }
     }
 
-    /**
-     * @return null|string
-     */
-    public function getAbsolutePath()
+    public function getAbsolutePath(): ?string
     {
         return (null === $this->filepath) ? null : $this->getTemplatesRootDir() . '/' . $this->filepath;
     }
 
-    /**
-     * @return string
-     */
-    protected function getTemplatesRootDir()
+    protected function getTemplatesRootDir(): string
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
         return __DIR__ . '/../../../var/Material';
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public static function getMaxFileSize()
+    public static function getMaxFileSize(): int
     {
         return self::$maxFileSize;
     }
@@ -223,9 +196,8 @@ trait UploadableTrait
     /**
      * Returns a response to send to the client if file is requested.
      *
-     * @return Response
      */
-    public function send()
+    public function send(): \Symfony\Component\HttpFoundation\Response
     {
         $response = new Response();
         //return array();
@@ -235,20 +207,18 @@ trait UploadableTrait
         $response->headers->set('Cache-Control', 'private');
         $response->headers->set('Content-Disposition', 'attachment; filename="' . $this->getFilename() . '";');
         $response->headers->set('Content-length', filesize($fp));
+
         $response->sendHeaders();
         $response->setContent(readfile($fp));
 
         return $response;
     }
 
-    /**
-     * @param ExecutionContextInterface $context
-     */
-    public function validateFileSize(ExecutionContextInterface $context)
+    public function validateFileSize(ExecutionContextInterface $executionContext): void
     {
         if ($this->file->getSize() > self::$maxFileSize) {
 //            $context->addViolationAt('file', 'La taille du fichier dépasse la limite autorisée', array(), null);
-            $context->buildViolation('La taille du fichier dépasse la limite autorisée')
+            $executionContext->buildViolation('La taille du fichier dépasse la limite autorisée')
                 ->atPath('file')
                 ->addViolation();
 

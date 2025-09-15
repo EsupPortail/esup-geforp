@@ -10,30 +10,21 @@ use Symfony\Component\DependencyInjection\Container;
 /**
  * Class SessionToElasticaTransformer.
  */
-class SessionToElasticaTransformer extends ModelToElasticaTransformer
+final class SessionToElasticaTransformer extends ModelToElasticaTransformer
 {
     /**
-     * @var \Symfony\Component\DependencyInjection\Container
-     */
-    protected $container;
-
-    /**
-     * @param Container $container
      * @param array     $options
      */
-    public function __construct(Container $container, $options = array())
+    public function __construct(protected Container $container, $options = [])
     {
-        $this->container = $container;
-        parent::__construct($options);
     }
 
     /**
      * @param AbstractSession $session
-     * @param array           $fields
      *
      * @return Document
      */
-    public function transform($session, array $fields)
+    public function transform($session, array $fields): \Elastica\Document
     {
         $document = parent::transform($session, $fields);
 
@@ -43,7 +34,7 @@ class SessionToElasticaTransformer extends ModelToElasticaTransformer
         if ($session instanceof AbstractSession) {
             /** @var EntityManager $em */
             $em = $this->container->get('doctrine')->getManager();
-            $stats = array();
+            $stats = [];
             if ($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
                 $query = $em
                   ->createQuery('SELECT s, count(i) FROM SygeforCoreBundle:Term\\InscriptionStatus s
@@ -54,14 +45,10 @@ class SessionToElasticaTransformer extends ModelToElasticaTransformer
 
                 $result = $query->getResult();
                 foreach ($result as $status) {
-                    $stats[] = array(
-                      'id' => $status[0]->getId(),
-                      'name' => $status[0]->getName(),
-                      'status' => $status[0]->getStatus(),
-                      'count' => (int) $status[1],
-                    );
+                    $stats[] = ['id' => $status[0]->getId(), 'name' => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count' => (int) $status[1]];
                 }
             }
+
             $document->set('inscriptionStats', $stats);
 
             /*
@@ -75,6 +62,7 @@ class SessionToElasticaTransformer extends ModelToElasticaTransformer
                         $stats[$key]['geographicOrigin'] = 'Autre';
                     }
                 }
+
                 $document->set('participantsStats', $stats);
             }
         }

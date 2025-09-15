@@ -15,20 +15,20 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Type de session.
  *
- * @ORM\Table(name="session_type")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'session_type')]
+#[ORM\Entity]
 class Sessiontype extends AbstractTerm implements VocabularyInterface
 {
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Type de session';
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }

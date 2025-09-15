@@ -14,58 +14,24 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class OrganizationType extends AbstractType
+final class OrganizationType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 
         $builder
-            ->add('name', TextType::class, array(
-                'label' => 'Nom',
-            ))
-            ->add('code', TextType::class, array(
-                'label' => 'Code',
-            ))
-            ->add('email', EmailType::class, array(
-                'label' => 'Email',
-            ))
-            ->add('phoneNumber', TextType::class, array(
-                'label'    => 'Téléphone',
-                'required' => false,
-            ))
-            ->add('faxNumber', TextType::class, array(
-                'label'    => 'Numéro de fax',
-                'required' => false,
-            ))
-            ->add('address', TextareaType::class, array(
-                'label'    => 'Adresse',
-                'required' => false,
-            ))
-            ->add('zip', TextType::class, array(
-                'label'    => 'Code postal',
-                'required' => false,
-            ))
-            ->add('city', TextType::class, array(
-                'label'    => 'Ville',
-                'required' => false,
-            ))
-            ->add('website', TextType::class, array(
-                'label'    => 'Site internet',
-                'required' => false,
-            ))
-            ->add('traineeRegistrable', CheckboxType::class, array(
-                'label'    => 'Les stagiaires peuvent choisir cette organisation',
-                'required' => false,
-            ))
-            ->add('institution', EntityType::class, array(
-                'label'         => 'Etablissement de rattachement',
-                'class'         => AbstractInstitution::class,
-                'required'      => true));
+            ->add('name', TextType::class, ['label' => 'Nom'])
+            ->add('code', TextType::class, ['label' => 'Code'])
+            ->add('email', EmailType::class, ['label' => 'Email'])
+            ->add('phoneNumber', TextType::class, ['label'    => 'Téléphone', 'required' => false])
+            ->add('faxNumber', TextType::class, ['label'    => 'Numéro de fax', 'required' => false])
+            ->add('address', TextareaType::class, ['label'    => 'Adresse', 'required' => false])
+            ->add('zip', TextType::class, ['label'    => 'Code postal', 'required' => false])
+            ->add('city', TextType::class, ['label'    => 'Ville', 'required' => false])
+            ->add('website', TextType::class, ['label'    => 'Site internet', 'required' => false])
+            ->add('traineeRegistrable', CheckboxType::class, ['label'    => 'Les stagiaires peuvent choisir cette organisation', 'required' => false])
+            ->add('institution', EntityType::class, ['label'         => 'Etablissement de rattachement', 'class'         => AbstractInstitution::class, 'required'      => true]);
 
     }
 }

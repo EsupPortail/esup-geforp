@@ -9,38 +9,26 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class RegistrationType.
  */
-class RegistrationType extends AbstractType
+final class RegistrationType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder
-            ->add('password', null, array(
-                'label' => 'Mot de passe',
-                'property_path' => 'plainPassword',
-            ))
+        $formBuilder
+            ->add('password', null, ['label' => 'Mot de passe', 'property_path' => 'plainPassword'])
         ;
     }
 
     /**
      * @param $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'csrf_protection' => false,
-            'validation_groups' => array('Default', 'trainee', 'api.profile', 'api.registration'),
-            'enable_security_check' => false,
-            'allow_extra_fields' => true,
-        ));
+        $optionsResolver->setDefaults(['csrf_protection' => false, 'validation_groups' => ['Default', 'trainee', 'api.profile', 'api.registration'], 'enable_security_check' => false, 'allow_extra_fields' => true]);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return ProfileType::class;
     }

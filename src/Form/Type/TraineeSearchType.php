@@ -19,74 +19,49 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
-class TraineeSearchType extends AbstractType
+final class TraineeSearchType extends AbstractType
 {
-    private $security;
-
-    public function __construct(Security $security )
+    public function __construct(private readonly Security $security)
     {
-        $this->security = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-            ->add('institution', EntityType::class, array(
-                'label' => 'Etablissement',
-                'choice_label' => 'name',
-                'class' => Institution::class
-            ))
-            ->add('nom', null, array(
-                'label' => 'Recherche par nom',
-                'required' => false,
-                'attr' => array('placeholder' => 'Tapez un nom')
-            ));
+        $formBuilder
+            ->add('institution', EntityType::class, ['label' => 'Etablissement', 'choice_label' => 'name', 'class' => Institution::class])
+            ->add('nom', null, ['label' => 'Recherche par nom', 'required' => false, 'attr' => ['placeholder' => 'Tapez un nom']]);
 
         // add listeners to handle conditionals fields
-        $this->addEventListeners($builder);
+        $this->addEventListeners($formBuilder);
     }
 
     /**
      * Add all listeners to manage conditional fields.
      */
-    protected function addEventListeners(FormBuilderInterface $builder)
+    private function addEventListeners(FormBuilderInterface $formBuilder): void
     {
         // PRE_SET_DATA for the parent form
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $formBuilder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $formEvent): void {
             $userAccessRights = $this->security->getUser()->getAccessRights();
 
             if (in_array("sygefor_core.rights.user.all", $userAccessRights)) {
-            } else {
+            } elseif (in_array("sygefor_core.rights.user.own", $userAccessRights)) {
                 // si l'utilisateur n'a que les droits sur son centre
-                if (in_array("sygefor_core.rights.user.own", $userAccessRights)) {
-                    // Pas de choix possible pour l'établissement
-                    $event->getForm()
-                        ->add('institution', EntityType::class, array(
-                            'label' => 'Etablissement',
-                            'choice_label' => 'name',
-                            'disabled' => true,
-                            'class' => Institution::class
-                        ));
-                }
+                // Pas de choix possible pour l'établissement
+                $formEvent->getForm()
+                    ->add('institution', EntityType::class, ['label' => 'Etablissement', 'choice_label' => 'name', 'disabled' => true, 'class' => Institution::class]);
             }
         });
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => null,
-            'id' => 'traineesearch'
-        ));
+        $optionsResolver->setDefaults(['data_class' => null, 'id' => 'traineesearch']);
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'traineesearch';
     }

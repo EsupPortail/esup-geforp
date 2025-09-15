@@ -16,19 +16,13 @@ use Symfony\Component\Form\Exception\TransformationFailedException;
 /**
  * Class ObjectToIdTransformer.
  */
-class EntityToIdTransformer implements DataTransformerInterface
+final class EntityToIdTransformer implements DataTransformerInterface
 {
-    /** @var EntityManagerInterface $om */
-    private $om;
     private $entityClass;
-    private $entityRepository;
 
-    /**
-     * @param EntityManagerInterface $om
-     */
-    public function __construct(EntityManagerInterface $om)
+
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->om = $om;
     }
 
     /**
@@ -40,10 +34,12 @@ class EntityToIdTransformer implements DataTransformerInterface
      */
     public function transform($entity)
     {
-        if (null === $entity || '' === $entity) {
+        if (null === $entity) {
             return;
         }
-
+        if ('' === $entity) {
+            return;
+        }
         return $entity->getId();
     }
 
@@ -77,7 +73,7 @@ class EntityToIdTransformer implements DataTransformerInterface
             return;
         }
 
-        $object = $this->om->getRepository($this->entityClass)->find($id);
+        $object = $this->entityManager->getRepository($this->entityClass)->find($id);
 
         if (null === $object) {
             throw new TransformationFailedException(sprintf(
@@ -93,16 +89,8 @@ class EntityToIdTransformer implements DataTransformerInterface
     /**
      * @param $entityClass
      */
-    public function setEntityClass($entityClass)
+    public function setEntityClass($entityClass): void
     {
         $this->entityClass = $entityClass;
-    }
-
-    /**
-     * @param $entityRepository
-     */
-    public function setEntityRepository($entityRepository)
-    {
-        $this->entityRepository = $entityRepository;
     }
 }

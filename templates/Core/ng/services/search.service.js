@@ -2,6 +2,7 @@
  * Search Service Factory
  */
 SearchServiceFactory.$inject = ['$http', '$q'];
+
 function SearchServiceFactory($http, $q) {
     return function (route, params) {
 
@@ -39,9 +40,9 @@ function SearchServiceFactory($http, $q) {
              */
             result: {
                 done: false,
-                total:0,
-                items:[],
-                aggs:[]
+                total: 0,
+                items: [],
+                aggs: []
             },
 
             /**
@@ -52,7 +53,7 @@ function SearchServiceFactory($http, $q) {
             /**
              * Execute the query and return a promise
              */
-            search: function() {
+            search: function () {
                 var deferred = $q.defer();
                 this.processing = true;
                 var that = this;
@@ -60,9 +61,9 @@ function SearchServiceFactory($http, $q) {
                 var query = angular.copy(this.query);
                 angular.extend(query.filters, this.filters);
                 $http({method: 'POST', url: url, data: query})
-                    .success(function(response) {
+                    .success(function (response) {
                         that.result = response;
-                        that.result.nbPages = Math.ceil(response.total/that.query.size);
+                        that.result.nbPages = Math.ceil(response.total / that.query.size);
                         that.processing = false;
                         that.executed = true;
                         deferred.resolve(that.result);
@@ -74,17 +75,17 @@ function SearchServiceFactory($http, $q) {
             /**
              * Fetch all the result without limit
              */
-            fetchAll: function(fields) {
+            fetchAll: function (fields) {
                 var deferred = $q.defer();
                 var query = angular.copy(this.query);
                 angular.extend(query.filters, this.filters);
                 angular.extend(query, {
                     page: 1,
-                    size:99999,
+                    size: 99999,
                     fields: fields
                 });
                 $http({method: 'POST', url: url, data: query})
-                    .success(function(response) {
+                    .success(function (response) {
                         deferred.resolve(response.items);
                     })
                     .error(deferred.reject);
@@ -94,7 +95,7 @@ function SearchServiceFactory($http, $q) {
             /**
              * Fetch one aggregation with no limit on items
              */
-            fetchAggregation: function(name, options) {
+            fetchAggregation: function (name, options) {
                 var deferred = $q.defer();
                 // build the new aggs query
                 var aggs = {};
@@ -103,7 +104,7 @@ function SearchServiceFactory($http, $q) {
                 // copy the query
                 var query = angular.copy(this.query);
                 // remove same name filter
-                if(query.filters[name]) {
+                if (query.filters[name]) {
                     delete query.filters[name];
                 }
                 // extend with global filters
@@ -120,9 +121,9 @@ function SearchServiceFactory($http, $q) {
 
                 // query the server
                 $http({method: 'POST', url: url, data: query})
-                    .success(function(response) {
-                        var agg = response.aggs[name];
-                        if(agg[name]) {
+                    .success(function (response) {
+                        const agg = response.aggs[name];
+                        if (agg[name]) {
                             // support filtered aggregation (see hack in SearchService)
                             // @todo better way ?
                             deferred.resolve(agg[name]);
@@ -137,8 +138,8 @@ function SearchServiceFactory($http, $q) {
             /**
              * setFilter
              */
-            setFilter: function(field, value) {
-                if(!value)
+            setFilter: function (field, value) {
+                if (!value)
                     delete this.search.query.filters[field];
                 else
                     this.search.query.filters[field] = value;
@@ -147,9 +148,9 @@ function SearchServiceFactory($http, $q) {
             /**
              * setSort
              */
-            setSort: function(field, order) {
+            setSort: function (field, order) {
                 this.query.sorts = {};
-                if(order) {
+                if (order) {
                     this.query.sorts[field] = order;
                 }
             },
@@ -157,8 +158,8 @@ function SearchServiceFactory($http, $q) {
             /**
              * extend current query from a JSON encoded object
              */
-            extendQueryFromJson: function(json) {
-                if(json) {
+            extendQueryFromJson: function (json) {
+                if (json) {
                     var query = angular.fromJson(json);
                     angular.extend(this.query, query);
                 }

@@ -88,6 +88,9 @@
         "front-add": [
             "assets/front/js/front.js",
             "assets/front/js/datatables.js"
+        ],
+		"bootstrapbundle": [
+            "assets/js/bootstrap.bundle.min.js"
         ]
     },
     "templates": [

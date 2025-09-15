@@ -13,15 +13,16 @@
                                 {% for vocabularyc in vocabularies %}
                                     <div class="list-group-item {{ vocabularyc.id == vocabulary.vocabularyId ? 'active' : '' }}">
                                         {% if vocabulary.vocabularyStatus > 0 %}
-                                            {% if organization is not null %}
-                                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id, 'organizationId': organization.id }) }}">
+                                        {% if organization is not null %}
+                                        <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id, 'organizationId': organization.id }) }}">
                                             {% elseif vocabulary.vocabularyStatus == 2 %}
-                                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
-                                            {% endif %}
-                                        {% else %}
                                             <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
-                                        {% endif %}
-                                            <span class="badge pull-right" title="Vocabulaire {{ vocabularyc.scope == 0 ? 'national' : (vocabularyc.scope == 1 ? 'local' : 'mixte') }}">
+                                                {% endif %}
+                                                {% else %}
+                                                <a href="{{ path('taxonomy.view', { 'vocabularyId': vocabularyc.id }) }}">
+                                                    {% endif %}
+                                                    <span class="badge pull-right"
+                                                          title="Vocabulaire {{ vocabularyc.scope == 0 ? 'national' : (vocabularyc.scope == 1 ? 'local' : 'mixte') }}">
                                                 {% if vocabularyc.scope == 0 %}
                                                     N
                                                 {% elseif vocabularyc.scope == 1 %}
@@ -32,7 +33,9 @@
                                                     {{ vocabularyc.scope }}
                                                 {% endif %}
                                             </span>
-                                            <div class="list-group-item-title">{{ vocabularyc.vocabulary.vocabularyLabel }}</div>
+                                                    <div class="list-group-item-title">{{ vocabularyc.vocabulary.vocabularyLabel }}</div>
+                                       </a>
+                                            </a>
                                         </a>
                                     </div>
                                 {% endfor %}

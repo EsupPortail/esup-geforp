@@ -15,15 +15,13 @@ use App\Entity\Core\AbstractTrainee;
 /**
  * Class InscriptionRepository.
  */
-class InscriptionRepository extends EntityRepository
+final class InscriptionRepository extends EntityRepository
 {
 	/**
-	 * @param AbstractTrainee $trainee
-	 * @param AbstractSession $session
-	 *
-	 * @return mixed
-	 */
-	public function getTraineeSessionRegistration(AbstractTrainee $trainee, AbstractSession $session)
+  *
+  * @return mixed
+  */
+ public function getTraineeSessionRegistration(AbstractTrainee $trainee, AbstractSession $session)
 	{
 		return $this->createQueryBuilder('inscription')
 			->leftJoin(AbstractSession::class, 'session', 'WITH', 'inscription.session = session.id')

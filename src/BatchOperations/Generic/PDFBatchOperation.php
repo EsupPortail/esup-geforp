@@ -20,85 +20,47 @@ use Symfony\Bridge\Doctrine\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Twig\Environment;
 
 /**
  * Class PDFBatchOperation.
  */
-class PDFBatchOperation extends AbstractBatchOperation
+final class PDFBatchOperation extends AbstractBatchOperation
 {
     /**
-     * @var Pdf
+     * @var string
      */
-    protected $pdf;
+    private string $defaultTemplate = 'PDF/attestation.pdf.twig';
 
     /**
      * @var string
      */
-    protected $entityKey;
-
-    /**
-     * @var Environment
-     */
-    protected $twig;
+    private string $templates;
 
     /**
      * @var string
      */
-    protected $defaultTemplate;
-
-    /**
-     * @var string
-     */
-    protected $templates;
-
-    /**
-     * @var string
-     */
-    protected $filename;
-
-    /**
-     * @var string
-     */
-    protected $templateDiscriminator;
-
-    /**
-     * @var Security
-     */
-    protected $securityContext;
-
-    protected $parameterBag;
+    private string $templateDiscriminator = "";
 
     /**
      * PDFBatchOperation constructor.
      *
-     * @param Pdf $pdf
-     * @param Security   $securityContext
      * @param             $parameterBag
      */
-    public function __construct(Pdf $pdf, Security $securityContext, Environment $twig, $parameterBag)
+    public function __construct( protected Pdf $pdf, protected Security $security, protected Environment $twigEnvironment, protected $parameterBag)
     {
-        $this->pdf = $pdf;
-        $this->securityContext = $securityContext;
-        $this->twig = $twig;
-        $this->parameterBag = $parameterBag;
-/*        $this->pdf->getInternalGenerator()
-            ->setTemporaryFolder(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR);*/
-    }
 
-    /**
-     * @param string $entityKey
-     */
-    public function setEntityKey($entityKey)
-    {
-        $this->entityKey = $entityKey;
+        parent::__construct();
+        /*        $this->pdf->getInternalGenerator()
+            ->setTemporaryFolder(sys_get_temp_dir().DIRECTORY_SEPARATOR.'sygefor'.DIRECTORY_SEPARATOR);*/
+
     }
 
     /**
      * @param string $defaultTemplate
      */
-    public function setDefaultTemplate($defaultTemplate)
+    public function setDefaultTemplate(string $defaultTemplate): void
     {
         $this->defaultTemplate = $defaultTemplate;
     }
@@ -106,7 +68,7 @@ class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @param string $templates
      */
-    public function setTemplates($templates)
+    public function setTemplates(string $templates): void
     {
         $this->templates = $templates;
     }
@@ -114,204 +76,171 @@ class PDFBatchOperation extends AbstractBatchOperation
     /**
      * @param string $templateDiscriminator
      */
-    public function setTemplateDiscriminator($templateDiscriminator)
+    public function setTemplateDiscriminator(string $templateDiscriminator): void
     {
         $this->templateDiscriminator = $templateDiscriminator;
     }
 
     /**
-     * @param string $filename
-     */
-    public function setFilename($filename)
-    {
-        $this->filename = $filename;
-    }
-
-    /**
-     * @param array $idList
-     * @param array $options
      *
      * @return mixed
      */
-    public function execute(array $idList = array(), array $options = array())
+    public function execute(array $idList = [], array $options = []): mixed
     {
-        $accessor = PropertyAccess::createPropertyAccessor();
-
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
         $entities = $this->getObjectList($idList);
-        $pages = array();
-        /*
+
         foreach ($entities as $entity) {
-            // security check
-            if ($this->securityContext->isGranted('VIEW', $entity)) {
-                // determine the template
-                $template = $this->defaultTemplate;
-                if ($this->templateDiscriminator) {
-                    $key = $accessor->getValue($entity, $this->templateDiscriminator);
-                    if (isset($this->templates[$key])) {
-                        $template = $this->templates[$key];
+            if (!$this->security->isGranted('VIEW', $entity)) {
+                continue;
+            }
+
+            $template = $this->defaultTemplate;
+            $vars = [];
+            $filename = 'attestation.pdf';
+
+            if ($entity instanceof AbstractTraining) {
+                $template = 'PDF/training.pdf.twig';
+                $vars = [
+                    'training' => $entity,
+                    'logo' => null,
+                    'signature' => null,
+                ];
+                $filename = 'training.pdf';
+            }
+
+            elseif ($entity instanceof AbstractSession) {
+                $training = $entity->getTraining();
+                $template = 'PDF/session.pdf.twig';
+                $organization = $training->getOrganization();
+                $images = $this->doctrine->getRepository(ImageFile::class)->findBy(['organization' => $organization]);
+
+                $filesystem = new Filesystem();
+                $fileLogo = null;
+                $fileSignature = null;
+
+                foreach ($images as $image) {
+                    $filepath = $this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/' . $image->getFilepath();
+                    $urlBase = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/' . $image->getFilepath();
+
+                    if (str_contains($image->getName(), 'logo') && $filesystem->exists($filepath)) {
+                        $fileLogo = $urlBase;
+                    }
+
+                    if (str_contains($image->getName(), 'signature') && $filesystem->exists($filepath)) {
+                        $fileSignature = $urlBase;
                     }
                 }
 
-                $signature = null;
-                $training = null;
-                if ($entity instanceof AbstractTraining) {
-                    $training = $entity;
-                } elseif ($entity instanceof AbstractSession) {
-                    $training = $entity->getTraining();
-                } elseif ($entity instanceof AbstractInscription) {
-                    $training = $entity->getSession()->getTraining();
-                }
-                //checking signature file existence
-                $fs = new Filesystem();
-                if ($fs->exists($this->parameterBag->get('kernel.project_dir').'/../web/img/organization/'.$training->getOrganization()->getCode().'/signature.png')) {
-                    $signature = '/img/organization/'.$training->getOrganization()->getCode().'/signature.png';
+                $vars = [
+                    'training' => $training,
+                    'logo' => $fileLogo,
+                    'signature' => $fileSignature
+                ];
+
+                $filename = 'session.pdf';
+            }
+
+            elseif ($entity instanceof AbstractInscription) {
+                $inscription = $entity;
+                $session = $inscription->getSession();
+                $training = $session->getTraining();
+
+                // === Calcul des heures de présence ===
+                $tabDates = [];
+                foreach ($session->getDates() as $dateSes) {
+                    $start = clone $dateSes->getDateBegin();
+                    $interval = $dateSes->getDateEnd()->diff($start)->days;
+                    for ($i = 0; $i <= $interval; ++$i) {
+                        $tabDates[] = [
+                            "dateDeb" => $start->format('d/m/Y'),
+                            "nbHeuresMatin" => $dateSes->getHourNumberMorn(),
+                            "nbHeuresApr" => $dateSes->getHourNumberAfter()
+                        ];
+                        $start->modify('+1 day');
+                    }
                 }
 
-                // render the page
-                $vars = array();
-                $vars[$this->entityKey] = $entity;
-                $vars['link'] = $_SERVER['DOCUMENT_ROOT'];
-                //prevent escaping quotes in rendered template.
-                $vars['autoescape'] = false;
-                $vars['signature'] = $signature;
-                $pages[$entity->getId()] = $this->templating->render($template, $vars);
+                $nbHeuresPresence = 0;
+                foreach ($inscription->getPresences() as $presence) {
+                    foreach ($tabDates as $tabDate) {
+                        if ($presence->getDateBegin()->format('d/m/Y') === $tabDate["dateDeb"]) {
+                            if ($presence->getMorning() === "Présent") {
+                                $nbHeuresPresence += $tabDate["nbHeuresMatin"];
+                            }
+                            if ($presence->getAfternoon() === "Présent") {
+                                $nbHeuresPresence += $tabDate["nbHeuresApr"];
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                $nbHeuresSession = $session->getHourNumber();
+
+                // === Récupération logo & signature ===
+                $organization = $inscription->getOrganization();
+                $images = $this->doctrine->getRepository(ImageFile::class)->findBy(['organization' => $organization]);
+
+                $filesystem = new Filesystem();
+                $fileLogo = null;
+                $fileSignature = null;
+
+                foreach ($images as $image) {
+                    $filepath = $this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/' . $image->getFilepath();
+                    $urlBase = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/' . $image->getFilepath();
+
+                    if (str_contains($image->getName(), 'logo') && $filesystem->exists($filepath)) {
+                        $fileLogo = $urlBase;
+                    }
+
+                    if (str_contains($image->getName(), 'signature') && $filesystem->exists($filepath)) {
+                        $fileSignature = $urlBase;
+                    }
+                }
+
+                // === Encodage HTML sécurité ===
+                $trainee = $inscription->getTrainee();
+                $trainee->setFirstname(htmlentities($trainee->getFirstname()));
+                $trainee->setLastname(htmlentities($trainee->getLastname()));
+
+                $organization = $training->getOrganization();
+                $organization->setName(htmlentities($organization->getName()));
+                $organization->setAddress(htmlentities($organization->getAddress()));
+                $organization->setCity(htmlentities($organization->getCity()));
+                $training->setName(htmlentities($training->getName()));
+
+                foreach ($session->getTrainers() as $trainer) {
+                    $trainer->setFirstname(htmlentities((string) $trainer->getFirstname()));
+                    $trainer->setLastname(htmlentities((string) $trainer->getLastname()));
+                }
+
+                $template = 'PDF/attestation.pdf.twig';
+                $vars = [
+                    'inscription' => $inscription,
+                    'nbHeuresPresence' => $nbHeuresPresence . '/' . $nbHeuresSession,
+                    'logo' => $fileLogo,
+                    'signature' => $fileSignature
+                ];
+                $filename = 'attestation.pdf';
             }
+
+            // === Génération du PDF ===
+            $html = $this->twigEnvironment->render($template, $vars);
+            $pdfOutput = $this->pdf->getOutputFromHtml($html, ['print-media-type' => null]);
+
+            return new Response(
+                $pdfOutput,
+                Response::HTTP_OK,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"'
+                ]
+            );
         }
 
-        // add a page break between each page
-        $html = implode('<div style="page-break-after: always;"></div>', $pages);
-        $filename = $this->filename ? $this->filename : 'file.pdf';
-
-        // return the pdf
-        return new Response(
-            $this->pdf->getOutputFromHtml($html, array('print-media-type' => null)),
-            200,
-            array(
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            )
-        );*/
-        foreach ($entities as $entity) {
-            // security check
-            if ($this->securityContext->isGranted('VIEW', $entity)) {
-                // determine the template
-                $template = $this->defaultTemplate;
-                if ($this->templateDiscriminator) {
-                    $key = $accessor->getValue($entity, $this->templateDiscriminator);
-                    if (isset($this->templates[$key])) {
-                        $template = $this->templates[$key];
-                    }
-                }
-
-                $signature = null;
-                $training = null;
-                if ($entity instanceof AbstractTraining) {
-                    $training = $entity;
-                } elseif ($entity instanceof AbstractSession) {
-                    $training = $entity->getTraining();
-                } elseif ($entity instanceof AbstractInscription) {
-                    $inscription = $entity;
-                    $session = $inscription->getSession();
-
-                    // Gestion nombre d'heures de formation
-                    // On crée le tableau de dates correspondant au tableau des présences
-                    $tabDates = array();
-                    $nbJoursDate2 = -1;
-                    foreach ($session->getDates() as $dateSes) {
-                        // Conversion date de début de session
-                        $dateDeb = $dateSes->getDateBegin();
-                        $dateNewS = $dateDeb->format('d/m/Y');
-                        $tab = explode('/', $dateNewS);
-                        $dateNew = new \DateTime();
-                        $dateNew->setDate($tab[2], $tab[1], $tab[0]);
-
-                        $nbJoursDate2 = date_diff($dateSes->getDateEnd(), $dateSes->getDateBegin());
-                        $nbJoursDate = $nbJoursDate2->format('%a');
-                        // création du tableau des dates suivant le nombre de jours à afficher
-                        for ($j = 0; $j < $nbJoursDate + 1; $j++) {
-                            $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
-                            $dateNew->modify('+ 1 days');
-
-                        }
-                    }
-
-                    // calcul du nombre d'heures de présence effective
-                    // On initialise le nombre d'heures de présence
-                    $nbHeuresPresence = 0;
-                    // Pour chaque presence, on compare avec le tableau des dates et on calcule le nombre d'heures
-                    foreach ($inscription->getPresences() as $pres) {
-                        foreach ($tabDates as $datePres) {
-                            if ($pres->getDateBegin()->format('d/m/Y') == $datePres["dateDeb"]) {
-                                if ($pres->getMorning() == "Présent") {
-                                    $nbHeuresPresence += $datePres["nbHeuresMatin"];
-                                }
-                                if ($pres->getAfternoon() == "Présent") {
-                                    $nbHeuresPresence += $datePres["nbHeuresApr"];
-                                }
-                                break;
-                            }
-                        }
-                    }
-                    $nbHeuresSession = $session->getHourNumber();
-
-                    // Recuperation des fichiers logos et signature
-                    $organization = $inscription->getOrganization();
-                    $images = $this->doctrine->getRepository('App\Entity\Term\ImageFile')->findBy(array('organization' => $organization));
-
-                    //checking file existence
-                    $fileSignature = null;
-                    $fileLogo = null;
-                    $fs = new Filesystem();
-                    foreach ($images as $img) {
-                        $fileName = $img->getName();
-                        if(strpos($fileName, 'logo') !== false){
-                            if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                                $fileLogo = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/'.$img->getFilepath();
-                            }
-                        }
-                        if(strpos($fileName, 'signature') !== false){
-                            if ($fs->exists($this->parameterBag->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
-                                $fileSignature = 'https://' . $this->parameterBag->get('front_host') . '/img/vocabulary/'.$img->getFilepath();
-                            }
-                        }
-                    }
-                    // patch pb encodage HTML
-                    $firstNameTrainee = htmlentities($inscription->getTrainee()->getFirstname());
-                    $inscription->getTrainee()->setFirstname($firstNameTrainee);
-                    $lastNameTrainee = htmlentities($inscription->getTrainee()->getLastname());
-                    $inscription->getTrainee()->setLastname($lastNameTrainee);
-                    $orgName = htmlentities($session->getTraining()->getOrganization()->getName());
-                    $session->getTraining()->getOrganization()->setName($orgName);
-                    $orgAdr = htmlentities($session->getTraining()->getOrganization()->getAddress());
-                    $session->getTraining()->getOrganization()->setAddress($orgAdr);
-                    $orgCity = htmlentities($session->getTraining()->getOrganization()->getCity());
-                    $session->getTraining()->getOrganization()->setCity($orgCity);
-                    $nameForm = htmlentities($session->getTraining()->getName());
-                    $session->getTraining()->setName($nameForm);
-                    $trainers = $session->getTrainers();
-                    foreach ($trainers as $trainer) {
-                        $firstNameTrainer = htmlentities($trainer->getFirstname());
-                        $trainer->setFirstName($firstNameTrainer);
-                        $lastNameTrainer = htmlentities($trainer->getLastname());
-                        $trainer->setLastname($lastNameTrainer);
-                    }
-                    $session->getTraining()->setName($nameForm);
-
-                    $pdfView = $this->twig->render('PDF/attestation.pdf.twig', array(
-                        'inscription' => $inscription,
-                        'nbHeuresPresence' => $nbHeuresPresence . "/" . $nbHeuresSession,
-                        'logo' => $fileLogo,
-                        'signature' => $fileSignature
-                    ));
-                    
-                    return new Response(
-                        $this->pdf->getOutputFromHtml($pdfView, array('print-media-type' => null)), 200,
-                        array(
-                            'Content-Type' => 'application/pdf',
-                            'Content-Disposition' => 'attachment; filename="attestation.pdf"',)
-                    );
-                }
-            }
-        }
+        // Si aucun PDF généré
+        return ['fileUrl' => null];
     }
+
 }

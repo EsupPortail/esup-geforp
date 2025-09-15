@@ -2,15 +2,15 @@
  * Include a participation table block for a given trainer
  * Usage : <div participations-block="trainer"></div>
  */
-sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', function($dialog, $searchFactory) {
+sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', function ($dialog, $searchFactory) {
     return {
         restrict: 'EA',
         scope: {
             trainer: '=participationsBlock'
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             // custum empty message
-            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucune session pour ce formateur.";
+            scope.emptyMsg = attrs.emptyMsg ? attrs.emptyMsg : "Il n'y a aucune session pour ce formateur.";
             scope.$dialog = $dialog;
 
             // get participations from elasticsearch
@@ -19,9 +19,9 @@ sygeforApp.directive('participationsBlock', ['$dialog', '$searchFactory', functi
             search.query.sorts = {'session.datebegin': 'desc'};
             search.query.size = 20;
             scope.search = search;
-            search.search().then(function() {
+            search.search().then(function () {
                 // watch page
-                scope.$watch('search.query.page', function(newValue, oldValue) {
+                scope.$watch('search.query.page', function (newValue, oldValue) {
                     if (newValue != oldValue) {
                         search.search();
                     }

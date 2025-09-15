@@ -5,10 +5,10 @@ namespace App\BatchOperations\SemesteredTraining;
 use App\BatchOperations\Training\ConvertTypeBatchOperation as BaseConvertTypeBatchOperation;
 use App\Model\SemesteredTraining;
 
-class SemesteredTrainingConvertTypeBatchOperation extends BaseConvertTypeBatchOperation
+final class SemesteredTrainingConvertTypeBatchOperation extends BaseConvertTypeBatchOperation
 {
-    protected function getObjectList($idList = array())
+    protected function getObjectList($idList = []): array
     {
-        return SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager());
+        return SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager(), excludedTypes: []);
     }
 }

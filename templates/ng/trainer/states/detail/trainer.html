@@ -2,13 +2,19 @@
     <div class="row">
         <div class="col-md-8">
             <div class="btn-group pull-right">
-                <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement" ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
-                   <!--ng-if="$user.hasAccessRight('sygefor_trainer.rights.trainer.all.update')" -->
-                <a class="btn btn-fa" href="" tooltip="Publipostage" ng-click="$dialog.open('batch.publipost', { items: [trainer.id], service: 'trainer' })"><span class="fa fa-file-word-o"></span></a>
-                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="trainer._accessRights.delete" ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Changer le centre de rattachement"
+                   ng-click="changeOrganization()"><span class="fa fa-university"></span></a>
+                <!--ng-if="$user.hasAccessRight('sygefor_trainer.rights.trainer.all.update')" -->
+                <a class="btn btn-fa" href="" tooltip="Publipostage"
+                   ng-click="$dialog.open('batch.publipost', { items: [trainer.id], service: 'trainer' })"><span
+                        class="fa fa-file-word-o"></span></a>
+                <a class="btn btn-fa" href="" tooltip="Supprimer" ng-if="trainer._accessRights.delete"
+                   ng-click="delete()"><span class="fa fa-trash-o"></span></a>
             </div>
 
-            <div class="pre-title">Enregistré le {{ trainer.createdat|date: 'dd/MM/yyyy' }} - {{ trainer.organization.name }}</div>
+            <div class="pre-title">Enregistré le {{ trainer.createdat|date: 'dd/MM/yyyy' }} - {{
+                trainer.organization.name }}
+            </div>
 
             <h2>{{ trainer.fullname }}</h2>
             <h3><span>Informations personnelles</span></h3>
@@ -16,22 +22,35 @@
             <div class="row mb-1">
                 <div class="col-lg-6">
                     <ul class="summary">
-                        <li><label>Nom</label> <span sf-xeditable="form.children.lastname">{{ trainer.lastname }}</span></li>
-                        <li><label>Prénom</label> <span sf-xeditable="form.children.firstname">{{ trainer.firstname }}</span></li>
-                        <li><label>Email</label> <span sf-xeditable="form.children.email">{{ trainer.email }}</span></li>
-                        <li><label>Téléphone</label> <span sf-xeditable="form.children.phonenumber">{{ trainer.phonenumber }}</span></li>
-                        <li><label>Site web</label> <span sf-xeditable="form.children.website">{{ trainer.website }}</span></li>
-                        <li><label>Publié sur le web</label>  <span sf-xeditable="form.children.ispublic">{{ trainer.ispublic ? 'Oui' : 'Non' }}</span></li>
-                        <li title="Autoriser l'envoi de courriels pour les stagiaires"><label>Autoriser les courriels</label> <span sf-xeditable="form.children.isallowsendmail">{{ trainer.isallowsendmail === true || trainer.isallowsendmail === undefined ? 'Oui' : 'Non' }}</span></li>
+                        <li><label>Nom</label> <span sf-xeditable="form.children.lastname">{{ trainer.lastname }}</span>
+                        </li>
+                        <li><label>Prénom</label> <span
+                                sf-xeditable="form.children.firstname">{{ trainer.firstname }}</span></li>
+                        <li><label>Email</label> <span sf-xeditable="form.children.email">{{ trainer.email }}</span>
+                        </li>
+                        <li><label>Téléphone</label> <span sf-xeditable="form.children.phonenumber">{{ trainer.phonenumber }}</span>
+                        </li>
+                        <li><label>Site web</label> <span
+                                sf-xeditable="form.children.website">{{ trainer.website }}</span></li>
+                        <li><label>Publié sur le web</label> <span sf-xeditable="form.children.ispublic">{{ trainer.ispublic ? 'Oui' : 'Non' }}</span>
+                        </li>
+                        <li title="Autoriser l'envoi de courriels pour les stagiaires"><label>Autoriser les
+                            courriels</label> <span sf-xeditable="form.children.isallowsendmail">{{ trainer.isallowsendmail === true || trainer.isallowsendmail === undefined ? 'Oui' : 'Non' }}</span>
+                        </li>
                     </ul>
                 </div>
                 <div class="col-lg-6">
                     <ul class="summary">
-                        <li><label>Etablissement</label> <span sf-xeditable="form.children.institution">{{ trainer.institution.name }}</span></li>
-                        <li><label>Formateur interne</label> <span sf-xeditable="form.children.isorganization">{{ trainer.isorganization ? 'Oui' : 'Non' }}</span></li>
-                        <li><label>Service</label> <span sf-xeditable="form.children.service">{{ trainer.service }}</span></li>
-                        <li><label>Fonction, statut</label>  <span sf-xeditable="form.children.status">{{ trainer.status }}</span></li>
-                        <li><label>Archivé</label> <span sf-xeditable="form.children.isarchived">{{ trainer.isarchived ? 'Oui' : 'Non' }}</span></li>
+                        <li><label>Etablissement</label> <span sf-xeditable="form.children.institution">{{ trainer.institution.name }}</span>
+                        </li>
+                        <li><label>Formateur interne</label> <span sf-xeditable="form.children.isorganization">{{ trainer.isorganization ? 'Oui' : 'Non' }}</span>
+                        </li>
+                        <li><label>Service</label> <span
+                                sf-xeditable="form.children.service">{{ trainer.service }}</span></li>
+                        <li><label>Fonction, statut</label> <span sf-xeditable="form.children.status">{{ trainer.status }}</span>
+                        </li>
+                        <li><label>Archivé</label> <span sf-xeditable="form.children.isarchived">{{ trainer.isarchived ? 'Oui' : 'Non' }}</span>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -41,8 +60,10 @@
             <div class="row mb-1">
                 <div class="col-lg-6">
                     <ul class="summary">
-                        <li><label>Adresse</label> <span sf-xeditable="form.children.address" data-type="textarea">{{ trainer.address }}</span></li>
-                        <li><label>Code postal</label> <span sf-xeditable="form.children.zip">{{ trainer.zip }}</span></li>
+                        <li><label>Adresse</label> <span sf-xeditable="form.children.address" data-type="textarea">{{ trainer.address }}</span>
+                        </li>
+                        <li><label>Code postal</label> <span sf-xeditable="form.children.zip">{{ trainer.zip }}</span>
+                        </li>
                         <li><label>Ville</label> <span sf-xeditable="form.children.city">{{ trainer.city }}</span></li>
                     </ul>
                 </div>
@@ -50,10 +71,12 @@
 
             <div class="row">
                 <div class="col-lg-12">
-                    <h3><span>Observations</span></h3><hr>
+                    <h3><span>Observations</span></h3>
+                    <hr>
                     <div class="row">
                         <div class="col-lg-10">
-                            <p><span sf-xeditable="form.children.comments" data-type="textarea">{{ trainer.comments }}</span></p>
+                            <p><span sf-xeditable="form.children.comments"
+                                     data-type="textarea">{{ trainer.comments }}</span></p>
 
                         </div>
                     </div>

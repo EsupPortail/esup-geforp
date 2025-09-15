@@ -1,6 +1,11 @@
 # see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
+    serializer:
+        enable_attributes: true # same results with false, or null
+    handle_all_throwables: true
     secret: '%env(APP_SECRET)%'
+    csrf_protection:
+        enabled: true
     #csrf_protection: true
     http_method_override: false
 
@@ -20,5 +25,8 @@ framework:
 when@test:
     framework:
         test: true
+        handle_all_throwables: true
+        annotations:
+            enabled: false
         session:
             storage_factory_id: session.storage.factory.mock_file

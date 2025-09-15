@@ -1,67 +1,240 @@
 {{ form_start(form) }}
 <section>
     <h2>Informations personnelles</h2>
-    {{ form_row(form.title) }}
-    {{ form_row(form.lastname) }}
-    {{ form_row(form.firstname) }}
-    {{ form_row(form.email) }}
-    {{ form_row(form.birthdate) }}
-    {% if disableAddress == 1  %}
-        {{ form_row(form.phonenumber, { 'attr':{'disabled':'disabled'} } ) }}
-        {{ form_row(form.address, { 'attr':{'disabled':'disabled'} } ) }}
-        {{ form_row(form.zip, { 'attr':{'disabled':'disabled'}}) }}
+    <div class="form-group">
+        {{ form_label(form.title, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.lastname, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.lastname, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.firstname, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.firstname, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.email, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.birthdate, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.birthdate, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    {% if disableAddress == 1 %}
+        <div class="form-group">
+            {{ form_label(form.phonenumber, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.phonenumber, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.address, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.address, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.zip, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.zip, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
         {{ form_row(form.city, { 'attr':{'disabled':'disabled'}}) }}
     {% else %}
-        {{ form_row(form.phonenumber) }}
-        {{ form_row(form.address) }}
-        {{ form_row(form.zip) }}
-        {{ form_row(form.city) }}
-    {% endif %}
-    {{ form_row(form.institution) }}
-    {{ form_row(form.service) }}
-    {{ form_row(form.publictype) }}
-    {{ form_row(form.amustatut) }}
-    {{ form_row(form.bap) }}
-    {{ form_row(form.corps) }}
-    {{ form_row(form.category) }}
-    {% if etablissement == "AMU"  %}
-        {{ form_row(form.campus) }}
-    {% else %}
-        <div style="display:none" >
-            {{ form_row(form.campus) }}
+        <div class="form-group">
+            {{ form_label(form.phonenumber, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.phonenumber, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.address, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.address, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.zip, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.zip, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.city, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.city, {'attr': {'class': 'form-control'}}) }}
+            </div>
         </div>
     {% endif %}
-    {{ form_row(form.fonction) }}
+    <div class="form-group">
+        {{ form_label(form.institution, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.institution, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.service, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.service, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.publictype, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.publictype, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.amustatut, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.amustatut, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.bap, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.bap, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.corps, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.corps, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    <div class="form-group">
+        {{ form_label(form.category, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.category, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+    {% if etablissement == "AMU" %}
+        <div class="form-group">
+            {{ form_label(form.campus, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    {% else %}
+        <div style="display:none">
+            <div class="form-group">
+                {{ form_label(form.campus, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+                <div class="col-sm-10">
+                    {{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <div class="form-group">
+    {{ form_label(form.fonction, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.fonction, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
     <br>
     <h2> Responsable hiérarchique <img class="glyphicon glyphicon-question-sign" title="Si vous êtes personnel BIATSS (titulaire ou non titulaire) : 
 - vous devez saisir obligatoirement ici les coordonnées de votre responsable hiérarchique qui validera votre inscription
 
 Si vous êtes enseignant, enseignant-chercheur, doctorant contractuel (démarche facultative) : 
-- vous pouvez saisir les coordonnées d'une personne à informer de votre inscription en formation : directeur de composante (ou de département d'enseignement), directeur de laboratoire, directeur de thèse.   " src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
+- vous pouvez saisir les coordonnées d'une personne à informer de votre inscription en formation : directeur de composante (ou de département d'enseignement), directeur de laboratoire, directeur de thèse.   "
+                                       src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
     </h2>
-    {% if flagAMU == 1  %}
-        {{ form_row(form.lastnamesup) }}
-        {{ form_row(form.firstnamesup) }}
-        {{ form_row(form.emailsup) }}
+    {% if flagAMU == 1 %}
+        <div class="form-group">
+        {{ form_label(form.lastnamesup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.lastnamesup, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+    <div class="form-group">
+        {{ form_label(form.firstnamesup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+        <div class="col-sm-10">
+            {{ form_widget(form.firstnamesup, {'attr': {'class': 'form-control'}}) }}
+        </div>
+    </div>
+        <div class="form-group">
+            {{ form_label(form.emailsup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.emailsup, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
     {% else %}
-        {{ form_row(form.lastnamesup) }}
-        {{ form_row(form.firstnamesup) }}
-        {{ form_row(form.emailsup) }}
+        <div class="form-group">
+            {{ form_label(form.lastnamesup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.lastnamesup, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.firstnamesup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.firstnamesup, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.emailsup, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.emailsup, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
     {% endif %}
     <br>
 
-    {% if activeCorrForm == 0  %}
-        <div style="display:none" >
-        {{ form_row(form.lastnamecorr) }}
-        {{ form_row(form.firstnamecorr) }}
-        {{ form_row(form.emailcorr) }}
+    {% if activeCorrForm == 0 %}
+        <div style="display:none">
+            <div class="form-group">
+                {{ form_label(form.lastnamecorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+                <div class="col-sm-10">
+                    {{ form_widget(form.lastnamecorr, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form_label(form.firstnamecorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+                <div class="col-sm-10">
+                    {{ form_widget(form.firstnamecorr, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
+            <div class="form-group">
+            {{ form_label(form.emailcorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+                <div class="col-sm-10">
+                    {{ form_widget(form.emailcorr, {'attr': {'class': 'form-control'}}) }}
+                </div>
+            </div>
         </div>
     {% else %}
-        <h2> Correspondant formation <img class="glyphicon glyphicon-question-sign" title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."  src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
+        <h2> Correspondant formation <img class="glyphicon glyphicon-question-sign"
+                                          title="Vous pouvez saisir ici, s’il y a lieu, les coordonnées du correspondant formation de votre laboratoire, composante / département d‘enseignement ou service (si celui-ci souhaite être en copie des mails de suivi de vos inscriptions en formation)."
+                                          src="{{ asset('img/help.png') }}" height="30" alt="Aide"/>
         </h2>
-        {{ form_row(form.lastnamecorr) }}
-        {{ form_row(form.firstnamecorr) }}
-        {{ form_row(form.emailcorr) }}
+        <div class="form-group">
+        {{ form_label(form.lastnamecorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.lastnamecorr, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.firstnamecorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.firstnamecorr, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form_label(form.emailcorr, null, {'label_attr': {'class': 'col-sm-2 control-label'}}) }}
+            <div class="col-sm-10">
+                {{ form_widget(form.emailcorr, {'attr': {'class': 'form-control'}}) }}
+            </div>
+        </div>
     {% endif %}
 </section>
 <section>

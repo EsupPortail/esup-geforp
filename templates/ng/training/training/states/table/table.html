@@ -22,18 +22,23 @@
                 </thead>
                 <tbody>
                 <tr ng-repeat="item in search.result.items" ng-class="{warning: isSelected(item.id)}">
-                    <td ng-click="switchSelect(item.id)" stop-event><i class="fa" ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i></td>
+                    <td ng-click="switchSelect(item.id)" stop-event><i class="fa"
+                                                                       ng-class="{'fa-square-o': !isSelected(item.id), 'fa-check-square-o': isSelected(item.id)}"></i>
+                    </td>
                     <!--td>{{ item.training.organization.name.replace('Centre de', '') }}</td-->
                     <td>{{ item.year }}</td>
                     <td>{{ item.semester }}</td>
                     <td>{{ item.training.number }}</td>
                     <td>{{ item.training.typeLabel }}</td>
-                    <td><a ui-sref="training.detail.view({id: item.id})">{{ item.training.name ? item.training.name : '(Sans titre)' }}</a></td>
+                    <td><a ui-sref="training.detail.view({id: item.id})">{{ item.training.name ? item.training.name :
+                        '(Sans titre)' }}</a></td>
                     <td>{{ item.training.category.name ? item.training.category.name : item.category }}</td>
                     <td>{{ item.training.trainers }}</td>
                     <td>{{ item.sessionscount }}</td>
-                    <td><a ui-sref="session.detail.view({id: item.lastsession.id, training: item.training.id})">{{ item.lastsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>
-                    <td><a ui-sref="session.detail.view({id: item.nextsession.id, training: item.training.id})">{{ item.nextsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>
+                    <td><a ui-sref="session.detail.view({id: item.lastsession.id, training: item.training.id})">{{
+                        item.lastsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>
+                    <td><a ui-sref="session.detail.view({id: item.nextsession.id, training: item.training.id})">{{
+                        item.nextsession.datebegin|date: 'dd/MM/yyyy' }}</a></td>
                 </tr>
                 </tbody>
             </table>

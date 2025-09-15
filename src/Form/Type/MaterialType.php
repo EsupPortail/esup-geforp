@@ -8,6 +8,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class MaterialType.
  */
-class MaterialType extends AbstractMaterialType
+final class MaterialType extends AbstractMaterialType
 {
 }

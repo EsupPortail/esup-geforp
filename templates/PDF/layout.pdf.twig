@@ -1,24 +1,24 @@
 <html>
 <head>
-    <link href="https://{{front_url}}/{{~ asset('build/pdf.css')}}" rel="stylesheet" type="text/css" />
+    <link href="https://{{ front_url }}/{{~ asset('build/pdf.css') }}" rel="stylesheet" type="text/css"/>
     {% block head %}{% endblock %}
 </head>
 <body class="organization-{{ organization.code }}">
-    <div class="row">
-        <div class="col-xs-7">
-            <img src='{{ logo }}' />
-        </div>
-        <div class="col-xs-5">
-            {% autoescape false %}
-                <strong>{{ organization.name }}</strong><br>
-                {{ organization.address }} <br>
-                {{ organization.zip }} {{ organization.city }}
-            {% endautoescape %}
-        </div>
+<div class="row">
+    <div class="col-xs-7">
+        <img src='{{ logo }}'/>
     </div>
-    <div class="row">
-        <div class="col-xs-12">
-            {% block body %}{% endblock %}
-        </div>
+    <div class="col-xs-5">
+        {% autoescape false %}
+            <strong>{{ organization.name }}</strong><br>
+            {{ organization.address }} <br>
+            {{ organization.zip }} {{ organization.city }}
+        {% endautoescape %}
     </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {% block body %}{% endblock %}
+    </div>
+</div>
 </body>

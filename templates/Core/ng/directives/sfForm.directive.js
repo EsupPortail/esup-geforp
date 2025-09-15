@@ -1,32 +1,29 @@
 /**
  * Symfony2 form
  */
-sygeforApp.directive('sfForm', ['$http', function($http) {
+sygeforApp.directive('sfForm', ['$http', function ($http) {
     /**
      * Extract data from a FormView
      * This function is recursive
      * @param formView
      */
-    var extractData = function(formView) {
+    var extractData = function (formView) {
         var name = formView.name;
         var data = {};
 
         if (formView.children) {
             // if the element has children, get the data from them
-            for(var key in formView.children) {
+            for (var key in formView.children) {
                 angular.extend(data, extractData(formView.children[key]));
             }
-        }
-        else {
+        } else {
             if (typeof formView.checked != "undefined") {
                 if (typeof formView.value === "string") {
                     data = formView.checked;
-                }
-                else {
+                } else {
                     data = formView.value;
                 }
-            }
-            else {
+            } else {
                 // get the data from the value property
                 data = formView.value;
             }
@@ -44,17 +41,17 @@ sygeforApp.directive('sfForm', ['$http', function($http) {
     return {
         restrict: 'A',
         require: 'form',
-        scope:{
+        scope: {
             "form": "=sfForm",
             "onSuccess": "&",
             "onError": "&",
             "onPreSubmit": "&"
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             /**
              * Process the form
              */
-            var process = function() {
+            var process = function () {
 
                 // build the post array
                 var data = extractData(scope.form);
@@ -65,27 +62,25 @@ sygeforApp.directive('sfForm', ['$http', function($http) {
                 }
 
                 // send the request
-                $http.post(element.attr('action'), data).
-                    success(function(data, status, headers, config) {
-                        var form = attrs.jsonPath ? data[attrs.jsonPath] : data;
-                        if(form !== undefined && form.valid !== undefined && !form.valid) {
-                            // invalid form, update the scope object
-                            angular.extend( scope.form, form);
-                        } else {
-                            // success
-                            scope.onSuccess({data: data, status: status , headers: headers, config: config});
-                        }
-                    }).
-                    error(function(data, status, headers, config) {
-                        scope.onError({data: data, status: status , headers: headers, config: config});
-                    });
+                $http.post(element.attr('action'), data).success(function (data, status, headers, config) {
+                    var form = attrs.jsonPath ? data[attrs.jsonPath] : data;
+                    if (form !== undefined && form.valid !== undefined && !form.valid) {
+                        // invalid form, update the scope object
+                        angular.extend(scope.form, form);
+                    } else {
+                        // success
+                        scope.onSuccess({data: data, status: status, headers: headers, config: config});
+                    }
+                }).error(function (data, status, headers, config) {
+                    scope.onError({data: data, status: status, headers: headers, config: config});
+                });
             };
 
             /**
              * on form submit, build the query
              * and send it to the server
              */
-            element.on('submit', function(event) {
+            element.on('submit', function (event) {
                 process();
                 return false;
             });
@@ -96,7 +91,7 @@ sygeforApp.directive('sfForm', ['$http', function($http) {
 /**
  * Generate a widget based on a form element
  */
-sygeforApp.directive('sfFormWidget', ['$compile', function($compile) {
+sygeforApp.directive('sfFormWidget', ['$compile', function ($compile) {
 
     var widgets = {
         text: "<input type='text'>",
@@ -110,21 +105,21 @@ sygeforApp.directive('sfFormWidget', ['$compile', function($compile) {
         restrict: 'EA',
         replace: true,
         scope: {
-            element:'=sfFormWidget'
+            element: '=sfFormWidget'
         },
-        link: function(scope, element, attrs) {
+        link: function (scope, element, attrs) {
             /**
              * update
              */
-            var update = function() {
+            var update = function () {
                 var elt = scope.element;
-                if(!elt) {
+                if (!elt) {
                     return;
                 }
 
                 var type = elt.type || 'text';
                 var tpl = "<input type='" + type + "'>";
-                if(widgets[type]) {
+                if (widgets[type]) {
                     tpl = widgets[elt.type];
                 }
 
@@ -139,25 +134,24 @@ sygeforApp.directive('sfFormWidget', ['$compile', function($compile) {
                 }
 
                 // required
-                if(elt.required) {
+                if (elt.required) {
                     elem.attr('required', true);
                 }
 
                 // attr
-                if(elt.attr) {
-                    for(var name in elt.attr) {
+                if (elt.attr) {
+                    for (var name in elt.attr) {
                         elem.attr(name, elt.attr[name]);
                     }
                 }
 
                 // get the attrs from the markup to add it to the new element
                 for (attr in attrs.$attr) {
-                    if (attrs.hasOwnProperty(attr)){
+                    if (attrs.hasOwnProperty(attr)) {
                         // prefer not compiled attribute
                         if (attrs.$attr[attr]) {
                             elem.attr(attrs.$attr[attr], attrs[attr]);
-                        }
-                        else {
+                        } else {
                             elem.attr(attr, attrs[attr]);
                         }
                     }
@@ -170,7 +164,7 @@ sygeforApp.directive('sfFormWidget', ['$compile', function($compile) {
             /**
              * watch element
              */
-            scope.$watch('element', function() {
+            scope.$watch('element', function () {
                 update();
             });
         }

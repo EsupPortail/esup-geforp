@@ -19,14 +19,11 @@ use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -34,38 +31,36 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Message;
 
-/**
- * This controller regroup actions related to registration.
- *
- * @Route("/account/team")
- * @Security("is_granted('IS_AUTHENTICATED_FULLY') and is_granted('ROLE_RESP')")
- */
+#[Route(path: '/account/team')]
 class TeamAccountController extends AbstractController
 {
     protected $inscriptionClass = Inscription::class;
 
-    /**
-     * Registrations.
-     *
-     * @Route("/registrations", name="front.account.team.registrations")
-     * @Template("Front/Account/team/registrations.html.twig")
-     * @Method("GET")
-     */
-    public function teamregistrationsAction(Request $request, ManagerRegistry $doctrine)
+    public function Index(): Response
+    {
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
+            throw new AccessDeniedException('Vous devez être pleinement authentifié pour accéder à cette page.');
+        }
+        return $this->render('Front/Account/team/registrations.html.twig');
+    }
+
+    #[Route(path: '/registrations', name: 'front.account.team.registrations', methods: ['GET'])]
+    public function teamregistrations(ManagerRegistry $doctrine): array
     {
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail'], 'isactive' => true));
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findBy(['emailsup' => $user->getCredentials()['mail'], 'isactive' => true]);
 
-        $upcoming = array();
-        $upcomingIds = array();
-        $past = array();
-        $pastEffective = array();
-        $pastOther = array();
+        $upcoming = [];
+        $upcomingIds = [];
+        $past = [];
+        $pastEffective = [];
+        $pastOther = [];
         $now = new \DateTime();
 
         if (!empty($arTrainee)) {
@@ -90,51 +85,40 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return array('user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds));
+        return ['user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), $this->render('Front/Account/team/registrations.html.twig')];
     }
 
-    /**
-     * Trainees.
-     *
-     * @Route("/trainees", name="front.account.team.trainees")
-     * @Template("Front/Account/team/trainees.html.twig")
-     * @Method("GET")
-     */
-    public function teamtraineesAction(Request $request, ManagerRegistry $doctrine)
+    #[Route(path: '/trainees', name: 'front.account.team.trainees', methods: 'GET')]
+    public function teamtrainees(ManagerRegistry $doctrine): array
     {
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $traineeUser = $arTraineeUser[0];
 
         // Recupération des agents dont on est responsable
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $user->getCredentials()['mail'], 'isactive' => true));
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findBy(['emailsup' => $user->getCredentials()['mail'], 'isactive' => true]);
 
-        return array('user' => $traineeUser, 'trainees' => $arTrainee);
+        return ['user' => $traineeUser, 'trainees' => $arTrainee, $this->render('Front/Account/team/trainees.html.twig')];
     }
 
-    /**
-     * Registrations from one trainee.
-     *
-     * @Route("/trainee/{id}/registrations", name="front.account.team.trainee.registrations")
-     * @Template("Front/Account/team/trainee-registrations.html.twig")
-     * @Method("GET")
-     */
-    public function traineeregistrationsAction(Request $request, ManagerRegistry $doctrine, $id)
+
+    #[Route(path: '/trainee/{id}/registrations', name: 'front.account.team.trainee.registrations', methods: 'GET')]
+    public function traineeregistrations(ManagerRegistry $doctrine, $id): array
     {
         $user = $this->getUser();
-        $arSup = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arSup = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $sup = $arSup[0];
 
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findById($id);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findById($id);
         $trainee = $arTrainee[0];
 
         $inscriptions = $trainee->getInscriptions();
-        $upcoming = array();
-        $upcomingIds = array();
-        $past = array();
-        $pastEffective = array();
-        $pastOther = array();
+        $upcoming = [];
+        $upcomingIds = [];
+        $past = [];
+        $pastEffective = [];
+        $pastOther = [];
 
         $now = new \DateTime();
         foreach ($inscriptions as $inscription) {
@@ -154,7 +138,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return array('user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee);
+        return ['user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee, $this->render('Front/Account/team/trainee-registrations.html.twig')];
     }
 
 }

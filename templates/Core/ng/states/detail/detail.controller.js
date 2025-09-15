@@ -1,7 +1,7 @@
 /**
  * ListDetailController
  */
-sygeforApp.controller('ListDetailController', ['$scope', '$http', '$listState', '$state', function($scope, $http, $listState, $state) {
+sygeforApp.controller('ListDetailController', ['$scope', '$http', '$listState', '$state', function ($scope, $http, $listState, $state) {
     $scope.resultTemplateUrl = $listState.current.data.resultTemplateUrl;
     $scope.$state = $state;
 
@@ -11,8 +11,8 @@ sygeforApp.controller('ListDetailController', ['$scope', '$http', '$listState', 
     /**
      * Watch items
      */
-    $scope.$watch('search.result.items', function(items) {
-        if(items.length > 0 && !params.id) {
+    $scope.$watch('search.result.items', function (items) {
+        if (items.length > 0 && !params.id) {
             var state = $listState.current.name.replace(/\.view$/g, "") + '.view';
             $listState.go(state, {id: items[0].id});
         }

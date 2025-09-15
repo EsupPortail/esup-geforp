@@ -1,7 +1,7 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 'search', 'BaseListController', '$state', '$timeout', '$dialog', 'growl', function($scope, $user, $injector, search, BaseListController, $state, $timeout, $dialog, growl) {
+sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 'search', 'BaseListController', '$state', '$timeout', '$dialog', 'growl', function ($scope, $user, $injector, search, BaseListController, $state, $timeout, $dialog, growl) {
     $injector.invoke(BaseListController, this, {key: 'trainee', $scope: $scope, $search: search});
 
     // batch operations
@@ -9,8 +9,8 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
         {
             icon: 'fa-envelope-o',
             label: 'Envoyer un email',
-            execute: function(items, $dialog) {
-                return $dialog.open('batch.email', { items: items, targetClass: 'App\\Entity\\Core\\AbstractTrainee' })
+            execute: function (items, $dialog) {
+                return $dialog.open('batch.email', {items: items, targetClass: 'App\\Entity\\Core\\AbstractTrainee'})
             }
         },
         {
@@ -20,15 +20,15 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
                 {
                     icon: 'fa-file-excel-o',
                     label: 'CSV',
-                    execute: function(items, $dialog) {
-                        return $dialog.open('batch.export.csv', { items: items, service: 'trainee' })
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.export.csv', {items: items, service: 'trainee'})
                     }
                 },
                 {
                     icon: 'fa-external-link',
                     label: 'Publipostage',
-                    execute: function(items, $dialog) {
-                        return $dialog.open('batch.publipost', { items: items, service: 'trainee' })
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.publipost', {items: items, service: 'trainee'})
                     }
                 }
             ]
@@ -50,14 +50,14 @@ sygeforApp.controller('TraineeListController', ['$scope', '$user', '$injector', 
 
     // facets
     $scope.facets = {
-        'title' : {
+        'title': {
             label: 'Civilité'
         },
-        'institution.name.source' : {
+        'institution.name.source': {
             label: 'Etablissement',
             size: 10
         },
-        'createdAt' : {
+        'createdAt': {
             label: 'Inscription',
             type: 'range'
         },

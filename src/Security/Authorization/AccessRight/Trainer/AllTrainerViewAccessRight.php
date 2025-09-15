@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Trainer;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllTrainerViewAccessRight extends AbstractAccessRight
+final class AllTrainerViewAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Voir les formateurs de tous les centres';
     }
@@ -26,24 +23,17 @@ class AllTrainerViewAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Trainer') {
-            return true;
-        }
-
-        return false;
+        return $class === \App\Entity\Back\Trainer::class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
-        if ($attribute !== 'VIEW') return false;
-
-        return true;
+        return $attribute === 'VIEW';
     }
 }

@@ -1,8 +1,7 @@
 /**
  * Controller for Inscription creation
  */
-sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialogParams', '$dialog','$state', '$user', '$http', 'form', 'growl', function($scope, $modalInstance, $dialogParams, $dialog, $state, $user, $http, form, growl)
-{
+sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialogParams', '$dialog', '$state', '$user', '$http', 'form', 'growl', function ($scope, $modalInstance, $dialogParams, $dialog, $state, $user, $http, form, growl) {
     $scope.dialog = $modalInstance;
     $scope.dialog.params = angular.copy($dialogParams);
     $scope.session = $scope.dialog.params.session;
@@ -18,7 +17,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         $scope.isInstitutionContracted = item.contracted;
     };
 
-    $scope.$watch('selectedTrainee', function (value){
+    $scope.$watch('selectedTrainee', function (value) {
         $scope.form.children.trainee.value = value ? value.value : '';
     });
 
@@ -30,18 +29,23 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
         var url = Routing.generate('trainee.search');
 
         return $http.post(url, {
-            "query": {
-                "match": {
-                    "fullname.autocomplete": {
-                        "query":    angular.lowercase(pref)
+                "query": {
+                    "match": {
+                        "fullname.autocomplete": {
+                            "query": angular.lowercase(pref)
+                        }
                     }
                 }
             }
-        }
         ).then(function (res) {
             var adresses = [];
-            angular.forEach (res.data.items, function (item) {
-                adresses.push ({label: item.fullname, value:item.id, institution: (item.institution !== null && item.institution !== undefined ) ? item.institution.name : '', contracted: (((item.institution !== null && item.institution !== undefined ) && item.institution.contracted) ? item.institution.contracted : false)})
+            angular.forEach(res.data.items, function (item) {
+                adresses.push({
+                    label: item.name,
+                    value: item.id,
+                    institution: (item.institution !== null && item.institution !== undefined) ? item.institution.name : '',
+                    contracted: (((item.institution !== null && item.institution !== undefined) && item.institution.contracted) ? item.institution.contracted : false)
+                })
             });
 
             return adresses;
@@ -51,13 +55,13 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
     /**
      * @param data
      */
-    $scope.onSuccess = function(data) {
+    $scope.onSuccess = function (data) {
         growl.addSuccessMessage("L'inscription a bien été créée.");
         $scope.dialog.close(data);
     };
 
 
-    $scope.userCanAddTrainee = function() {
+    $scope.userCanAddTrainee = function () {
         return $user.hasAccessRight('sygefor_trainee.rights.trainee.own.create') || $user.hasAccessRight('sygefor_trainee.rights.trainee.all.create');
     };
 
@@ -65,14 +69,14 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
      * manages user creation dialog and its return.
      **/
     $scope.createUser = function () {
-        $dialog.open('trainee.create').then(function (result){
+        $dialog.open('trainee.create').then(function (result) {
             var trainee = {
                 label: result.trainee.fullName,
                 value: result.trainee.id,
                 organization: result.trainee.organization.name,
                 institution: (typeof result.trainee.institution == 'undefined') ? '' : result.trainee.institution
             };
-            $scope.selectedTrainee = trainee ;
+            $scope.selectedTrainee = trainee;
             $scope.setTrainee(trainee);
         });
     }

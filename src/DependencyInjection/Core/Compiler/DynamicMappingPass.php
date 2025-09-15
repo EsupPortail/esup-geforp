@@ -20,11 +20,10 @@ class DynamicMappingPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        $typeConfigs = array();
+        $typeConfigs = [];
         $elasticaConfig = $container->getExtensionConfig('fos_elastica');
 
         // populate the $typeConfigs array
@@ -40,7 +39,7 @@ class DynamicMappingPass implements CompilerPassInterface
         foreach ($typeConfigs as $index => $types) {
             foreach ($types as $type => $fields) {
                 // if the type name begin with _, it's a abstract type
-                if (substr($type, 0, 1) === '_') {
+                if (str_starts_with($type, '_')) {
                     // remove from the config source
                     unset($sourceConfigs[$index]['types'][$type]);
                     continue;
@@ -75,12 +74,12 @@ class DynamicMappingPass implements CompilerPassInterface
      *
      * @return array
      */
-    private function extendTypeConfig($fields, $typeConfigs)
+    private function extendTypeConfig($fields, $typeConfigs): array
     {
-        $includedFields = array();
+        $includedFields = [];
         foreach ($fields as $field => $config) {
             if ($field === '_include') {
-                $exclude = array();
+                $exclude = [];
                 if (is_array($config)) {
                     $exclude = (array) $config['exclude'];
                     $config = $config['type'];
@@ -101,13 +100,12 @@ class DynamicMappingPass implements CompilerPassInterface
     /**
      * @param $path
      * @param $typeConfigs
-     * @param array $exclude
      *
      * @return array
      */
-    private function extractMapping($path, $typeConfigs, $exclude = array())
+    private function extractMapping($path, $typeConfigs, array $exclude = []): array
     {
-        $parts = explode('.', $path);
+        $parts = explode('.', (string) $path);
         $fields = $typeConfigs;
         foreach ($parts as $part) {
             $fields = $fields[$part];

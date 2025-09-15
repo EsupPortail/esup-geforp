@@ -20,7 +20,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -33,109 +33,53 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 /**
  * Class UserType.
  */
-class UserType extends AbstractType
+final class UserType extends AbstractType
 {
-    /**
-     * @var Security
-     */
-    private $security;
-
-    /**
-     * @param Security $security
-     */
-    public function __construct(Security $security)
+    public function __construct(private readonly Security $security)
     {
-        $this->security = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder->add('username', TextType::class, array(
-            'constraints' => new Length(array('min' => 5)),
-            'invalid_message' => 'Le nom d\'utilisateur est trop court',
-            'label' => 'Nom d\'utilisateur',
-            'disabled' => true
-        ))
-            ->add('email', EmailType::class, array(
-                'constraints' => new Email(array('message' => 'Invalid email address')),
-                'label' => 'Email',
-                'disabled' => true
-            ));
+        $formBuilder->add('username', TextType::class, ['constraints' => new Length(['min' => 5]), 'invalid_message' => "Le nom d'utilisateur est trop court", 'label' => "Nom d'utilisateur", 'disabled' => true])
+            ->add('email', EmailType::class, ['constraints' => new Email(['message' => 'Invalid email address']), 'label' => 'Email', 'disabled' => true]);
 
 
-        $builder->add('organization', EntityType::class, array(
-            'required' => true,
-            'class' => Organization::class,
-            'label' => 'Centre',
-            'query_builder' => function (EntityRepository $er) {
-                $res = $er->createQueryBuilder('o');
-                return $res;
-            },
-        ));
+        $formBuilder->add('organization', EntityType::class, ['required' => true, 'class' => Organization::class, 'label' => 'Centre', 'query_builder' => static fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('o')]);
 
-        $builder->add('isAdmin', CheckboxType::class, array(
-            'label' => 'Administrateur',
-            'mapped' => false,
-            'required' => false
-        ));
+        $formBuilder->add('isAdmin', CheckboxType::class, ['label' => 'Administrateur', 'mapped' => false, 'required' => false]);
 
         // add choice list for user creation
         if (!$options['data']->getId()) {
-            $builder->add('accessRightScope', ChoiceType::class, array(
-                'label' => 'Droits d\'accès',
-                'mapped' => false,
-                'choices' => array(
-                    'own.view' => 'Droits locaux de lecture',
-                    'own.manage' => 'Droits locaux de gestion',
-                    'all.view' => 'Tous les droits de lecture',
-                    'all.manage' => 'Tous les droits de gestion',
-                ),
-                'required' => false,
-            ));
+            $formBuilder->add('accessRightScope', ChoiceType::class, ['label' => 'Droits d\'accès', 'mapped' => false, 'choices' => ['own.view' => 'Droits locaux de lecture', 'own.manage' => 'Droits locaux de gestion', 'all.view' => 'Tous les droits de lecture', 'all.manage' => 'Tous les droits de gestion'], 'required' => false]);
         }
+
         // add listeners to handle conditionals fields
-        $this->addEventListeners($builder);
+        $this->addEventListeners($formBuilder);
     }
 
     /**
      * Add all listeners to manage conditional fields.
      */
-    protected function addEventListeners(FormBuilderInterface $builder)
+    private function addEventListeners(FormBuilderInterface $formBuilder): void
     {
         // PRE_SET_DATA for the parent form
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+        $formBuilder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $formEvent): void {
             $userAccessRights = $this->security->getUser()->getAccessRights();
 
             if (in_array("sygefor_core.rights.user.all", $userAccessRights)) {
-            } else {
+            } elseif (in_array("sygefor_core.rights.user.own", $userAccessRights)) {
                 // si l'utilisateur n'a que les droits sur son centre
-                if (in_array("sygefor_core.rights.user.own", $userAccessRights)) {
-                    // Pas de choix possible pour l'établissement
-                    $event->getForm()
-                        ->add('organization', EntityType::class, array(
-                        'required' => true,
-                        'class' => Organization::class,
-                        'label' => 'Centre',
-                        'disabled' => true
-                        ));
-                }
+                // Pas de choix possible pour l'établissement
+                $formEvent->getForm()
+                    ->add('organization', EntityType::class, ['required' => true, 'class' => Organization::class, 'label' => 'Centre', 'disabled' => true]);
             }
         });
     }
 
 
-	/**
-	 * @param OptionsResolver $resolver
-	 */
-	public function configureOptions(OptionsResolver $resolver)
+	public function configureOptions(OptionsResolver $optionsResolver): void
 	{
-		$resolver->setDefaults(array(
-			'data_class' => User::class,
-			'validation_groups' => ['Default', 'user', 'organization'],
-		));
+		$optionsResolver->setDefaults(['data_class' => User::class, 'validation_groups' => ['Default', 'user', 'organization']]);
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * Core List Controller
  */
-sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector', 'BaseListController', '$trainingBundle', '$state', '$timeout', '$dialog', 'search', function($scope, $user, $injector, BaseListController, $trainingBundle, $state, $timeout, $dialog, search) {
+sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector', 'BaseListController', '$trainingBundle', '$state', '$timeout', '$dialog', 'search', function ($scope, $user, $injector, BaseListController, $trainingBundle, $state, $timeout, $dialog, search) {
     $injector.invoke(BaseListController, this, {key: 'training', $scope: $scope, $search: search});
 
     /**
@@ -15,20 +15,20 @@ sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector',
             {
                 icon: 'fa-file-excel-o',
                 label: 'CSV',
-                execute: function(items, $dialog) {
-                    return $dialog.open('batch.export.csv', { items: items, service: 'semestered_training' })
+                execute: function (items, $dialog) {
+                    return $dialog.open('batch.export.csv', {items: items, service: 'semestered_training'})
                 }
-            },{
+            }, {
                 icon: 'fa-file-pdf-o',
                 label: 'PDF',
-                execute: function(items, $dialog) {
-                    return $dialog.open('batch.export.pdf', { items: items, service: 'training' }) // warning : use of 'training' instead of 'semestered_training' is waiting !
+                execute: function (items, $dialog) {
+                    return $dialog.open('batch.export.pdf', {items: items, service: 'training'}) // warning : use of 'training' instead of 'semestered_training' is waiting !
                 }
-            },{
+            }, {
                 icon: 'fa-external-link',
                 label: 'Publipostage',
-                execute: function(items, $dialog) {
-                    return $dialog.open('batch.publipost', { items: items, service: 'semestered_training' })
+                execute: function (items, $dialog) {
+                    return $dialog.open('batch.publipost', {items: items, service: 'semestered_training'})
                 }
             }
         ]
@@ -38,7 +38,7 @@ sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector',
      * Declare add operation
      * @var {Array}
      */
-    $scope.addOperations = function (){
+    $scope.addOperations = function () {
         var ops = [];
         var trainingTypes = $trainingBundle.getTypes();
 
@@ -47,13 +47,15 @@ sygeforApp.controller('TrainingListController', ['$scope', '$user', '$injector',
 
             ops.push({
                 key: key,
-                label: ( typeof type.label != "undefined" ) ? type.label : key,
-                execute: function (key){
-                    $dialog.open('training.create', { type: key, filters: search.query.filters }).then(function(data) {
+                label: (typeof type.label != "undefined") ? type.label : key,
+                execute: function (key) {
+                    $dialog.open('training.create', {type: key, filters: search.query.filters}).then(function (data) {
                         $state.go('training.detail.view', {id: data.training.id}, {reload: true});
                     });
                 },
-                available: function (){ return $user.hasAccessRight('sygefor_training.rights.training.all.create') || $user.hasAccessRight('sygefor_training.rights.training.own.create');}
+                available: function () {
+                    return $user.hasAccessRight('sygefor_training.rights.training.all.create') || $user.hasAccessRight('sygefor_training.rights.training.own.create');
+                }
             });
         }
         return ops;

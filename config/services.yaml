@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    app.default_pdf_template: 'PDF/attestation.pdf.twig'
+    .container.dumper.inline_factories: true
     router.request_context.scheme: 'https'
     asset.request_context.secure: true
     front_url: '%env(front_host)%'
@@ -36,12 +38,13 @@ parameters:
         session_id: 'Shib-Session-ID'
         remote_user: '%env(REMOTE_USER)%'
     batch:
+
         convert_type:
             semestered_training:
                 class: 'App\Entity\Core\AbstractTraining'
         csv:
             user:
-                class: 'App\Entity\Back\User'
+                class: 'App\Entity\Core\User'
                 filename: 'utilisateurs.csv'
                 fields:
                     username: Nom
@@ -178,10 +181,9 @@ parameters:
                     dif: { label: "CPF", type: "boolean" }
             institution:
                 class: 'App\Entity\Core\AbstractInstitution'
-                filename: 'unite.csv'
+                filename: 'test.csv'
                 fields:
                     name: "Nom"
-                    organization.name: "Centre"
                     createdAt: { label: "Date de création", type: "date" }
                     address: "Adresse"
                     zip: "Code postal"
@@ -257,7 +259,7 @@ parameters:
                 emailPath: 'email'
                 fields:
                     #personTrait
-                    civilite: { property: title }
+                    civilite: { property: getTitle }
                     nomComplet: { property: fullname }
                     nom: { property: lastname }
                     prenom: { property: firstname }
@@ -284,7 +286,7 @@ parameters:
                     id: { property: "id" }
                     dateDebut: { property: "datebegin", type: "date" }
                     dateFin: { property: "dateend", type: "date" }
-                    dates: { property: "dates" }
+                    dates: { property: "datesString" }
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
@@ -327,7 +329,6 @@ parameters:
                     categorie: { property: category.name }
                     typeIntervention: { property: interventionType }
                     initiativeExterne: { property: externalInitiative }
-                    commentaires: { property: comments }
                     # Internship && Long training
                     prerequis: { property: prerequisites }
                     public: { property: publictype.name }
@@ -406,7 +407,26 @@ parameters:
 #    - { resource: "packages/batch.yml" }
 
 services:
+    App\Service\TrainingBalanceSheet:
+        arguments:
+            $doctrine: '@doctrine'
+    sygefor_core.batch.pdf.inscription.attestation:
+        class: App\BatchOperations\Generic\PDFBatchOperation
+        arguments:
+                - '@knp_snappy.pdf'
+                - '@security.helper'
+                - '@twig'
+                - '@parameter_bag'
+        tags:
+                - { name: sygefor.batch_operation, type:
+                              inscription, label: 'PDF : Attestation', domain: 'sygefor_core' }
     # default configuration for services in *this* file
+    Symfony\Component\Security\Core\Security: '@Symfony\Bundle\SecurityBundle\Security'
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+    Namespace\ImportService:
+        arguments:
+            - '@service_container'
+ # Injection explicite du service conteneur
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -426,23 +446,21 @@ services:
     app.menu_builder:
         class: App\Menu\MenuBuilder
         arguments:
-            - "@knp_menu.factory"
-            - "@security.authorization_checker"
-            - "@router"
+            $menuFactory: '@knp_menu.factory'  # Utilisation de la factory KnpMenuFactory
+            $router: '@router'
         tags:
-            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
+            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main }
 
     App\Listener\TrainingListener:
         tags:
             - { name: doctrine.event_subscriber }
 
-    App\Listener\SessionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
 
-    App\EventListener\ORM\InscriptionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
+    App\Twig\SpacelessExtension:
+        tags: ['twig.extension']
+
+    App\Vocabulary\VocabularyRegistry: ~
+
 
     shibbundle.sup_service:
         class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Session de formation</title>
+</head>
+<body>
+<h1>Session de formation</h1>
+
+<p><strong>Nom de la formation :</strong> {{ training.name }}</p>
+
+<p><strong>Organisme :</strong> {{ training.organization.name }}</p>
+<p><strong>Adresse :</strong> {{ training.organization.address }} - {{ training.organization.city }}</p>
+
+{% if logo %}
+    <img src="{{ logo }}" alt="Logo" style="height: 80px;">
+{% endif %}
+
+{% if signature %}
+    <img src="{{ signature }}" alt="Signature" style="height: 60px; margin-top: 30px;">
+{% endif %}
+</body>
+</html>

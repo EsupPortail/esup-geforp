@@ -13,40 +13,44 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @var string
      */
-    private $id;
+    private string $id;
 
     /**
      * @var string
      */
-    private $label;
+    private string $label;
 
     /**
      * @var string
      */
-    protected $targetClass;
+    protected string $targetClass;
 
     /**
      * @var ManagerRegistry
      */
-    protected $doctrine;
+    protected ManagerRegistry $doctrine;
 
     /**
      * @var array
      */
-    protected $options = array();
+    protected array $options;
 
+    public function __construct(){
+        $this->options = [];
+        $this->label = "";
+    }
     /**
      * @param $id
      */
-    public function setId($id)
+    public function setId($id): mixed
     {
-        $this->id = $id;
+       return $this->id = $id;
     }
 
     /**
      * @return string
      */
-    public function getId()
+    public function getId(): string
     {
         return $this->id;
     }
@@ -54,7 +58,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @param string $class
      */
-    public function setTargetClass($class)
+    public function setTargetClass(string $class): void
     {
         $this->targetClass = $class;
     }
@@ -62,7 +66,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @return string
      */
-    public function getTargetClass()
+    public function getTargetClass(): string
     {
         return $this->targetClass;
     }
@@ -70,7 +74,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @var string
      */
-    public function setLabel($label)
+    public function setLabel($label): void
     {
         $this->label = $label;
     }
@@ -80,23 +84,20 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
      *
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return $this->label;
     }
 
-    /**
-     * @param ManagerRegistry $doctrine
-     */
-    public function setDoctrine(ManagerRegistry $doctrine)
+    public function setDoctrine(ManagerRegistry $managerRegistry): void
     {
-        $this->doctrine = $doctrine;
+        $this->doctrine = $managerRegistry;
     }
 
     /**
      * @param array $options
      */
-    public function setOptions($options)
+    public function setOptions(array $options): void
     {
         $this->options = array_merge($this->options, $options);
     }
@@ -108,10 +109,10 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
      *
      * @return array
      */
-    protected function getObjectList($idList)
+    protected function getObjectList($idList): array
     {
 //        $entities = $this->em->getRepository($this->targetClass)->findBy(array('id' => $idList));
-        $entities = $this->doctrine->getRepository($this->targetClass)->findBy(array('id' => $idList));
+        $entities = $this->doctrine->getRepository($this->targetClass)->findBy(['id' => $idList]);
         $this->reorderByKeys($entities, $idList);
 
         return $entities;
@@ -120,20 +121,19 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
     /**
      * @return array modal window modal config options
      */
-    public function getModalConfig($options = array())
+    public function getModalConfig($options = []): array
     {
-        return array();
+        return [];
     }
 
     /**
      * Re-order a list by keys.
      */
-    protected function reorderByKeys(&$items, $keys)
+    protected function reorderByKeys(&$items, $keys): void
     {
-        usort($items, function ($a, $b) use ($keys) {
-            $position_a = array_search($a->getId(), $keys);
-            $position_b = array_search($b->getId(), $keys);
-
+        usort($items, static function ($a, $b) use ($keys) : int {
+            $position_a = array_search($a->getId(), $keys, true);
+            $position_b = array_search($b->getId(), $keys, true);
             return  $position_a < $position_b ? -1 : 1;
         });
     }

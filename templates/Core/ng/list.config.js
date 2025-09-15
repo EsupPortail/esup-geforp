@@ -1,7 +1,7 @@
 /**
  * TrainingBundle
  */
-sygeforApp.config(['$dialogProvider', function($dialogProvider) {
+sygeforApp.config(['$dialogProvider', function ($dialogProvider) {
 
     /**
      * batch operations
@@ -24,9 +24,11 @@ sygeforApp.config(['$dialogProvider', function($dialogProvider) {
         controller: 'BatchPublipostController',
         templateUrl: 'batch/publipost/publipost.html',
         resolve: {
-            config: function($http, $dialogParams) {
-                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_core.batch.publipost.'+$dialogParams.service});
-                return $http.get(url).then(function(response){ return response.data;} );
+            config: function ($http, $dialogParams) {
+                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_core.batch.publipost.' + $dialogParams.service});
+                return $http.get(url).then(function (response) {
+                    return response.data;
+                });
             }
         }
     });
@@ -36,9 +38,11 @@ sygeforApp.config(['$dialogProvider', function($dialogProvider) {
         controller: 'BatchConvertTypeController',
         templateUrl: 'batch/convert-type/convert-type.html',
         resolve: {
-            config: function($http, $dialogParams) {
-                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_core.batch.convert_type.'+$dialogParams.service});
-                return $http.get(url).then(function(response){ return response.data;} );
+            config: function ($http, $dialogParams) {
+                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_core.batch.convert_type.' + $dialogParams.service});
+                return $http.get(url).then(function (response) {
+                    return response.data;
+                });
             }
         }
     });
@@ -49,16 +53,18 @@ sygeforApp.config(['$dialogProvider', function($dialogProvider) {
         templateUrl: 'batch/email/email.html',
         size: 'lg',
         resolve: {
-            config: function($http) {
+            config: function ($http) {
                 var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_core.batch.email'});
-                return $http.get(url).then(function(response){ return response.data;} );
+                return $http.get(url).then(function (response) {
+                    return response.data;
+                });
             }
         }
     });
 
     //email preview
     $dialogProvider.dialog("batch.emailPreview", /* @ngInject */ {
-        controller: function($scope, $modalInstance, $dialogParams, email){
+        controller: function ($scope, $modalInstance, $dialogParams, email) {
             console.log(email);
             $scope.email = {
                 subject: email.subject,
@@ -71,9 +77,12 @@ sygeforApp.config(['$dialogProvider', function($dialogProvider) {
         templateUrl: 'batch/email/email-preview.html',
         size: 'lg',
         resolve: {
-            email: function($http, $dialogParams) {
+            email: function ($http, $dialogParams) {
                 var url = Routing.generate('sygefor_core.batch_operation.execute', {id: 'sygefor_core.batch.email'});
-                return $http.post(url, {ids: $dialogParams.ids, options: angular.extend($dialogParams.options, {preview: true}) }).then(function (response){
+                return $http.post(url, {
+                    ids: $dialogParams.ids,
+                    options: angular.extend($dialogParams.options, {preview: true})
+                }).then(function (response) {
                     return response.data.email;
                 });
             }

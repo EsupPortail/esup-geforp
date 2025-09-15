@@ -14,10 +14,10 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class MultipleAlert
+final readonly class MultipleAlert
 {
 
-    protected $alerts;
+    private \Doctrine\Common\Collections\ArrayCollection $alerts;
 
     public function __construct()
     {

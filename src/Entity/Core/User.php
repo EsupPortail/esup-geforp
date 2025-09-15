@@ -3,78 +3,73 @@
 namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Repository\UserRepository;
 use App\Entity\Core\AbstractOrganization;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 
 /**
  * BaseUser.
  *
- * @ORM\Entity(repositoryClass=UserRepository::class)
  */
+#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Table("user")]
 class User implements UserInterface
 {
-    /**
-     * @ORM\Id
-     * @ORM\GeneratedValue
-     * @ORM\Column(type="integer")
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
+    private int $id;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
-    private $email;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    private ?string $email = null;
 
-    /**
-     * @ORM\Column(type="string", length=180, unique=true)
-     */
-    private $username;
+    #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(['Default', 'trainer'])]
+    private string $username;
 
     /**
      * @var \DateTime
-    @ORM\Column(name="last_login", type="datetime", options={"default": "CURRENT_TIMESTAMP"})
      */
-    protected $lastLogin;
+    #[ORM\Column(name: 'last_login', type: 'datetime', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    protected ?\DateTime $lastLogin = null;
 
-    /**
-     * @ORM\Column(type="simple_array")
-     */
-    private $roles = [];
+    #[ORM\Column(type: 'simple_array')]
+    private array $roles = [];
 
     /**
      * @var string The hashed password
-     * @ORM\Column(type="string")
      */
-    private $password;
+    #[ORM\Column(type: 'string')]
+    private string $password;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="AbstractOrganization", inversedBy="users", cascade={"persist", "merge"})
-     * @ORM\JoinColumn(nullable=true)
-     * @Assert\NotNull(message="Vous devez renseigner un centre de rattachement.", groups={"organization"})
-     * @MaxDepth(2)
      *
      */
-    protected $organization;
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization', cascade: ['persist', 'merge'], inversedBy: 'users')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Assert\NotNull(message: 'Vous devez renseigner un centre de rattachement.', groups: ['organization'])]
+    protected \App\Entity\Core\AbstractOrganization $organization;
 
     /**
      * @var string
-     * @ORM\Column(name="access_rights", type="simple_array", nullable=true)
      */
-    protected $accessRights;
+    #[ORM\Column(name: 'access_rights', type: 'simple_array', nullable: true)]
+    protected array $accessRights = [];
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->accessRights = array();
+        $this->accessRights = [];
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
@@ -91,6 +86,10 @@ class User implements UserInterface
         return $this;
     }
 
+    public function getLastLoginFormatted(): ?string
+    {
+        return $this->lastLogin ? $this->lastLogin->format('Y-m-d H:i:s') : null;
+    }
     /**
      * A visual identifier that represents this user.
      *
@@ -98,7 +97,7 @@ class User implements UserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string) $this->username;
+        return (string)$this->username;
     }
 
     public function setUsername(string $username): self
@@ -113,20 +112,19 @@ class User implements UserInterface
      */
     public function getUsername(): string
     {
-        return (string) $this->username;
+        return $this->getUserIdentifier();
     }
 
     /**
      * Gets the last login time.
      *
-     * @return \DateTime
      */
-    public function getLastLogin()
+    public function getLastLogin(): ?\DateTime
     {
         return $this->lastLogin;
     }
 
-    public function setLastLogin(\DateTime $time)
+    public function setLastLogin(\DateTime $time): static
     {
         $this->lastLogin = $time;
 
@@ -152,9 +150,9 @@ class User implements UserInterface
         return $this;
     }
 
-    public function hasRole($role)
+    public function hasRole($role): bool
     {
-        return in_array(strtoupper($role), $this->getRoles(), true);
+        return in_array(strtoupper((string) $role), $this->getRoles(), true);
     }
 
     /**
@@ -186,47 +184,32 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
     }
-    /**
-     * @param AbstractOrganization $organization
-     */
-    public function setOrganization(AbstractOrganization $organization)
+    public function setOrganization(AbstractOrganization $organization): void
     {
         $this->organization = $organization;
     }
 
-    /**
-     * @return AbstractOrganization
-     */
-    public function getOrganization()
+    public function getOrganization(): \App\Entity\Core\AbstractOrganization
     {
         return $this->organization;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getAccessRights()
+    public function getAccessRights(): array
     {
         return $this->accessRights;
     }
 
-    /**
-     * @param mixed $accessRights
-     */
-    public function setAccessRights($accessRights)
+    public function setAccessRights(array  $accessRights): void
     {
-        $this->accessRights = $accessRights ? $accessRights : array();
+        $this->accessRights = $accessRights;
     }
 
-    /**
-     * @return bool
-     */
-    public function isAdmin()
+    public function isAdmin(): bool
     {
         return $this->hasRole('ROLE_ADMIN');
     }

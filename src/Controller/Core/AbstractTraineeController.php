@@ -11,27 +11,25 @@ use App\Entity\Term\Title;
 use App\Form\Type\AbstractTraineeType;
 use App\Repository\TraineeSearchRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use App\Entity\Core\AbstractTrainee;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use App\Form\Type\ChangeOrganizationType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-
 /**
  * Class TraineeController.
  *
- * @Route("/trainee")
  */
+#[Route(path: '/trainee')]
 abstract class AbstractTraineeController extends AbstractController
 {
     /**
@@ -39,27 +37,24 @@ abstract class AbstractTraineeController extends AbstractController
      */
     protected $traineeClass = AbstractTrainee::class;
 
-    /**
-     * @param Request $request
-     * 
-     * @Route("/search", name="trainee.search", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
-     * 
-     * @return array
-     * 
-     * @throws \Exception
-     */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, TraineeSearchRepository $traineeRepository, AccessRightRegistry $accessRightRegistry)
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', array());
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
-        $query = $request->request->get('query', 'NO QUERY');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
-        $fields = $request->request->get('fields', 'NO FIELDS');
+    }
+
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/search', name: 'trainee.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(Request $request, ManagerRegistry $managerRegistry, TraineeSearchRepository $traineeSearchRepository, AccessRightRegistry $accessRightRegistry): array
+    {
+        $keywords = (string) ($request->request->get('keyword') ?? $request->request->get('keywords') ?? '');
+        //dump($request->query->all(), $request->request->all());
+        $filters = $request->request->all('filters')  ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?:[] ;
+        $query = $request->request->all('query') ?:[];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ??[];
+        $fields = $request->request->all('fields') ??[];
 
         // security check : trainee : 'sygefor_trainee.rights.trainee.all.view' -> id=17
         if(!$accessRightRegistry->hasAccessRight(17)) {
@@ -70,7 +65,7 @@ abstract class AbstractTraineeController extends AbstractController
             if (isset($filters['institution.name.source'])) {
                 if (is_array($filters['institution.name.source'])) {
                     // si filtre sur plusieurs etablissements, on verifie les droits en visibilite
-                    $tabFilters = array();
+                    $tabFilters = [];
                     // on parcourt les filtres pour vérifier qu'on a la visibilité sur les établissements
                     foreach ($filters['institution.name.source'] as $filter) {
                         if ($filter == $ownInst->getName())
@@ -84,29 +79,29 @@ abstract class AbstractTraineeController extends AbstractController
                             }
                         }
                     }
+
                     $filters['institution.name.source'] = $tabFilters;
-                } else {
+                } elseif ($filters['institution.name.source'] == $ownInst->getName()) {
                     // si filtre sur un seul etablissement, on verifie les droits
-                    if ($filters['institution.name.source'] == $ownInst->getName())
-                        // on verifie l'établissement du  user
-                        $tabFilters[] = $filters['institution.name.source'];
-                    else {
-                        // sinon, on regarde les etablissements associés
-                        $flag = 0;
-                        foreach ($otherInst as $etab) {
-                            if ($filters['institution.name.source'] == $etab->getName()) {
-                                $flag = 1;
-                                break;
-                            }
+                    // on verifie l'établissement du  user
+                    $tabFilters[] = $filters['institution.name.source'];
+                } else {
+                    // sinon, on regarde les etablissements associés
+                    $flag = 0;
+                    foreach ($otherInst as $etab) {
+                        if ($filters['institution.name.source'] == $etab->getName()) {
+                            $flag = 1;
+                            break;
                         }
-                        // si pas autorisé, par défaut, on met le filtre sur établissement du user
-                        if ($flag==0)
-                            $filters['institution.name.source'] = $this->getUser()->getOrganization()->getInstitution()->getName();
                     }
+
+                    // si pas autorisé, par défaut, on met le filtre sur établissement du user
+                    if ($flag==0)
+                        $filters['institution.name.source'] = $this->getUser()->getOrganization()->getInstitution()->getName();
                 }
             } else {
                 // restriction to user's institution
-                $filters['institution.name.source'] = array();
+                $filters['institution.name.source'] = [];
                 $filters['institution.name.source'][] = $this->getUser()->getOrganization()->getInstitution()->getName();
                 if ($otherInst != null) {
                     foreach ($otherInst as $otherEtab) {
@@ -117,19 +112,14 @@ abstract class AbstractTraineeController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
-
-        // Recherche pour aggs et query_filters
-        $tabAggs = array();
-        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $traineeRepository);
+        $ret = $traineeSearchRepository->getTraineesList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sort: $sorts, fields: $fields);
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $traineeSearchRepository);
 
         // Recherche avec query (pour autocompletion)
-        if (isset($query)) {
-            // on transforme le champ 'query' en 'keywords'
-            if (isset($query['match']['fullname.autocomplete']['query'])) {
-                $keywords = $query['match']['fullname.autocomplete']['query'];
-                $ret = $traineeRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
-            }
+        // on transforme le champ 'query' en 'keywords'
+        if (isset($query) && isset($query['match']['fullname.autocomplete']['query'])) {
+            $keywords = $query['match']['fullname.autocomplete']['query'];
+            $ret = $traineeSearchRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
         }
 
         // Concatenation des resultats
@@ -138,23 +128,18 @@ abstract class AbstractTraineeController extends AbstractController
         return $ret;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @Route("/create", name="trainee.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
-     * 
-     * @return array
-     */
-    public function createAction(Request $request, ManagerRegistry $doctrine)
+
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/create', name: 'trainee.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function create(Request $request, ManagerRegistry $managerRegistry): array
     {
         /** @var AbstractTrainee $trainee */
         $trainee = new $this->traineeClass();
         // Ajout de l'établissement du trainee que l'on crée
         try {
             $trainee->setInstitution($this->getUser()->getOrganization()->getInstitution());
-        } catch (\Exception $e) {
-            return array($e->getMessage());
+        } catch (\Exception $exception) {
+            return [$exception->getMessage()];
         }
 
         //trainee can't be created if user has no rights for it
@@ -168,32 +153,29 @@ abstract class AbstractTraineeController extends AbstractController
             if ($form->isValid()) {
                 $trainee->setCreatedAt(new \DateTime('now'));
                 $trainee->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->persist($trainee);
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($trainee);
+                $objectManager->flush();
             }
         }
 
-        return array('form' => $form->createView(), 'trainee' => $trainee);
+        return ['form' => $form->createView(), 'trainee' => $trainee];
     }
 
-    /**
-     * @param Request $request
-     * @param AbstractTrainee $trainee
-     * 
-     * @Route("/{id}/view", requirements={"id" = "\d+"}, name="trainee.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("VIEW", subject="trainee")
-     * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
-     * 
-     * @return array
-     */
-    public function viewAction(Request $request,  ManagerRegistry $doctrine, AbstractTrainee $trainee)
+
+    #[Route(path: '/{id}/view', name: 'trainee.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[IsGranted('VIEW', subject: 'trainee')]
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    public function view(Request $request,  ManagerRegistry $managerRegistry, AbstractTrainee $trainee, int $id): array
     {
+        $trainee = $managerRegistry->getRepository(Trainee::class)->find($id);
+        if (!$trainee) {
+            throw new NotFoundHttpException('Trainee not found');
+        }
         // access right is checked inside controller, so to be able to send specific error message
         if (!$this->isGranted('EDIT', $trainee)) {
             if ($this->isGranted('VIEW', $trainee)) {
-                return array('trainee' => $trainee);
+                return ['trainee' => $trainee];
             }
 
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
@@ -204,108 +186,136 @@ abstract class AbstractTraineeController extends AbstractController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $trainee->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->persist($trainee);
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($trainee);
+                $objectManager->flush();
             }
         }
 
-        return array('form' => $form->createView(), 'trainee' => $trainee);
+        return ['form' => $form->createView(), 'trainee' => $trainee];
     }
 
-    /**
-     * @param Request $request
-     * @param AbstractTrainee $trainee
-     * 
-     * @Route("/{id}/toggleActivation", requirements={"id" = "\d+"}, name="trainee.toggleActivation", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
-     * @Method("POST")
-     * 
-     * @return array
-     */
-    public function toggleActivationAction(Request $request, AbstractTrainee $trainee)
+    #[Groups(['Default', 'trainee'])]
+    #[Route(path: '/{id}/toggleActivation', name: 'trainee.toggleActivation', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['POST'])]
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    public function toggleActivation(AbstractTrainee $trainee, ManagerRegistry $managerRegistry, int $id): array
     {
+        $trainee = $managerRegistry->getRepository(Trainee::class)->find($id);
+        if (!$trainee) {
+            throw new NotFoundHttpException('Trainee not found');
+        }
         //access right is checked inside controller, so to be able to send specific error message
         if (!$this->isGranted('EDIT', $trainee)) {
             throw new AccessDeniedException("Vous n'avez pas accès aux informations détaillées de cet utilisateur");
         }
 
         $trainee->setIsactive(!$trainee->getIsactive());
-        $this->getDoctrine()->getManager()->flush();
+        $this->managerRegistry->getManager()->flush();
 
-        return array('trainee' => $trainee);
+        return ['trainee' => $trainee];
     }
 
-    /**
-     * @param AbstractTrainee $trainee
-     *
-     * @Route("/{id}/remove", name="trainee.delete", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("DELETE", subject="trainee")
-     * @Method("POST")
-     * @ParamConverter("trainee", class="App\Entity\Core\AbstractTrainee", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "trainee"}, serializerEnableMaxDepthChecks=true)
-     * 
-     * @return array
-     */
-    public function deleteAction(AbstractTrainee $trainee, ManagerRegistry $doctrine)
-    {
-        $em = $doctrine->getManager();
-        $em->remove($trainee);
-        $em->flush();
 
-        return array();
+    #[Route(path: '/{id}/remove', name: 'trainee.delete', options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['POST'])]
+    #[IsGranted('DELETE', subject: 'trainee')]
+    #[Rest\View(serializerGroups: ['Default', 'trainee'], serializerEnableMaxDepthChecks: true)]
+    public function delete(AbstractTrainee $trainee, ManagerRegistry $managerRegistry ,int $id): array
+    {
+        $trainee = $managerRegistry->getRepository(Trainee::class)->find($id);
+        if (!$trainee) {
+            throw new NotFoundHttpException('Trainee not found');
+        }
+        $objectManager = $managerRegistry->getManager();
+        $objectManager->remove($trainee);
+        $objectManager->flush();
+
+        return [];
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $traineeRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TraineeSearchRepository $traineeSearchRepository): array
     {
-        $tabAggs = array();
+        $tabAggs = [];
 
         // CONSTRUCTION CIVILITE
         if(isset( $aggs['title'])){
-            $allTitles = $doctrine->getRepository(Title::class)->findAll();
+            $allTitles = $managerRegistry->getRepository(Title::class)->findAll();
 
-            $i = 0; $tabTitles = array();
+            $i = 0; $tabTitles = [];
             //Pour chaque civilité on teste la requête
-            foreach($allTitles as $title){
-                $nbTraineesTitles = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $title->getName());
-                if ($nbTraineesTitles > 0) {
-                    $tabTitles[$i] = [ 'key' => $title->getName(), 'doc_count' => $nbTraineesTitles];
-                    $i++;
+            foreach($allTitles as $allTitle){
+                $nbTraineesTitles = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, $aggs, $allTitle->getName());
+                if ($nbTraineesTitles['total'] > 0) {
+                    $tabTitles[$i] = [ 'key' => $allTitle->getName(), 'doc_count' => $nbTraineesTitles['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['title']['buckets'] = $tabTitles;
         }
 
         // CONSTRUCTION ETABLISSEMENT
         if (isset($aggs['institution.name.source'])) {
-            $allInst = $doctrine->getRepository(Institution::class)->findAll();
+            $allInst = $managerRegistry->getRepository(Institution::class)->findAll();
 
-            $i = 0; $tabInst = array();
+            $i = 0; $tabInst = [];
             //Pour chaque établissement on teste la requête
             foreach($allInst as $inst){
-                $nbTraineesInst = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $inst->getName());
-                if ($nbTraineesInst > 0) {
-                    $tabInst[$i] = [ 'key' => $inst->getName(), 'doc_count' => $nbTraineesInst];
-                    $i++;
+                $nbTraineesInst = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, ['institution' => true], $inst->getName());
+                if ($nbTraineesInst['total']  > 0) {
+                    $tabInst[$i] = [ 'key' => $inst->getName(), 'doc_count' => $nbTraineesInst['total'] ];
+                    ++$i;
                 }
             }
+
             $tabAggs['institution.name.source']['buckets'] = $tabInst;
+        }
+
+        // CONSTRUCTION DATE INSCRIPTION
+        if (isset($aggs['createdAt'])) {
+
+            // Récupération de la plage de dates
+            $dates = explode('-', (string) $aggs['createdAt']);
+
+            $dateFrom = date('Y-m-d 00:00:00', strtotime(trim($dates[0])));
+            $dateTo   = isset($dates[1])
+                ? date('Y-m-d 23:59:59', strtotime(trim($dates[1])))
+                : date('Y-m-d 23:59:59', strtotime(trim($dates[0])));
+
+            // QueryBuilder pour compter les trainees par date
+            $qb = $managerRegistry->getRepository(Trainee::class)->createQueryBuilder('t');
+            $qb->select('DATE(t.createdAt) as day, COUNT(t.id) as total')
+                ->andWhere('t.createdAt BETWEEN :dateFrom AND :dateTo')
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo)
+                ->groupBy('day')
+                ->orderBy('day', 'ASC');
+
+            $results = $qb->getQuery()->getResult();
+
+            // Construction des buckets
+            $tabAggs['createdAt']['buckets'] = [];
+            foreach ($results as $row) {
+                $tabAggs['createdAt']['buckets'][] = [
+                    'key' => $row['day'],
+                    'doc_count' => $row['total'],
+                ];
+            }
         }
 
         // CONSTRUCTION PUBLIC TYPE
         if(isset( $aggs['publicType.source'])){
-            $allPublictypes = $doctrine->getRepository(Publictype::class)->findAll();
+            $allPublictypes = $managerRegistry->getRepository(Publictype::class)->findAll();
 
-            $i = 0; $tabPublicTypes = array();
+            $i = 0; $tabPublicTypes = [];
             //Pour chaque public type on teste la requête
-            foreach($allPublictypes as $pt){
-                $nbTraineesPt = $traineeRepository->getNbTrainees($query_filters, $keyword, $aggs, $pt->getName());
-                if ($nbTraineesPt > 0) {
-                    $tabPublicTypes[$i] = [ 'key' => $pt->getName(), 'doc_count' => $nbTraineesPt];
-                    $i++;
+            foreach($allPublictypes as $allPublictype){
+                $nbTraineesPt = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, ['publicType' => true],  $allPublictype->getName());
+                if ($nbTraineesPt['total'] > 0) {
+                    $tabPublicTypes[$i] = [ 'key' => $allPublictype->getName(), 'doc_count' => $nbTraineesPt['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['publicType.source']['buckets'] = $tabPublicTypes;
         }
 

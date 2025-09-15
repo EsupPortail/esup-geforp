@@ -5,66 +5,72 @@ namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractInscription;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Form\Type\InscriptionType;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
-/**
- *
- * @ORM\Table(name="inscription")
- * @ORM\Entity
- */
-class Inscription extends AbstractInscription
+#[ORM\Table(name: 'inscription')]
+#[ORM\Entity]
+class Inscription extends AbstractInscription implements \Stringable
 {
 
+    public bool $isPaying = false;
     /**
-     * @var String
-     * @ORM\Column(name="motivation", type="text", nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $motivation;
+    #[Groups(['Default', 'api'])]
+    #[ORM\Column(name: 'motivation', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $motivation = null;
 
     /**
-     * @var ArrayCollection
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\EvaluationNotedCriterion", mappedBy="inscription", cascade={"persist", "merge", "remove"})
+     * @var Collection<\App\Entity\Back\EvaluationNotedCriterion>
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $criteria;
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, cascade: ['persist', 'merge', 'remove'])]
+    protected Collection $criteria;
 
     /**
-     * @ORM\Column(name="message", type="text", nullable=true)
      * @Serializer\Groups({"Default", "inscription", "api.attendance"})
      */
-    protected $message;
+    #[Groups(['Default', 'inscription', 'api.attendance'])]
+    #[ORM\Column(name: 'message', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $message = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Term\Actiontype")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $actiontype;
+    #[Groups(['Default', 'api'])]
+    #[ORM\ManyToOne(targetEntity: \App\Entity\Term\Actiontype::class)]
+    #[ORM\JoinColumn]
+    protected ?\App\Entity\Term\Actiontype $actiontype = null;
+
 
     /**
-     * @var String
-     * @ORM\Column(name="refuse", type="text", nullable=true)
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $refuse;
+    #[Groups(['Default', 'api'])]
+    #[ORM\Column(name: 'refuse', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $refuse = null;
 
     /**
-     * @var ArrayCollection $presences
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\Presence", mappedBy="inscription", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"datebegin" = "ASC"})
+     * @var Collection<Presence> $presences
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $presences;
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
+    #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Presence::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['datebegin' => 'ASC'])]
+    protected Collection|ArrayCollection $presences;
 
     /**
-     * @var Boolean
-     * @ORM\Column(name="dif", type="boolean", options={"default":false})
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    protected $dif;
+    #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
+    #[ORM\Column(name: 'dif', type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
+    protected ?bool $dif = null;
 
 
     /**
@@ -74,37 +80,37 @@ class Inscription extends AbstractInscription
     {
         $this->criteria = new ArrayCollection();
         $this->presences = new ArrayCollection();
+        $this->isPaying = false;
     }
 
     /**
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"api"})
      */
-    public function getPrice()
+    #[Serializer\VirtualProperty]
+    #[Groups(['api'])]
+    public function getPrice(): float|int|null
     {
-        return $this->isPaying ? $this->getSession()->getPrice() : 0;
+        return isset($this->isPaying) && $this->isPaying ? $this->getSession()->getPrice() : 0;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMotivation()
+    public function getMotivation(): ?string
     {
         return $this->motivation;
     }
 
-    /**
-     * @param mixed $motivation
-     */
-    public function setMotivation($motivation)
+    public function setMotivation(mixed $motivation): void
     {
         $this->motivation = $motivation;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getRefuse()
+    public function getRefuse(): ?string
     {
         return $this->refuse;
     }
@@ -112,63 +118,65 @@ class Inscription extends AbstractInscription
     /**
      * @param mixed refuse
      */
-    public function setRefuse($refuse)
+
+    public function checkAndLoadActionType($entityManager): void
+    {
+        $actionType = $this->getActiontype();
+        if ($actionType !== null) {
+            $entityManager->initialiszeObject($actionType);
+            //dump ($actionType);
+        }
+    }
+
+    public function setRefuse($refuse): void
     {
         $this->refuse = $refuse;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getCriteria()
+    public function getCriteria(): ArrayCollection|Collection
     {
         return $this->criteria;
     }
 
-    /**
-     * @param mixed $criteria
-     */
-    public function setCriteria($criteria)
+    public function setCriteria(mixed $criteria): void
     {
         $this->criteria = $criteria;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMessage()
+    public function getMessage(): ?string
     {
         return $this->message;
     }
 
-    /**
-     * @param mixed $message
-     */
-    public function setMessage($message)
+    public function setMessage(mixed $message): void
     {
         $this->message = $message;
     }
 
     /**
-     * @return mixed
+     * @return \App\Entity\Term\Actiontype|null
      */
-    public function getActiontype()
+
+    public function getActiontype(): ?\App\Entity\Term\Actiontype
     {
         return $this->actiontype;
     }
 
-    /**
-     * @param mixed $actiontype
-     */
-    public function setActiontype($actiontype)
+    public function setActiontype(mixed $actiontype): void
     {
         $this->actiontype = $actiontype;
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Collection
      */
-    public function getPresences()
+    public function getPresences(): ArrayCollection|Collection
     {
         return $this->presences;
     }
@@ -176,53 +184,54 @@ class Inscription extends AbstractInscription
     /**
      * @param mixed presences
      */
-    public function setPresences($presences)
+    public function setPresences($presences): void
     {
         $this->presences = $presences;
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getDif()
+    public function getDif(): ?bool
     {
         return $this->dif;
     }
 
-    /**
-     * @param mixed $dif
-     */
-    public function setDif($dif)
+    public function setDif(mixed $dif): void
     {
         $this->dif = $dif;
     }
 
     /**
      * Add a noted criterion
-     * @param EvaluationNotedCriterion $criterion
      */
-    public function addCriterion(EvaluationNotedCriterion $criterion)
+    public function addCriterion(EvaluationNotedCriterion $evaluationNotedCriterion): void
     {
-        $this->criteria->add($criterion);
+        $this->criteria->add($evaluationNotedCriterion);
     }
 
     /**
      * Add a presence
-     * @param Presence $presence
      */
-    public function addPresence(Presence $presence)
+    public function addPresence(Presence $presence): void
     {
         $this->presences->add($presence);
     }
 
 
-    static public function getFormType()
+    static public function getFormType(): string
     {
         return InscriptionType::class;
     }
 
-    function __toString()
+    function __toString(): string
     {
-        return strval($this->getId());
+        return (string) $this->getId();
+    }
+
+    #[Groups(['inscription'])]
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 }

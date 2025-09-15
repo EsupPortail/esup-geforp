@@ -1,7 +1,7 @@
 /**
  * Widget provider
  */
-sygeforApp.provider('$widget', [function() {
+sygeforApp.provider('$widget', [function () {
 
     var widgets = {};
 
@@ -10,16 +10,16 @@ sygeforApp.provider('$widget', [function() {
      * @param name
      * @param params
      */
-    this.widget = function(name, params) {
+    this.widget = function (name, params) {
         widgets[name] = params;
     }
 
     /**
      * this.$get
      */
-    this.$get = function($modal, $dialogParams) {
+    this.$get = function ($modal, $dialogParams) {
         return {
-            get: function(name) {
+            get: function (name) {
                 return widgets[name];
             }
         }

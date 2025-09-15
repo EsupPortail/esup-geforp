@@ -93,9 +93,9 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             $scope.form = form;
 
             // add new module option
-/*            if ($scope.form.children.module) {
-                $scope.form.children.module.choices.unshift({l: "Nouveau module"});
-            }*/
+            /*            if ($scope.form.children.module) {
+                            $scope.form.children.module.choices.unshift({l: "Nouveau module"});
+                        }*/
 
             $scope.$moment = moment;
             $scope.onSuccess = function(data) {

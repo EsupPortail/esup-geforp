@@ -9,56 +9,58 @@
 namespace App\Entity\Back;
 
 
+use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTrainee;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- *
- * @ORM\Table(name="alert")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'alert')]
+#[ORM\Entity]
 class Alert
 {
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[Groups(["Default", "api"])]
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Trainee", inversedBy="alerts")
-     * @ORM\JoinColumn(name="trainee_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez sélectionner un stagiaire.")
      * @Serializer\Groups({"session"})
      */
-    protected $trainee;
+    #[Groups(["session"])]
+    #[ORM\ManyToOne(targetEntity: 'Trainee', inversedBy: 'alerts')]
+    #[ORM\JoinColumn(name: 'trainee_id')]
+    #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
+    protected AbstractTrainee $trainee;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Session", inversedBy="alerts")
-     * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
-     * @Assert\NotNull()
      * @Serializer\Groups({"trainee"})
      */
-    protected $session;
+    #[Groups(["trainee"])]
+    #[ORM\ManyToOne(targetEntity: 'Session', inversedBy: 'alerts')]
+    #[ORM\JoinColumn(name: 'session_id')]
+    #[Assert\NotNull]
+    protected AbstractSession $session;
 
     /**
-     * @var \DateTime
-     * @ORM\Column(name="created_at",type="datetime", nullable=true)
      * @Serializer\Groups({"inscription", "session", "trainee", "trainer", "api"})
      */
-    protected $createdat;
+    #[Groups(["inscription", "session", "trainee", "trainer", "api"])]
+    #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $createdat = null;
 
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -66,15 +68,12 @@ class Alert
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @param mixed $trainee
-     */
-    public function setTrainee($trainee)
+    public function setTrainee(mixed $trainee): void
     {
         $this->trainee = $trainee;
     }
@@ -82,23 +81,20 @@ class Alert
     /**
      * @return AbstractTrainee
      */
-    public function getTrainee()
+    public function getTrainee(): AbstractTrainee
     {
         return $this->trainee;
     }
 
     /**
-     * @return ArrayCollection
+     * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
 
-    /**
-     * @param mixed $session
-     */
-    public function setSession($session)
+    public function setSession(mixed $session): void
     {
         $this->session = $session;
     }
@@ -106,7 +102,7 @@ class Alert
     /**
      * @return \DateTime
      */
-    public function getCreatedat()
+    public function getCreatedat(): \DateTime|\DateTimeInterface|null
     {
         return $this->createdat;
     }
@@ -114,17 +110,17 @@ class Alert
     /**
      * @param \DateTime $createdat
      */
-    public function setCreatedat($createdAt)
+    public function setCreatedat($createdAt): void
     {
         $this->createdat = $createdAt;
     }
 
     /**
-     * @return \App\Entity\Organization
+     * @return \App\Entity\Core\AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): \App\Entity\Core\AbstractOrganization
     {
-        return $this->getSession()->getTraining()->getOrganization();
+        return $this->session->getTraining()->getOrganization();
     }
 
 }

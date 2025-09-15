@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Trainer;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class OwnTrainerDeleteAccessRight extends AbstractAccessRight
+final class OwnTrainerDeleteAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Supprimer les formateurs de son propre centre';
     }
@@ -26,27 +23,23 @@ class OwnTrainerDeleteAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Trainer') {
-            return true;
-        }
-
-        return false;
+        return $class === \App\Entity\Back\Trainer::class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null ,$object = null): bool
     {
         if ($attribute !== 'DELETE') return false;
+
         if ($object) {
             return $object->getOrganization() === $token->getUser()->getOrganization();
-        } else {
-            return true;
         }
+
+        return true;
     }
 }

@@ -14,7 +14,7 @@ sygeforApp.controller('DatesEditController', ['$scope', '$modalInstance', '$dial
      * @param dates
      */
     $scope.editDates = function (dates) {
-        $dialog.open('dates.edit', {dates: dates}).then(function (data){
+        $dialog.open('dates.edit', {dates: dates}).then(function (data) {
             dates = data.dates;
         });
     };

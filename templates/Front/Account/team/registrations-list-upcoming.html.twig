@@ -18,14 +18,17 @@
                     <td data-order="{{ registration.createdAt|date('U') }}">{{ registration.createdAt | date('d/m/Y') }}</td>
                     <td>{{ registration.trainee.fullname }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>
-                    <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
+                    <td>
+                        <a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a>
+                    </td>
                     <td data-order="{{ registration.session.dateBegin|date('U') }}">{{ registration.session.dateBegin | date('d/m/Y') }}</td>
                     <td>
                         {% include 'Front/Account/team/inscription-status-label.html.twig' %}
                     </td>
                     <td>
                         {% if registration.upcoming and (registration.inscriptionstatus.machinename == 'waiting') %}
-                            <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                            <a href="{{ path('front.account.registration.valid', {id: registration.id}) }}"
+                               class="btn btn-xs btn-primary pull-right">
                                 Accepter ou refuser la demande
                             </a>
                         {% endif %}
@@ -42,12 +45,12 @@
 
 {% block javascripts %}
     <script type="text/javascript">
-        $(document).ready( function () {
+        $(document).ready(function () {
             var table = $('#registrations-upcoming').DataTable({
                 "searching": false,
                 "paging": false,
                 "info": false
             });
-        } );
+        });
     </script>
 {% endblock %}

@@ -8,18 +8,21 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
 
-class AdminShibbolethExtension extends Extension
+final class AdminShibbolethExtension extends Extension
 {
 
-    public function load(array $configs, ContainerBuilder $container)
+    /**
+     * @throws \Exception
+     */
+    public function load(array $configs, ContainerBuilder $containerBuilder): void
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('shibboleth', $config);
+        $containerBuilder->setParameter('shibboleth', $config);
 
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
-        $loader->load('services.yml');
+        $yamlFileLoader = new Loader\YamlFileLoader($containerBuilder, new FileLocator(__DIR__.'/../Resources/config'));
+        $yamlFileLoader->load('services.yml');
     }
 }

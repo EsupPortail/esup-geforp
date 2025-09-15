@@ -11,28 +11,21 @@ namespace App\Form\Type;
 use App\Form\Type\VocabularyType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Security\Core\Security;
 
-class TrainingcategoryType extends VocabularyType
+final class TrainingcategoryType extends VocabularyType
 {
     /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
+     * @var array<string, string>
      */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    private const CHOICES = ['Stage' => 'internship'];
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $choices       = array('Stage' => 'internship');
+        $formBuilder->add('trainingType', ChoiceType::class, ['label'    => 'Type de formation', 'choices'  => self::CHOICES, 'required' => true]);
 
-        $builder->add('trainingType', ChoiceType::class, array(
-            'label'    => 'Type de formation',
-            'choices'  => $choices,
-            'required' => true,
-        ));
-
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return VocabularyType::class;
     }

@@ -11,38 +11,24 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class PublictypeVocabularyType.
  */
-class PublictypeVocabularyType extends VocabularyType
+final class PublictypeVocabularyType extends VocabularyType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder->add('machinename', null, array(
-            'label' => 'Equivalent eduPersonAffiliation',
-        ));
+        $formBuilder->add('machinename', null, ['label' => 'Equivalent eduPersonAffiliation']);
 
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return VocabularyType::class;
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => Publictype::class,
-        ));
+        $optionsResolver->setDefaults(['data_class' => Publictype::class]);
     }
 }
 

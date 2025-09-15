@@ -13,49 +13,43 @@ use App\Utils\TrainingTypeRegistry;
  * Populate the Training discriminator map
  * + auto-increment local number.
  */
-class TrainingListener implements EventSubscriber
+final class TrainingListener implements EventSubscriber
 {
-    protected $registry;
-
     /**
      * Constructor.
      */
-    public function __construct(TrainingTypeRegistry $registry)
+    public function __construct(protected TrainingTypeRegistry $trainingTypeRegistry)
     {
-        $this->registry = $registry;
     }
 
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::prePersist,
-            Events::loadClassMetadata,
-        );
+        return [Events::prePersist, Events::loadClassMetadata];
     }
 
     /**
      * Populate the Training discriminator map.
      *
-     * @param LoadClassMetadataEventArgs $eventArgs The event arguments
+     * @param LoadClassMetadataEventArgs $loadClassMetadataEventArgs The event arguments
      */
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $loadClassMetadataEventArgs): void
     {
-        $classMetadata = $eventArgs->getClassMetadata();
-        if (null === $classMetadata->reflClass) {
+        $classMetadata = $loadClassMetadataEventArgs->getClassMetadata();
+        if (!$classMetadata->reflClass instanceof \ReflectionClass) {
             return;
         }
 
         if ($classMetadata->getName() === AbstractTraining::class) {
             // fill the discriminator map with types from the registry
-            $map = array();
-            foreach ($this->registry->getTypes() as $key => $type) {
+            $map = [];
+            foreach ($this->trainingTypeRegistry->getTypes() as $key => $type) {
                 $map[$key] = $type['class'];
             }
+
             $classMetadata->setDiscriminatorMap($map);
 
             // update material trait to map trainings
@@ -67,14 +61,13 @@ class TrainingListener implements EventSubscriber
      * When a inscription is created, copy all the professional situation
      * from the Trainee entity.
      *
-     * @param LifecycleEventArgs $eventArgs
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
+    public function prePersist(LifecycleEventArgs $lifecycleEventArgs): void
     {
-        $entity = $eventArgs->getEntity();
+        $entity = $lifecycleEventArgs->getEntity();
         if ($entity instanceof AbstractTraining && !$entity->getNumber()) {
-            $em = $eventArgs->getEntityManager();
-            $query = $em->createQuery('SELECT MAX(t.number) FROM '.AbstractTraining::class.' t WHERE t.organization = :organization')
+            $entityManager = $lifecycleEventArgs->getEntityManager();
+            $query = $entityManager->createQuery('SELECT MAX(t.number) FROM '.AbstractTraining::class.' t WHERE t.organization = :organization')
                 ->setParameter('organization', $entity->getOrganization());
             $max = (int) $query->getSingleScalarResult();
             $entity->setNumber($max + 1);

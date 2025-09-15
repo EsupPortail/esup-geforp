@@ -1,56 +1,51 @@
 <?php
 
-
 namespace App\Utils;
 
 use Knp\Menu\FactoryInterface;
+use Knp\Menu\ItemInterface;
 use Knp\Menu\Util\MenuManipulator;
-use App\Event\ConfigureMenuEvent;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\RouterInterface;
 
 /**
  * Class MenuBuilder.
  */
-class MenuBuilder implements ContainerAwareInterface
+final class MenuBuilder
 {
-    use ContainerAwareTrait;
+    public $factory;
     /**
-     * @param FactoryInterface $factory
+     * Constructor
+     *
      */
-    public function __construct(FactoryInterface $factory)
+    public function __construct(FactoryInterface $factory, private readonly LoggerInterface $logger, private readonly EventDispatcherInterface $eventDispatcher)
     {
         $this->factory = $factory;
     }
 
-    /**
-     * @param Request $request
-     *
-     * @return \Knp\Menu\ItemInterface
-     */
-    public function createMainMenu(Request $request)
+    public function createMainMenu(Request $request): ItemInterface
     {
         $menu = $this->factory->createItem('root');
-        /*$menu->addChild('home', array(
-            'label' => 'Accueil',
-            'route' => 'core.index'
-        ));*/
 
-        $menu->addChild('administration', array(
+// Add some children to the menu
+        $menu->addChild('administration', [
             'label' => 'Administration',
             'icon' => 'gear',
-        ));
+        ]);
 
-        $this->container->get('event_dispatcher')->dispatch(ConfigureMenuEvent::CONFIGURE, new ConfigureMenuEvent($this->factory, $menu));
-        $this->container->get('event_dispatcher')->dispatch(ConfigureMenuEvent::ALTER, new ConfigureMenuEvent($this->factory, $menu));
+// Dispatch the 'configure' and 'alter' events with the menu
+        $this->eventDispatcher->dispatch(new ConfigureMenuEvent($this->factory, $menu), ConfigureMenuEvent::CONFIGURE);
+        $this->eventDispatcher->dispatch(new ConfigureMenuEvent($this->factory, $menu), ConfigureMenuEvent::ALTER);
 
+// Manipulate the menu (move the 'administration' item to the last position if it has children)
         if ($menu->getChild('administration')->count() === 0) {
             $menu->removeChild('administration');
         } else {
-            $manipulator = new MenuManipulator();
+            $menuManipulator = new MenuManipulator();
             $item = $menu->getChild('administration');
-            $manipulator->moveToLastPosition($item);
+            $menuManipulator->moveToLastPosition($item);
         }
 
         return $menu;

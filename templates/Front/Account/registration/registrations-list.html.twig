@@ -21,10 +21,14 @@
                 <tr>
                     <td>{{ registration.createdAt | date('d/m/Y') }}</td>
                     <td>{{ registration.session.training.organization.name }}</td>
-                    <td><a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a></td>
+                    <td>
+                        <a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a>
+                    </td>
                     <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
                     {% if user is defined and user.isPaying == true %}
-                        <td title="Tarif de la formation"> {{registration.session.price ? registration.session.price : '0'}} €</td>
+                        <td title="Tarif de la formation"> {{ registration.session.price ? registration.session.price : '0' }}
+                            €
+                        </td>
                     {% endif %}
                     <td>
                         {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
@@ -37,7 +41,8 @@
                     <td>
                         {% if relance == true %}
                             {% if registration.upcoming and (registration.inscriptionStatus.machinename == 'waiting') %}
-                                <a href="{{ path('front.account.registration.authorize', {id: registration.id}) }}" class="btn btn-xs btn-primary pull-right">
+                                <a href="{{ path('front.account.registration.authorize', {id: registration.id}) }}"
+                                   class="btn btn-xs btn-primary pull-right">
                                     Relancer ma demande d'autorisation hiérarchique
                                 </a>
                             {% endif %}
@@ -45,7 +50,8 @@
                     </td>
                     <td>
                         {% if registration.upcoming and (registration.inscriptionStatus.status <=2 ) %}
-                            <a href="{{ path('front.account.registration.desist', {id: registration.id}) }}" class="btn btn-danger btn-xs pull-right">
+                            <a href="{{ path('front.account.registration.desist', {id: registration.id}) }}"
+                               class="btn btn-danger btn-xs pull-right">
                                 {{ registration.inscriptionStatus.status == 0 ? 'Annuler cette demande' : 'Déclarer un désistement' }}
                             </a>
                         {% endif %}

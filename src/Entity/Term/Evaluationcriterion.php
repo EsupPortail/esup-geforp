@@ -11,20 +11,17 @@ use JMS\Serializer\Annotation as Serializer;
 /**
  * Critère d'évaluation
  *
- * @ORM\Table(name="evaluation_criterion")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'evaluation_criterion')]
+#[ORM\Entity]
 class Evaluationcriterion extends AbstractTerm implements VocabularyInterface
 {
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return "Critère d'évaluation";
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_LOCAL;
     }

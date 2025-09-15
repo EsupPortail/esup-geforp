@@ -10,6 +10,7 @@ namespace App\Controller\Front;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Env\Response;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use App\Entity\Back\Alert;
@@ -17,24 +18,17 @@ use App\Entity\Back\MultipleAlert;
 use App\Entity\Back\SingleAlert;
 use App\Form\Type\ProgramAlertType;
 
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-/**
- * @Route("/")
- */
+#[Route(path: '/')]
 class PublicController extends AbstractController
 {
 
     /**
-     * @Route("/{page}", name="front.public.index", requirements={"page": "\d+"})
-     * @Template("Front/Public/index.html.twig")
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function indexAction(Request $request, ManagerRegistry $doctrine, $page = 1)
+    #[Route(path: '/{page}', name: 'front.public.index', requirements: ['page' => '\d+'])]
+    public function index(Request $request, ManagerRegistry $doctrine, int $page = 1): \Symfony\Component\HttpFoundation\Response
     {
         if ($request->get('shibboleth') == 1) {
             if ($request->get('error') == "activation") {
@@ -42,59 +36,59 @@ class PublicController extends AbstractController
             }
         }
         
-        return array('user' => $this->getUser());
+        return $this->render('Front/Public/index.html.twig', ['user' => $this->getUser(), 'page' => $page]);
     }
 
     /**
-     * @Route("/login", name="front.public.login")
-     * @Template("Front/Public/login.html.twig")
+     * @return array{user: \Symfony\Component\Security\Core\User\UserInterface|null}
      */
-    public function loginAction(Request $request)
+    #[Route(path: '/login', name: 'front.public.login')]
+    public function login(): \Symfony\Component\HttpFoundation\Response
     {
-        return array('user' => $this->getUser());
+        return $this->render('Front/Public/login.html.twig',['user' => $this->getUser()]);
     }
 
     /**
-     * @Route("/contact", name="front.public.contact")
-     * @Template("Front/Public/contact.html.twig")
+     * @return array{etablissements: \App\Entity\Back\Institution[]}
      */
-    public function contactAction(ManagerRegistry $doctrine, Request $request)
+    #[Route(path: '/contact', name: 'front.public.contact')]
+    public function contact(ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
         // Récupération des établissements de la plate-forme
-        $institutions = $doctrine->getRepository('App\Entity\Back\Institution')->findBy(array(), array('name' => 'ASC'));
-        $instContacts = array();
+        $institutions = $doctrine->getRepository(\App\Entity\Back\Institution::class)->findBy([], ['name' => 'ASC']);
+        $instContacts = [];
         foreach ($institutions as $institution) {
             if ($institution->getEmail() !== null)
                 $instContacts[] = $institution;
         }
-        return array('etablissements' => $instContacts);
+        return $this->render('Front/Public/contact.html.twig', ['etablissements' => $instContacts, ]);
     }
 
     /**
-     * @Route("/faq", name="front.public.faq")
-     * @Template("Front/Public/faq.html.twig")
+     * @return array{contact_mail: mixed[]|bool|float|int|string|\UnitEnum|null, front_url: mixed[]|bool|float|int|string|\UnitEnum|null}
      */
-    public function faqAction(Request $request)
+    #[Route(path: '/faq', name: 'front.public.faq')]
+    public function faq(): \Symfony\Component\HttpFoundation\Response
     {
-        return array('contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'));
+        return $this->render('Front/Public/faq.html.twig', ['contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url')]);
     }
 
     /**
-     * @Route("/about", name="front.public.about")
-     * @Template("Front/Public/about.html.twig")
+     * @return array{user: \Symfony\Component\Security\Core\User\UserInterface|null}
      */
-    public function aboutAction(Request $request)
+    #[Route(path: '/about', name: 'front.public.about')]
+    public function about(): \Symfony\Component\HttpFoundation\Response
     {
-        return array('user' => $this->getUser());
+        return $this->render('Front/Public/about.html.twig', ['user' => $this->getUser()]);
     }
 
     /**
-     * @Route("/legalNotice", name="front.public.legalNotice")
-     * @Template("Front/Public/legalNotice.html.twig")
+     * @return array{user: \Symfony\Component\Security\Core\User\UserInterface|null}
      */
-    public function legalNoticeAction(Request $request)
+    #[Route(path: '/legalNotice', name: 'front.public.legalNotice')]
+    public function legalNotice(): \Symfony\Component\HttpFoundation\Response
     {
-        return array('user' => $this->getUser());
+        return $this->render('Front/Public/legalNotice.html.twig',['user' => $this->getUser()]);
     }
 
 }

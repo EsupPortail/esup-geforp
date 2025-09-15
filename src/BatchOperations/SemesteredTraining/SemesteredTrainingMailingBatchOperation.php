@@ -14,8 +14,10 @@ use App\Model\SemesteredTraining;
 /**
  * Class MailingBatchOperation.
  */
-class SemesteredTrainingMailingBatchOperation extends BaseMailingBatchOperation
+final class SemesteredTrainingMailingBatchOperation extends BaseMailingBatchOperation
 {
+    private $idList;
+
     /**
      * Getting objects list.
      *
@@ -23,7 +25,7 @@ class SemesteredTrainingMailingBatchOperation extends BaseMailingBatchOperation
      *
      * @return \App\Model\SemesteredTraining[]
      */
-    protected function getObjectList($idList)
+    protected function getObjectList($idList): array
     {
         return SemesteredTraining::getSemesteredTrainingsByIds($this->idList, $this->doctrine->getManager());
     }

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Core\AbstractTraining;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
@@ -12,17 +13,37 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class TrainingRepository extends ServiceEntityRepository
+final class TrainingRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private ManagerRegistry $managerRegistry;
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Internship::class);
+        parent::__construct($managerRegistry, Internship::class);
+        $this->managerRegistry = $managerRegistry;
     }
 
-    public function getTrainingsList($keyword, $filters, $page, $pageSize, $sorts)
+    /**
+     * @return array{total: int, pageSize: mixed, items: array<int, array{id: mixed, name: mixed, number: mixed, sessionscount: mixed, trainers?: array{fullname: mixed}[]|array{id: mixed}[]&mixed[], training: array{id: mixed, type: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, name: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed, trainers: string}, nextsession: mixed, lastsession: mixed, theme: mixed, inscriptionsStats: never[]}>}
+     */
+    public function getTrainingsList($keyword,
+                                     array $filters = [],
+                                     int $page = 1,
+                                     int $pageSize = 1,
+                                     array $sorts = ['createdat' => 'DESC']): array
     {
+
+        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
+        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
+
+        $isExport = isset($filters['_export']) && $filters['_export'] === true;
+
+        $pageSize = max(1, (int) $pageSize);
+        $pageSize = $isExport
+            ? min($pageSize, $MAX_EXPORT_LIMIT)
+            : min($pageSize, $MAX_PAGE_SIZE);
+
         /* addcslashes empêchera des manipulations malveillantes éventuelles */
-        $keywordPr = '%' . addcslashes($keyword, '%_') . '%';
+        $keywordPr = '%' . addcslashes((string) $keyword, '%_') . '%';
         $qb = $this->createQueryBuilder('training');
         $qb
             ->select('training')
@@ -58,12 +79,22 @@ class TrainingRepository extends ServiceEntityRepository
             }
 
             // FILTRE SEMESTRE
-            if( isset($filters['semester']) ) {
-                if ($filters['semester']  == 1) {
-                    $monthFrom = 1; $monthTo = 6;
+            if( isset($filters['semester']) && isset($filters['year']) ) {
+                $sessionDate = new \DateTime($filters['year']);
+                $month = (int) $sessionDate->format('m');
+
+                if ($month > 1 && $month < 12) {
+                    $semester = 1;
+                    $monthFrom = 0;
+                    $monthTo = 6;
                 } else {
-                    $monthFrom = 7; $monthTo = 12;
+                    $semester = 2;
+                    $monthFrom = 7;
+                    $monthTo = 12;
                 }
+
+                $filters['semester'] = $semester;
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
@@ -79,7 +110,7 @@ class TrainingRepository extends ServiceEntityRepository
 
             // FILTRE FORMATEUR
             if(isset($filters['trainers.fullName'])) {
-                $fullName = explode(" ", $filters['trainers.fullName']);
+                $fullName = explode(" ", (string) $filters['trainers.fullName']);
                 $lastName = array_pop($fullName);
                 $firstName = array_shift($fullName);
                 $qb
@@ -114,6 +145,7 @@ class TrainingRepository extends ServiceEntityRepository
         elseif ((is_array($sorts)) && (array_key_exists('training.category.source', $sorts))) {
             if(!isset($filters['training.category.source']))
                 $qb->innerJoin('training.category', 'category', 'WITH', 'training.category = category');
+
             $qb->addOrderBy('category.name', $sorts['training.category.source']);
         } else
             $qb->addOrderBy('training.name');
@@ -123,85 +155,132 @@ class TrainingRepository extends ServiceEntityRepository
             // on met une valeur par défaut (pour l'autocompletion)
             $page = 1;
             $pageSize = 50;
+            
         }
-        $offset = ($page-1) * $pageSize;
+                $page = max(1, (int)$page);
+        $pageSize = max(1, (int)$pageSize);
+        $offset = ($page - 1) * $pageSize;
+
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
+
         $query = $qb->getQuery();
-
         $paginator = new Paginator($query, $fetchJoinCollection = true);
-
         $c = count($paginator);
-        $tabTrainings = array();
 
-        foreach($paginator as $training) {
-            $trainingES = array();
-            // On ne garde que les infos du stage dont on a besoin
-            $trainingES['sessionscount'] = $training->getSessionscount();
-            $trainingES['id'] = $training->getId();
-            $trainingES['number'] = $training->getNumber();
-            $trainingES['name'] = $training->getName();
+        $items = [];
 
+        foreach ($paginator as $training) {
+            // Préparation de la liste des formateurs + chaîne de noms concaténés
+            $trainerList = [];
+            $trainerNames = [];
 
-            $trainingES['training']['id'] = $training->getId();
-            $trainingES['training']['type'] = $training->getType();
-            $trainingES['training']['typeLabel'] = $training->getTypeLabel();
-            $trainingES['training']['organization'] =$training->getOrganization();
-            $trainingES['training']['number'] = $training->getNumber();
-            $trainingES['training']['theme'] = $training->getTheme();
-            $trainingES['training']['tags'] = $training->getTags();
-            $trainingES['training']['name'] = $training->getName();
-            $trainingES['training']['program'] = $training->getProgram();
-            $trainingES['training']['description'] = $training->getDescription();
-            $trainingES['training']['interventionType'] = $training->getInterventionType();
-            $trainingES['training']['externalInitiative'] = $training->isExternalInitiative();
-            $trainingES['training']['category'] = $training->getCategory();
-            $trainingES['training']['comments'] = $training->getComments();
-            $trainingES['training']['firstSessionPeriodSemester'] = $training->getFirstSessionPeriodSemester();
-            $trainingES['training']['firstSessionPeriodYear'] = $training->getFirstSessionPeriodSemester();
-            $trainingES['training']['publictypes'] = $training->getPublicTypes();
-
-            $trainingES['training']['trainers'] = "";
-            $i=0;
             foreach ($training->getTrainers() as $trainer) {
-                $trainingES['trainers'][]['id'] = $trainer->getId();
-                $trainingES['trainers'][]['fullname'] = $trainer->getFullname();
-                if($i>0)
-                    $trainingES['training']['trainers'] .= ', ' . $trainer->getFullname();
-                else
-                    $trainingES['training']['trainers'] .= $trainer->getFullname();
-                $i++;
+                $trainerList[] = [
+                    'id' => $trainer->getId(),
+                    'fullName' => $trainer->getFullname(),
+                ];
+                $trainerNames[] = $trainer->getFullname();
             }
 
+            // Tentative de récupération de la prochaine session
+            $nextSession = $training->getNextsession();
+            $year = null;
+            $semester = null;
 
-            $trainingES['nextsession'] = $training->getNextsession();
-            $trainingES['lastsession'] = $training->getLastsession();
+            if ($nextSession) {
+                if (method_exists($nextSession, 'getYear') && $nextSession->getYear()) {
+                    $year = $nextSession->getYear();
+                }
+                if (method_exists($nextSession, 'getSemesterLabel')) {
+                    $semester = $nextSession->getSemesterLabel();
+                }
+            }
 
-            $trainingES['theme'] = $training->getTheme();
+            // Si elle existe, on récupère le semestre depuis cette session
 
-            $trainingES['inscriptionsStats'] = array();
 
-            $tabTrainings[] = $trainingES;
-        }
+            $sessionData = [];
+            foreach ($training->getSessions() as $session) {
+                $sessionData[] = [
+                    'id' => $session->getId(),
+                    'datebegin' => $session->getDatebegin(),
+                    'dateend' => $session->getDateend(),
+                    'year' => $session->getYear(),
+                    'semester' => $session->getSemester(),
+                    'type' => 'session',
+                    'numberofregistrations' => $session->getNumberofregistrations(),
+                    'numberofacceptedregistrations' => $session->getNumberofacceptedregistrations(),
+                    'maximumnumberofregistrations' => $session->getMaximumnumberofregistrations(),
+                    'numberofparticipants' => count($session->getParticipations()),
+                ];
+            }
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabTrainings);
+            $semester = null;
+            $years = null;
+            if ($nextSession && method_exists($nextSession, 'getSemesterLabel')) {
+                $semester = $nextSession->getSemesterLabel();
+            }
 
-        return $res;
+            if ($nextSession && method_exists($nextSession, 'getYear') && $nextSession->getYear()) {
+                $years = $nextSession->getYear();
+            }
+
+            $items[] = [
+                'id' => $training->getId(),
+                'number' => $training->getNumber(),
+                'name' => $training->getName(),
+                'theme' => $training->getTheme(),
+                'sessionscount' => $training->getSessionscount(),
+                'semester' => $semester,
+                'nextsession' => $training->getNextsession(),
+                'lastsession' => $training->getLastsession(),
+                'trainers' => $trainerList,
+                'sessions' => $sessionData,
+                'inscriptionsStats' => [], // à compléter si nécessaire
+                'year' => $years,
+                'description' => $training->getDescription(),
+                'program' => $training->getProgram(),
+                'tags' => $training->getTags(),
+                'training' => [
+                    'id' => $training->getId(),
+                    'type' => $training->getType(),
+                    'typeLabel' => $training->getTypeLabel(),
+                    'organization' => $training->getOrganization(),
+                    'number' => $training->getNumber(),
+                    'name' => $training->getName(),
+                    'theme' => $training->getTheme(),
+                    'tag' => $training->getTags(),
+                    'program' => $training->getProgram(),
+                    'description' => $training->getDescription(),
+                    'interventionType' => $training->getInterventionType(),
+                    'externalInitiative' => $training->isExternalInitiative(),
+                    'category' => $training->getCategory(),
+                    'comments' => $training->getComments(),
+                    'firstSessionPeriodSemester' => $training->getFirstSessionPeriodSemester(),
+                    'firstSessionPeriodYear' => $training->getFirstSessionPeriodYear(),
+                    'publictypes' => $training->getPublicTypes(),
+                    'trainers' => implode(', ', $trainerNames),
+                ],
+            ];
+
+
     }
 
-    public function getNbTrainings($query_filters, $keyword, $aggs, $name)
+
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $items];
+    }
+
+    public function getNbTrainings(array $query_filters = [], ?string $keyword = '', array $aggs = [], mixed $name = "", $facet = null): array
     {
         $qb = $this->createQueryBuilder('training');
         $qb
-            ->select('training')
-
+            ->select('COUNT(DISTINCT training)')
             // FILTRE KEYWORD
             ->where('training.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
 
         // FILTRE CENTRE
@@ -223,7 +302,7 @@ class TrainingRepository extends ServiceEntityRepository
             (isset($aggs['trainers.fullName'])) || (isset($query_filters['trainers.fullName']))
         ) {
             // join sur la session
-            $qb->innerJoin(Session::class, 's', 'WITH', 's.training = training');
+            $qb->innerJoin('training.sessions', 's');
 
             // FILTRE ANNEE
             if (isset($aggs['year'])) {
@@ -238,21 +317,25 @@ class TrainingRepository extends ServiceEntityRepository
 
             // FILTRE SEMESTRE
             if (isset($aggs['semester'])) {
-                if ($name  == 1) {
+                $semester = (int) $name;
+                if ($semester  == 1) {
                     $monthFrom = 1; $monthTo = 6;
                 } else {
                     $monthFrom = 7; $monthTo = 12;
                 }
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
                     ->setParameter('monthTo', $monthTo);
-            } elseif( isset($query_filters['semester']) ) {
-                if ($query_filters['semester']  == 1) {
+            } elseif( isset($query_filters['session.semester']) ) {
+                $semester = (int) $query_filters['session.semester'];
+                if ($semester  == 1) {
                     $monthFrom = 1; $monthTo = 6;
                 } else {
                     $monthFrom = 7; $monthTo = 12;
                 }
+
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
@@ -279,7 +362,7 @@ class TrainingRepository extends ServiceEntityRepository
                     ->setParameter('id', $name);
             } elseif( isset($query_filters['trainers.fullName']) ) {
                 /* le front envoie un full name (prénom+nom), je le découpe et ne récupère que le nom de famille */
-                $fullName = explode(" ", $query_filters['participations.trainer.fullName']);
+                $fullName = explode(" ", (string) $query_filters['participations.trainer.fullName']);
                 $lastName = array_pop($fullName);
                 $firstName = array_shift($fullName);
                 $qb
@@ -288,6 +371,23 @@ class TrainingRepository extends ServiceEntityRepository
                     ->andWhere('trainer.lastname = :trainerLastName AND trainer.firstname = :trainerFirstName')
                     ->setParameter('trainerLastName', $lastName)
                     ->setParameter('trainerFirstName', $firstName);
+            }
+        }
+
+            //FILTRE NUMÉRO
+        if (isset($aggs['training.number'])) {
+            $qb->andWhere('training.number = :number')
+                ->setParameter('number', $name);
+
+        } elseif (!empty($query_filters['training.number'])) {
+            $values = (array) $query_filters['training.number'];
+
+            if (count($values) === 1) {
+                $qb->andWhere('training.number = :number')
+                    ->setParameter('number', reset($values));
+            } else {
+                $qb->andWhere('training.number IN (:numbers)')
+                    ->setParameter('numbers', $values);
             }
         }
 
@@ -304,11 +404,39 @@ class TrainingRepository extends ServiceEntityRepository
                 ->setParameter('themes', $query_filters['theme.name']);
         }
 
-        // On compte le nb de sessions en résultat
-        $paginator = new Paginator($qb->getQuery());
-        $totalRows = count($paginator);
+        // FILTRE TYPE
+        if(isset( $aggs['training.typeLabel.source'])) {
+            $qb
+                ->leftJoin('training.category', 'c')
+                ->andWhere('c.name  = :type')
+                ->setParameter('type', $name);
+        } elseif( isset($query_filters['training.typeLabel.source']) ){
+            $qb
+                ->leftJoin('training.category', 'c')
+                ->andWhere('c.name IN (:types)')
+                ->setParameter('types', $query_filters['training.typeLabel.source']);
+        }
 
-        return $totalRows;
+        //FILTRE CATEGORY
+        if ($facet === 'training.category' && $name !== null) {
+            $qb->innerJoin('training.category', 'c')
+                ->andWhere('c.name = :category')
+                ->setParameter('category', $name);
+        } elseif (!empty($query_filters['training.category'])) {
+            $categories = (array) $query_filters['training.category'];
+            $qb->innerJoin('training.category', 'c')
+                ->andWhere('c.name IN (:categorys)')
+                ->setParameter('categorys', $categories);
+        }
+
+        // On compte le nb de sessions en résultat
+
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
+
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 
 }

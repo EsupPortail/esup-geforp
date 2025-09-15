@@ -19,8 +19,8 @@
     <script src="{{ asset('build/front.js') }}"></script>
     <script src="{{ asset('build/datatables.js') }}"></script>
     <script type="application/javascript">
-        (function($) {
-            $(document).ready(function() {
+        (function ($) {
+            $(document).ready(function () {
                 jQuery.cookieBar({
                     'message': "Cette plateforme utilise des cookies pour vous assurer la meilleure expérience de visite possible.",
                     'acceptText': "Je comprends"
@@ -34,33 +34,33 @@
 </head>
 <body class="body">
 
-    <!-- header -->
-    {% include 'Front/header.html.twig' %}
+<!-- header -->
+{% include 'Front/header.html.twig' %}
 
-    <!-- content -->
-    <div class="content">
+<!-- content -->
+<div class="content">
 
-        {% block header %}{% endblock %}
-        {% block breadcrumbs %} {% endblock %}
+    {% block header %}{% endblock %}
+    {% block breadcrumbs %} {% endblock %}
 
-        <!-- flashes -->
-        {% block flashes %}
-            {% from '@MopaBootstrap/flash.html.twig' import session_flash %}
-            {% if app.session.flashbag.peekAll|length > 0 %}
-                <div class="container flashes">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            {{ session_flash() }}
-                        </div>
+    <!-- flashes -->
+    {% block flashes %}
+        {% from '@MopaBootstrap/flash.html.twig' import session_flash %}
+        {% if app.session.flashbag.peekAll|length > 0 %}
+            <div class="container flashes">
+                <div class="row">
+                    <div class="col-sm-12">
+                        {{ session_flash() }}
                     </div>
                 </div>
-            {% endif %}
-        {% endblock flashes %}
+            </div>
+        {% endif %}
+    {% endblock flashes %}
 
-        {% block body %}{% endblock %}
-    </div>
+    {% block body %}{% endblock %}
+</div>
 
-    <!-- footer -->
-    {% include 'Front/footer.html.twig' %}
+<!-- footer -->
+{% include 'Front/footer.html.twig' %}
 </body>
 </html>

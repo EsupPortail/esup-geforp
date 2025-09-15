@@ -8,7 +8,7 @@ sygeforApp.directive("slimScroll", ['$timeout', function ($timeout) {
         link: function (scope, element, attrs) {
             // instance-specific options
             var opts = angular.extend({}, options, scope.$eval(attrs.slimScroll));
-            $timeout(function() {
+            $timeout(function () {
                 angular.element(element).slimScroll(opts);
             });
         }

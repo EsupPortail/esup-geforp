@@ -7,28 +7,29 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\VocabularyInterface;
 use App\Form\Type\TrainingcategoryType;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Catégorie de formation.
  *
- * @ORM\Table(name="training_category")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'training_category')]
+#[ORM\Entity]
 class Trainingcategory extends AbstractTerm implements VocabularyInterface
 {
     /**
-     * @var string
-     * @ORM\Column(name="trainingType", type="string", length=256, nullable=true)
-     * @Assert\NotNull(message="Vous devez renseigner un type de formation")
      * @Serializer\Groups({"Default", "api"})
      */
-    private $trainingType;
+    #[Groups(["Default", "api"])]
+    #[ORM\Column(name: 'trainingType', type: \Doctrine\DBAL\Types\Types::STRING, length: 256, nullable: true)]
+    #[Assert\NotNull(message: 'Vous devez renseigner un type de formation')]
+    private ?string $trainingType = null;
 
     /**
      * @return string
      */
-    public function getTrainingType()
+    public function getTrainingType(): ?string
     {
         return $this->trainingType;
     }
@@ -36,7 +37,7 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @param string $trainingType
      */
-    public function setTrainingType($trainingType)
+    public function setTrainingType($trainingType): void
     {
         $this->trainingType = $trainingType;
     }
@@ -44,17 +45,17 @@ class Trainingcategory extends AbstractTerm implements VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return 'Catégorie de formation';
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return TrainingcategoryType::class;
     }
 
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }

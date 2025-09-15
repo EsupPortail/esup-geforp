@@ -13,7 +13,8 @@
                 <span class="btn btn-primary fileinput-button">
                     <i class="glyphicon glyphicon-plus"></i>
                     <span>Ajouter un fichier</span>
-                    <div sf-file-upload data-thref="{route: 'material.add', params: {entity_id: dialog.params.entity.id, type_entity: dialog.params.entityType}}"
+                    <div sf-file-upload
+                         data-thref="{route: 'material.add', params: {entity_id: dialog.params.entity.id, type_entity: dialog.params.entityType}}"
                          data-add-callback="getUploadedFile"
                          data-queue='entity.materials'>
                     </div>
@@ -49,7 +50,9 @@
             <a ng-if="file.url" target="_blank" href="{{file.url}}"><i class="fa fa-external-link"></i></a>
 
             <!--file material uploading -->
-            <div ng-if="file.uploading" class="progress progress-striped active fade" ng-class="{pending: 'in'}[file.$state()]" data-file-upload-progress="file.$progress()" style="width:96px; height:33px;">
+            <div ng-if="file.uploading" class="progress progress-striped active fade"
+                 ng-class="{pending: 'in'}[file.$state()]" data-file-upload-progress="file.$progress()"
+                 style="width:96px; height:33px;">
                 <div class="progress-bar progress-bar-success" ng-style="{width: num + '%'}"></div>
             </div>
 

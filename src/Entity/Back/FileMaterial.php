@@ -7,14 +7,15 @@ use App\Entity\Core\Material;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\UploadableTrait;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * FileMaterial.
  *
- * @ORM\Entity
- * @ORM\Table(name="file_material")
- * @ORM\HasLifecycleCallbacks
  */
+#[ORM\Table(name: 'file_material')]
+#[ORM\Entity]
+#[ORM\HasLifecycleCallbacks]
 class FileMaterial extends Material
 {
     use UploadableTrait;
@@ -28,23 +29,18 @@ class FileMaterial extends Material
      *
      * @return string
      */
-    public function getName()
+    #[Groups([ 'Default','api.attendance'])]
+    public function getName(): string
     {
         return $this->filename;
     }
 
-    /**
-     * @return string
-     */
-    static public function getType()
+    static public function getType(): string
     {
         return 'file';
     }
 
-    /**
-     * @return string
-     */
-    protected function getTemplatesRootDir()
+    protected function getTemplatesRootDir(): string
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
         return __DIR__ . '/../../../var/Material';

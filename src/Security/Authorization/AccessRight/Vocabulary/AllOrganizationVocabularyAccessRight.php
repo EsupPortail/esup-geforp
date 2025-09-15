@@ -11,7 +11,7 @@ class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Gestion des vocabulaires locaux de tous les centres';
     }
@@ -23,7 +23,7 @@ class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
      *
      * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         if ($class === 'App\Vocabulary\VocabularyInterface') {
             return true;
@@ -44,7 +44,7 @@ class AllOrganizationVocabularyAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
     {
         if (is_string($object)) {
             return true;

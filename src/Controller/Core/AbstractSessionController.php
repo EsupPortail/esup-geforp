@@ -8,15 +8,19 @@ use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Session;
 use App\Entity\Back\Trainer;
+use App\Entity\Term\Trainingcategory;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use JMS\Serializer\Annotation\Groups;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use JMS\Serializer\SerializationContext;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractInscription;
 use App\Entity\Core\AbstractParticipation;
 use App\Entity\Core\AbstractSession;
@@ -29,29 +33,35 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
+use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * @Route("/training/session")
- */
+#[Route(path: '/training/session')]
 abstract class AbstractSessionController extends AbstractController
 {
-    protected $sessionClass = AbstractSession::class;
-    protected $participationClass = AbstractParticipation::class;
+    protected string $sessionClass = AbstractSession::class;
+
+    protected string $participationClass = AbstractParticipation::class;
+
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
+    {
+    }
 
     /**
-     * @Route("/search", name="session.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
+     * @return array{total: int, pageSize: mixed, items: array<int, array{availablePlaces?: mixed, datebegin?: mixed, dateend?: mixed, daynumber?: mixed, displayonline?: mixed, hournumber?: mixed, id: mixed, inscriptions?: array<int, array{id: mixed}>, inscriptionStats?: array<int, array{id: mixed, name: mixed, status: mixed, count: int}>, limitRegistrationDate?: mixed, maximumnumberofregistrations?: mixed, name?: mixed, numberofacceptedregistrations?: mixed, numberofparticipants?: mixed, numberofregistrations?: mixed, participations?: array<int, array{id: mixed}>, promote?: mixed, registrable?: mixed, registration?: mixed, semester?: mixed, semesterLabel?: mixed, sessiontype?: mixed, status?: mixed, theme?: mixed, training?: array{id: mixed, type: mixed, name: mixed, typeLabel: mixed, organization: mixed, number: mixed, theme: mixed, tags: mixed, program: mixed, description: mixed, interventionType: mixed, externalInitiative: mixed, category: mixed, comments: mixed, firstSessionPeriodSemester: mixed, firstSessionPeriodYear: mixed, publictypes: mixed}, year?: mixed}>, aggs: mixed}
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry)
+    #[Rest\View(['Default','session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/search', name: 'session.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, SessionRepository $sessionRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', array());
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
-        $fields = $request->request->get('fields', 'NO FIELDS');
+        $filters = $request->request->all('filters') ?? [];
+        $query_filters = $request->request->all('query_filters') ?? [];
+        $aggs = $request->request->all('aggs') ?? [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ?? [];
+        $fields = $request->request->all('fields') ?? [];
 
         // security check : session : 'sygefor_training.rights.inscription.all.view' -> id=9
         if(!$accessRightRegistry->hasAccessRight(9)) {
@@ -63,7 +73,7 @@ abstract class AbstractSessionController extends AbstractController
         $ret = $sessionRepository->getSessionsList($keywords, $filters, $page, $size, $sorts, $fields);
 
         // Recherche pour aggs et query_filters
-        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $sessionRepository);
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $sessionRepository);
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
@@ -72,17 +82,22 @@ abstract class AbstractSessionController extends AbstractController
     }
 
     /**
-     * @Route("/create/{training}", requirements={"id" = "\d+"}, name="session.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("EDIT", subject="training")
-     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "training"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function createAction(Request $request, ManagerRegistry $doctrine, AbstractTraining $training)
+    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/create/{training}', name: 'session.create', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[IsGranted('EDIT', subject: 'training')]
+    public function create(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, AbstractTraining $training): array
     {
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($training);
+        if(!$training) {
+            throw new NotFoundHttpException();
+        }
         /** @var AbstractSession $session */
         $session = new $this->sessionClass();
         $session->setTraining($training);
         $session->setName($training->getName());
+
         $form = $this->createForm($session::getFormType(), $session);
 
         if ($request->getMethod() === 'POST') {
@@ -91,80 +106,106 @@ abstract class AbstractSessionController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $session->setCreatedAt(new \DateTime('now'));
                 $session->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->persist($session);
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($session);
 //                $training->updateTimestamps();
-                $em->flush();
+                $objectManager->flush();
             }
         }
 
         if (!$this->isGranted('EDIT', $session->getTraining())) {
             if ($this->isGranted('VIEW', $session->getTraining())) {
-                return array('session' => $session);
+                return ['session' => $session];
             }
 
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        return array('form' => $form->createView(), 'training' => $session->getTraining(), 'session' => $session);
+        return ['form' => $form->createView(), 'training' => $session->getTraining(), 'session' => $session];
     }
 
     /**
      * This action attach a form to the return array when the user has the permission to edit the training.
      *
-     * @Route("/{id}/view", requirements={"id" = "\d+"}, name="session.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function viewAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
+    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/{id}/view', name: 'session.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function view(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, int $id):\Symfony\Component\HttpFoundation\RedirectResponse|array
     {
+        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
+        if(!$session){
+            throw new NotFoundHttpException();
+        }
         if (!$this->isGranted('EDIT', $session->getTraining())) {
             if ($this->isGranted('VIEW', $session->getTraining())) {
-                return array('session' => $session);
+                return ['session' => $session];
             }
 
             throw new AccessDeniedException('Action non autorisée');
         }
 
-        $sessionRegistration = $session->getRegistration();
         $form = $this->createForm($session::getFormType(), $session);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $em = $doctrine->getManager();
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->flush();
 
-                return $this->redirectToRoute('session.view', array('id' => $session->getId()));
+                return $this->redirectToRoute('session.view', ['id' => $session->getId()]);
             }
         }
+
         $url = 'https://' . $_ENV['front_host'] . '/program/training/' . $session->getTraining()->getId() . '/' . $session->getId();
-        return array('form' => $form->createView(), 'session' => $session, 'front_url' => $url);
+        return ['form' => $form->createView(), 'session' => $session, 'front_url' => $url];
     }
 
     /**
-     * @param Request              $request
      * @param AbstractSession|null $session
-     * @param mixed                $inscriptionIds
      *
-     * @Route("/duplicate/{id}/{inscriptionIds}", requirements={"id" = "\d+"}, name="session.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", isOptional="true")
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      *
      * @return array
      */
-    public function duplicateAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session = null, $inscriptionIds = null)
+    #[Rest\View(['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/duplicate/{id}/{inscriptionIds}', name: 'session.duplicate', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json', 'inscriptionIds'=> []])]
+    public function duplicate(Request $request, ManagerRegistry $managerRegistry,  int $id): array
     {
-        // we need at least one of both arguments
-        if (!$session && empty($inscriptionIds)) {
-            throw new MissingOptionsException('You have to pass a session id or an inscription array of ids');
-        }
+        $inscriptionIdsRaw = $request->attributes->get('inscriptionIds', '');
+        $inscriptionIds = [];
 
-        // get inscriptions and session
-        $inscriptions = array();
+        if (!empty($inscriptionIdsRaw)) {
+            // Cas : URL encode JSON (ex: [54678,54679])
+            if (str_starts_with($inscriptionIdsRaw, '[')) {
+                $decoded = json_decode($inscriptionIdsRaw, true);
+                if (is_array($decoded)) {
+                    $inscriptionIds = array_filter($decoded, fn($id) => is_numeric($id));
+                }
+            } else {
+                $inscriptionIds = array_filter(
+                    explode(',', $inscriptionIdsRaw),
+                    fn($id) => ctype_digit($id)
+                );
+            }
+        }
+        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
+
+// get inscriptions and session
+        $inscriptions = [];
         $this->retrieveInscriptions($inscriptionIds, $inscriptions);
+
+// Cas où aucune session n’a été trouvée directement et on essaie de la deviner via une inscription
+        if (!$session && !empty($inscriptions)) {
+            $firstInscription = $inscriptions[0] ?? null;
+
+            if (!$firstInscription instanceof AbstractInscription || !$firstInscription->getSession()) {
+                throw new MissingOptionsException('Les inscriptions ne permettent pas de déterminer une session valide');
+            }
+
+            $session = $firstInscription->getSession();
+        }
         if (!$session) {
-            // get session
-            $session = $inscriptions[0]->getSession();
+            throw new MissingOptionsException('Vous devez fournir un ID de session ou une liste d\'inscriptions valides');
         }
 
         // new session can't be created if user has no rights for it
@@ -174,64 +215,39 @@ abstract class AbstractSessionController extends AbstractController
 
         $cloned = clone $session;
         $form = $this->createFormBuilder($cloned)
-            ->add('name', null, array(
-                'required' => true,
-                'label' => 'Intitulé de la session',
-            ))
-            ->add('datebegin', DateType::class, array(
-                'label' => 'Date de début',
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'required' => true,
-            ))
-            ->add('dateend', DateType::class, array(
-                'label' => 'Date de fin',
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'required' => false,
-            ));
+            ->add('name', null, ['required' => true, 'label' => 'Intitulé de la session'])
+            ->add('datebegin', DateType::class, ['label' => 'Date de début', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'html5' => false, 'required' => true])
+            ->add('dateend', DateType::class, ['label' => 'Date de fin', 'widget' => 'single_text', 'format' => 'dd/MM/yyyy', 'html5' => false, 'required' => false]);
 
         if (!empty($inscriptions)) {
             $form
-                ->add('inscriptionManagement', ChoiceType::class, array(
-                    'label' => 'Choisir la méthode d\'importation des inscriptions',
-                    'mapped' => false,
-                    'choices' => array(
-                        'Ne pas importer les inscriptions' => 'none',
-                        'Copier les inscriptions' => 'copy',
-                        'Déplacer les inscriptions' => 'move',
-                    ),
-                    'empty_data' => 'none',
-                    'required' => true,
-                ));
+                ->add('inscriptionManagement', ChoiceType::class, ['label' => 'Choisir la méthode d\'importation des inscriptions', 'mapped' => false, 'choices' => ['Ne pas importer les inscriptions' => 'none', 'Copier les inscriptions' => 'copy', 'Déplacer les inscriptions' => 'move'], 'empty_data' => 'none', 'required' => true]);
         }
 
         $form = $form->getForm();
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
-                $em = $doctrine->getManager();
+                $objectManager = $managerRegistry->getManager();
                 $this->cloneSessionArrayCollections($session, $cloned, $inscriptions, $form->has('inscriptionManagement') ? $form->get('inscriptionManagement')->getData() : null);
-                $em->persist($cloned);
-                $em->flush();
+                $objectManager->persist($cloned);
+                $objectManager->flush();
 
-                return array('session' => $cloned);
+                return ['session' => $cloned];
             }
         }
 
-        return array('form' => $form->createView(), 'session' => $session, 'inscriptions' => $inscriptionIds);
+        return ['form' => $form->createView(), 'session' => $session, 'inscriptions' => $inscriptionIds];
     }
 
-    /**
-     * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="session.remove", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Method("POST")
-     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function removeAction(AbstractSession $session, ManagerRegistry $doctrine)
+    #[Groups(['Default', 'session'])]
+    #[Route(path: '/{id}/remove', name: 'session.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: 'POST')]
+    public function remove(AbstractSession $session, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\JsonResponse
     {
+        $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
+        if (!$session) {
+            throw new NotFoundHttpException();
+        }
         if (!$this->isGranted('DELETE', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
@@ -248,55 +264,45 @@ abstract class AbstractSessionController extends AbstractController
         $em->flush();
 //        $this->get('fos_elastica.index')->refresh();
 
-        return $this->redirect($this->generateUrl('training.view', array('id' => $training->getId())));
+        $training = $session->getTraining();
+        $objectManager = $managerRegistry->getManager();
+        $objectManager->remove($session);
+        $objectManager->flush();
+
+        // Au lieu de rediriger, renvoyez une réponse JSON
+        // qui contient un message de succès.
+        return new \Symfony\Component\HttpFoundation\JsonResponse(['success' => true]);
     }
 
-    /**
-     * Get inscription from json id inscription list.
-     *
-     * @param $inscriptionIds
-     * @param $inscriptions
-     */
-    protected function retrieveInscriptions(&$inscriptionIds, &$inscriptions)
+    protected function retrieveInscriptions(array &$inscriptionIds, array &$inscriptions): void
     {
-        if ($inscriptionIds && is_string($inscriptionIds)) {
-            $inscriptionIds = json_decode($inscriptionIds, true);
-        }
 
         // retrieve inscriptions and session
         if ($inscriptionIds) {
-            $inscriptions = $this->getDoctrine()->getManager()
+            $inscriptions = $this->managerRegistry->getManager()
                 ->getRepository(AbstractInscription::class)
-                ->findById($inscriptionIds);
+                ->findBy(['id' => $inscriptionIds]);
 
             if (empty($inscriptions)) {
                 throw new MissingOptionsException('You have to pass a session id or an inscription array of ids');
             }
 
             // check if all inscription come from a unique session
-            $arraySessionIds = array();
-            /** @var AbstractInscription $inscription */
-            foreach ($inscriptions as $inscription) {
-                $arraySessionIds[] = $inscription->getSession()->getId();
-            }
-            $arraySessionIds = array_unique($arraySessionIds);
-            if (count($arraySessionIds) > 1) {
+            $sessionIds = array_unique(array_map(
+                fn(AbstractInscription $inscription) => $inscription->getSession()?->getId(),
+                $inscriptions
+            ));
+
+
+            if (count($sessionIds) > 1) {
                 throw new InvalidOptionException('The inscriptions come from several sessions');
             }
         }
     }
 
-    /**
-     * Clone participations, inscriptions and materials.
-     *
-     * @param AbstractSession $session
-     * @param AbstractSession $cloned
-     * @param $inscriptions
-     * @param mixed $inscriptionManagement
-     */
-    protected function cloneSessionArrayCollections($session, $cloned, $inscriptions, $inscriptionManagement)
+    protected function cloneSessionArrayCollections(AbstractSession $session, AbstractSession $cloned, mixed $inscriptions, mixed $inscriptionManagement): void
     {
-        $em = $this->getDoctrine()->getManager();
+        $em = $this->managerRegistry->getManager();
 
         // clone participations
         /** @var AbstractParticipation $participation */
@@ -321,6 +327,7 @@ abstract class AbstractSessionController extends AbstractController
                     $cloned->addInscription($newInscription);
                     $em->persist($newInscription);
                 }
+
                 break;
             case 'move':
                 /** @var AbstractInscription $inscription */
@@ -329,6 +336,7 @@ abstract class AbstractSessionController extends AbstractController
                     $inscription->setSession($cloned);
                     $cloned->addInscription($inscription);
                 }
+
                 break;
             default:
                 break;
@@ -336,185 +344,215 @@ abstract class AbstractSessionController extends AbstractController
 
         // clone duplicate materials
         $tmpMaterials = $session->getMaterials();
-        if (!empty($tmpMaterials)) {
-            foreach ($tmpMaterials as $material) {
-                $newMat = clone $material;
-                $cloned->addMaterial($newMat);
-            }
+        foreach ($tmpMaterials as $tmpMaterial) {
+            $newMat = clone $tmpMaterial;
+            $cloned->addMaterial($newMat);
         }
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $sessionRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\SessionRepository $sessionRepository): array
     {
-        $tabAggs = array();
+        $tabAggs = [];
 
         // CONSTRUCTION CENTRES
         if(isset( $aggs['training.organization.name.source'])){
-            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+            $allOrganizations = $managerRegistry->getRepository(Organization::class)->findAll();
 
-            $i = 0; $tabOrg = array();
+            $i = 0; $tabOrg = [];
             //Pour chaque centre on teste la requête
-            foreach($allOrganizations as $organization){
-                $nbSessionsOrg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $organization->getName());
+            foreach($allOrganizations as $allOrganization){
+                $nbSessionsOrg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allOrganization->getName());
                 if ($nbSessionsOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbSessionsOrg];
-                    $i++;
+                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbSessionsOrg];
+                    ++$i;
                 }
             }
+
             $tabAggs['training.organization.name.source']['buckets'] = $tabOrg;
         }
 
         // CONSTRUCTION ANNEES
         if (isset($aggs['year'])) {
             $curYear = date('Y');
-            $allYears = array();
-            for($i=2017; $i<=$curYear; $i++){
+            $allYears = [];
+            for($i=2017; $i<=$curYear; ++$i){
                 $allYears[] = $i;
             }
-            $i = 0; $tabYears = array();
+
+            $i = 0; $tabYears = [];
             //Pour chaque année on teste la requête
-            foreach($allYears as $year){
-                $nbSessionsYear = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $year);
+            foreach($allYears as $allYear){
+                $nbSessionsYear = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allYear);
                 if ($nbSessionsYear > 0) {
-                    $tabYears[$i] = [ 'key' => $year, 'doc_count' => $nbSessionsYear];
-                    $i++;
+                    $tabYears[$i] = [ 'key' => $allYear, 'doc_count' => $nbSessionsYear];
+                    ++$i;
                 }
             }
+
             $tabAggs['year']['buckets'] = $tabYears;
         }
 
         // CONSTRUCTION SEMESTRE
         if (isset($aggs['semester'])) {
-            $allSemesters = array(1, 2);
-            $i = 0; $tabSemesters = array();
+            $allSemesters = [1, 2];
+            $i = 0; $tabSemesters = [];
             //Pour chaque semestre on teste la requête
-            foreach($allSemesters as $semester){
-                $nbSessionsSem = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $semester);
+            foreach($allSemesters as $allSemester){
+                $nbSessionsSem = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allSemester);
                 if ($nbSessionsSem > 0) {
-                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbSessionsSem];
-                    $i++;
+                    $tabSemesters[$i] = [ 'key' => $allSemester, 'doc_count' => $nbSessionsSem];
+                    ++$i;
                 }
             }
+
             $tabAggs['semester']['buckets'] = $tabSemesters;
         }
 
         // CONSTRUCTION THEMES
         if(isset( $aggs['theme.name'])){
-            $allThemes = $doctrine->getRepository(Theme::class)->findAll();
+            $allThemes = $managerRegistry->getRepository(Theme::class)->findAll();
 
-            $i = 0; $tabThemes = array();
+            $i = 0; $tabThemes = [];
             //Pour chaque thème on teste la requête
-            foreach($allThemes as $theme){
-                $nbSessionsThemes = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $theme->getName());
+            foreach($allThemes as $allTheme){
+                $nbSessionsThemes = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allTheme->getName());
                 if ($nbSessionsThemes > 0) {
-                    $tabThemes[$i] = [ 'key' => $theme->getName(), 'doc_count' => $nbSessionsThemes];
-                    $i++;
+                    $tabThemes[$i] = [ 'key' => $allTheme->getName(), 'doc_count' => $nbSessionsThemes];
+                    ++$i;
                 }
             }
+
             $tabAggs['theme.name']['buckets'] = $tabThemes;
         }
 
         // CONSTRUCTION INSCRIPTION (0,1,2,3)
         if( isset($aggs['registration']) ) {
-            $allRegistrations = array(0, 1, 2, 3);
-            $i = 0; $tabReg = array();
+            $allRegistrations = [0, 1, 2, 3];
+            $i = 0; $tabReg = [];
             //Pour chaque inscription on teste la requête
-            foreach($allRegistrations as $registration){
-                $nbSessionsReg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $registration);
+            foreach($allRegistrations as $allRegistration){
+                $nbSessionsReg = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allRegistration);
                 if ($nbSessionsReg > 0) {
-                    $tabReg[$i] = [ 'key' => $registration, 'doc_count' => $nbSessionsReg];
-                    $i++;
+                    $tabReg[$i] = [ 'key' => $allRegistration, 'doc_count' => $nbSessionsReg];
+                    ++$i;
                 }
             }
+
             $tabAggs['registration']['buckets'] = $tabReg;
         }
 
         // CONSTRUCTION STATUT (0,1,2)
         if( isset($aggs['status']) ) {
-            $allStatus = array(0, 1, 2);
-            $i = 0; $tabStatus = array();
+            $allStatus = [0, 1, 2];
+            $i = 0; $tabStatus = [];
             //Pour chaque status on teste la requête
-            foreach($allStatus as $status){
-                $nbSessionsStatus = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $status);
+            foreach($allStatus as $allRectorPrefix202304Status){
+                $nbSessionsStatus = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allRectorPrefix202304Status);
                 if ($nbSessionsStatus > 0) {
-                    $tabStatus[$i] = [ 'key' => $status, 'doc_count' => $nbSessionsStatus];
-                    $i++;
+                    $tabStatus[$i] = [ 'key' => $allRectorPrefix202304Status, 'doc_count' => $nbSessionsStatus];
+                    ++$i;
                 }
             }
+
             $tabAggs['status']['buckets'] = $tabStatus;
         }
 
         // CONSTRUCTION DISPLAYONLINE (0,1)
         if( isset($aggs['displayOnline']) ) {
-            $allDisplay = array(0 => 'F', 1 => 'T');
-            $i = 0; $tabDis = array();
+            $allDisplay = [0 => 'F', 1 => 'T'];
+            $i = 0; $tabDis = [];
             //Pour chaque status on teste la requête
             foreach($allDisplay as $key => $display){
                 $nbSessionsDis = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $key);
                 if ($nbSessionsDis > 0) {
                     $tabDis[$i] = [ 'key' => $display, 'doc_count' => $nbSessionsDis];
-                    $i++;
+                    ++$i;
                 }
             }
+
             $tabAggs['displayOnline']['buckets'] = $tabDis;
         }
 
         // CONSTRUCTION PROMOTION (true,false) = (0,1)
         if( isset($aggs['promote']) ) {
-            $allPromote = array(0, 1);
-            $i = 0; $tabPro = array();
+            $allPromote = [0, 1];
+            $i = 0; $tabPro = [];
             //Pour chaque promote on teste la requête
             foreach($allPromote as $promote){
                 $nbSessionsPro = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $promote);
                 if ($nbSessionsPro > 0) {
                     $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbSessionsPro];
-                    $i++;
+                    ++$i;
                 }
             }
+
             $tabAggs['promote']['buckets'] = $tabPro;
         }
 
         // CONSTRUCTION FORMATION (nom de la formation)
         if( isset($aggs['training.name.source']) ) {
-            $allTraining = $doctrine->getRepository(Internship::class)->findAll();
-            $i = 0; $tabTra = array();
+            $allTraining = $managerRegistry->getRepository(Internship::class)->findAll();
+            $i = 0; $tabTra = [];
             //Pour chaque promote on teste la requête
             foreach($allTraining as $training){
                 $nbSessionsTra = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $training->getName());
                 if ($nbSessionsTra > 0) {
                     $tabTra[$i] = [ 'key' => $training->getName(), 'doc_count' => $nbSessionsTra];
-                    $i++;
+                    ++$i;
                 }
             }
+
             $tabAggs['training.name.source']['buckets'] = $tabTra;
+        }
+
+// TYPE
+        if (isset($aggs['training.typeLabel.source'])) {
+            $allTypes = $managerRegistry->getRepository(Session::class)
+                ->createQueryBuilder('s')
+                ->select('DISTINCT tc.trainingType')
+                ->join('s.training', 't')
+                ->join('t.category', 'tc')
+                ->getQuery()
+                ->getSingleColumnResult();
+
+            $tabTraType = [];
+            foreach ($allTypes as $type) {
+                $nbSessionsTraType = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $type);
+                if ($nbSessionsTraType > 0) {
+                    $tabTraType[] = [
+                        'key' => $type,
+                        'doc_count' => $nbSessionsTraType
+                    ];
+                }
+            }
+
+            $tabAggs['training.typeLabel.source']['buckets'] = $tabTraType;
         }
 
         // CONSTRUCTION FORMATEUR
         if( isset($aggs['participations.trainer.fullName']) ) {
-            $allTrainers = $doctrine->getRepository(Trainer::class)->findAll();
-            $i = 0; $tabTra = array();
+            $allTrainers = $managerRegistry->getRepository(Trainer::class)->findAll();
+            $i = 0; $tabTra = [];
             //Pour chaque trainer on teste la requête
-            foreach($allTrainers as $trainer){
-                $nbSessionsTra = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $trainer->getId());
+            foreach($allTrainers as $allTrainer){
+                $nbSessionsTra = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $allTrainer->getId());
                 if ($nbSessionsTra > 0) {
-                    $tabTra[$i] = [ 'key' => $trainer->getFullname(), 'doc_count' => $nbSessionsTra];
-                    $i++;
+                    $tabTra[$i] = [ 'key' => $allTrainer->getFullname(), 'doc_count' => $nbSessionsTra];
+                    ++$i;
                 }
             }
             $tabAggs['participations.trainer.fullName']['buckets'] = $tabTra;
         }
-
-
         return $tabAggs;
     }
 
-    public function computeInscriptionsStats(ManagerRegistry $doctrine, $session)
+    public function computeInscriptionsStats(ManagerRegistry $managerRegistry, $session): array
     {
-        /** @var EntityManager $em */
-        $em = $doctrine->getManager();
-        $stats = array();
+        /** @var EntityManager $objectManager */
+        $objectManager = $managerRegistry->getManager();
+        $stats = [];
         if ($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
-            $query = $em
+            $query = $objectManager
                 ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
                         JOIN App\Entity\Core\AbstractInscription i WITH i.inscriptionstatus = s
                         WHERE i.session = :session
@@ -523,23 +561,19 @@ abstract class AbstractSessionController extends AbstractController
 
             $result = $query->getResult();
             foreach ($result as $status) {
-                $stats[] = array(
-                    'id' => $status[0]->getId(),
-                    'name' => $status[0]->getName(),
-                    'status' => $status[0]->getStatus(),
-                    'count' => (int)$status[1],
-                );
+                $stats[] = ['id' => $status[0]->getId(), 'name' => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count' => (int)$status[1]];
             }
         }
+
         return $stats;
     }
 
-    public function computePresencesStats(ManagerRegistry $doctrine, $session)
+    public function computePresencesStats(ManagerRegistry $managerRegistry, $session): array
     {
-        /** @var EntityManager $em */
-        $em = $doctrine->getManager();
-        $statsPres = array();
-        $queryPres = $em
+        /** @var EntityManager $objectManager */
+        $objectManager = $managerRegistry->getManager();
+        $statsPres = [];
+        $queryPres = $objectManager
             ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
                             JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
                             WHERE i.session = :session
@@ -547,13 +581,8 @@ abstract class AbstractSessionController extends AbstractController
             ->setParameter('session', $this);
 
         $resultPres = $queryPres->getResult();
-        foreach ($resultPres as $status) {
-            $statsPres[] = array(
-                'id' => $status[0]->getId(),
-                'name' => $status[0]->getName(),
-                'status' => $status[0]->getStatus(),
-                'count' => (int)$status[1],
-            );
+        foreach ($resultPres as $resultPre) {
+            $statsPres[] = ['id' => $resultPre[0]->getId(), 'name' => $resultPre[0]->getName(), 'status' => $resultPre[0]->getStatus(), 'count' => (int)$resultPre[1]];
         }
 
         return $statsPres;

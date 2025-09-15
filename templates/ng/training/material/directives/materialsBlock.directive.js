@@ -2,19 +2,18 @@
  * Include a inscription table block for a given session
  * Usage : <div materials-block="session" entity-type="'session'"></div>
  */
-sygeforApp.directive('materialsBlock', ['$dialog', '$window', function($dialog, $window) {
+sygeforApp.directive('materialsBlock', ['$dialog', '$window', function ($dialog, $window) {
     return {
         restrict: 'EA',
         scope: {
             entity: '=materialsBlock',
             entityType: '='
         },
-        link: function(scope, attrs) {
+        link: function (scope, attrs) {
             // custum empty message
-            scope.emptyMsg = attrs.emptyMsg ?  attrs.emptyMsg : "Il n'y a aucun support disponible.";
+            scope.emptyMsg = attrs.emptyMsg ? attrs.emptyMsg : "Il n'y a aucun support disponible.";
         },
-        controller: function($scope, $dialog, $timeout)
-        {
+        controller: function ($scope, $dialog, $timeout) {
             /**
              * Manage material modal
              */

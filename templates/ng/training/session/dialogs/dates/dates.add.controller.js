@@ -13,7 +13,7 @@ sygeforApp.controller('DatesAddController', ['$scope', '$modalInstance', '$dialo
      * @param session
      */
     $scope.addDates = function () {
-        $dialog.open('add.dates', {session: $scope.session}).then(function (data){
+        $dialog.open('add.dates', {session: $scope.session}).then(function (data) {
             $scope.session.dates.push(data.date);
         });
     }

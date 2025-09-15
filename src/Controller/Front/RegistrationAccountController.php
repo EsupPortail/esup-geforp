@@ -22,14 +22,11 @@ use App\Vocabulary\VocabularyRegistry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Config\Definition\Exception\ForbiddenOverwriteException;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -40,46 +37,47 @@ use Symfony\Component\Mime\Message;
 /**
  * This controller regroup actions related to registration.
  *
- * @Route("/account")
- * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
  */
+#[Route(path: '/account')]
 class RegistrationAccountController extends AbstractController
 {
-    protected $inscriptionClass = Inscription::class;
+    protected string $inscriptionClass = Inscription::class;
 
+    public function Index(): Response
+    {
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
+            throw new AccessDeniedException('Vous devez être pleinement authentifié pour accéder à cette page.');
+        }
+            return $this->render('Front/Account/registration/registrations.html.twig');
+    }
     /**
      * Checkout registrations cart.
      *
-     * @Route("/checkout", name="front.account.checkout")
      */
-    public function checkoutAction(Request $request, ManagerRegistry $doctrine, $sessions = array())
+    #[Route(path: '/checkout', name: 'front.account.checkout')]
+    public function checkout(Request $request, ManagerRegistry $doctrine, $sessions = []): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $inscription = $doctrine->getManager()->getRepository('App\Entity\Back\Inscription')->find($request->get('inscriptionId'));
+        $inscription = $doctrine->getManager()->getRepository(\App\Entity\Back\Inscription::class)->find($request->get('inscriptionId'));
 //        $this->sendCheckoutNotification($doctrine, array($inscription), $inscription->getTrainee());
 
         return $this->redirectToRoute('front.account.registrations');
     }
 
-    /**
-     * Registrations.
-     *
-     * @Route("/registrations", name="front.account.registrations")
-     * @Template("Front/Account/registration/registrations.html.twig")
-     * @Method("GET")
-     */
-    public function registrationsAction(Request $request, ManagerRegistry $doctrine)
+    #[Route(path: '/registrations', name: 'front.account.registrations', methods: 'GET')]
+    public function registrations(ManagerRegistry $doctrine): Response
     {
         // Recup param pour l'activation du bouton de relance au N+1
         $relanceActif = $this->getParameter('relance_actif');
 
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
         $inscriptions = $trainee->getInscriptions();
-        $upcoming = array();
-        $upcomingIds = array();
-        $past = array();
+        $upcoming = [];
+        $upcomingIds = [];
+        $past = [];
         $now = new \DateTime();
         $sup = "vide";
         foreach ($inscriptions as $inscription) {
@@ -97,31 +95,32 @@ class RegistrationAccountController extends AbstractController
             }
         }
 
-        return array('user' => $trainee, 'upcoming' => $upcoming, 'past' => $past, 'upcomingIds' => implode(',', $upcomingIds), 'relance' => $relanceActif);
+        return $this->render('Front/Account/registration/registrations.html.twig',[
+            'user' => $trainee,
+            'upcoming' => $upcoming,
+            'past' => $past, 'upcomingIds' => implode(',', $upcomingIds),
+            'relance' => $relanceActif,
+            ]);
     }
 
     /**
      * Desist a registration.
      *
-     * @Route("/registration/{id}/desist", name="front.account.registration.desist")
-     * @Template("Front/Account/registration/registration-desist.html.twig")
      */
-    public function desistAction($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer)
+    #[Route(path: '/registration/{id}/desist', name: 'front.account.registration.desist')]
+    public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): array
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
-        $registration = $doctrine->getRepository('App\Entity\Core\AbstractInscription')->find($id);
+        $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
         if ($request->getMethod() === "POST") {
             $em         = $doctrine->getManager();
             $repository = $em->getRepository($this->inscriptionClass);
 
-            $inscription = $repository->findOneBy(array(
-                'id'      => $id,
-                'trainee' => $trainee,
-            ));
+            $inscription = $repository->findOneBy(['id'      => $id, 'trainee' => $trainee]);
 
             if ( ! $inscription) {
                 throw new NotFoundHttpException('Unknown registration.');
@@ -143,7 +142,7 @@ class RegistrationAccountController extends AbstractController
                 $em->remove($inscription);
                 $em->flush();
                 $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
-                return $this->redirectToRoute('front.account.registrations');
+                return [$this->redirectToRoute('front.account.registrations')];
             }
             else {
                 // else set the status to "Desist"
@@ -154,25 +153,23 @@ class RegistrationAccountController extends AbstractController
                 // Envoyer un mail au supérieur hiérarchique
                 $templateTerm = $vocabularyRegistry->getVocabularyById(5);
                 $em = $doctrine->getManager();
-                $repo = $em->getRepository(get_class($templateTerm));
+                $repo = $em->getRepository($templateTerm::class);
                 /** @var Emailtemplate $template */
-                $templates = $repo->findBy(array('name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                $templates = $repo->findBy(['name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
                 $formathtml = $templates[0]->getPosition();
                 if ($formathtml)
                     $newline = "<br>";
                 else
                     $newline = "\n";
                 $subject = $templates[0]->getSubject();
-                $newsub = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject);
+                $newsub = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject);
                 $newsub = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newsub);
                 $newsub = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newsub);
                 $newsub = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newsub);
                 $newsub = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newsub);
-                $newsub = str_replace("[session.id]", $registration->getSession()->getId(), $newsub);
-                $newsub = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newsub);
 
                 $body = $templates[0]->getBody();
-                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
                 $Texte = "";
                 foreach ($registration->getSession()->getDates() as $date) {
                     if ($date->getDatebegin() == $date->getDateend()) {
@@ -181,13 +178,11 @@ class RegistrationAccountController extends AbstractController
                         $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                     }
                 }
-                $newbody = str_replace("[dates]", $Texte, $newbody);
+                $newbody = str_replace("[date]", $Texte, $newbody);
                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
-                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
-                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
 
                 $message = (new Email())
                     ->from($registration->getSession()->getTraining()->getOrganization()->getEmail())
@@ -218,22 +213,22 @@ class RegistrationAccountController extends AbstractController
                 $mailer->send($message);
 
                 $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
-                return $this->redirectToRoute('front.account.registrations');
+                return [$this->redirectToRoute('front.account.registrations')];
             }
 
         }
 
-        return array('user' => $trainee, 'registration' => $registration);
+        return ['user' => $trainee, 'registration' => $registration, $this->render('Front/Account/registration/registration-desist.html.twig')];
     }
 
     /**
      * Authorize a registration.
      *
-     * @Route("/registration/{id}/authorize", name="front.account.registration.authorize")
      */
-    public function authorizeAction($id, ManagerRegistry $doctrine, Request $request, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer)
+    #[Route(path: '/registration/{id}/authorize', name: 'front.account.registration.authorize')]
+    public function authorize($id, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $registration = $doctrine->getRepository('App\Entity\Core\AbstractInscription')->find($id);
+        $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
 
         if (!$registration->getTrainee()->getEmailSup()) {
@@ -247,9 +242,9 @@ class RegistrationAccountController extends AbstractController
         // Envoyer un mail au supérieur hiérarchique
         $templateTerm = $vocabularyRegistry->getVocabularyById(5);
         $em = $doctrine->getManager();
-        $repo = $em->getRepository(get_class($templateTerm));
+        $repo = $em->getRepository($templateTerm::class);
         /** @var Emailtemplate $template */
-        $templates = $repo->findBy(array('name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+        $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
         $formathtml = $templates[0]->getPosition();
         if ($formathtml)
             $newline = "<br>";
@@ -257,7 +252,7 @@ class RegistrationAccountController extends AbstractController
             $newline = "\n";
         $subject = $templates[0]->getSubject();
         $body = $templates[0]->getBody();
-        $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+        $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
         $Texte = "";
         foreach ($registration->getSession()->getDates() as $date) {
             if ($date->getDatebegin() == $date->getDateend()) {
@@ -300,27 +295,26 @@ class RegistrationAccountController extends AbstractController
 
     /**
      * Valid registration
-     * @Route("/registration/{id}/valid", name="front.account.registration.valid")
-     * @Template("Front/Account/registration/registration-valid.html.twig")
      *
      */
-    public function validAction($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer)
+    #[Route(path: '/registration/{id}/valid', name: 'front.account.registration.valid')]
+    public function valid($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer): ?array
     {
         // Authentification et récup du mail retourné par Shibboleth
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $traineeUser = $arTraineeUser[0];
 
         $supMail = $user->getCredentials()['mail'];
 
         // transforme le mail en minu
-        $supMail = strtolower($supMail);
+        $supMail = strtolower((string) $supMail);
         $supFirstName = $user->getCredentials()['givenName'];
         $supLastName = $user->getCredentials()['sn'];
 
         // Récupération des infos de l'inscription
-        $registration = $doctrine->getRepository('App\Entity\Core\AbstractInscription')->find($id);
+        $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
         if ($registration) {
             $dateSession = $registration->getSession()->getDatebegin()->format('d/m/Y');
             $nameTraining = $registration->getSession()->getTraining()->getName();
@@ -329,12 +323,12 @@ class RegistrationAccountController extends AbstractController
             $nameTrainee = $registration->getTrainee()->getFullname();
             $supMailTrainee = $registration->getTrainee()->getEmailsup();
             // transforme le mail en minu
-            $supMailTrainee = strtolower($supMailTrainee);
+            $supMailTrainee = strtolower((string) $supMailTrainee);
             $supMail = strtolower($supMail);
 
             // Création du formulaire d'autorisation
             // Ajout du champ motif de refus
-            $defaultData = array();
+            $defaultData = [];
             $form = $this->createForm(AuthorizationType::class, $defaultData);
 
             $form->handleRequest($request);
@@ -353,8 +347,8 @@ class RegistrationAccountController extends AbstractController
                             if ($dataForm['validation'] == "ok") {
                                 // Si avis favorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
                                 $registration->setInscriptionstatus(
-                                    $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
-                                        array('machinename' => 'favorable')
+                                    $doctrine->getRepository(\App\Entity\Term\Inscriptionstatus::class)->findOneBy(
+                                        ['machinename' => 'favorable']
                                     )
                                 );
                                 $em = $doctrine->getManager();
@@ -363,11 +357,11 @@ class RegistrationAccountController extends AbstractController
 
                                 // Recuperation des templates emails dans le registre des vocabulaires
                                 $templateTerm = $vocRegistry->getVocabularyById(5);
-                                $repo = $em->getRepository(get_class($templateTerm));
+                                $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
-                                $templates = $repo->findBy(array('name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                                $templates = $repo->findBy(['name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
                                 $subject1 = $templates[0]->getSubject();
-                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject1);
+                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)
@@ -375,7 +369,7 @@ class RegistrationAccountController extends AbstractController
                                 else
                                     $newline = "\n";
 
-                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
 
                                 $Texte = "";
                                 foreach ($registration->getSession()->getDates() as $date) {
@@ -392,11 +386,6 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
-                                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
-                                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
-                                $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
-                                $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
-                                $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
 
                                 // Envoyer un mail au stagiaire
                                 $message = (new Email())
@@ -421,8 +410,8 @@ class RegistrationAccountController extends AbstractController
                                 // Sinon, on modifie le statut de l'inscription à "avis défavorable" et on envoie un mail au stagiaire
                                 // Si avis défavorable, on modifie le statut de l'inscription et on envoie un mail au stagiaire
                                 $registration->setInscriptionstatus(
-                                    $doctrine->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(
-                                        array('machinename' => 'defavorable')
+                                    $doctrine->getRepository(\App\Entity\Term\Inscriptionstatus::class)->findOneBy(
+                                        ['machinename' => 'defavorable']
                                     )
                                 );
                                 $registration->setRefuse($dataForm['refuse']);
@@ -432,11 +421,11 @@ class RegistrationAccountController extends AbstractController
 
                                 // Recuperation des templates emails dans le registre des vocabulaires
                                 $templateTerm = $vocRegistry->getVocabularyById(5);
-                                $repo = $em->getRepository(get_class($templateTerm));
+                                $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
-                                $templates = $repo->findBy(array('name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()));
+                                $templates = $repo->findBy(['name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
                                 $subject1 = $templates[0]->getSubject();
-                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $subject1);
+                                $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)
@@ -444,7 +433,7 @@ class RegistrationAccountController extends AbstractController
                                 else
                                     $newline = "\n";
 
-                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), $body);
+                                $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
 
                                 $Texte = "";
                                 foreach ($registration->getSession()->getDates() as $date) {
@@ -462,11 +451,6 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
-                                $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
-                                $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
-                                $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
-                                $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
-                                $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
 
                                 // Envoyer un mail au stagiaire
                                 $message = (new Email())
@@ -500,23 +484,19 @@ class RegistrationAccountController extends AbstractController
                 // Sinon, on affiche un message d'erreur
                 $access = "Non autorisé";
             }
-            return array('form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser);
+            return ['form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
         } else {
             // Sinon, on affiche un message d'erreur
             $access = "Inscription non trouvée";
-            return array('form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser);
+            return ['form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
         }
 
     }
 
-    /**
-     * @param array $inscriptions
-     * @param AbstractTrainee $trainee
-     */
-    protected function sendCheckoutNotification(ManagerRegistry $doctrine, EmailingBatchOperation $emailingBatchOperation, $inscriptions, $trainee)
+    protected function sendCheckoutNotification(ManagerRegistry $doctrine, EmailingBatchOperation $emailingBatchOperation, array $inscriptions, AbstractTrainee $trainee): void
     {
         // send a recap to the trainee
-        $inscriptionIdsByOrganization = array();
+        $inscriptionIdsByOrganization = [];
         foreach ($inscriptions as $inscription) {
             $inscriptionIdsByOrganization[$inscription->getSession()
                 ->getTraining()
@@ -528,65 +508,40 @@ class RegistrationAccountController extends AbstractController
             /** @var Emailtemplate $checkoutEmailTemplate */
             $checkoutEmailTemplate = $doctrine
                 ->getRepository(Emailtemplate::class)
-                ->findOneBy(array(
-                    'organization' => $doctrine
-                        ->getRepository(Organization::class)
-                        ->find($organizationId),
-                    'inscriptionStatus' => $doctrine
-                        ->getRepository(Inscriptionstatus::class)
-                        ->findOneBy(array('status' => Inscriptionstatus::STATUS_PENDING, 'organization' => null)
-                        )));
+                ->findOneBy(['organization' => $doctrine
+                    ->getRepository(Organization::class)
+                    ->find($organizationId), 'inscriptionStatus' => $doctrine
+                    ->getRepository(Inscriptionstatus::class)
+                    ->findOneBy(['status' => Inscriptionstatus::STATUS_PENDING, 'organization' => null]
+                    )]);
 
             // generate authorization forms
-            $attachments = array();
+            $attachments = [];
 
             if ($checkoutEmailTemplate) {
                 $emailingBatchOperation->execute(
                     $inscriptionIds,
-                    array(
-                        'targetClass' => $this->inscriptionClass,
-                        'preview' => FALSE,
-                        'subject' => $checkoutEmailTemplate->getSubject(),
-                        'message' => $checkoutEmailTemplate->getBody(),
-                        'attachment' => empty($attachments) ? NULL : $attachments,
-                        'typeUser' => get_class($trainee),
-                    )
+                    ['targetClass' => $this->inscriptionClass, 'preview' => FALSE, 'subject' => $checkoutEmailTemplate->getSubject(), 'message' => $checkoutEmailTemplate->getBody(), 'attachment' => empty($attachments) ? NULL : $attachments, 'typeUser' => $trainee::class]
                 );
             }
         }
     }
 
-    /**
-     * @param AbstractTrainee $trainee
-     *
-     * @return Inscriptionstatus|null
-     */
-    protected function getDesistInscriptionStatus(ManagerRegistry $doctrine, AbstractTrainee $trainee)
+    protected function getDesistInscriptionStatus(ManagerRegistry $doctrine, AbstractTrainee $trainee): ?\App\Entity\Term\Inscriptionstatus
     {
         $em     = $doctrine->getManager();
-        $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machinename' => 'desist', 'organization' => null));
+        $status = $em->getRepository(\App\Entity\Term\Inscriptionstatus::class)->findOneBy(['machinename' => 'desist', 'organization' => null]);
         if (!$status) {
-            $status = $em->getRepository('App\Entity\Term\Inscriptionstatus')->findOneBy(array('machinename' => 'desist', 'organization' => $trainee->getOrganization()));
+            $status = $em->getRepository(\App\Entity\Term\Inscriptionstatus::class)->findOneBy(['machinename' => 'desist', 'organization' => $trainee->getOrganization()]);
         }
 
         return $status;
     }
 
-    /**
-     * Generate authorization forms.
-     *
-     * @param $trainee
-     * @param $registrations
-     * @param $templates
-     *
-     * @throws \InvalidArgumentException
-     *
-     * @return array
-     */
-    protected function getAuthorizationForms($doctrine,$trainee, $registrations, $templates)
+    protected function getAuthorizationForms(ManagerRegistry $doctrine,$trainee, $registrations, $templates): array
     {
         $repository    = $doctrine->getManager()->getRepository($this->inscriptionClass);
-        $sessionsByOrg = array();
+        $sessionsByOrg = [];
 
         // verify & group sessions by organization
         /** @var AbstractInscription $registration */
@@ -607,19 +562,15 @@ class RegistrationAccountController extends AbstractController
         }
 
         if (is_string($templates)) {
-            $templates = array($templates);
+            $templates = [$templates];
         }
 
         // build pages
-        $forms = array();
+        $forms = [];
         foreach ($sessionsByOrg as $org => $sessions) {
             // prepare pdf variables
             $organization = $sessions[0]->getTraining()->getOrganization();
-            $variables    = array(
-                'organization' => $organization,
-                'trainee'      => $trainee,
-                'sessions'     => $sessions,
-            );
+            $variables    = ['organization' => $organization, 'trainee'      => $trainee, 'sessions'     => $sessions];
             foreach ($templates as $key => $template) {
                 $forms[$organization->getCode()][$key] = $this->renderView($template, $variables);
             }
