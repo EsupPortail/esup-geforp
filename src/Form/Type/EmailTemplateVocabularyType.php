@@ -80,7 +80,7 @@ final class EmailTemplateVocabularyType extends VocabularyType
                 ->where('p.organization = :orgId')
                 ->orWhere('p.organization is null')
                 ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId()), 'required' => false])
-            ->add('cc', ChoiceType::class, [
+/*            ->add('cc', ChoiceType::class, [
                 'label' => 'Envoyer une copie au N+1 et correspondant formation ',
                 'choices' => [
                     'NON' => 0,
@@ -89,7 +89,15 @@ final class EmailTemplateVocabularyType extends VocabularyType
                 'expanded' => true,
                 'multiple' => true,
                 'required' => false,
-            ])
+            ])*/
+			->add('machinename', ChoiceType::class, array(
+                'label' => 'Envoyer une copie au N+1 et correspondant formation',
+                'choices'  => [
+                    'OUI' => 1,
+                    'NON' => 0,
+                ],
+                'placeholder' => false
+            ))
             ->add('private', CheckboxType::class, ['label' => 'Lien calendrier', 'required' => false])
             ->add('position', ChoiceType::class, ['label' => 'Format HTML', 'choices'  => [
                 'NON' => 0,

@@ -30,12 +30,12 @@ class TrainingType extends AbstractType
     {
     }
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         /** @var AbstractTraining $training */
         $training = $options['data'] ?? null;
 
-        $formBuilder
+        $builder
             // this field will be removed by a listener after a failed rights check
             ->add('organization', EntityType::class, ['required'      => true, 'class'         => Organization::class, 'label'         => 'Centre', 'query_builder' => static fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('o')->orderBy('o.name', 'ASC')])
             ->add('name', null, ['label' => 'Titre'])
@@ -52,13 +52,13 @@ class TrainingType extends AbstractType
             ->add('firstsessionperiodyear', null, ['label'    => 'Année', 'required' => true]);
 
         // add listeners to handle conditionals fields
-        $this->addEventListeners($formBuilder);
+        $this->addEventListeners($builder);
 
         // If the user does not have the rights, remove the organization field and force the value
         $hasAccessRightForAll = $this->accessRightRegistry->hasAccessRight('sygefor_training.rights.training.all.create');
         if (!$hasAccessRightForAll) {
             $user            = $this->security->getUser();
-            $formBuilder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $formEvent) use ($user) : void {
+            $builder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $formEvent) use ($user) : void {
                 $training = $formEvent->getData();
                 $training->setOrganization($user->getOrganization());
                 $formEvent->getForm()->remove('organization');
