@@ -11,7 +11,6 @@ namespace App\EventListener\ORM;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Events;
-use Elastica\Query\Match;
 use Elastica\Type;
 use FOS\ElasticaBundle\Doctrine\Listener;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;

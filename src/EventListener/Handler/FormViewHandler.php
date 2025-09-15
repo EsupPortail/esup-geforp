@@ -27,7 +27,7 @@ final class FormViewHandler implements SubscribingHandlerInterface
      *
      * @return array
      */
-    public function serializeToJson(JsonSerializationVisitor $jsonSerializationVisitor, FormView $formView, array $type, SerializationContext $serializationContext): array
+    public function serializeToJson(JsonSerializationVisitor $jsonSerializationVisitor, FormView $formView, array $type, SerializationContext $serializationContext)
     {
         $variables = $formView->vars;
         $element = ['id' => $variables['id'], 'name' => $variables['name'], 'full_name' => $variables['full_name'], 'label' => $variables['label'], 'errors' => $variables['errors'], 'value' => $variables['value'], 'required' => $variables['required'], 'attr' => $variables['attr'], 'valid' => $variables['valid']];
@@ -84,6 +84,11 @@ final class FormViewHandler implements SubscribingHandlerInterface
      */
     private function buildChoices($choices, bool $expanded, $variables): array
     {
+        if (!is_iterable($choices)) {
+            // protège contre les strings ou null
+            return [];
+        }
+
         if ($expanded) {
             $fullName = $variables['full_name'];
             $elementId = $variables['id'];
