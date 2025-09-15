@@ -77,12 +77,8 @@ EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-<<<<<<< src/BatchOperations/Generic/EmailingBatchOperation.php
-=======
         $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
->>>>>>> src/BatchOperations/Generic/EmailingBatchOperation.php
 
-        $this->parseAndSendMail($targetEntities, $options['subject'] ?? '', $options['message'] ?? '', $options['attachment'] ?? [], false, $options['ical'] ?? false, $options['format'] ?? 0);
 
         return ['', Response::HTTP_NO_CONTENT];
     }
@@ -164,176 +160,10 @@ EmailingBatchOperation extends AbstractBatchOperation
                 $hrpa = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
                 //dump($hrpa);
 
-<<<<<<< src/BatchOperations/Generic/EmailingBatchOperation.php
                 $email = $hrpa->email;
                 if (empty($email)) {
                     error_log("Pas d'email pour l'entité ID " . $entity->getId());
                     continue;
-=======
-
-                    // attachements
-                    if (!empty($attachments)) {
-                        if (!is_array($attachments)) {
-                            $attachments = array($attachments);
-                        }
-                        foreach ($attachments as $attachment) {
-                            $path = $attachment->getPathname();
-
-                            if (get_class($attachment) == UploadedFile::class)
-                                $originalName = $attachment->getClientOriginalName();
-                            else
-                                $originalName = $attachment->getFilename();
-
-                            $msg->attachFromPath($path, $originalName);
-                        }
-                    }
-
-                    // Dans le cas des stagiaires
-                    if ((get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee')||(get_parent_class($entity) === 'App\Entity\Core\AbstractInscription')) {
-                        $flagSup = 0;
-
-                        // Envoyer une copie au N+1 et/ou correspondant formation si l'option est activée
-                        if ($sendresp == 0) {
-                            // si option à 'NON', on ne fait rien
-                        } else {
-                            if ($hrpa->emailSup != null) {
-                                $emailSup = $hrpa->emailSup;
-                                $flagSup = 1;
-                                $msg->cc($emailSup);
-                            }
-
-                            if ($hrpa->emailCorr != null) {
-                                $emailCorr = $hrpa->emailCorr;
-                                if ($flagSup == 0){
-                                    $msg->cc($emailCorr);
-                                } else {
-                                    $msg->addCc($emailCorr);
-                                }
-                            }
-                        }
-
-                        if ($ical) {
-                            // AJOUT ICS CAL
-                            $calendar = new Calendar();
-                            $calendar->setTimezone(new \DateTimeZone('Europe/Paris'));
-                            $calendar->setProdId('-//Calendrier GEFORP//');
-
-                            $sessionName = $entity->getSession()->getTraining()->getName();
-
-                            // Creation tableau des evenements
-                            $tabDates = $entity->getSession()->getDates();
-                            $tabEvent = array(); $i=0;
-                            foreach ($tabDates as $dateSession) {
-                                $id = $dateSession->getId();
-                                $tabEvent[$i] = new CalendarEvent();
-                                $dateBegin = clone $dateSession->getDatebegin();
-                                $dateEnd = clone $dateSession->getDateend();
-                                $schedulemorn = $dateSession->getSchedulemorn();
-                                $scheduleafter = $dateSession->getScheduleafter();
-
-                                // Par défaut, on fixe les horaires à la journée
-                                $horBegin = '+8 hours';
-                                $horEnd = '+18 hours';
-
-                                // récupération des horaires pour exploitation avec le calendrier
-                                $j=0;
-                                $horMod1=[];
-                                $horMod2=[];
-                                // Horaires matin
-                                if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
-                                    foreach ($matchesMorn[0] as $hor) {
-                                        $partsMorn = explode(':', $hor);
-                                        $horMod1[$j] = "$partsMorn[0]h$partsMorn[1]";
-                                        $horMod2[$j] = "$partsMorn[0] hours $partsMorn[1] minutes";
-                                        $j++;
-                                    }
-                                }
-                                // Horaires après-midi
-                                if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
-                                    foreach ($matchesAfter[0] as $hor) {
-                                        $partsAfter = explode(':', $hor);
-                                        $horMod1[$j] = "$partsAfter[0]h$partsAfter[1]";
-                                        $horMod2[$j] = "$partsAfter[0] hours $partsAfter[1] minutes";
-                                        $j++;
-                                    }
-                                }
-                                // au moins 2 horaires dans le tableau
-                                if (sizeof($horMod1) >= 2) {
-                                    // Conversion en date pour comparaison
-                                    $heureBegin = \DateTime::createFromFormat('H\hi', $horMod1[0]);
-                                    $heureEnd = \DateTime::createFromFormat('H\hi', end($horMod1));
-                                    // Vérif l'heure de fin est bien > à l'heure de début
-                                    if ($heureBegin<$heureEnd) {
-                                        $horBegin = "+" . $horMod2[0];
-                                        $horEnd = "+" . end($horMod2);
-                                    }
-                                }
-
-                                $tabEvent[$i]->setStart($dateBegin->modify($horBegin))
-                                    ->setEnd($dateEnd->modify($horEnd))
-                                    ->setSummary($sessionName)
-                                    ->setUid('geforp'.$id);
-                                $calendar->addEvent($tabEvent[$i]);
-                                $i++;
-                            }
-                            $calendarExport = new CalendarExport(new CalendarStream(), new Formatter());
-
-                            // Fichier attaché ou demande dans outlook suivant une ou plusieurs dates pour la session
-                            if ($i == 1) {
-                                // une seule date -> demande d'acceptation
-                                $calendar->setMethod('REQUEST'); // or PUBLISH
-                                $calendarExport->addCalendar($calendar);
-
-                                $ics = $calendarExport->getStream();
-                                // inline it
-                                $attachment = new DataPart($ics, 'inline.ics', 'text/calendar', 'quoted-printable');
-                                $attachment->asInline();
-                                $attachment->getHeaders()->addParameterizedHeader('Content-Type', 'text/calendar', ['charset' => 'utf-8', 'method' => 'REQUEST']);
-                                $msg->attachPart($attachment);
-                            } else {
-                                // plusieurs dates -> fichier attaché
-                                $calendarExport->addCalendar($calendar);
-
-                                $ics = $calendarExport->getStream();
-                                $msg->attach($ics, 'ical.ics', 'text/calendar');
-                            }
-                        }
-                    }
-
-                    // Envoi message
-                    $last = $this->mailer->send($msg);
-
-                    // save email in db
-                    $email = new \App\Entity\Core\Email();
-                    $email->setUserFrom($em->getRepository('App\Entity\Core\User')->find($this->security->getUser()->getId()));
-                    $email->setEmailFrom($organization->getEmail());
-                    if (get_parent_class($entity) === 'App\Entity\Core\AbstractTrainee') {
-                        $email->setTrainee($entity);
-                    }
-                    else if (get_parent_class($entity) === 'App\Entity\Core\AbstractTrainer') {
-                        $email->setTrainer($entity);
-                    }
-                    else if (get_parent_class($entity) === 'App\Entity\Core\AbstractInscription') {
-                        $email->setTrainee($entity->getTrainee());
-                        $email->setSession($entity->getSession());
-                    } else if (get_class($entity) === 'App\Entity\Back\Alert') {
-                        $email->setTrainee($entity->getTrainee());
-                        $email->setSession($entity->getSession());
-                    } else if (get_parent_class($entity) === 'App\Entity\Core\AbstractParticipation') {
-                        $email->setTrainer($entity->getTrainer());
-                        $email->setSession($entity->getSession());
-                    }
-                    $email->setSubject($subjectR);
-                    $email->setBody($bodyR);
-                    $email->setSendAt(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
-                    $em->persist($email);
-                    if (++$i % 500 === 0) {
-                        $em->flush();
-                        $em->clear();
-                    }
-                } catch (\Exception $e) {
-                    // continue
->>>>>>> src/BatchOperations/Generic/EmailingBatchOperation.php
                 }
                 $subjectR = $this->replaceTokens($subject, $entity);
                 $bodyR = $this->replaceTokens($body, $entity, $format);
@@ -414,12 +244,49 @@ EmailingBatchOperation extends AbstractBatchOperation
                             $id = $tabDate->getId();
                             $tabEvent[$i] = new CalendarEvent();
                             $dateBegin = clone $tabDate->getDatebegin();
-                            $dateBegin->setTime(8, 0);
-
                             $dateEnd = clone $tabDate->getDateend();
-                            $dateEnd->setTime(18, 0);
                             $startTime = (clone $tabDate->getDatebegin())->setTime(8, 0);
-                            $endTime = (clone $tabDate->getDateend())->setTime(18, 0);
+
+							$schedulemorn = $dateSession->getSchedulemorn();
+                            $scheduleafter = $dateSession->getScheduleafter();
+
+                            // Par défaut, on fixe les horaires à la journée
+                            $horBegin = '+8 hours';
+                            $horEnd = '+18 hours';
+
+                            // récupération des horaires pour exploitation avec le calendrier
+                            $j=0;
+                            $horMod1=[];
+                            $horMod2=[];
+                            // Horaires matin
+                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
+                                    foreach ($matchesMorn[0] as $hor) {
+                                        $partsMorn = explode(':', $hor);
+                                        $horMod1[$j] = "$partsMorn[0]h$partsMorn[1]";
+                                        $horMod2[$j] = "$partsMorn[0] hours $partsMorn[1] minutes";
+                                        $j++;
+                                    }
+                            }
+                            // Horaires après-midi
+                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
+                                    foreach ($matchesAfter[0] as $hor) {
+                                        $partsAfter = explode(':', $hor);
+                                        $horMod1[$j] = "$partsAfter[0]h$partsAfter[1]";
+                                        $horMod2[$j] = "$partsAfter[0] hours $partsAfter[1] minutes";
+                                        $j++;
+                                    }
+                            }
+                            // au moins 2 horaires dans le tableau
+                            if (sizeof($horMod1) >= 2) {
+                                    // Conversion en date pour comparaison
+                                    $heureBegin = \DateTime::createFromFormat('H\hi', $horMod1[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H\hi', end($horMod1));
+                                    // Vérif l'heure de fin est bien > à l'heure de début
+                                    if ($heureBegin<$heureEnd) {
+                                        $horBegin = "+" . $horMod2[0];
+                                        $horEnd = "+" . end($horMod2);
+                                    }
+                            }
 
                             $tabEvent[$i]->setStart($startTime)
                                 ->setEnd($endTime)
