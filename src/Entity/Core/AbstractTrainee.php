@@ -37,6 +37,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     use TimestampableTrait;
     use AccountTrait;
     use ProfessionalSituationTrait;
+    use PersonTrait;
     /**
      * @var int id
      *
@@ -62,7 +63,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
      */
     #[Groups(['trainee'])]
     #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: AbstractInscription::class, cascade: ['remove'])]
-    protected array|Collection $inscriptions;
+    protected Collection $inscriptions;
 
     /**
      * Construct.

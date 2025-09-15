@@ -124,7 +124,7 @@ trait UploadableTrait
     #[ORM\PrePersist]
     public function preUpload(): void
     {
-        if (null !== $this->file && ($this->file instanceof UploadedFile)) {
+        if (($this->file instanceof UploadedFile)) {
             // nom unique du fichier.
             $this->filepath = sha1(uniqid(random_int(0, mt_getrandmax()), true)) . '.' . $this->file->guessClientExtension();
             $this->filename = $this->file->getClientOriginalName();
@@ -134,7 +134,7 @@ trait UploadableTrait
     /**
      * @return \DateTimeInterface
      */
-    public function getUploaded()
+    public function getUploaded(): \DateTimeInterface
     {
         return $this->uploaded;
     }
@@ -186,9 +186,9 @@ trait UploadableTrait
     }
 
     /**
-     * @return mixed
+     * @return int
      */
-    public static function getMaxFileSize()
+    public static function getMaxFileSize(): int
     {
         return self::$maxFileSize;
     }

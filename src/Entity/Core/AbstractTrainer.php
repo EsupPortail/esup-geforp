@@ -114,6 +114,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
     /**
      * Remove properties related to another organization, except excluded ones.
      */
+
     public function changePropertiesOrganization(): void
     {
     }

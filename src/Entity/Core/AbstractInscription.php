@@ -6,7 +6,6 @@ use App\Entity\Back\Session;
 use App\Form\Type\BaseInscriptionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Mapping\UniqueConstraint;
 use JMS\Serializer\Annotation as Serializer;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -52,7 +51,6 @@ abstract class AbstractInscription implements SerializedAccessRights
     #[ORM\ManyToOne(targetEntity: 'AbstractTrainee', inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'trainee_id')]
     #[Assert\NotNull(message: 'Vous devez sélectionner un stagiaire.')]
-    #[MaxDepth(1)]
     protected AbstractTrainee $trainee;
 
     /**
@@ -63,7 +61,7 @@ abstract class AbstractInscription implements SerializedAccessRights
     #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'inscriptions')]
     #[ORM\JoinColumn(name: 'session_id', referencedColumnName: 'id')]
     #[Assert\NotNull]
-    protected AbstractSession $session;
+    protected Session $session;
 
     /**
      * @Serializer\Groups({"Default", "api"})

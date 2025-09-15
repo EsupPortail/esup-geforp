@@ -582,7 +582,7 @@ abstract class AbstractSession implements SerializedAccessRights
     /**
      * @param String $place
      */
-    public function setPlace(String $place): void
+    public function setPlace(?String $place): void
     {
         $this->place = $place;
     }

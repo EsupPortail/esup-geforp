@@ -162,7 +162,6 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      */
     #[Groups(["training", "api"])]
     #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
-    #[Assert\NotNull]
     protected int $firstsessionperiodsemester = 1;
 
     /**
@@ -170,9 +169,8 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\Groups({"training", "api"})
      */
     #[Groups(['training', 'api'])]
-    #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
-    #[Assert\NotNull]
-    protected ?int $firstsessionperiodyear;
+    #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: false)]
+    protected int $firstsessionperiodyear = 0;
 
     /**
      *
@@ -558,7 +556,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @return int
      */
-    public function getFirstsessionperiodyear(): ?int
+    public function getFirstsessionperiodyear(): int
     {
         return $this->firstsessionperiodyear;
     }
@@ -566,9 +564,9 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param int $firstSessionPeriodYear
      */
-    public function setFirstsessionperiodyear(int $firstSessionPeriodYear): void
+    public function setFirstsessionperiodyear(?int $firstSessionPeriodYear): void
     {
-        $this->firstsessionperiodyear = $firstSessionPeriodYear;
+        $this->firstsessionperiodyear = $firstSessionPeriodYear ?? 0;
     }
 
     /**

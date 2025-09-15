@@ -99,15 +99,15 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     /**
      * @return string
      */
-    public function getIdp(): string
+    public function getIdp(): ?string
     {
-        return $this->idp;
+            return $this->idp ;
     }
 
     /**
      * @param string $idp
      */
-    public function setIdp(string $idp): void
+    public function setIdp(?string $idp): void
     {
         $this->idp = $idp;
     }
