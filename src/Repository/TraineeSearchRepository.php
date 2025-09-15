@@ -44,33 +44,43 @@ final class TraineeSearchRepository extends ServiceEntityRepository
         // Mise en forme en cas de recherche nom + prénom
 
         $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 100; // Limite "normale" pour la navigation
+        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
 
         $isExport = isset($filters['_export']) && $filters['_export'] === true;
 
-        $pageSize = max(1, (int) $pageSize);
+        $pageSize = max(1, $pageSize);
         $pageSize = $isExport
             ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : min($pageSize, $MAX_PAGE_SIZE);
+            : $MAX_PAGE_SIZE;
 
-        $qb = $this->createQueryBuilder('trainee');
+        $qb = $this->createQueryBuilder('trainee')
+            ->leftJoin('trainee.inscriptions', 'inscription')
+            ->addSelect('inscription')
+            ->leftJoin('inscription.session', 'session')
+            ->addSelect('session');
 
         $qb->select('trainee');
 
-        // Gestion du mot-clé
-        $keyword = trim($keyword);
-        if (!empty($keyword)) {
-            $tabKey = explode(' ', $keyword, 2);
+            $tabKey = explode(" ", $keyword, 2);
+       // dump($keyword, $tabKey);
             if (count($tabKey) === 2) {
-                $qb->andWhere('(trainee.firstname LIKE :keyword AND trainee.lastname LIKE :keyword2)')
-                    ->setParameter('keyword', '%' . addcslashes($tabKey[0], '%_') . '%')
-                    ->setParameter('keyword2', '%' . addcslashes($tabKey[1], '%_') . '%');
+                $qb->andWhere('
+            (LOWER(trainee.firstname) LIKE :k1 AND LOWER(trainee.lastname) LIKE :k2)
+            OR (LOWER(trainee.firstname) LIKE :k2 AND LOWER(trainee.lastname) LIKE :k1)
+            OR LOWER(trainee.lastname) LIKE :kw
+        ')
+                    ->setParameter('k1', '%' . strtolower(addcslashes($tabKey[0], '%_')) . '%')
+                    ->setParameter('k2', '%' . strtolower(addcslashes($tabKey[1], '%_')) . '%')
+                    ->setParameter('kw', '%' . strtolower(addcslashes($keyword, '%_')) . '%');
             } else {
-                $qb->andWhere(
-                    'trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR trainee.email LIKE :keyword'
-                )->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+                $qb->andWhere('
+            LOWER(trainee.firstname) LIKE :kw
+            OR LOWER(trainee.lastname) LIKE :kw
+            OR LOWER(trainee.email) LIKE :kw
+        ')
+                    ->setParameter('kw', '%' . strtolower(addcslashes($keyword, '%_')) . '%');
             }
-        }
+
 
         // Filtres
         if (!empty($filters['createdAt'])) {
@@ -130,28 +140,43 @@ final class TraineeSearchRepository extends ServiceEntityRepository
             $qb->addOrderBy('trainee.createdat', 'desc');
 
         // Pagination
-        $qb->setFirstResult(($page - 1) * $pageSize)
+        $offset = ($page - 1) * $pageSize;
+        $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
-        $paginator = new Paginator($qb);
+        $paginator = new Paginator($qb, true);
+        $c = count($paginator);
 
         $items = [];
         foreach ($paginator as $trainee) {
+            $fullname = $trainee->getFirstname() . ' ' . $trainee->getLastname();
+
+            $inscriptions = [];
+            foreach ($trainee->getInscriptions() as $inscription) {
+                $inscriptions[] = [
+                    'id' => $inscription->getId(),
+                    'session' => $inscription->getSession() ? $inscription->getSession()->getName() : null,
+                    'status' => $inscription->getPresencestatus() ?? null,
+                ];
+            }
+
             $items[] = [
                 'id' => $trainee->getId(),
                 'firstname' => $trainee->getFirstname(),
                 'lastname' => $trainee->getLastname(),
-                'fullname' => $trainee->getFirstname() . ' ' . $trainee->getLastname(),
+                'fullname' => $fullname,
+                'name' => $fullname,
                 'institution' => $trainee->getInstitution(),
                 'title' => $trainee->getTitle(),
-                'createdat' => $trainee->getCreatedAt()->format('Y-m-d'),
+                'createdat' => $trainee->getCreatedAt()->format('c'),
                 'publictype' => $trainee->getPublictype(),
                 'email' => $trainee->getEmail(),
+                'inscriptions' => $inscriptions,
             ];
         }
 
         return [
-            'total' => count($paginator),
+            'total' => $c,
             'pageSize' => $pageSize,
             'items' => $items,
         ];
@@ -160,9 +185,9 @@ final class TraineeSearchRepository extends ServiceEntityRepository
     /**
      * Compte les stagiaires selon filtres et agrégats
      */
-    public function getNbTrainees(array $query_filters = [], ?string $keyword = '', array $aggs = [], ?string $name = null): int
+    public function getNbTrainees(array $query_filters = [], ?string $keyword = '', array $aggs = [], ?string $name = null): array
     {
-        $qb = $this->createQueryBuilder('trainee')->select('trainee');
+        $qb = $this->createQueryBuilder('trainee')->select('COUNT(DISTINCT trainee.id)');
 
         if ($keyword) {
             $qb->andWhere('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword')
@@ -188,19 +213,33 @@ final class TraineeSearchRepository extends ServiceEntityRepository
             }
         }
 
-        if (isset($aggs['publicType']) || isset($query_filters['publicType'])) {
+        //FILTRE DATE
+        if( isset($aggs['createdAt']) || isset($query_filters['createdAt']) ) {
+            $dates = explode('-', (string) $aggs["createdAt"]);
+            $dateFrom = date('d/m/Y 00:00:00', strtotime(trim($dates[0])));
+            $dateTo   = date('d/m/Y 23:59:59', strtotime(trim($dates[1])));
+
+            $qb
+                ->andWhere("trainee.createdat BETWEEN :dateFrom AND :dateTo")
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo);
+        }
+
+        if (isset($aggs['publicType']) || isset($query_filters['publicType.source'])  || isset($query_filters['publicType']))  {
             $qb->innerJoin('trainee.publictype', 'pt');
-            if (isset($aggs['publicType'])) {
+            if (isset($aggs['publicType'])|| isset($aggs['publicType.source'])) {
                 $qb->andWhere('pt.name = :publictype')->setParameter('publictype', $name);
             } else {
                 $qb->andWhere('pt.name IN (:publictypes)')
-                    ->setParameter('publictypes', $query_filters['publicType']);
+                    ->setParameter('publictypes', $query_filters['publicType.source']);
             }
         }
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
 
-        $paginator = new Paginator($qb->getQuery());
-
-        return count($paginator);
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 
     /**

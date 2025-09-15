@@ -62,32 +62,29 @@ final class InstitutionRepository extends ServiceEntityRepository
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabInst];
     }
 
-    public function getNbInstitutions($query_filters, $keyword, $aggs, $name): int
+    public function getNbInstitutions($query_filters, $keyword, $aggs, $name): array
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb
-            ->select('i')
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(DISTINCT i.id)');
 
-            // FILTRE KEYWORD
-            ->where('i.name LIKE :keyword')
-            /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
-
-        // FILTRE ANNEE
-        if (isset($aggs['city.source'])) {
-            $qb
-                ->andWhere('i.city = :city')
-                ->setParameter('city', $name);
-        } elseif (isset($query_filters['year'])) {
-            $qb
-                ->andWhere('i.city in (:cities)')
-                ->setParameter('cities', $query_filters['city.source']);
+        // Filtre mot-clé
+        if ($keyword) {
+            $qb->andWhere('i.name LIKE :keyword')
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
         }
 
+        // Cas d’agrégation : on force une seule ville (= $name)
+        if (isset($aggs['city'])) {
+            $qb->andWhere('i.city = :city')
+                ->setParameter('city', $name);
+        }
         // On compte le nb de sessions en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
 
-        return count($paginator);
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 
     /**

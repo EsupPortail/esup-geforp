@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Core\AbstractTraining;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
@@ -14,9 +15,11 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class TrainingRepository extends ServiceEntityRepository
 {
+    private ManagerRegistry $managerRegistry;
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, Internship::class);
+        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -265,12 +268,11 @@ final class TrainingRepository extends ServiceEntityRepository
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $items];
     }
 
-    public function getNbTrainings($query_filters, $keyword, $aggs, $name): int
+    public function getNbTrainings(array $query_filters = [], ?string $keyword = '', array $aggs = [], mixed $name = "", $facet = null): array
     {
         $qb = $this->createQueryBuilder('training');
         $qb
-            ->select('COUNT(DISTINCT training.id)')
-
+            ->select('COUNT(DISTINCT training)')
             // FILTRE KEYWORD
             ->where('training.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
@@ -296,18 +298,23 @@ final class TrainingRepository extends ServiceEntityRepository
             (isset($aggs['trainers.fullName'])) || (isset($query_filters['trainers.fullName']))
         ) {
             // join sur la session
-            $qb->innerJoin(Session::class, 's', 'WITH', 's.training = training');
+            $qb->innerJoin('training.sessions', 's');
 
             // FILTRE ANNEE
             if (isset($aggs['year'])) {
                 $qb
                     ->andWhere('YEAR(s.datebegin) = :year')
-                    ->setParameter('year', $aggs['year']);
+                    ->setParameter('year', $name);
+            } elseif (isset($query_filters['year'])) {
+                $qb
+                    ->andWhere('YEAR(s.datebegin) in (:years)')
+                    ->setParameter('years', $query_filters['year']);
             }
 
             // FILTRE SEMESTRE
             if (isset($aggs['semester'])) {
-                if ($name  == 1) {
+                $semester = (int) $name;
+                if ($semester  == 1) {
                     $monthFrom = 1; $monthTo = 6;
                 } else {
                     $monthFrom = 7; $monthTo = 12;
@@ -317,8 +324,9 @@ final class TrainingRepository extends ServiceEntityRepository
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                     ->setParameter('monthFrom', $monthFrom)
                     ->setParameter('monthTo', $monthTo);
-            } elseif( isset($query_filters['semester']) ) {
-                if ($query_filters['semester']  == 1) {
+            } elseif( isset($query_filters['session.semester']) ) {
+                $semester = (int) $query_filters['session.semester'];
+                if ($semester  == 1) {
                     $monthFrom = 1; $monthTo = 6;
                 } else {
                     $monthFrom = 7; $monthTo = 12;
@@ -362,6 +370,23 @@ final class TrainingRepository extends ServiceEntityRepository
             }
         }
 
+            //FILTRE NUMÉRO
+        if (isset($aggs['training.number'])) {
+            $qb->andWhere('training.number = :number')
+                ->setParameter('number', $name);
+
+        } elseif (!empty($query_filters['training.number'])) {
+            $values = (array) $query_filters['training.number'];
+
+            if (count($values) === 1) {
+                $qb->andWhere('training.number = :number')
+                    ->setParameter('number', reset($values));
+            } else {
+                $qb->andWhere('training.number IN (:numbers)')
+                    ->setParameter('numbers', $values);
+            }
+        }
+
         //FILTRE THEME
         if(isset( $aggs['theme.name'])) {
             $qb
@@ -375,8 +400,39 @@ final class TrainingRepository extends ServiceEntityRepository
                 ->setParameter('themes', $query_filters['theme.name']);
         }
 
+        // FILTRE TYPE
+        if(isset( $aggs['training.typeLabel.source'])) {
+            $qb
+                ->leftJoin('training.category', 'c')
+                ->andWhere('c.name  = :type')
+                ->setParameter('type', $name);
+        } elseif( isset($query_filters['training.typeLabel.source']) ){
+            $qb
+                ->leftJoin('training.category', 'c')
+                ->andWhere('c.name IN (:types)')
+                ->setParameter('types', $query_filters['training.typeLabel.source']);
+        }
+
+        //FILTRE CATEGORY
+        if ($facet === 'training.category' && $name !== null) {
+            $qb->innerJoin('training.category', 'c')
+                ->andWhere('c.name = :category')
+                ->setParameter('category', $name);
+        } elseif (!empty($query_filters['training.category'])) {
+            $categories = (array) $query_filters['training.category'];
+            $qb->innerJoin('training.category', 'c')
+                ->andWhere('c.name IN (:categorys)')
+                ->setParameter('categorys', $categories);
+        }
+
         // On compte le nb de sessions en résultat
-        return (int) $qb->getQuery()->getSingleScalarResult();
+
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
+
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 
 }

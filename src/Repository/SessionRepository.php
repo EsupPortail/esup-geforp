@@ -54,17 +54,18 @@ final class SessionRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($filters['datebegin']) ) {
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', (string) $filters["datebegin"]);
+            $dates = explode('/', (string) $filters["datebegin"]);
             /* on retire les caractères non utiles */
-            $from = str_replace('/','-', $dates[0]);
-            $to = str_replace('/', '-', $dates[1]);
+            $from = str_replace('/','/', $dates[0]);
+            $to = str_replace('/', '/', $dates[1]);
             /* on convertit au même format qu'en base de données */
-            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
-            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
+            $dateFrom = date('d/m/y 00:00:00' ,strtotime($from));
+            $dateTo = date('d/m/y 00:00:00',strtotime($to));
 
             $qb
                 /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
+                ->orderBy('s.datebegin', 'DESC')
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
         }
@@ -102,7 +103,7 @@ final class SessionRepository extends ServiceEntityRepository
         $pageSize = max(1, (int) $pageSize);
         $pageSize = $isExport
             ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : min($pageSize, $MAX_PAGE_SIZE);
+            : $MAX_PAGE_SIZE;
 
         $qb = $this->createQueryBuilder('s');
         $qb
@@ -169,20 +170,22 @@ final class SessionRepository extends ServiceEntityRepository
 
         //FILTRE DATE
         if (isset($filters['datebegin'])) {
-            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', (string)$filters["datebegin"]);
-            /* on retire les caractères non utiles */
-            $from = str_replace('/', '-', $dates[0]);
-            $to = str_replace('/', '-', $dates[1]);
-            /* on convertit au même format qu'en base de données */
-            $dateFrom = date('Y/m/d 00:00:00', strtotime($from));
-            $dateTo = date('Y/m/d 00:00:00', strtotime($to));
+            // Format attendu : "dd/mm/yyyy - dd/mm/yyyy"
+            $dates = explode('-', (string)$filters['datebegin']);
 
-            $qb
-                /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
-                ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
-                ->setParameter('dateFrom', $dateFrom)
-                ->setParameter('dateTo', $dateTo);
+            $from = trim($dates[0] ?? '');
+            $to   = trim($dates[1] ?? '');
+
+            $dateFrom = \DateTime::createFromFormat('d/m/Y H:i:s', $from . ' 00:00:00');
+            $dateTo   = \DateTime::createFromFormat('d/m/Y H:i:s', $to   . ' 23:59:59');
+
+            if ($dateFrom && $dateTo) {
+                $qb
+                    ->andWhere('s.datebegin BETWEEN :dateFrom AND :dateTo')
+                    ->orderBy('s.datebegin', 'DESC')
+                    ->setParameter('dateFrom', $dateFrom)
+                    ->setParameter('dateTo', $dateTo);
+            }
         }
 
         // FILTRE INSCRIPTION (0,1,2,3)
@@ -227,8 +230,6 @@ final class SessionRepository extends ServiceEntityRepository
             $lastName = array_pop($fullName);
             $firstName = array_shift($fullName);
             $qb
-                ->innerJoin(Participation::class, 'p', 'WITH', 'p.session = s')
-                ->innerJoin(Trainer::class, 'trainer', 'WITH', 'trainer = p.trainer')
                 ->andWhere('trainer.lastname = :trainerLastName AND trainer.firstname = :trainerFirstName')
                 ->setParameter('trainerLastName', $lastName)
                 ->setParameter('trainerFirstName', $firstName);
@@ -240,7 +241,7 @@ final class SessionRepository extends ServiceEntityRepository
         elseif (isset($sorts['datebegin']))
             $qb->addOrderBy('s.datebegin', $sorts['datebegin']);
         else
-            $qb->addOrderBy('s.datebegin')
+            $qb->addOrderBy('s.datebegin', 'DESC')
                 ->addOrderBy('s.name');
 
         // PAGINATION
@@ -258,13 +259,13 @@ final class SessionRepository extends ServiceEntityRepository
         foreach ($paginator as $session) {
             if (is_array($fields) && in_array("_id", $fields)) {
                 // Si on ne veut que les IDs
-                $tabSession[] = ['session' => ['id' => $session->getId()]];
+                $tabSession[]['id'] = $session->getId();
             } else {
                 // Extraire les infos principales de la session
                 $sessionES = [
                     'id' => $session->getId(),
                     'name' => $session->getName(),
-                    'datebegin' => $session->getDatebegin(),
+                    'datebegin' => $session->getDatebegin()->format('d/m/Y'),
                     'dateend' => $session->getDateend(),
                     'hournumber' => $session->getHournumber(),
                     'daynumber' => $session->getDaynumber(),
@@ -411,11 +412,13 @@ final class SessionRepository extends ServiceEntityRepository
         if (isset($aggs['year'])) {
             $qb
                 ->andWhere('YEAR(s.datebegin) = :year')
+                ->orderBy('s.datebegin', 'ASC')
                 ->setParameter('year', $name);
         } elseif (isset($query_filters['year'])) {
             $qb
                 /* On récupère l'année du dateBegin (à l'aide d'une doctrine extension) */
                 ->andWhere('YEAR(s.datebegin) in (:years)')
+                ->orderBy('s.datebegin', 'ASC')
                 ->setParameter('years', $query_filters['year']);
         }
 
@@ -449,11 +452,10 @@ final class SessionRepository extends ServiceEntityRepository
             /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
             $dates = explode('-', (string) $query_filters["datebegin"]);
             /* on retire les caractères non utiles */
-            $from = str_replace('/','-', $dates[0]);
-            $to = str_replace('/', '-', $dates[1]);
+
             /* on convertit au même format qu'en base de données */
-            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
-            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
+            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($dates[0]));
+            $dateTo = date('Y/m/d 00:00:00',strtotime($dates[1]));
 
             $qb
                 /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
@@ -482,6 +484,21 @@ final class SessionRepository extends ServiceEntityRepository
             $qb
                 ->andWhere('s.status in (:status)')
                 ->setParameter('status', $query_filters['status']);
+        }
+
+        // FILTRE TYPE
+        if(isset( $aggs['training.typeLabel.source'])) {
+            $qb
+                ->innerJoin('s.training', 't')
+                ->innerJoin('t.category', 'tc')
+                ->andWhere('tc.trainingType  = :type')
+                ->setParameter('type', $name);
+        } elseif( isset($query_filters['training.typeLabel.source']) ){
+            $qb
+                ->innerJoin('s.training', 't')
+                ->innerJoin('t.category', 'tc')
+                ->andWhere('tc.category IN (:type)')
+                ->setParameter('type', $query_filters['training.typeLabel.source']);
         }
 
         // FILTRE DISPLAYONLINE (F,T) ou (0,1) ?

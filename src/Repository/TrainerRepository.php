@@ -43,10 +43,12 @@ final class TrainerRepository extends ServiceEntityRepository
             ->setParameter('keyword', '%' . addcslashes((string)$keyword, '%_') . '%');
 
         // Join & Filter: Organization
+        $joinedOrg = false;
         if (!empty($filters['organization.name.source'])) {
             $qb->innerJoin('trainer.organization', 'o')
                 ->andWhere('o.name IN (:centers)')
                 ->setParameter('centers', $filters['organization.name.source']);
+            $joinedOrg = true;
         }
 
         // Join & Filter: Institution
@@ -73,8 +75,10 @@ final class TrainerRepository extends ServiceEntityRepository
                         $qb->addOrderBy('trainer.lastname', $direction);
                         break;
                     case 'organization.name':
-                        $qb->leftJoin('trainer.organization', 'o')
-                            ->addOrderBy('o.name', $direction);
+                        if (!$joinedOrg) {
+                            $qb->leftJoin('trainer.organization', 'o');
+                            }
+                        $qb->addOrderBy('o.name', $direction);
                         break;
                     case 'institution.name':
                         $qb->leftJoin('trainer.institution', 'i')
@@ -107,8 +111,16 @@ final class TrainerRepository extends ServiceEntityRepository
                 'trainertype' => $trainer->getTrainertype(),
                 'isarchived' => $trainer->isIsarchived(),
                 'service' => $trainer->getService(),
-                'organization' => $trainer->getOrganization()?->getName(),
-                'institution' => $trainer->getInstitution()?->getName(),
+                'organization' => $trainer->getOrganization()
+                    ? [
+                        'id' => $trainer->getOrganization()->getId(),
+                        'name' => $trainer->getOrganization()->getName(),
+                    ] : null,
+                'institution' => $trainer->getInstitution()
+                    ? [
+                        'id' => $trainer->getInstitution()->getId(),
+                        'name' => $trainer->getInstitution()->getName(),
+                    ] : null,
             ];
         }
 
@@ -146,6 +158,24 @@ final class TrainerRepository extends ServiceEntityRepository
                 ->setParameter('centers', $query_filters['organization.name.source']);
         }
 
+        //FILTRE TYPE INTERVENANT
+        if (!empty($query_filters['trainerType.source'])) {
+            $qb->innerJoin('i.session', 's_filter')
+                ->innerJoin('s_filter.participations', 'p_filter')
+                ->innerJoin('p_filter.trainer', 'trainer_filter')
+                ->innerJoin('trainer_filter.trainertype', 'trainerType_filter');
+
+            $filterValues = (array) $query_filters['trainerType.source'];
+
+            if (count($filterValues) === 1) {
+                $qb->andWhere('trainerType_filter.name = :type')
+                    ->setParameter('type', reset($filterValues));
+            } else {
+                $qb->andWhere('trainerType_filter.name IN (:types)')
+                    ->setParameter('types', $filterValues);
+            }
+        }
+
         // FILTRE ETABLISSEMENT
         if (isset($aggs['institution.name.source'])) {
             $qb
@@ -159,39 +189,41 @@ final class TrainerRepository extends ServiceEntityRepository
                 ->setParameter('i', $query_filters['institution.name.source']);
         }
 
-        //FILTRE STATUT (true,false) = (0,1)
-        if(isset( $aggs['isorganization'])) {
-            $qb
-                ->andWhere('trainer.isorganization = :isOrg')
-                ->setParameter('isOrg', $name);
-        } elseif( isset($query_filters['isorganization']) ) {
-            $qb
-                ->andWhere('trainer.isorganization = :isOrg')
-                ->setParameter('isOrg', $query_filters['isorganization']);
+// --- isOrganization ---
+        if (isset($aggs['isOrganization'])) {
+            $bool = ($name === 1 || $name === '1' || $name === true || $name === 'true');
+            $qb->andWhere('trainer.isorganization = :isOrg')
+                ->setParameter('isOrg', $bool, \PDO::PARAM_BOOL);
+        } elseif (isset($query_filters['isorganization'])) {
+            $v = $query_filters['isorganization'];
+            $bool = ($v === 1 || $v === '1' || $v === true || $v === 'true');
+            $qb->andWhere('trainer.isorganization = :isOrg')
+                ->setParameter('isOrg', $bool, \PDO::PARAM_BOOL);
         }
 
-        //FILTRE PUBLIE (true,false) = (0,1)
-        if(isset( $aggs['ispublic'])) {
-            $qb
-                ->andWhere('trainer.ispublic = :isPub')
-                ->setParameter('isPub', $name);
-        } elseif( isset($query_filters['ispublic']) ) {
-            $qb
-                ->andWhere('trainer.ispublic = :isPub')
-                ->setParameter('isPub', $query_filters['ispublic']);
+// --- isPublic ---
+        if (isset($aggs['isPublic'])) {
+            $bool = ($name === 1 || $name === '1' || $name === true || $name === 'true');
+            $qb->andWhere('trainer.ispublic = :isPub')
+                ->setParameter('isPub', $bool, \PDO::PARAM_BOOL);
+        } elseif (isset($query_filters['ispublic'])) {
+            $v = $query_filters['ispublic'];
+            $bool = ($v === 1 || $v === '1' || $v === true || $v === 'true');
+            $qb->andWhere('trainer.ispublic = :isPub')
+                ->setParameter('isPub', $bool, \PDO::PARAM_BOOL);
         }
 
-        //FILTRE ARCHIVE (true,false) = (0,1)
-        if(isset( $aggs['isarchived'])) {
-            $qb
-                ->andWhere('trainer.isarchived = :isArch')
-                ->setParameter('isArch', $name);
-        } elseif( isset($query_filters['isarchived']) ) {
-            $qb
-                ->andWhere('trainer.isarchived = :isArch')
-                ->setParameter('isArch', $query_filters['isarchived']);
+// --- isArchived ---
+        if (isset($aggs['isArchived'])) {
+            $bool = ($name === 1 || $name === '1' || $name === true || $name === 'true');
+            $qb->andWhere('trainer.isarchived = :isArch')
+                ->setParameter('isArch', $bool, \PDO::PARAM_BOOL);
+        } elseif (isset($query_filters['isarchived'])) {
+            $v = $query_filters['isarchived'];
+            $bool = ($v === 1 || $v === '1' || $v === true || $v === 'true');
+            $qb->andWhere('trainer.isarchived = :isArch')
+                ->setParameter('isArch', $bool, \PDO::PARAM_BOOL);
         }
-
 
         // On compte le nb de sessions en résultat
         $paginator = new Paginator($qb->getQuery());
@@ -201,14 +233,23 @@ final class TrainerRepository extends ServiceEntityRepository
             'items' => array_map(function(Trainer $trainer) {
                 return [
                     'id' => $trainer->getId(),
-                    'firstname' => $trainer->getFirstname(),
+
                     'lastname' => $trainer->getLastname(),
                     'fullname' => $trainer->getFirstname() . ' ' . $trainer->getLastname(),
                     'ispublic' => $trainer->isIspublic(),
                     'isarchived' => $trainer->isIsarchived(),
                     'service' => $trainer->getService(),
-                    'organization' => $trainer->getOrganization()?->getName(),
-                    'institution' => $trainer->getInstitution()?->getName()
+                    'trainertype' => $trainer->getTrainertype(),
+                    'organization' => $trainer->getOrganization()
+                        ? [
+                            'id' => $trainer->getOrganization()->getId(),
+                            'name' => $trainer->getOrganization()->getName(),
+                        ] : null,
+                    'institution' => $trainer->getInstitution()
+                        ? [
+                            'id' => $trainer->getInstitution()->getId(),
+                            'name' => $trainer->getInstitution()->getName(),
+                        ] : null,
                 ];
             }, iterator_to_array($paginator)),
         ];

@@ -27,7 +27,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
      */
     public function getInscriptionsList(string $keyword = '',
                                         array $filters = [],
-                                        string $formatCreatedAt = 'd-m-y H:i',
+                                        string $formatCreatedAt = 'd/m/y H:i',
                                         int $page = 1,
                                         int $pageSize = 1,
                                         array $sorts = ['createdat' => 'DESC'],
@@ -62,12 +62,12 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             ->leftJoin('i.presencestatus', 'pstatus')
 
             // Filtre keyword amélioré avec gestion des cas NULL
-            ->where('
-                (trainee.firstname LIKE :keyword OR trainee.firstname IS NULL) OR 
-                (trainee.lastname LIKE :keyword OR trainee.lastname IS NULL) OR 
-                (tr.name LIKE :keyword OR tr.name IS NULL) OR 
-                (tag.name LIKE :keyword OR tag.name IS NULL)
-            ')
+            ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword')
+            ->andWhere('i.trainee = trainee.id')
+            ->andWhere('s.training = tr.id')
+            ->andWhere('i.session = s.id')
+
+            /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
         // FILTRE CENTRE
@@ -102,11 +102,12 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
         //FILTRE DATE
         if( isset($filters['session.datebegin']) ) {
             $dates = explode('-', (string) $filters["session.datebegin"]);
-            $dateFrom = date('Y/m/d 00:00:00' ,strtotime(str_replace('/','-', trim($dates[0]))));
-            $dateTo = date('Y/m/d 00:00:00',strtotime(str_replace('/', '-', trim($dates[1]))));
+            $dateFrom = date('d/m/y 00:00:00' ,strtotime(trim($dates[0])));
+            $dateTo = date('d/m/y 00:00:00',strtotime(trim($dates[1])));
 
             $qb
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
+                ->addOrderBy('i.createdat', 'DESC')
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
         }
@@ -158,6 +159,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('themes', $filters['session.training.theme.name']);
         }
 
+        $qb->addOrderBy('i.createdat', 'DESC');
         // TRI DES RESULTATS
         $sortableFields = [
             'createdat' => 'i.createdat',
@@ -178,7 +180,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
         $qb->setFirstResult(($page - 1) * $pageSize)
             ->setMaxResults($pageSize);
 
-        $paginator = new Paginator($qb);
+        $paginator = new Paginator($qb, true);
 
         $items = [];
         foreach ($paginator as $insc) {
@@ -204,6 +206,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 'isPaying' => $insc?->getPrice(),
                 'presencestatus' => $insc->getPresencestatus(),
                 'inscriptionstatus' => $insc->getInscriptionstatus(),
+                'type' => $insc->getType(),
 
                 //inscription.trainee.organization.name
 
@@ -230,8 +233,8 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ],
                 'session' => [
                     'id' => $session?->getId(),
-                    'datebegin' => $session?->getDatebegin()?->format('Y-m-d'),
-                    'dateend' => $session?->getDateend()?->format('Y-m-d'),
+                    'datebegin' => $session?->getDatebegin()?->format('d/m/y'),
+                    'dateend' => $session?->getDateend()?->format('d/m/y'),
                     'maximumnumberofregistrations' => $session?->getMaximumNumberOfRegistrations(),
                     'price' => $session?->getPrice(),
                     'fullname' => $fullname,
@@ -254,13 +257,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                     'id' => $organization->getId(),
                     'name' => $organization->getName() ?? 'Non précisé',
                 ] : [],
-                'tags' => $training?->getTags() ? array_map(
-                    fn($tag) => [
-                        'id' => $tag->getId(),
-                        'name' => $tag->getName(),
-                    ],
-                    $training->getTags()->toArray()
-                ) : [],
+
 
                 // Pour compatibilité avec le code existant
                 'inscription_obj' => $insc,
@@ -276,7 +273,6 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             'currentPage' => $page,
             'totalPages' => ceil(count($paginator) / $pageSize),
             'items' => $items,
-            'agg' => [],
         ];
     }
 
@@ -294,7 +290,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
     }
 
 
-    public function getNbInscriptions($query_filters, $keyword, $aggs, $name): array
+    public function getNbInscriptions($query_filters, $keyword, $aggs, $name, ?string $facet = null): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -304,6 +300,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             ->innerJoin('s.training', 'tr')
             ->leftJoin('tr.tags', 'tag')
             ->leftJoin('tr.theme', 'theme')
+            ->leftJoin('tr.category', 'c')
             ->leftJoin('tr.organization', 'org')
             ->leftJoin('trainee.institution', 'inst')
             ->leftJoin('trainee.publictype', 'publictype')
@@ -366,6 +363,81 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('monthFrom', $monthFrom)
                 ->setParameter('monthTo', $monthTo);
         }
+
+        // FILTRE Stagiaire
+        if(isset($aggs['trainee.fullName.source'])) {
+            $qb->andWhere("CONCAT(trainee.firstname, ' ', trainee.lastname) = :fullname")
+                ->setParameter('fullname', $name);
+        } elseif (!empty($query_filters['trainee.fullName.source']) && $facet !== 'trainee.fullName.source') {
+            $qb->andWhere("CONCAT(trainee.firstname, ' ', trainee.lastname) IN (:fullNames)")
+                ->setParameter('fullNames', (array)$query_filters['trainee.fullName.source']);
+        }
+
+        // FILTRE ÉTABLISSEMENT
+        if(isset($aggs['institution.name.source'])) {
+            $qb->andWhere('inst.name = :status')
+                ->setParameter('status', $name);
+        }
+
+        // FILTRE ÉTABLISSEMENT ACTUEL
+
+
+        if ($facet === 'trainee.institution.name.source' && $name !== null) {
+            $qb->andWhere('inst.name LIKE :instName')
+                ->setParameter('instName', "%$name%");
+        } elseif (!empty($query_filters['trainee.institution.name.source']) && $facet !== 'institution.name') {
+            $qb->andWhere('inst.name IN (:instNames)')
+                ->setParameter('instNames', (array)$query_filters['trainee.institution.name.source']);
+        }
+
+        // FILTRE CATÉGORIE PERSONNEL
+        if(isset($aggs['publicType.source'])) {
+            $qb->andWhere('publictype.name = :status')
+                ->setParameter('status', $name);
+        }
+
+        // FILTRE STATUT INSCRIPTION
+        if(isset($aggs['inscriptionStatus.name.source'])) {
+            $qb->andWhere('istatus.name = :status')
+                ->setParameter('status', $name);
+        }
+
+// FILTRE TYPE DE FORMATION
+        if ($facet === 'session.training.typeLabel' && $name !== null) {
+            $qb->andWhere('c.name = :typeLabel')
+                ->setParameter('typeLabel', $name);
+        } elseif(!empty($query_filters['session.training.typeLabel.source'])) {
+        $qb->andWhere('c.name IN (:typeLabels)')
+            ->setParameter('typeLabels', $query_filters['session.training.typeLabel.source']);
+    }
+
+        // FILTRE STATUT DE PRÉSENCE
+        if(isset($aggs['presenceStatus.name.source'])) {
+            $qb->andWhere('pstatus.name = :status')
+                ->setParameter('status', $name);
+        }
+
+        // FILTRE DOMAINE DE FORMATION
+        if (isset($query_filters['session.training.name.source'])) {
+            $qb->andWhere('tr.name IN (:trainingNames)')
+                ->setParameter('trainingNames', (array) $query_filters['session.training.name.source']);
+        }
+
+        if ($facet === 'session.training.name' && $name !== null) {
+            $qb->andWhere('tr.name = :trainingName')
+                ->setParameter('trainingName', $name);
+        }
+
+
+        // FILTRE DOMAINE DE FORMATION
+        if(isset($aggs['session.training.theme.name'])) {
+            $qb->andWhere('theme.name = :themeName')
+                ->setParameter('themeName', $name);
+        } elseif (isset($query_filters['session.training.theme.name.source'])) {
+            $qb->andWhere('theme.name IN (:themes)')
+                ->setParameter('themes', (array) $query_filters['session.training.theme.name.source']);
+        }
+
 
         // Autres filtres... (je garde la même logique que votre code original)
         // mais en utilisant les alias cohérents
