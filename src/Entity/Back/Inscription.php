@@ -124,7 +124,7 @@ class Inscription extends AbstractInscription implements \Stringable
         $actionType = $this->getActiontype();
         if ($actionType !== null) {
             $entityManager->initialiszeObject($actionType);
-            dump ($actionType);
+            //dump ($actionType);
         }
     }
 

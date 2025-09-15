@@ -66,7 +66,6 @@ class DateSession
     #[Groups([ 'inscription', 'trainee', 'trainer', 'api', 'api.session'])]
     #[ORM\ManyToOne(targetEntity: Session::class, inversedBy: 'dates')]
     #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    #[MaxDepth(1)]
     protected Session $session;
 
     public function __construct()

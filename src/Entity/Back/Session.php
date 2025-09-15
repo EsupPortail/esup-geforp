@@ -88,7 +88,6 @@ class Session extends AbstractSession
     #[Groups(['api.session'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\DateSession::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
-    #[MaxDepth(1)]
     protected Collection $dates;
 
     /**
@@ -219,6 +218,7 @@ class Session extends AbstractSession
         $this->taking = $taking;
     }
 
+    #[Groups(['session', 'api.session'])]
     public function getDatesString(): string
     {
         if ($this->dates->isEmpty()) {
@@ -227,14 +227,51 @@ class Session extends AbstractSession
 
         $formattedDates = [];
 
+
         foreach ($this->dates as $date) {
             $start = $date->getDatebegin()?->format('d/m/Y');
-            $end = $date->getDateend()?->format('d/m/Y');
+            $end   = $date->getDateend()?->format('d/m/Y');
+
+            $formatted = function ($val) {
+                if ($val instanceof \DateTimeInterface) {
+                    return $val->format('H:i');
+                }
+                if (!$val) {
+                    return '';
+                }
+
+                $s = trim((string) $val);
+
+                // Cas "9" ou "09"
+                if (preg_match('/^(\d{1,2})$/', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':00';
+                }
+
+                // Cas "9h" ou "09h"
+                if (preg_match('/^(\d{1,2})h$/i', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':00';
+                }
+
+                // Cas "9h30" ou "09h30"
+                if (preg_match('/^(\d{1,2})h(\d{1,2})$/i', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':' . str_pad($m[2], 2, '0', STR_PAD_LEFT);
+                }
+
+                // Cas "09:30" ou déjà au bon format
+                if (preg_match('/^\d{1,2}:\d{2}$/', $s)) {
+                    return $s;
+                }
+
+                return $s; // fallback
+            };
+
+            $hMorn = $formatted($date->getSchedulemorn());
+            $hAfter = $formatted($date->getScheduleafter());
 
             if ($start && $end) {
-                $formattedDates[] = "du $start au $end";
+                $formattedDates[] = "du $start $hAfter au $end $hMorn";
             } elseif ($start) {
-                $formattedDates[] = $start;
+                $formattedDates[] = $start . ($hMorn || $hAfter ? ' ' . trim($hMorn . ' ' . $hAfter) : '');
             }
         }
 

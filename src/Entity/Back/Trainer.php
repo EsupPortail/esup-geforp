@@ -4,6 +4,7 @@ namespace App\Entity\Back;
 
 
 use App\Entity\Core\AbstractTrainer;
+use App\Entity\PersonTrait\PersonTrait;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use JMS\Serializer\Annotation as Serializer;
