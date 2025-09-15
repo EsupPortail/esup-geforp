@@ -210,7 +210,7 @@ parameters:
                     presences: { property: presences }
                     statutInscription: { property: inscriptionstatus.name }
                     statutPresence: { property: presencestatus.name }
-                    dates: { property: session.datesString }
+                    dates: { property: session.dates }
                     dateDebut: { property: session.dateDebut }
                     domaine: { property: session.formation.theme }
                     typeAction: { property: actiontype }
@@ -255,7 +255,7 @@ parameters:
                 emailPath: 'email'
                 fields:
                     #personTrait
-                    civilite: { property: title }
+                    civilite: { property: getTitle }
                     nomComplet: { property: fullname }
                     nom: { property: lastname }
                     prenom: { property: firstname }
@@ -340,7 +340,7 @@ parameters:
                     id: { property: id }
                     formateur: { property: trainer }
                     session: { property: session }
-                    dates: { property: session.datesString }
+                    dates: { property: session.dates }
             internship:
                 class: 'App\Entity\Back\Internship'
                 parent: training
