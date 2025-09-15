@@ -174,7 +174,7 @@ use Symfony\Component\Form\FormError;
 
              $em = $managerRegistry->getManager();
              $em->persist($session);
-             $em->flush();
+
 
          }
          return ['session' => $session, 'dates' => $datesBegin, 'groups' => 'session'];
