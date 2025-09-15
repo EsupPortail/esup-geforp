@@ -3,11 +3,14 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Back\Session;
 use App\Entity\Core\AbstractTrainee;
+use App\Entity\Term\Sessiontype;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
+use App\Entity\Term\Trainingcategory;
 use App\Form\Type\AbstractTrainingType;
 use App\Service\TrainingBalanceSheet;
 use Doctrine\ORM\EntityManager;
@@ -51,12 +54,12 @@ abstract class AbstractTrainingController extends AbstractController
     public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
     }
-
+    #[Groups(['Default', 'training'])]
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/search', name: 'training.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = $request->request->get('keywords', '');
+        $keywords = (string)$request->request->get('keywords', '');
         $filters = $request->request->all('filters') ?: [];
         $query_filters = $request->request->all('query_filters') ?: [];
         $aggs = $request->request->all('aggs') ?: [];
@@ -72,7 +75,7 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size, $sorts);
+        $ret = $trainingRepository->getTrainingsList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sorts: $sorts);
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $trainingRepository);
 
         // Concatenation des resultats
@@ -81,6 +84,7 @@ abstract class AbstractTrainingController extends AbstractController
         return $ret;
     }
 
+    #[Groups(['Default', 'training'])]
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create/{type}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function create(Request $request, ManagerRegistry $managerRegistry): array
@@ -318,7 +322,7 @@ abstract class AbstractTrainingController extends AbstractController
         return $trainingBalanceSheet->getCsvResponse($training);
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainingRepository $trainingRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainingRepository $trainingRepository): array
     {
         $tabAggs = [];
 
@@ -330,8 +334,8 @@ abstract class AbstractTrainingController extends AbstractController
             //Pour chaque centre on teste la requête
             foreach($allOrganizations as $allOrganization){
                 $nbTrainingsOrg = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allOrganization->getName());
-                if ($nbTrainingsOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbTrainingsOrg];
+                if ($nbTrainingsOrg['total'] > 0) {
+                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbTrainingsOrg['total']];
                     ++$i;
                 }
             }
@@ -351,8 +355,8 @@ abstract class AbstractTrainingController extends AbstractController
             //Pour chaque année on teste la requête
             foreach($allYears as $allYear){
                 $nbTrainingsYear = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allYear);
-                if ($nbTrainingsYear > 0) {
-                    $tabYears[$i] = [ 'key' => $allYear, 'doc_count' => $nbTrainingsYear];
+                if ($nbTrainingsYear['total'] > 0) {
+                    $tabYears[$i] = [ 'key' => $allYear, 'doc_count' => $nbTrainingsYear['total']];
                     ++$i;
                 }
             }
@@ -362,17 +366,38 @@ abstract class AbstractTrainingController extends AbstractController
 
         // CONSTRUCTION SEMESTRE
         if (isset($aggs['semester'])) {
-            $i = 0; $tabSemesters = [];
+
+            $tabSemesters = [];
+            $i = 0;
             //Pour chaque semestre on teste la requête
             foreach(self::ALL_SEMESTERS as $semester){
-                $nbTrainingsSem = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $semester);
-                if ($nbTrainingsSem > 0) {
-                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbTrainingsSem];
+                $nbTrainingsSem = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $semester, 'semester');
+                if ($nbTrainingsSem['total'] > 0) {
+                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbTrainingsSem['total']];
                     ++$i;
                 }
             }
 
             $tabAggs['semester']['buckets'] = $tabSemesters;
+        }
+
+        // CONSTRUCTION NUMÉRO
+        if (isset($aggs['training.number'])) {
+            $allNumbers = $managerRegistry->getRepository(AbstractTraining::class)->findAll();
+
+            $i = 0; $tabNumbers = [];
+            //Pour chaque semestre on teste la requête
+            foreach($allNumbers as $allNumber){
+                $trainingNumber = $allNumber->getNumber();
+                $nbTrainingsNum = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $trainingNumber, 'training.number');
+
+                if ($nbTrainingsNum['total'] > 0) {
+                    $tabNumbers[$i] = [ 'key' => $allNumber, 'doc_count' => $nbTrainingsNum['total']];
+                    ++$i;
+                }
+            }
+
+            $tabAggs['training.number']['buckets'] = $tabNumbers;
         }
 
         // CONSTRUCTION THEMES
@@ -383,8 +408,8 @@ abstract class AbstractTrainingController extends AbstractController
             //Pour chaque thème on teste la requête
             foreach($allThemes as $allTheme){
                 $nbTrainingsThemes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allTheme->getName());
-                if ($nbTrainingsThemes > 0) {
-                    $tabThemes[$i] = [ 'key' => $allTheme->getName(), 'doc_count' => $nbTrainingsThemes];
+                if ($nbTrainingsThemes['total'] > 0) {
+                    $tabThemes[$i] = [ 'key' => $allTheme->getName(), 'doc_count' => $nbTrainingsThemes['total']];
                     ++$i;
                 }
             }
@@ -392,14 +417,58 @@ abstract class AbstractTrainingController extends AbstractController
             $tabAggs['theme.name']['buckets'] = $tabThemes;
         }
 
+        $tabAggs['training.typeLabel.source'] = ['buckets' => []];
+        // CONSTRUCTION TYPE
+        if(isset( $aggs['training.typeLabel.source'])){
+            $allTypes = $managerRegistry->getRepository(Session::class)
+                ->createQueryBuilder('s')
+                ->select('DISTINCT tc.trainingType')
+                ->join('s.training', 't')
+                ->join('t.category', 'tc')
+                ->getQuery()
+                ->getSingleColumnResult();
+
+            $tabTypes = [];
+            //Pour chaque type on teste la requête
+            foreach($allTypes as $allType){
+                $nbTrainingsTypes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allType);
+                 //dump($allType, $nbTrainingsTypes);
+                if ($nbTrainingsTypes['total'] > 0) {
+                    $tabTypes[] = [ 'key' => $allType, 'doc_count' => $nbTrainingsTypes['total']];
+                }
+            }
+
+            $tabAggs['training.typeLabel.source']['buckets'] = $tabTypes;
+        }
+
+        // CONSTRUCTION CATÉGORIE
+        if (isset($aggs['training.category.source'])) {
+            $allCategories = $managerRegistry->getRepository(\App\Entity\Term\Trainingcategory::class)->findAll();
+
+            $tabCategory = [];
+            foreach ($allCategories as $category) {
+                $nbCategory = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $category->getName(), 'training.category');
+
+                if ($nbCategory['total'] > 0) {
+                    $tabCategory[] = [
+                        'key'       => $category->getName(),
+                        'filter'    => $category->getName(),
+                        'doc_count' => $nbCategory['total']
+                    ];
+                }
+            }
+            $tabAggs['training.category.source']['buckets'] = $tabCategory;
+        }
+
+
         // CONSTRUCTION PROMOTION (true,false) = (0,1)
         if( isset($aggs['nextSession.promote']) ) {
             $i = 0; $tabPro = [];
             //Pour chaque promote on teste la requête
             foreach(self::ALL_PROMOTE as $promote){
                 $nbTrainingsPro = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $promote);
-                if ($nbTrainingsPro > 0) {
-                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbTrainingsPro];
+                if ($nbTrainingsPro['total'] > 0) {
+                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbTrainingsPro['total']];
                     ++$i;
                 }
             }
@@ -414,8 +483,8 @@ abstract class AbstractTrainingController extends AbstractController
             //Pour chaque trainer on teste la requête
             foreach($allTrainers as $allTrainer){
                 $nbTrainingsTra = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allTrainer->getId());
-                if ($nbTrainingsTra > 0) {
-                    $tabTra[$i] = [ 'key' => $allTrainer->getFullname(), 'doc_count' => $nbTrainingsTra];
+                if ($nbTrainingsTra['total'] > 0) {
+                    $tabTra[$i] = [ 'key' => $allTrainer->getFullname(), 'doc_count' => $nbTrainingsTra['total']];
                     ++$i;
                 }
             }

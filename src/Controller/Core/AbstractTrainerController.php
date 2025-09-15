@@ -3,11 +3,13 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Back\Inscription;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
 use App\Entity\Core\AbstractInstitution;
 use App\Entity\Core\AbstractTraining;
+use App\Entity\Term\Trainertype;
 use App\Form\Type\AbstractTrainerType;
 use App\Repository\TrainerRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
@@ -73,6 +75,10 @@ abstract class AbstractTrainerController extends AbstractController
 
         // Recherche avec query (pour autocompletion)
         // on transforme le champ 'query' en 'keywords'
+        if (isset($query['filtered']['query']['match']['fullName.autocomplete']['query'])) {
+            $keywords = $query['filtered']['query']['match']['fullName.autocomplete']['query'];
+            $ret = $trainerRepository->getTrainersList($keywords, $filters, $page, $size, $sorts, $fields);
+        }
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
@@ -194,8 +200,8 @@ abstract class AbstractTrainerController extends AbstractController
             //Pour chaque centre on teste la requête
             foreach ($allOrganizations as $allOrganization) {
                 $nbTrOrg = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $allOrganization->getName());
-                if ($nbTrOrg > 0) {
-                    $tabOrg[$i] = ['key' => $allOrganization->getName(), 'doc_count' => $nbTrOrg];
+                if ($nbTrOrg['total'] > 0) {
+                    $tabOrg[$i] = ['key' => $allOrganization->getName(), 'doc_count' => $nbTrOrg['total']];
                     ++$i;
                 }
             }
@@ -212,8 +218,8 @@ abstract class AbstractTrainerController extends AbstractController
             //Pour chaque etablissement on teste la requête
             foreach ($allInstitutions as $allInstitution) {
                 $nbTrInst = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $allInstitution->getName());
-                if ($nbTrInst > 0) {
-                    $tabInst[$i] = ['key' => $allInstitution->getName(), 'doc_count' => $nbTrInst];
+                if ($nbTrInst['total'] > 0) {
+                    $tabInst[$i] = ['key' => $allInstitution->getName(), 'doc_count' => $nbTrInst['total']];
                     ++$i;
                 }
             }
@@ -225,10 +231,10 @@ abstract class AbstractTrainerController extends AbstractController
         if (isset($aggs['isOrganization'])) {
             $i = 0;
             $tabSta = [];
-            foreach (self::ALL_STATUS as $status) {
-                $nbTrSt = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $status);
-                if ($nbTrSt > 0) {
-                    $tabSta[$i] = ['key' => $status, 'doc_count' => $nbTrSt];
+            foreach ([0, 1] as $status) {
+                $nbTrSt = $trainerRepository->getNbTrainers($query_filters, $keyword, ['isOrganization' => $status], $status);
+                if ($nbTrSt['total'] > 0) {
+                    $tabSta[$i] = ['key' => (string)$status, 'doc_count' => $nbTrSt['total']];
                     ++$i;
                 }
             }
@@ -236,14 +242,40 @@ abstract class AbstractTrainerController extends AbstractController
             $tabAggs['isOrganization']['buckets'] = $tabSta;
         }
 
+        // CONSTRUCTION INTERVENANT
+        $tabAggs['trainerType.source'] = ['buckets' => []];
+
+        if (isset($aggs['trainerType.source'])) {
+            $qb = $managerRegistry->getRepository(Inscription::class)->createQueryBuilder('i');
+            $qb->innerJoin('i.session', 's')
+                ->innerJoin('s.participations', 'p')
+                ->innerJoin('p.trainer', 'trainer')
+                ->innerJoin('trainer.trainertype', 'trainerType')
+                ->select('trainerType.name AS typeName, COUNT(i.id) AS total')
+                ->groupBy('trainerType.id')
+                ->orderBy('total', 'DESC');
+
+            $results = $qb->getQuery()->getResult();
+            $buckets = [];
+            //Pour chaque Type d'intervenant on teste la requête
+            foreach ($results as $row) {
+                $buckets[] = [
+                    'key' => $row['typeName'],
+                    'doc_count' => $row['total'],
+                ];
+            }
+
+            $tabAggs['trainerType.source']['buckets'] = $buckets;
+        }
+
         // CONSTRUCTION PUBLIE
         if (isset($aggs['isPublic'])) {
             $i = 0;
             $tabPub = [];
-            foreach (self::ALL_PUB as $pub) {
-                $nbTrPub = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $pub);
-                if ($nbTrPub > 0) {
-                    $tabPub[$i] = ['key' => $pub, 'doc_count' => $nbTrPub];
+            foreach ([0, 1] as $pub) {
+                $nbTrPub = $trainerRepository->getNbTrainers($query_filters, $keyword, ['isPublic' => $pub], $pub);
+                if ($nbTrPub['total'] > 0) {
+                    $tabPub[$i] = ['key' => (string)$pub, 'doc_count' => $nbTrPub['total']];
                     ++$i;
                 }
             }
@@ -255,10 +287,10 @@ abstract class AbstractTrainerController extends AbstractController
         if (isset($aggs['isArchived'])) {
             $i = 0;
             $tabArch = [];
-            foreach (self::ALL_ARCH as $arch) {
-                $nbTrArch = $trainerRepository->getNbTrainers($query_filters, $keyword, $aggs, $arch);
-                if ($nbTrArch > 0) {
-                    $tabArch[$i] = ['key' => $arch, 'doc_count' => $nbTrArch];
+            foreach ([0, 1] as $arch) {
+                $nbTrArch = $trainerRepository->getNbTrainers($query_filters, $keyword, ['isArchived' => $arch], $arch);
+                if ($nbTrArch['total'] > 0) {
+                    $tabArch[$i] = ['key' => (string)$arch, 'doc_count' => $nbTrArch['total']];
                     ++$i;
                 }
             }

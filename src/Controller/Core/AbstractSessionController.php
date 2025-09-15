@@ -8,6 +8,7 @@ use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Session;
 use App\Entity\Back\Trainer;
+use App\Entity\Term\Trainingcategory;
 use App\Repository\SessionRepository;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
@@ -241,7 +242,7 @@ abstract class AbstractSessionController extends AbstractController
 
     #[Groups(['Default', 'session'])]
     #[Route(path: '/{id}/remove', name: 'session.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: 'POST')]
-    public function remove(AbstractSession $session, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
+    public function remove(AbstractSession $session, ManagerRegistry $managerRegistry, int $id): \Symfony\Component\HttpFoundation\JsonResponse
     {
         $session = $managerRegistry->getRepository(AbstractSession::class)->find($id);
         if (!$session) {
@@ -254,11 +255,11 @@ abstract class AbstractSessionController extends AbstractController
         $training = $session->getTraining();
         $objectManager = $managerRegistry->getManager();
         $objectManager->remove($session);
-//        $training->updateTimestamps();
         $objectManager->flush();
-//        $this->get('fos_elastica.index')->refresh();
 
-        return $this->redirectToRoute('training.view', ['id' => $training->getId()]);
+        // Au lieu de rediriger, renvoyez une réponse JSON
+        // qui contient un message de succès.
+        return new \Symfony\Component\HttpFoundation\JsonResponse(['success' => true]);
     }
 
     protected function retrieveInscriptions(array &$inscriptionIds, array &$inscriptions): void
@@ -492,6 +493,30 @@ abstract class AbstractSessionController extends AbstractController
             $tabAggs['training.name.source']['buckets'] = $tabTra;
         }
 
+// TYPE
+        if (isset($aggs['training.typeLabel.source'])) {
+            $allTypes = $managerRegistry->getRepository(Session::class)
+                ->createQueryBuilder('s')
+                ->select('DISTINCT tc.trainingType')
+                ->join('s.training', 't')
+                ->join('t.category', 'tc')
+                ->getQuery()
+                ->getSingleColumnResult();
+
+            $tabTraType = [];
+            foreach ($allTypes as $type) {
+                $nbSessionsTraType = $sessionRepository->getNbSessions($query_filters, $keyword, $aggs, $type);
+                if ($nbSessionsTraType > 0) {
+                    $tabTraType[] = [
+                        'key' => $type,
+                        'doc_count' => $nbSessionsTraType
+                    ];
+                }
+            }
+
+            $tabAggs['training.typeLabel.source']['buckets'] = $tabTraType;
+        }
+
         // CONSTRUCTION FORMATEUR
         if( isset($aggs['participations.trainer.fullName']) ) {
             $allTrainers = $managerRegistry->getRepository(Trainer::class)->findAll();
@@ -504,11 +529,8 @@ abstract class AbstractSessionController extends AbstractController
                     ++$i;
                 }
             }
-
             $tabAggs['participations.trainer.fullName']['buckets'] = $tabTra;
         }
-
-
         return $tabAggs;
     }
 

@@ -2,7 +2,10 @@
 
 namespace App\Controller\Core;
 
+use App\BatchOperations\BatchOperationRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use http\Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,15 +34,15 @@ abstract class AbstractBatchOperationController extends AbstractController
      */
     #[Rest\View()]
     #[Route(path: '/batchoperation/{id}/execute', name: 'sygefor_core.batch_operation.execute', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function execute(Request $request, $id)
+    public function execute(Request $request, $id, BatchOperationRegistry $batchRegistry, LoggerInterface $logger, Exception $exeption = null)
     {
         $ids = $request->get('ids');
         $options = $request->get('options');
 
         try {
-            $this->get('monolog.logger.batch_operation')->addDebug(sprintf('BatchOperation %s; ids: ', $id).$ids.'; options: '.$options);
+            $logger->debug(sprintf('BatchOperation %s; ids: ', $id).$ids.'; options: '.$options);
         } catch (\Exception $exception) {
-            $this->get('monolog.logger.batch_operation')->addDebug(sprintf('BatchOperation %s; Exception: ', $id).$exception->getMessage());
+            $logger->debug(sprintf('BatchOperation %s; Exception: ', $id).$exception->getMessage());
         }
 
         //we try to read option list as a JSON string (case of multipart form type)
@@ -68,7 +71,7 @@ abstract class AbstractBatchOperationController extends AbstractController
 
         $ids = explode(',', (string) $ids);
 
-        $batchOperation = $this->get('sygefor_core.batch_registry')->get($id);
+        $batchOperation = $batchRegistry->get($id);
 
         if (!$batchOperation) {
             throw new NotFoundHttpException('Operation not found : '.$id);
@@ -85,7 +88,7 @@ abstract class AbstractBatchOperationController extends AbstractController
      */
     #[Rest\View()]
     #[Route(path: '/batchoperation/modalconfig/{service}', name: 'sygefor_core.batch_operation.modal_config', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function modalConfig(Request $request, $service)
+    public function modalConfig(Request $request, $service, BatchOperationRegistry $batchRegistry)
     {
         $options = $request->get('options');
 
@@ -97,7 +100,7 @@ abstract class AbstractBatchOperationController extends AbstractController
             }
         }
 
-        $batchOperation = $this->get('sygefor_core.batch_registry')->get($service);
+        $batchOperation = $batchRegistry->get($service);
         if (method_exists($batchOperation, 'getModalConfig')) {
             return $batchOperation->getModalConfig($options);
         }
@@ -112,10 +115,10 @@ abstract class AbstractBatchOperationController extends AbstractController
      */
     #[Rest\View()]
     #[Route(path: '/batchoperation/{service}/get/{file}/as/{filename}', name: 'sygefor_core.batch_operation.get_file', options: ['expose' => true], defaults: ['_format' => 'json', 'filename' => null])]
-    public function fileDownload(Request $request, $service, $file, $filename = null)
+    public function fileDownload(Request $request, $service, $file, BatchOperationRegistry $batchRegistry, $filename = null)
     {
         $pdf = $request->get('pdf') === 'true';
-        $batchOperation = $this->get('sygefor_core.batch_registry')->get($service);
+        $batchOperation = $batchRegistry->get($service);
 
         if (method_exists($batchOperation, 'sendFile')) {
             return $batchOperation->sendFile($file, $filename ?: 'publipostage.odt', ['pdf' => $pdf]);

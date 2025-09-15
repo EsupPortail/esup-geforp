@@ -304,7 +304,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
         if (!$user) {
             throw new AccessDeniedHttpException();
         }
-        
+
         $formBuilder = $this->createFormBuilder($user);
         $formBuilder->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès']);
 

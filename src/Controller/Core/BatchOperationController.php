@@ -30,16 +30,20 @@ final class BatchOperationController extends AbstractController
      * @return array{operations: array<int, array{label: mixed, id: mixed, ids: int}>}
      */
     #[Route(path: '/batchoperation/dump', name: 'sygefor_core.batch.dump')]
-    public function dump(): array
+    public function dump(BatchOperationRegistry $batchOperationRegistry): JsonResponse
     {
-        $operations = $this->get('sygefor_core.batch_operation_registry')->getAll();
+        $operations = $batchOperationRegistry->getAll();
         $operations_infos = [];
 
         foreach ($operations as $operation) {
-            $operations_infos [] = ['label' => $operation->getLabel(), 'id' => $operation->getId(), 'ids' => 1];
+            $operations_infos[] = [
+                'label' => $operation->getLabel(),
+                'id'    => $operation->getId(),
+                'ids'   => 1
+            ];
         }
 
-        return ['operations' => $operations_infos];
+        return new JsonResponse(['operations' => $operations_infos]);
     }
 
     /**
@@ -47,70 +51,90 @@ final class BatchOperationController extends AbstractController
      * @throws \JsonException
      */
     #[Rest\View()]
-    #[Route(path: '/batchoperation/{id}/execute', name: 'sygefor_core.batch_operation.execute', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[Route(
+        path: '/batchoperation/{id}/execute',
+        name: 'sygefor_core.batch_operation.execute',
+        options: ['expose' => true],
+        defaults: ['_format' => 'json']
+    )]
     public function execute(string $id, BatchOperationRegistry $batchOperationRegistry, Request $request)
     {
-        $idsRaw = $request->get('ids');
-        $options = $request->get('options');
+        $contentType = $request->headers->get('Content-Type');
+        $isJson = str_contains($contentType, 'application/json');
 
-        //we try to read option list as a JSON string (case of multipart form type)
-        if (is_string($options)) {
-            $decodeOptions = json_decode($options,true, 512, JSON_THROW_ON_ERROR);
-            if (is_array($decodeOptions)) { //if translation succeeded, the result is stored as options array
-                $options = $decodeOptions;
-            }
+        // Récupération des données selon le type de requête
+        if ($isJson) {
+            $data = json_decode($request->getContent(), true);
+            $idsRaw = $data['ids'] ?? [];
+            $options = $data['options'] ?? [];
+        } else {
+            $idsRaw = $request->get('ids');
+            $options = $request->get('options');
         }
 
+        // Gestion des options JSON string (cas multipart/form)
+        if (is_string($options)) {
+            $decodedOptions = json_decode($options, true, 512, JSON_THROW_ON_ERROR);
+            if (is_array($decodedOptions)) {
+                $options = $decodedOptions;
+            }
+        }
+        $options = is_array($options) ? $options : [];
+
+        // Gestion des fichiers uploadés
         if (count($request->files) > 0) {
             $attachments = [];
-            //files are stored in option list using form name as key
             foreach ($request->files as $file) {
                 $attachments[] = $file;
             }
-
             $options['attachment'] = $attachments;
         }
 
+
+// Gestion robuste des IDs
         if (is_array($idsRaw)) {
             $ids = $idsRaw;
         } else {
-            // Sinon on tente de le parser
             $idsString = (string) $idsRaw;
 
+            // Essaye de décoder en JSON
             try {
                 $decodedIds = json_decode($idsString, true, 512, JSON_THROW_ON_ERROR);
 
-                // Si json_decode donne un tableau
                 if (is_array($decodedIds)) {
                     $ids = $decodedIds;
-                }
-                // Si ça donne une string "1,2,3", on explose
-                elseif (is_string($decodedIds)) {
+                } elseif (is_string($decodedIds)) {
                     $ids = explode(',', $decodedIds);
-                }
-                // Autres cas : on essaie en CSV direct
-                else {
+                } else {
                     $ids = explode(',', $idsString);
                 }
             } catch (\JsonException) {
-                // Si pas un JSON valide, on traite comme CSV "1,2,3"
+                // Si ce n’est pas un JSON valide, traite comme CSV "1,2,3"
                 $ids = explode(',', $idsString);
             }
         }
 
-        //$batchOperation = $this->get('sygefor_core.batch_operation_registry')->get($id);
+// Nettoyage final : suppression de tous les guillemets et conversion en int
+        $ids = array_map(function($id) {
+            // Supprime récursivement tous les guillemets de début/fin
+            while (is_string($id) && preg_match('/^"+(.+?)"+$/', $id, $matches)) {
+                $id = $matches[1];
+            }
+            return (int) $id;
+        }, $ids);
+
+        // Récupération de l'opération batch
         $batchOperation = $batchOperationRegistry->getByName($id);
-
-
         if (!$batchOperation) {
             throw new NotFoundHttpException('Operation not found: ' . $id);
         }
 
-        $options = is_array($options) ? $options : [];
         $batchOperation->setOptions($options);
-
+        //dump($options);
+        // Exécution de l'opération avec les IDs nettoyés
         return $batchOperation->execute($ids, $options);
     }
+
 
     /**
      * @Rest\View

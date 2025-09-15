@@ -45,7 +45,8 @@ abstract class AbstractTraineeController extends AbstractController
     #[Route(path: '/search', name: 'trainee.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function search(Request $request, ManagerRegistry $managerRegistry, TraineeSearchRepository $traineeSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = (string) $request->request->get('keyword', '');
+        $keywords = (string) ($request->request->get('keyword') ?? $request->request->get('keywords') ?? '');
+        //dump($request->query->all(), $request->request->all());
         $filters = $request->request->all('filters')  ?: [];
         $query_filters = $request->request->all('query_filters') ?: [];
         $aggs = $request->request->all('aggs') ?:[] ;
@@ -116,8 +117,8 @@ abstract class AbstractTraineeController extends AbstractController
 
         // Recherche avec query (pour autocompletion)
         // on transforme le champ 'query' en 'keywords'
-        if (isset($query['match']['fullname.autocomplete']['query'])) {
-            $keywords = (string)$query['match']['fullname.autocomplete']['query'];
+        if (isset($query) && isset($query['match']['fullname.autocomplete']['query'])) {
+            $keywords = $query['match']['fullname.autocomplete']['query'];
             $ret = $traineeSearchRepository->getTraineesList($keywords, $filters, $page, $size, $sorts, $fields);
         }
 
@@ -243,8 +244,8 @@ abstract class AbstractTraineeController extends AbstractController
             //Pour chaque civilité on teste la requête
             foreach($allTitles as $allTitle){
                 $nbTraineesTitles = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, $aggs, $allTitle->getName());
-                if ($nbTraineesTitles > 0) {
-                    $tabTitles[$i] = [ 'key' => $allTitle->getName(), 'doc_count' => $nbTraineesTitles];
+                if ($nbTraineesTitles['total'] > 0) {
+                    $tabTitles[$i] = [ 'key' => $allTitle->getName(), 'doc_count' => $nbTraineesTitles['total']];
                     ++$i;
                 }
             }
@@ -259,14 +260,46 @@ abstract class AbstractTraineeController extends AbstractController
             $i = 0; $tabInst = [];
             //Pour chaque établissement on teste la requête
             foreach($allInst as $inst){
-                $nbTraineesInst = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, $aggs, $inst->getName());
-                if ($nbTraineesInst > 0) {
-                    $tabInst[$i] = [ 'key' => $inst->getName(), 'doc_count' => $nbTraineesInst];
+                $nbTraineesInst = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, ['institution' => true], $inst->getName());
+                if ($nbTraineesInst['total']  > 0) {
+                    $tabInst[$i] = [ 'key' => $inst->getName(), 'doc_count' => $nbTraineesInst['total'] ];
                     ++$i;
                 }
             }
 
             $tabAggs['institution.name.source']['buckets'] = $tabInst;
+        }
+
+        // CONSTRUCTION DATE INSCRIPTION
+        if (isset($aggs['createdAt'])) {
+
+            // Récupération de la plage de dates
+            $dates = explode('-', (string) $aggs['createdAt']);
+
+            $dateFrom = date('Y-m-d 00:00:00', strtotime(trim($dates[0])));
+            $dateTo   = isset($dates[1])
+                ? date('Y-m-d 23:59:59', strtotime(trim($dates[1])))
+                : date('Y-m-d 23:59:59', strtotime(trim($dates[0])));
+
+            // QueryBuilder pour compter les trainees par date
+            $qb = $managerRegistry->getRepository(Trainee::class)->createQueryBuilder('t');
+            $qb->select('DATE(t.createdAt) as day, COUNT(t.id) as total')
+                ->andWhere('t.createdAt BETWEEN :dateFrom AND :dateTo')
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo)
+                ->groupBy('day')
+                ->orderBy('day', 'ASC');
+
+            $results = $qb->getQuery()->getResult();
+
+            // Construction des buckets
+            $tabAggs['createdAt']['buckets'] = [];
+            foreach ($results as $row) {
+                $tabAggs['createdAt']['buckets'][] = [
+                    'key' => $row['day'],
+                    'doc_count' => $row['total'],
+                ];
+            }
         }
 
         // CONSTRUCTION PUBLIC TYPE
@@ -276,9 +309,9 @@ abstract class AbstractTraineeController extends AbstractController
             $i = 0; $tabPublicTypes = [];
             //Pour chaque public type on teste la requête
             foreach($allPublictypes as $allPublictype){
-                $nbTraineesPt = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, $aggs, $allPublictype->getName());
-                if ($nbTraineesPt > 0) {
-                    $tabPublicTypes[$i] = [ 'key' => $allPublictype->getName(), 'doc_count' => $nbTraineesPt];
+                $nbTraineesPt = $traineeSearchRepository->getNbTrainees($query_filters, $keyword, ['publicType' => true],  $allPublictype->getName());
+                if ($nbTraineesPt['total'] > 0) {
+                    $tabPublicTypes[$i] = [ 'key' => $allPublictype->getName(), 'doc_count' => $nbTraineesPt['total']];
                     ++$i;
                 }
             }

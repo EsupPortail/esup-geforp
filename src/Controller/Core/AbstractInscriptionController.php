@@ -4,12 +4,18 @@ namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Presence;
+use App\Entity\Back\Trainee;
+use App\Entity\Core\AbstractInstitution;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Core\AbstractTraining;
+use App\Entity\PersonTrait\PersonTrait;
 use App\Entity\Term\Presencestatus;
 use App\Entity\Term\Publictype;
 use App\Entity\Back\Inscription;
 use App\Entity\Back\Institution;
 use App\Entity\Back\Organization;
 use App\Entity\Term\Theme;
+use App\Entity\Term\Trainingcategory;
 use App\Form\Type\InscriptionType;
 use App\Form\Type\BaseInscriptionType;
 use App\Repository\InscriptionSearchRepository;
@@ -51,8 +57,8 @@ abstract class AbstractInscriptionController extends AbstractController
     #[Rest\View(serializerGroups: ["Default", "inscription"] ,serializerEnableMaxDepthChecks: true)]
     public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, InscriptionSearchRepository $inscriptionSearchRepository, AccessRightRegistry $accessRightRegistry): array
     {
-        $keywords = (string)$request->request->get('keywords', '');
-        $filters = $request->request->all('filters') ?: [];
+        $keywords = (string)$request->request->get('keywords') ?? "";
+        $filters = $request->request->all('filters') ?? [];
         $query_filters = $request->request->all('query_filters') ?: [];
         $aggs = $request->request->all('aggs') ?: [];
         $page = $request->request->get('page', 1);
@@ -67,7 +73,7 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $inscriptionSearchRepository->getInscriptionsList(keyword: $keywords, filters: $filters, formatCreatedAt: 'd-m-y', page: (int)$page, pageSize: (int)$size, sorts: $sorts, fields: $fields);
+        $ret = $inscriptionSearchRepository->getInscriptionsList(keyword: $keywords, filters: $filters, formatCreatedAt: 'd/m/Y', page: (int)$page, pageSize: (int)$size, sorts: $sorts, fields: $fields);
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $inscriptionSearchRepository);
 
         // Concatenation des resultats
@@ -176,6 +182,10 @@ abstract class AbstractInscriptionController extends AbstractController
 
     private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\InscriptionSearchRepository $inscriptionSearchRepository): array
     {
+        if ($aggs === null) {
+            return [];
+        }
+
         $tabAggs = [];
 
         // CONSTRUCTION CENTRES
@@ -186,8 +196,9 @@ abstract class AbstractInscriptionController extends AbstractController
             //Pour chaque centre on teste la requête
             foreach($allOrganizations as $allOrganization){
                 $nbInscriptionsOrg = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allOrganization->getName());
-                if ($nbInscriptionsOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbInscriptionsOrg];
+                if ($nbInscriptionsOrg['total'] > 0) {
+                    //dump($nbInscriptionsOrg);
+                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => (int) $nbInscriptionsOrg['total']];
                     ++$i;
                 }
             }
@@ -201,11 +212,19 @@ abstract class AbstractInscriptionController extends AbstractController
 
             $i = 0; $tabStatInsc = [];
             //Pour chaque statut d'inscription on teste la requête
-            foreach($allInscStatus as $allInscRectorPrefix202304Status){
-                $nbInscriptionsStat = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allInscRectorPrefix202304Status->getName());
-                if ($nbInscriptionsStat > 0) {
-                    $tabStatInsc[$i] = [ 'key' => $allInscRectorPrefix202304Status->getName(), 'doc_count' => $nbInscriptionsStat];
-                    ++$i;
+            foreach($allInscStatus as $allInscStatut){
+                $nbInscriptionsStat = $inscriptionSearchRepository->getNbInscriptions(
+                    $query_filters,
+                    $keyword,
+                    $aggs,
+                    $allInscStatut->getName(),
+                );
+
+                if ($nbInscriptionsStat['total'] > 0) {
+                    $tabStatInsc[] = [
+                        'key' => $allInscStatut->getName(),
+                        'doc_count' =>  $nbInscriptionsStat['total']
+                    ];
                 }
             }
 
@@ -220,8 +239,8 @@ abstract class AbstractInscriptionController extends AbstractController
             //Pour chaque statut de présence on teste la requête
             foreach($allPresStatus as $allPreRectorPrefix202304Status){
                 $nbPresStat = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allPreRectorPrefix202304Status->getName());
-                if ($nbPresStat > 0) {
-                    $tabStatPres[$i] = [ 'key' => $allPreRectorPrefix202304Status->getName(), 'doc_count' => $nbPresStat];
+                if ($nbPresStat['total'] > 0) {
+                    $tabStatPres[$i] = [ 'key' => $allPreRectorPrefix202304Status->getName(), 'doc_count' => $nbPresStat['total']];
                     ++$i;
                 }
             }
@@ -236,8 +255,8 @@ abstract class AbstractInscriptionController extends AbstractController
             //Pour chaque établissement on teste la requête
             foreach($allInstitutions as $allInstitution){
                 $nbInscriptionsInst= $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allInstitution->getName());
-                if ($nbInscriptionsInst > 0) {
-                    $tabInst[$i] = [ 'key' => $allInstitution->getName(), 'doc_count' => $nbInscriptionsInst];
+                if ($nbInscriptionsInst['total'] > 0) {
+                    $tabInst[$i] = [ 'key' => $allInstitution->getName(), 'doc_count' => $nbInscriptionsInst['total']];
                     ++$i;
                 }
             }
@@ -246,20 +265,83 @@ abstract class AbstractInscriptionController extends AbstractController
         }
 
         // CONSTRUCTION TYPE DE PERSONNEL
-        if(isset( $aggs['publicType.source'])){
-            $allPublicTypes = $managerRegistry->getRepository(Publictype::class)->findAll();
+        $tabAggs['publicType.source'] = ['buckets' => []];
 
+        if (isset($aggs['publicType.source'])) {
+            $allPublicTypes = $managerRegistry->getRepository(Publictype::class)->findAll();
             $i = 0; $tabPub = [];
-            //Pour chaque établissement on teste la requête
-            foreach($allPublicTypes as $allPublicType){
-                $nbInscriptionsPub= $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allPublicType->getName());
-                if ($nbInscriptionsPub > 0) {
-                    $tabPub[$i] = [ 'key' => $allPublicType->getName(), 'doc_count' => $nbInscriptionsPub];
-                    ++$i;
+
+            foreach ($allPublicTypes as $allPublicType) {
+                $nbInscriptionsPub = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allPublicType->getName());
+                if ($nbInscriptionsPub['total'] > 0) {
+                    $tabPub[$i++] = [
+                        'key' => $allPublicType->getName(),
+                        'doc_count' => $nbInscriptionsPub['total']
+                    ];
                 }
             }
 
             $tabAggs['publicType.source']['buckets'] = $tabPub;
+        }
+
+        // CONSTRUCTION ÉTABLISSEMENT ACTUEL
+        $tabAggs['trainee.institution.name.source'] = ['buckets' => []];
+
+        if (isset($aggs['trainee.institution.name.source'])) {
+            $qb = $managerRegistry->getRepository(Inscription::class)->createQueryBuilder('i');
+
+            // Jointure vers trainee puis institution
+            $qb->leftJoin('i.trainee', 't')
+                ->leftJoin('t.institution', 'inst')
+                ->select('inst.name AS institutionName, COUNT(i.id) AS total')
+                ->groupBy('inst.id')
+                ->orderBy('total', 'DESC');
+
+            if (!empty($query_filters)) {
+            }
+
+            $results = $qb->getQuery()->getResult();
+
+            $buckets = [];
+            foreach ($results as $row) {
+                if (!empty($row['institutionName'])) {
+                    $buckets[] = [
+                        'key' => $row['institutionName'],
+                        'doc_count' => $row['total'],
+                    ];
+                }
+            }
+
+            $tabAggs['trainee.institution.name.source']['buckets'] = $buckets;
+        }
+
+
+
+        // CONSTRUCTION STAGIAIRE
+        $tabAggs['trainee.fullName.source'] = ['buckets' => []];
+
+        if (isset($aggs['trainee.fullName.source'])) {
+            $qb = $managerRegistry->getRepository(Inscription::class)->createQueryBuilder('i');
+
+            $qb->leftJoin('i.trainee', 't')
+                ->select("CONCAT(t.firstname, ' ', t.lastname) AS fullName, COUNT(i.id) AS total")
+                ->groupBy('t.id')
+                ->orderBy('total', 'DESC');
+
+            // réapplique ici tes filtres globaux si nécessaire
+            $results = $qb->getQuery()->getResult();
+
+            $buckets = [];
+            foreach ($results as $row) {
+                if (!empty($row['fullName'])) {
+                    $buckets[] = [
+                        'key' => $row['fullName'],
+                        'doc_count' => $row['total'],
+                    ];
+                }
+            }
+
+            $tabAggs['trainee.fullName.source']['buckets'] = $buckets;
         }
 
         // CONSTRUCTION ANNEE
@@ -274,8 +356,8 @@ abstract class AbstractInscriptionController extends AbstractController
             //Pour chaque établissement on teste la requête
             foreach($allYears as $allYear){
                 $nbInscriptionsYear= $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allYear);
-                if ($nbInscriptionsYear > 0) {
-                    $tabYear[$i] = [ 'key' => $allYear, 'doc_count' => $nbInscriptionsYear];
+                if ($nbInscriptionsYear['total'] > 0) {
+                    $tabYear[$i] = [ 'key' => $allYear, 'doc_count' => $nbInscriptionsYear['total']];
                     ++$i;
                 }
             }
@@ -289,8 +371,8 @@ abstract class AbstractInscriptionController extends AbstractController
             //Pour chaque semestre on teste la requête
             foreach(self::ALL_SEMESTERS as $semester){
                 $nbInsSem = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $semester);
-                if ($nbInsSem > 0) {
-                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbInsSem];
+                if ($nbInsSem['total'] > 0) {
+                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbInsSem['total']];
                     ++$i;
                 }
             }
@@ -298,24 +380,78 @@ abstract class AbstractInscriptionController extends AbstractController
             $tabAggs['session.semester']['buckets'] = $tabSemesters;
         }
 
+// CONSTRUCTION TYPE DE FORMATION
+        $tabAggs['session.training.typeLabel.source'] = ['buckets' => []];
+
+        if (isset($aggs['session.training.typeLabel.source'])) {
+            $allCategories = $managerRegistry->getRepository(Trainingcategory::class)->findAll();
+            $i = 0;
+            $tabTypes = [];
+
+            foreach ($allCategories as $category) {
+                $typeLabel = $category->getName();
+                $nbType = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $typeLabel, 'session.training.typeLabel');
+                if ($nbType['total'] > 0) {
+                    $tabTypes[] = [
+                        'key'       => $typeLabel,
+                        'doc_count' => $nbType['total'],
+                    ];
+                }
+            }
+
+            $tabAggs['session.training.typeLabel.source']['buckets'] = $tabTypes;
+        }
+
+        // CONSTRUCTION FORMATION
+        $tabAggs['session.training.name.source'] = ['buckets' => []];
+
+        if (isset($aggs['session.training.name.source'])) {
+            $allTraining = $managerRegistry->getRepository(AbstractTraining::class)->findAll();
+            $i = 0; $tabTr = [];
+            //Pour chaque Formation on teste la requête
+            foreach($allTraining as $Training){
+                $nbInscTraining = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $Training->getName(), 'session.training.name' );
+                if ($nbInscTraining['total'] > 0) {
+                    $tabTr[$i++] = [ 'key' => $Training->getName(), 'doc_count' => (int)$nbInscTraining['total']];
+                }
+            }
+            $tabAggs['session.training.name.source']['buckets'] = $tabTr;
+        }
+
         // CONSTRUCTION DOMAINES DE FORMATION
+        $tabAggs['session.training.theme.name'] = ['buckets' => []];
+
         if (isset($aggs['session.training.theme.name'])) {
             $allThemes = $managerRegistry->getRepository(Theme::class)->findAll();
             $i = 0; $tabTh = [];
             //Pour chaque thème on teste la requête
             foreach($allThemes as $allTheme){
                 $nbInscThemes = $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $allTheme->getName());
-                if ($nbInscThemes > 0) {
-                    $tabTh[$i] = [ 'key' => $allTheme->getName(), 'doc_count' => $nbInscThemes];
-                    ++$i;
+                if ($nbInscThemes['total'] > 0) {
+                    $tabTh[$i++] = [ 'key' => $allTheme->getName(), 'doc_count' => (int)$nbInscThemes['total']];
                 }
             }
 
             $tabAggs['session.training.theme.name']['buckets'] = $tabTh;
         }
 
-
-
+        if (empty($aggs)) {
+            return [
+                // Renvoie quand même une structure vide attendue par le front
+                'session.training.organization.name.source' => ['buckets' => []],
+                'inscriptionStatus.name.source' => ['buckets' => []],
+                'presenceStatus.name.source' => ['buckets' => []],
+                'institution.name.source' => ['buckets' => []],
+                'publicType.source' => ['buckets' => []],
+                'trainee.fullName.source' => ['buckets' => []],
+                'session.year' => ['buckets' => []],
+                'session.semester' => ['buckets' => []],
+                'session.training.typeLabel.source' => ['buckets' => []],
+                'session.training.name.source' => ['buckets' => []],
+                'session.training.theme.name' => ['buckets' => []],
+            ];
+        }
+        //dump($aggs);
         return $tabAggs;
     }
 }

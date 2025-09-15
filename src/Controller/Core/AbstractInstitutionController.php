@@ -142,9 +142,9 @@ abstract class AbstractInstitutionController extends AbstractController
             $i = 0; $tabCit = [];
             //Pour chaque ville on teste la requête
             foreach($allCities as $allCity){
-                $nbInstPub= $institutionRepository->getNbInstitutions($query_filters, $keyword, $aggs, $allCity);
-                if ($nbInstPub > 0) {
-                    $tabCit[$i] = [ 'key' => $allCity, 'doc_count' => $nbInstPub];
+                $nbInstPub= $institutionRepository->getNbInstitutions($query_filters, $keyword, ['city' => true], $allCity);
+                if ($nbInstPub['total'] > 0) {
+                    $tabCit[$i] = [ 'key' => $allCity, 'doc_count' => $nbInstPub['total']];
                     ++$i;
                 }
             }
