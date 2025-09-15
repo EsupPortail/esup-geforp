@@ -18,6 +18,7 @@
             <td>{{ item.institution.name }}</td>
             <td>
                     <span class="label"
+                          style="color: black"
                           ng-class="{'label-danger' : item.isactive == false, 'label-default' : item.isactive == true}">
                         {{ item.isactive ? 'Oui' : 'Non' }}
                     </span>
