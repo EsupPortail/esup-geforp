@@ -16,8 +16,8 @@ var assets = require('./config/assets');
 /***
  * Scripts
  */
-gulp.task('scripts', ['templates'], function(){
-    gulp.src(assets.scripts.scripts.concat(['public/build/templates.js']))
+gulp.task('scripts', ['templates', 'ckeditor'], function(){
+    gulp.src(assets.scripts.scripts.concat(['public/build/templates.js', 'public/build/ckeditor.js']))
         .pipe(concat('scripts.js'))
         .pipe(gulp.dest('public/build'));
 
@@ -25,7 +25,10 @@ gulp.task('scripts', ['templates'], function(){
         .pipe(concat('scss.js'))
         .pipe(gulp.dest('public/build'));
 
-    gulp.src(assets.scripts["front-add"])
+	gulp.src(assets.scripts.bootstrapbundle)
+        .pipe(gulp.dest('public/build'));
+    
+	gulp.src(assets.scripts["front-add"])
             .pipe(gulp.dest('public/build'));
 
 
@@ -124,6 +127,18 @@ gulp.task('templates', function(){
         .pipe(gulp.dest('public/build')); */
 
     //.pipe(notify({ message: 'templated!' }));
+});
+
+/***
+ * CKEDITOR
+ ***/
+gulp.task('ckeditor', function() {
+    gulp.src(['bower_components/ckeditor/*','bower_components/ckeditor/*/**'])
+        .pipe(gulp.dest('public/build/ckeditor'));
+
+    gulp.src(['bower_components/base64image/*','bower_components/base64image/*/**'])
+        .pipe(gulp.dest('public/build/ckeditor/plugins/base64image'));
+
 });
 
 /**
