@@ -9,6 +9,7 @@
 
 namespace App\BatchOperations\Generic;
 
+use App\Entity\Back\Session;
 use Doctrine\ORM\EntityManager;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\User;
@@ -36,7 +37,11 @@ class CSVBatchOperation extends AbstractBatchOperation
      * @var string
      */
     private const string SQL = <<<SQL
-        SELECT t.name FROM tag t, training__training_tag i_t, training train WHERE train.id = :trainingId and i_t.training_id = train.id and i_t.tag_id = t.id 
+        SELECT t.name
+FROM tag t
+JOIN training__training_tag i_t ON i_t.tag_id = t.id
+JOIN training train ON train.id = i_t.training_id
+WHERE train.id = :trainingId 
 SQL;
 
     public function __construct(protected Security $security)
@@ -55,7 +60,6 @@ SQL;
     public function execute(array $idList = [], array $options = []): array
     {
         $entities = $this->getObjectList($idList);
-
         // accessor
         $propertyAccessor = PropertyAccess::createPropertyAccessor();
 
@@ -470,7 +474,7 @@ SQL;
 
                         $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
-                        $data[$key] = str_replace('.', ',', $data[$key]);
+                        $data[$key] = str_replace('.', '', (string)$data[$key]);
 
                     }elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
@@ -480,6 +484,10 @@ SQL;
                         $em = $this->doctrine->getManager();
                         $session = $entity;
                         $training = $session->getTraining();
+                        if (!$entity instanceof Session) {
+                            $data[$key] = '';
+                            continue;
+                        }
                         $trainingId = $training->getId();
                         $rsm = new ResultSetMapping();
                         $rsm->addScalarResult('name', 'name');
@@ -497,7 +505,7 @@ SQL;
                         $data[$key] = $rvalue ?: '';
                     } elseif ($key == "date.lieu") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', (string) $key);
+                        $key = str_replace('.', ',', (string) $key);
 
                         $statsNbHeures = [];
                         /** @var EntityManager $em */
@@ -586,6 +594,7 @@ SQL;
                         // Remarques evals
                         $rvalue .= 'Remarques: ' . $evalsMsg . ' | ';
 
+                        $nbEvals = 0;
                         // Nb d'éval
                         $rvalue .= sprintf('Nb evals : %s ', $nbEvals);
 
@@ -655,7 +664,7 @@ SQL;
                     $data[$key] = '';
                 }
             }
-
+           // dump($data);
             $lines[$entity->getId()] = $data;
 //            }
         }

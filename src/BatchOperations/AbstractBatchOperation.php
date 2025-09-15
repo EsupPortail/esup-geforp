@@ -37,6 +37,7 @@ abstract class AbstractBatchOperation implements BatchOperationInterface
 
     public function __construct(){
         $this->options = [];
+        $this->label = "";
     }
     /**
      * @param $id

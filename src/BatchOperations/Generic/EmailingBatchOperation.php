@@ -29,7 +29,8 @@ use Jsvrcek\ICS\CalendarExport;
 use Jsvrcek\ICS\CalendarStream;
 use Jsvrcek\ICS\Utility\Formatter;
 use Symfony\Component\Mime\Part\DataPart;
-final class EmailingBatchOperation extends AbstractBatchOperation
+final class
+EmailingBatchOperation extends AbstractBatchOperation
 {
     use \App\BatchOperations\AttachEmailPublipostAttachment;
 
@@ -135,9 +136,9 @@ final class EmailingBatchOperation extends AbstractBatchOperation
             return [];
         }
 
-        dump($body);
-        dump($entities);
-        dump($this->replaceTokens($body, $entities, $format));
+        //dump($body);
+       // dump($entities);
+        //dump($this->replaceTokens($body, $entities, $format));
 
         if ($preview) {
             return ['email' => ['subject' => $this->replaceTokens($subject, $entities[0]), 'message' => $this->replaceTokens($body, $entities[0])]];
@@ -157,7 +158,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                     $organization = $this->security->getUser()->getOrganization();
 
                 $hrpa = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
-                dump($hrpa);
+                //dump($hrpa);
 
                 $email = $hrpa->email;
                 if (empty($email)) {
@@ -178,8 +179,8 @@ final class EmailingBatchOperation extends AbstractBatchOperation
                 } else
                     $msg->text($bodyR);
 
-               dump($publipostTemplates);
-                dump($publipostIdList);
+               //dump($publipostTemplates);
+                //dump($publipostIdList);
 
                     error_log('Appel de attachPublipostAttachment');
                     $this->attachPublipostAttachment(
@@ -268,8 +269,13 @@ final class EmailingBatchOperation extends AbstractBatchOperation
 
                             $ics = $calendarExport->getStream();
                             // inline it
-                            $attachment = new DataPart($ics, 'inline.ics', 'text/calendar', 'quoted-printable');
-                            $attachment->asInline();
+                            $icalPart = new DataPart(
+                                $ics,
+                                'invite.ics',
+                                        'text/calendar; method=REQUEST, charset=UTF-8',
+                            );
+                            $icalPart->getHeaders()->setHeaderBody('Parameterized', 'Content-Disposition', 'inline');
+                            $msg->addPart($icalPart);
                         } else {
                             // plusieurs dates -> fichier attaché
                             $calendarExport->addCalendar($calendar);
@@ -355,7 +361,7 @@ final class EmailingBatchOperation extends AbstractBatchOperation
 
                 // Gestion des objets DateTime
                 if ($value instanceof \DateTimeInterface) {
-                    return $value->format('d/m/Y');
+                    return $value->format('d/m/Y H');
                 }
 
                 // Gestion des tableaux ou collections

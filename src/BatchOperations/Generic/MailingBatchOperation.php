@@ -14,6 +14,7 @@ use App\Vocabulary\VocabularyRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Exception\NotSupported;
 use MBence\OpenTBSBundle\Services\OpenTBS;
+use App\Utils\HumanReadable\CustomOpenTBS;
 use clsTinyButStrong;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
@@ -279,7 +280,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
                         $lines[0]['nom'] = $data->nom;
                         $lines[0]['prenom'] = $data->prenom;
-                        $lines[0]['dateJour'] = date("d/m/Y");
+                        $lines[0]['dateJour'] = date("d/m/Y H:M");
 
                         // Tri des sessions par date de session
                         $sessions = $entities[0]->getSessions();
@@ -435,31 +436,31 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 return ($dateDebA < $dateDebA) ? -1 : 1;
             }
 
-            $Dates = $entities[0]->getDates();
-            $inscriptions = $entities[0]->getInscriptions();
-            $formateurs = $entities[0]->getTrainers();
+            //dump(get_class($entities[0]));
+            $session = $entities[0];
+            $Dates = $session->getDates();
+            $inscriptions = $session->getInscriptions();
+            $formateurs = $session->getTrainers();
 
             $i = 0;
             $dateDebuts = [];
             $dateFins = [];
             foreach ($Dates as $date) {
                 // Test sur le nombre de jours à afficher
-                $dateDebuts[] = $date->getDatebegin()->getTimestamp();
-                $dateFins[] = $date->getDateend()->getTimestamp();
-                $diffJours = (int) floor(($date->getDateend()->getTimestamp() - $date->getDatebegin()->getTimestamp()) / 86400);;
+                $diffJours = (int) floor(($date->getDateend()->getTimestamp() - $date->getDatebegin()->getTimestamp()) / 86400);
 
                 for ($j = 0; $j < $diffJours + 1; ++$j) {
                     $timestampJour = $date->getDatebegin()->getTimestamp() + $j * 86400;
-                    $lines[$i]['dateDebut'] = date('d/m/Y', $timestampJour);
+                    $lines[$i]['dateDebut'] = date('d/m/Y H:m', $timestampJour);
                     $lines[$i]['dateFin'] = date('d/m/Y', $timestampJour);
                     $lines[$i]['horairesMatin'] = $date->getScheduleMorn();
                     $lines[$i]['horairesAprem'] = $date->getScheduleAfter();
                     $lines[$i]['lieu'] = $date->getPlace();
                     $lines[$i]['nom'] = $data->nom;
 
-                    $lines[$i]['formateurs'] = [];
+                    $lines[$i]['formateur'] = [];
                     foreach ($formateurs as $formateur) {
-                        $lines[$i]['formateurs'][] = ['nom' => $formateur->getLastname(), 'prenom' => $formateur->getFirstname()];
+                        $lines[$i]['formateur'][] = ['nom' => $formateur->getLastname(), 'prenom' => $formateur->getFirstname()];
                     }
 
                     $lines[$i]['inscriptions'] = [];
@@ -486,12 +487,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         // merge all fields from the first object
         //fields are merged one by one, so that we dont have to recall a enity name for global names
         if (!empty($lines)) {
-
                 $clsTinyButStrong->MergeField('global', current($lines));
         }
         reset($lines);
 
      //$clsTinyButStrong->MergeBlock('inscriptions', $lines['inscriptions']);
+
         $clsTinyButStrong->MergeBlock($entityName, $lines);
         $error = ob_get_flush();
         if ($error) {
@@ -503,7 +504,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         }
 
         $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
-        $clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
+
 
         //do we want the file or just infos about it ?
         if ($getFile) {
@@ -754,6 +755,14 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $trainee = $entity->getTrainee();
 
                 $lines[$i] = [
+                    'session' => [
+                        'formation' => [
+                            'nom' => $training->getName(),
+                        ],
+                        ],
+                    'stagiaire' => [
+                            'nom' => $trainee->getLastName(),
+                    ],
                     'typeAction' => $entity->getActiontype(),
                     'motivation' => $entity->getMotivation(),
                     'refus' => $entity->getRefuse(),
@@ -780,12 +789,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
                     'statutInscription' => $entity->getInscriptionStatus()?->getName() ?? '',
                     'statutPresence' => $entity->getPresenceStatus()?->getName() ?? '',
-                    'dates' => [],
                 ];
 
                 foreach ($session->getDates() as $dateSess) {
                     $lines[$i]['dates'][] = [
                         'dateDebut' => $dateSess->getDatebegin()?->format('d/m/Y') ?? '',
+
                         'dateFin' => $dateSess->getDateend()?->format('d/m/Y') ?? '',
                         'horairesMatin' => $dateSess->getSchedulemorn(),
                         'horairesAprem' => $dateSess->getScheduleafter(),
@@ -826,20 +835,18 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $theme = $training->getTheme();
                 $lines[$i] = [
                     'datesString' => $entity->getDatesString(),
-                    'dateDebut' => $entity->getDatebegin()?->format('d/m/Y'),
+                    'dateDebut' => $entity->getDatebegin()?->format('d/m/Y H:M'),
                     'name' => $entity->getName(),
-                    dump($entity->getName()),
                     'centre.nom' => $organization?->getName(),
                     'domaine' => $theme?->getName(),
                     'listeFormateurs' => $entity->getTrainersListString(),
                     'inscriptions' => [],
-                    'dates' => [],
                 ];
 
                 foreach ($entity->getDates() as $dateSess) {
                     $lines[$i]['dates'][] = [
-                        'dateDebut' => $dateSess->getDatebegin()?->format('d/m/Y') ?? '',
-                        'dateFin' => $dateSess->getDateend()?->format('d/m/Y') ?? '',
+                        'dateDebut' => $dateSess->getDatebegin()?->format('d/m/Y H:M') ?? '',
+                        'dateFin' => $dateSess->getDateend()?->format('d/m/Y H:M') ?? '',
                         'horairesMatin' => $dateSess->getSchedulemorn(),
                         'horairesAprem' => $dateSess->getScheduleafter(),
                         'nbHeuresMatin' => $dateSess->getHournumbermorn(),
