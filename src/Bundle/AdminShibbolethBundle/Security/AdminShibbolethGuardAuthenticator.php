@@ -80,7 +80,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
     /**
      * @param AuthenticationException|null $authenticationException
      */
-    public function start(Request $request, AuthenticationException $authenticationException = null): RedirectResponse
+    public function start(Request $request, AuthenticationException $authenticationException = null): Response
     {
         return new RedirectResponse(sprintf('%s/', $request->getSchemeAndHttpHost()).trim($this->login_path, '/')."?target=".(empty($this->login_target)? $request->getUri() : $request->getSchemeAndHttpHost() . $this->router->generate($this->login_target)));
     }
@@ -118,7 +118,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
     /**
      * @return JsonResponse
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): JsonResponse
+    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): Response
     {
 //        return new JsonResponse(array('message' => $exception->getMessageKey()), Response::HTTP_FORBIDDEN);
         return new JsonResponse(['message' => "Vous n'avez pas les droits pour accéder à cette application"], Response::HTTP_FORBIDDEN);
@@ -128,7 +128,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
      * @param string $providerKey
      * @return null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): null
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         return null;
     }
