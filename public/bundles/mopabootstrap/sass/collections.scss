@@ -1,0 +1,11 @@
+/*!
+ * MopaBootstrapBundle collection support
+ */
+.row, .form-group {
+    .collection-item {
+        margin-bottom: 9px;
+        padding-left: ($grid-gutter-width / 2);
+        padding-right: ($grid-gutter-width / 2);
+        @include clearfix();
+    }
+}
