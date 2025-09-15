@@ -19,6 +19,8 @@
     {% block stylesheets %}{% endblock %}
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}"/>
 </head>
+
+<script src="{{ asset('build/bootstrap.bundle.min.js') }}"></script>
 <body class="{{ body_classes is defined ? body_classes|join(" ") : '' }}">
 <!-- body -->
 {% block body %}
