@@ -149,11 +149,15 @@ final class TrainingRepository extends ServiceEntityRepository
             $qb->addOrderBy('category.name', $sorts['training.category.source']);
         } else
             $qb->addOrderBy('training.name');
-
-
-
+        
         // PAGINATION
-        $page = max(1, (int)$page);
+        if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
+            // on met une valeur par défaut (pour l'autocompletion)
+            $page = 1;
+            $pageSize = 50;
+            
+        }
+                $page = max(1, (int)$page);
         $pageSize = max(1, (int)$pageSize);
         $offset = ($page - 1) * $pageSize;
 

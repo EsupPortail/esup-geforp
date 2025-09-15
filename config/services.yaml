@@ -55,6 +55,7 @@ parameters:
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
+                    training.number: "Numéro de stage"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
                     training.theme.name: "Thématique"
@@ -89,6 +90,8 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
+                    taking: "Recettes"
+                    individualcost: "Coût par stagiaire"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
                     comments: "Commentaires"
                     evalResume: "Evaluations"
@@ -168,6 +171,7 @@ parameters:
                     session.training.supervisor.name: "Nom du responsable pédagogique"
                     session.training.supervisor.first_name: "Prénom du responsable pédagogique"
                     session.training.theme.name: "Domaine de formation"
+                    session.training.category.name: "Type de formation"
                     session.dayNumber: "Nombre de jours"
                     session.totalCost: "Coût total de la session"
                     inscriptionStatus.name: "Statut de l'inscription"

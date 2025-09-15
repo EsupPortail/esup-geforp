@@ -13,6 +13,7 @@
                 <th>Statut</th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -31,6 +32,11 @@
                     {% endif %}
                     <td>
                         {% include 'Front/Account/registration/inscription-status-label.html.twig' %}
+                    </td>
+                    <td>
+                        {% if registration.inscriptionStatus.machinename == 'defavorable' %}
+                            {{ registration.refuse }}
+                        {% endif %}
                     </td>
                     <td>
                         {% if relance == true %}

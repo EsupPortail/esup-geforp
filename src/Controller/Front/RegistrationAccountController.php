@@ -262,8 +262,16 @@ class RegistrationAccountController extends AbstractController
             }
         }
         $newbody = str_replace("[dates]", $Texte, $newbody);
+        $newbody = str_replace("[motivation]", $registration->getMotivation(), $newbody);
         $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
         $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
+        $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+        $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
+        $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
+        $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
+        $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
+        $newbody = str_replace("[session.nom]", $registration->getSession()->getName(), $newbody);
+
         $newbody = str_replace("[lien]", $lien, $newbody);
 
         $message = (new Email())
@@ -436,6 +444,7 @@ class RegistrationAccountController extends AbstractController
                                     }
                                 }
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
+                                $newbody = str_replace("[refuse]", $registration->getRefuse(), $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);

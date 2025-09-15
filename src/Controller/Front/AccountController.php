@@ -117,6 +117,7 @@ final class AccountController extends AbstractController
             }
             $this->logger->debug('Shibboleth attributes: ' . json_encode($shibbolethAttributes, JSON_PRETTY_PRINT));
             $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
+            $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
             if ($shibbolethAttributes['primary-affiliation'] == "staff") {
                 // Transformation de l'attribut 'staff' en 'employee'
                 $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -372,6 +373,7 @@ final class AccountController extends AbstractController
         }
 
         $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
+        $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";

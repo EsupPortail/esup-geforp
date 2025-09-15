@@ -20,22 +20,22 @@
                 <th>Lieu</th>
                 <th>Modifier</th>
                 <th>Supprimer</th>
+                <th>Dupliquer</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="date in session.dates | orderBy:'datebegin':false">
                 <!--form sf-xeditable-form="form" sf-href='dates.edit({dates: date })' on-success="onSuccess(data)"-->
-                <td>{{ date.datebegin|date: 'dd/MM/yyyy' }}</td>
-                <td>{{ date.dateend|date: 'dd/MM/yyyy' }}</td>
-                <td>{{ date.schedulemorn }}</td>
-                <td>{{ date.hournumbermorn }}</td>
-                <td>{{ date.scheduleafter }}</td>
-                <td>{{ date.hournumberafter }}</td>
-                <td>{{ date.place }}</td>
-                <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span
-                        class="fa fa-pencil"></span></a></td>
-                <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span
-                        class="fa fa-trash-o"></span></a></td>
+                    <td>{{ date.datebegin|date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.dateend|date: 'dd/MM/yyyy' }}</td>
+                    <td>{{ date.schedulemorn }}</td>
+                    <td>{{ date.hournumbermorn }}</td>
+                    <td>{{ date.scheduleafter }}</td>
+                    <td>{{ date.hournumberafter }}</td>
+                    <td>{{ date.place }}</td>
+                    <td><a class="btn btn-fa" href="" ng-click="editDates(date)" tooltip="Modifier"><span class="fa fa-pencil"></span></a></td>
+                    <td><a class="btn btn-fa" href="" ng-click="removeDates(date)" tooltip="Supprimer"><span class="fa fa-trash-o"></span></a></td>
+                    <td><a class="btn btn-fa" href="" ng-click="duplicateDates(date)" tooltip="Dupliquer"><span class="fa fa-copy"></span></a></td>
                 <!--/form-->
             </tr>
             </tbody>

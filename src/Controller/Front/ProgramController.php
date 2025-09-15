@@ -270,7 +270,7 @@ class ProgramController extends AbstractController
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
                 $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
-                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
             $form = $this->createForm(InscriptionType::class, $inscription);
@@ -320,6 +320,8 @@ class ProgramController extends AbstractController
                         $newbody = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastname(), $newbody);
                         $newbody = str_replace("[session.dateDebut]", $inscription->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                         $newbody = str_replace("[session.dateFin]", $inscription->getSession()->getDateend()->format('d/m/Y'), $newbody);
+                        $newbody = str_replace("[session.nom]", $inscription->getSession()->getName(), $newbody);
+                        $newbody = str_replace("[motivation]", $inscription->getMotivation(), $newbody);
                         $newbody = str_replace("[lien]", $lien, $newbody);
 
                         // Envoyer un mail au supérieur hiérarchique
