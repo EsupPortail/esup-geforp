@@ -37,3 +37,71 @@
     {{ form_end(form) }}
 
 {% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('/build/ckeditor/ckeditor.js') }}"></script>
+
+    <script type="application/javascript">
+        (function($) {
+            const position = document.getElementById('email_template_vocabulary_position');
+            var positionValue = position.value;
+            if (positionValue==1) {
+                $('[ckeditor]').each(function () {
+                    var config = {
+                        language: 'fr',
+                        extraPlugins: "base64image",
+                        toolbar: [
+                            /*                        { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },*/
+                            { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
+                            { name: 'editing', items: [ 'Scayt' ] },
+                            /*                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },*/
+                            { name: 'links', items: [ 'Link', 'Unlink' ] },
+                            { name: 'insert', items: [ 'base64image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+                            { name: 'document', items: [ 'Source' ] },
+                            '/',
+                            { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
+                            { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', ] },
+                            /*                        { name: 'styles', items: [ 'Styles', 'Format' ] },*/
+                        ]
+                    };
+                    CKEDITOR.replace(this.id, config);
+                });
+            }
+
+            //change
+            position.addEventListener('change', changeCkeditor);
+
+            function changeCkeditor() {
+                if (position.value == 1) {
+                    $('[ckeditor]').each(function () {
+                        var config = {
+                            language: 'fr',
+                            extraPlugins: "base64image",
+                            toolbar: [
+                                /*                        { name: 'clipboard', items: [ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo' ] },*/
+                                { name: 'clipboard', items: [ 'Undo', 'Redo' ] },
+                                { name: 'editing', items: [ 'Scayt' ] },
+                                /*                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },*/
+                                { name: 'links', items: [ 'Link', 'Unlink' ] },
+                                { name: 'insert', items: [ 'base64image', 'Table', 'HorizontalRule', 'SpecialChar' ] },
+                                { name: 'document', items: [ 'Source' ] },
+                                '/',
+                                { name: 'basicstyles', items: [ 'Bold', 'Italic', 'Strike', '-', 'RemoveFormat' ] },
+                                { name: 'paragraph', items: [ 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', ] },
+                                /*                        { name: 'styles', items: [ 'Styles', 'Format' ] },*/
+                            ]
+                        };
+                        CKEDITOR.replace(this.id, config);
+                    });
+                } else {
+                    $('[ckeditor]').each(function () {
+                        if (CKEDITOR.instances.hasOwnProperty(this.id)) {
+                            CKEDITOR.instances[this.id].destroy();
+                        }
+                    });
+                }
+            }
+
+        }(jQuery));
+    </script>
+{% endblock %}

@@ -41,6 +41,10 @@ sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function ($s
         getFacetItemsTimeout = $timeout(function () {
             return $scope.search.fetchAggregation(name, options).then(function (agg) {
                 var items = [];
+                if (!agg || !agg.buckets) {
+                    console.error('fetchAggregation returned invalid agg:', agg);
+                    return [];
+                }
                 for (var i = 0; i < agg.buckets.length; i++) {
                     var key = agg.buckets[i].key;
                     items.push({
@@ -119,8 +123,10 @@ sygeforApp.controller('SearchBoxController', ['$scope', '$timeout', function ($s
 
             // empty all the filters based on facets
             // @todo : searchbox must return empty value for each facet
-            for (var i = 0; i < oldParams.length; i++) {
-                delete query.filters[oldParams[i].key];
+            if (Array.isArray(oldParams)) {
+                for (var i = 0; i < oldParams.length; i++) {
+                    delete query.filters[oldParams[i].key];
+                }
             }
 
             // fill the query with params
