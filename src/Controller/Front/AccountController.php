@@ -50,7 +50,7 @@ final class AccountController extends AbstractController
 
         // Récupération des attributs Shibboleth pour mise à jour du profil
         $shibbolethAttributes = $this->getUser()->getCredentials();
-dump($this->getUser());
+//dump($this->getUser());
         //$trainee = $this->getUser();
         $userEmail = $this->getUser()->getCredentials()['mail'];
         // on utilise l'eppn comme persistent-id
@@ -58,7 +58,7 @@ dump($this->getUser());
         $userPersitentId = $this->getUser()->getCredentials()['eppn'];
 
         if (isset($userPersitentId)) {
-            dump($arTrainee, "c'est bon");
+           // dump($arTrainee);
             $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethPersistentId" => $userPersitentId]);
             if ($arTrainee !== null) {
             } elseif (isset($userEmail)) {
