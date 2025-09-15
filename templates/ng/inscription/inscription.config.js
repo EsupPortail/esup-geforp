@@ -270,4 +270,28 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", "$widgetProvider", f
             }
         }
     });
+
+    $widgetProvider.widget("favorable", /* @ngInject */ {
+        controller: 'WidgetListController',
+        templateUrl: 'inscription/widget/favorable.html',
+        options: function($user, $filter) {
+            return {
+                route: 'inscription.search',
+                rights: ['sygefor_inscription.rights.inscription.own.view'],
+                state: 'inscription.table',
+                title: 'Derniers avis favorables du N+1',
+                size: 10,
+                filters:{
+                    'inscriptionStatus.name.source': 'Avis favorable du N+1',
+                    "inscriptionStatusUpdatedAt": {
+                        "type": "range",
+                        "gte": $filter('date')(date, 'yyyy-MM-dd')
+                    },
+                    'session.training.organization.name.source': $user.organization.name
+                },
+                sorts: {'inscriptionStatusUpdatedAt': 'desc'}
+            }
+        }
+    });
+
 }]);

@@ -1,6 +1,5 @@
 {% extends "html.html.twig" %}
 {% from '@MopaBootstrap/flash.html.twig' import session_flash %}
-
 {% set ngApp = ngApp is defined ? ngApp : 0 %}
 
 {% block body %}
@@ -27,8 +26,10 @@
 
                 <nav class="navbar-collapse collapse" id="bs-navbar" aria-expanded="false">
 
-                    {{ knp_menu_render('main', {'automenu': 'navbar', 'attr': {'class': 'nav navbar-nav'}}) }}
-
+					{{ knp_menu_render('main', {
+                'template': 'bootstrap5_knp_menu.html.twig',
+                'currentClass': 'active'
+            }) }} 
                     <ul class="nav navbar-nav navbar-right">
                         {% if app.user %}
                             <li class="dropdown">
@@ -42,6 +43,7 @@
                         {% endif %}
                     </ul>
                 </nav>
+
             </div>
         </div>
 
