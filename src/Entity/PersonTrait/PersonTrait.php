@@ -35,9 +35,9 @@ trait PersonTrait
      * @ORM\Column(name="last_name", type="string", length=50)
      * @Groups({"Default", "api"})
      */
-    #[ORM\Column(name: 'last_name', type: 'string', length: 50)]
+    #[ORM\Column(name: 'last_name', type: 'string', length: 50, nullable: false)]
     #[Groups(['Default', 'api'])]
-    protected string $lastname = '';
+    protected  ?string $lastname = "";
     
 
     public function setTitle(mixed $title): void
@@ -56,7 +56,7 @@ trait PersonTrait
     /**
      * @param string $firstName
      */
-    public function setFirstname(string $firstName): void
+    public function setFirstname(?string $firstName): void
     {
         $this->firstname = $firstName;
     }
@@ -72,7 +72,7 @@ trait PersonTrait
     /**
      * @param string $lastName
      */
-    public function setLastname(string $lastName): void
+    public function setLastname(?string $lastName): void
     {
         $this->lastname = $lastName;
     }
@@ -80,7 +80,7 @@ trait PersonTrait
     /**
      * @return string
      */
-    public function getLastname(): string
+    public function getLastname(): ?string
     {
         return $this->lastname;
     }

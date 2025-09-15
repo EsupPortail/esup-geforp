@@ -64,7 +64,7 @@ trait AccountTrait
      * @Ignore()
      */
     #[Ignore]
-    #[ORM\Column(name: 'data', type: 'json', nullable: true)]
+    #[ORM\Column(name: 'data', type: 'simple_array', nullable: true)]
     private mixed $data;
 
     /**

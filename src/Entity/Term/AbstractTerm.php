@@ -41,7 +41,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      */
     #[ORM\Column(name: 'name', type: 'string', length: 255)]
     #[Assert\NotBlank]
-    private string $name;
+    private ?string $name = null;
 
     /**
      * @Serializer\Groups({"Default", "api"})
@@ -118,7 +118,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @return string
      */
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

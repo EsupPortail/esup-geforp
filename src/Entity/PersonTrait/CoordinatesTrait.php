@@ -171,7 +171,7 @@ trait CoordinatesTrait
     /**
      * @param string $phoneNumber
      */
-    public function setPhonenumber(string $phoneNumber): void
+    public function setPhonenumber(?string $phoneNumber): void
     {
         $this->phonenumber = $phoneNumber;
     }
