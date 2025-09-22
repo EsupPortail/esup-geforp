@@ -55,7 +55,6 @@ parameters:
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
-                    training.number: "Numéro de stage"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
                     training.theme.name: "Thématique"
@@ -90,8 +89,6 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
-                    taking: "Recettes"
-                    individualcost: "Coût par stagiaire"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
                     comments: "Commentaires"
                     evalResume: "Evaluations"
@@ -171,7 +168,6 @@ parameters:
                     session.training.supervisor.name: "Nom du responsable pédagogique"
                     session.training.supervisor.first_name: "Prénom du responsable pédagogique"
                     session.training.theme.name: "Domaine de formation"
-                    session.training.category.name: "Type de formation"
                     session.dayNumber: "Nombre de jours"
                     session.totalCost: "Coût total de la session"
                     inscriptionStatus.name: "Statut de l'inscription"
@@ -214,7 +210,10 @@ parameters:
                     presences: { property: presences }
                     statutInscription: { property: inscriptionstatus.name }
                     statutPresence: { property: presencestatus.name }
-                    dates: { property: session.dates }
+                    formateur: { property: formateurCivilite }
+                    formation: { property: formationNom }
+                    dates: { property: dates }
+                    commentaires: { property: comments }
                     dateDebut: { property: session.dateDebut }
                     domaine: { property: session.formation.theme }
                     typeAction: { property: actiontype }
@@ -231,8 +230,8 @@ parameters:
                     civilite: { property: title }
                     nomComplet: { property: fullname }
                     nomNaissance: { property: maidenName }
-                    nom: { property: lastname }
-                    prenom: { property: firstname }
+                    nom: { property: Lastname }
+                    prenom: { property: Firstname }
                     emailSup: { property: emailSup }
                     emailCorr: { property: emailCorr }
                     # CoordinatesTrait
@@ -243,6 +242,7 @@ parameters:
                     telephone: { property: phonenumber }
                     # ProfessionalSituationTrait
                     institution: { property: institution }
+                    stagiaire: { property: Trainees }
                     service: { property: service }
                     corps: { property: corps }
                     bap: { property: bap }
@@ -251,6 +251,10 @@ parameters:
                     statut: { property: status }
                     payant: { property: isPaying }
                     # Trainee
+                    dates: { property: DateSession }
+                    commentaires: { property: CommentsSession }
+                    formateur: { property: Civilite }
+                    formation: { property: FormationName}
                     inscriptions: { property: inscriptions }
             trainer:
                 class: 'App\Entity\Back\Trainer'
@@ -260,12 +264,16 @@ parameters:
                 fields:
                     #personTrait
                     civilite: { property: getTitle }
+                    formateur: { property: getTitle }
                     nomComplet: { property: fullname }
+                    formation: { property: SessionName }
                     nom: { property: lastname }
                     prenom: { property: firstname }
                     # CoordinatesTrait
                     adresse: { property: address }
                     codePostal: { property: zip }
+                    dates: { property: DateSession }
+                    commentaires: { property: CommentsSession }
                     ville: { property: city }
                     email: { property: email }
                     fax: { property: faxnumber }
@@ -290,6 +298,7 @@ parameters:
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
+                    prenom: { property: "Lastname" }
                     formateur: { property: "participations[0].trainer" }
                     nombrePlaces: { property: "maximumnumberofregistrations" }
                     nombreInscrits: { property: "numberofregistrations" }
