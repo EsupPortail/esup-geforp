@@ -35,7 +35,7 @@ final class SessionRepository extends ServiceEntityRepository
         if ($keyword != 'NO KEYWORDS') {
             $qb
                 ->where('s.name LIKE :keyword')
-                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                // addcslashes empêchera des manipulations malveillantes éventuelles 
                 ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
         }
 
@@ -53,17 +53,17 @@ final class SessionRepository extends ServiceEntityRepository
 
         //FILTRE DATE
         if( isset($filters['datebegin']) ) {
-            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('/', (string) $filters["datebegin"]);
-            /* on retire les caractères non utiles */
-            $from = str_replace('/','/', $dates[0]);
-            $to = str_replace('/', '/', $dates[1]);
-            /* on convertit au même format qu'en base de données */
-            $dateFrom = date('d/m/y 00:00:00' ,strtotime($from));
-            $dateTo = date('d/m/y 00:00:00',strtotime($to));
+			// Format attendu : "dd/mm/yyyy - dd/mm/yyyy"
+            $dates = explode('-', (string)$filters['datebegin']);
+
+            $from = trim($dates[0] ?? '');
+            $to = trim($dates[1] ?? '');
+
+            $dateFrom = \DateTime::createFromFormat('d/m/Y H:i:s', $from . ' 00:00:00');
+            $dateTo = \DateTime::createFromFormat('d/m/Y H:i:s', $to . ' 23:59:59');
 
             $qb
-                /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
+                // si la date de début d'une session est entre les 2 dates envoyées dans le formulaire 
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
                 ->orderBy('s.datebegin', 'DESC')
                 ->setParameter('dateFrom', $dateFrom)
@@ -78,14 +78,13 @@ final class SessionRepository extends ServiceEntityRepository
                 ->andWhere('th.name in (:themes)')
                 ->setParameter('themes', $filters['theme.name']);
         }
-
-        // TRI DES RESULTATS
+        
+		// TRI DES RESULTATS
         $qb->addOrderBy('th.name')
             ->addOrderBy('s.datebegin')
             ->addOrderBy('s.name');
 
         $query = $qb->getQuery();
-
         return $result = $query->getResult();
     }
 
