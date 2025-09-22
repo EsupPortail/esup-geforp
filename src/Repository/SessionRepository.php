@@ -111,8 +111,7 @@ final class SessionRepository extends ServiceEntityRepository
 
         // FILTRE KEYWORD
         $qb
-            ->where('s.name LIKE :keyword OR s.id = :keywordId')
-            ->setParameter('keywordId', $keyword)
+            ->where('s.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes((string)$keyword, '%_') . '%');
 
@@ -175,10 +174,10 @@ final class SessionRepository extends ServiceEntityRepository
             $dates = explode('-', (string)$filters['datebegin']);
 
             $from = trim($dates[0] ?? '');
-            $to   = trim($dates[1] ?? '');
+            $to = trim($dates[1] ?? '');
 
             $dateFrom = \DateTime::createFromFormat('d/m/Y H:i:s', $from . ' 00:00:00');
-            $dateTo   = \DateTime::createFromFormat('d/m/Y H:i:s', $to   . ' 23:59:59');
+            $dateTo = \DateTime::createFromFormat('d/m/Y H:i:s', $to . ' 23:59:59');
 
             if ($dateFrom && $dateTo) {
                 $qb
@@ -187,24 +186,6 @@ final class SessionRepository extends ServiceEntityRepository
                     ->setParameter('dateFrom', $dateFrom)
                     ->setParameter('dateTo', $dateTo);
             }
-        }
-
-        //FILTRE DATE DE FIN
-        if( isset($filters['dateend']) ) {
-            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
-            $dates = explode('-', $filters["dateend"]);
-            /* on retire les caractères non utiles */
-            $from = str_replace('/','-', $dates[0]);
-            $to = str_replace('/', '-', $dates[1]);
-            /* on convertit au même format qu'en base de données */
-            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
-            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
-
-            $qb
-                /* si la date de fin d'une session est entre les 2 dates envoyées dans le formulaire */
-                ->andWhere("s.dateend BETWEEN :dateFrom AND :dateTo")
-                ->setParameter('dateFrom', $dateFrom)
-                ->setParameter('dateTo', $dateTo);
         }
 
         // FILTRE INSCRIPTION (0,1,2,3)
@@ -254,13 +235,22 @@ final class SessionRepository extends ServiceEntityRepository
                 ->setParameter('trainerFirstName', $firstName);
         }
 
+        $now = new \DateTimeImmutable();
+
+        if (isset($filters['dateend'])){
+            $qb->andWhere('s.dateend < :now')
+                ->setParameter('now', $now);
+        } elseif (isset($filters['datebegin'])){
+            $qb->andWhere('s.datebegin >= :now')
+            ->setParameter('now', $now);
+        }
+
+
         // TRI DES RESULTATS
         if (isset($sorts['training.name.source']))
             $qb->addOrderBy('s.name', $sorts['training.name.source']);
         elseif (isset($sorts['datebegin']))
             $qb->addOrderBy('s.datebegin', $sorts['datebegin']);
-        elseif (isset($sorts['dateend']))
-            $qb->addOrderBy('s.dateend', $sorts['dateend']);
         else
             $qb->addOrderBy('s.datebegin', 'DESC')
                 ->addOrderBy('s.name');
@@ -337,11 +327,19 @@ final class SessionRepository extends ServiceEntityRepository
                     //item.training.TypeLabel
                 ];
 
-                $sessions = $training->getSessions();
+                $lastSession = null;
+                $sessions = $training->getSessions()->toArray();
+
+                if (!empty($sessions)) {
+                    usort($sessions, function ($a, $b) {
+                        return $a->getDatebegin() <= $b->getDatebegin();
+                    });
+                    $lastSession = $sessions[0];
+                }
                 $trainingStats = [];
 
-                foreach ($sessions as $s) {
-                    foreach ($s->getInscriptions() as $insc) {
+                if ($lastSession) {
+                    foreach ($lastSession->getInscriptions() as $insc) {
                         $status = $insc->getInscriptionStatus();
                         $statusId = $status->getId();
 
@@ -360,6 +358,7 @@ final class SessionRepository extends ServiceEntityRepository
                 }
 
                 $sessionES['inscriptionStats'] = array_values($trainingStats);
+
 
                 // Trainers
                 $participations = [];

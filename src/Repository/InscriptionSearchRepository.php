@@ -188,10 +188,9 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             $session = $insc->getSession();
             $training = $session?->getTraining();
             $theme = $training?->getTheme();
-            $organization = $training?->getOrganization();
+            $trainingOrg = $training?->getOrganization();
             $institution = $trainee?->getInstitution();
             $publicType = $trainee?->getPublictype();
-
             $firstname = trim($trainee?->getFirstname() ?? '');
             $lastname = trim($trainee?->getLastname() ?? '');
 
@@ -207,6 +206,10 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 'presencestatus' => $insc->getPresencestatus(),
                 'inscriptionstatus' => $insc->getInscriptionstatus(),
                 'type' => $insc->getType(),
+                'organization' => $trainingOrg  ? [
+                    'id' => $trainingOrg?->getId(),
+                    'name' => $trainingOrg?->getName() ?? 'Non précisée',
+                ] : null,
 
                 //inscription.trainee.organization.name
 
@@ -222,13 +225,6 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                         'id' => $institution?->getId(),
                         'name' => $institution?->getName() ?? 'Non renseignée',
                         'city' => $institution?->getCity() ?? 'Non renseignée',
-                    ],
-                    'organization' => ($insc->getOrganization()) ? [
-                        'id' => $insc->getOrganization()->getId(),
-                        'name' => $insc->getOrganization()->getName() ?? 'Non renseignée',
-                    ] : [
-                        'id' => null,
-                        'name' => 'Non renseignée'
                     ],
                 ],
                 'session' => [
@@ -253,11 +249,6 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                     'id' => $theme->getId(),
                     'name' => $theme->getName() ?? 'Non renseigné',
                 ] : [],
-                'organization' => $organization ? [
-                    'id' => $organization->getId(),
-                    'name' => $organization->getName() ?? 'Non précisé',
-                ] : [],
-
 
                 // Pour compatibilité avec le code existant
                 'inscription_obj' => $insc,
