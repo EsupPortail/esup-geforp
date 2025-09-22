@@ -143,12 +143,12 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 }
 
                 // Droits et roles pour test
-                $userAccessRights = ['a:0:{}'];
+                $userAccessRights = [];
                 $user->setAccessRights($userAccessRights);
 
                 // Roles
                 $isAdmin = $form['isAdmin']->getData();
-                $roles = $isAdmin ? ['ROLE_ADMIN'] : ['a:0:{}'];
+                $roles = $isAdmin ? ['ROLE_ADMIN'] : [];
 
                 $user->setRoles($roles);
 
@@ -207,7 +207,8 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $repository = $em->getRepository(User::class);
                foreach ($trainees as $trainee) {
                    // On teste si le trainee est dejà gestionnaire
-                   $rUser = $repository->findOneBy(['email' => $trainee]);
+                   $email = $trainee['email'] ?? null;
+                   $rUser = $email ? $repository->findOneBy(['email' => $email]) : null;
                     $tabTrainees[] = $rUser ? 1 : 0;
                 }
 
