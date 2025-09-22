@@ -69,10 +69,16 @@ trait UploadableTrait
     /**
      * @return File
      */
-    public function getFile(): File
+    public function getFile(): ?File
     {
         if ($this->filepath !== null) {
-            $this->file = new File($this->getTemplatesRootDir() . '/' . $this->filepath);
+            $fullPath = $this->getTemplatesRootDir() . '/' . $this->filepath;
+
+            if (!file_exists($fullPath)) {
+                return null; 
+            }
+
+            $this->file = new File($fullPath);
         }
 
         return $this->file;

@@ -53,7 +53,7 @@ class ImageFile extends AbstractTerm implements VocabularyInterface
     protected function getTemplatesRootDir(): string
     {
         // le chemin absolu du répertoire où les documents uploadés doivent être sauvegardés
-        return __DIR__.'/../../../public/img/vocabulary';
+        return __DIR__.'/../../../var/Publipost';
     }
 
     /**
