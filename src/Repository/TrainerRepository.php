@@ -38,9 +38,29 @@ final class TrainerRepository extends ServiceEntityRepository
 
 
         $qb = $this->createQueryBuilder('trainer')
-            ->select('trainer')
-            ->where('trainer.firstname LIKE :keyword OR trainer.lastname LIKE :keyword')
-            ->setParameter('keyword', '%' . addcslashes((string)$keyword, '%_') . '%');
+            ->select('trainer');
+
+        $keyword = trim((string) $keyword);
+
+        if ($keyword !== '') {
+            $parts = preg_split('/\s+/', $keyword, 2);
+
+            if (count($parts) === 2) {
+                $p1 = '%' . addcslashes(mb_strtolower($parts[0], 'UTF-8'), '%_') . '%';
+                $p2 = '%' . addcslashes(mb_strtolower($parts[1], 'UTF-8'), '%_') . '%';
+
+                $qb->andWhere(
+                    '(LOWER(trainer.firstname) LIKE :p1 AND LOWER(trainer.lastname) LIKE :p2)
+             OR (LOWER(trainer.firstname) LIKE :p2 AND LOWER(trainer.lastname) LIKE :p1)'
+                )
+                    ->setParameter('p1', $p1)
+                    ->setParameter('p2', $p2);
+            } else {
+                $k = '%' . addcslashes(mb_strtolower($keyword, 'UTF-8'), '%_') . '%';
+                $qb->andWhere('LOWER(trainer.firstname) LIKE :k OR LOWER(trainer.lastname) LIKE :k')
+                    ->setParameter('k', $k);
+            }
+        }
 
         // Join & Filter: Organization
         $joinedOrg = false;

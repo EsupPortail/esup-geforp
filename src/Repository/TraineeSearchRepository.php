@@ -61,26 +61,31 @@ final class TraineeSearchRepository extends ServiceEntityRepository
 
         $qb->select('trainee');
 
-            $tabKey = explode(" ", $keyword, 2);
-       // dump($keyword, $tabKey);
-            if (count($tabKey) === 2) {
-                $qb->andWhere('
-            (LOWER(trainee.firstname) LIKE :k1 AND LOWER(trainee.lastname) LIKE :k2)
-            OR (LOWER(trainee.firstname) LIKE :k2 AND LOWER(trainee.lastname) LIKE :k1)
-            OR LOWER(trainee.lastname) LIKE :kw
-        ')
-                    ->setParameter('k1', '%' . strtolower(addcslashes($tabKey[0], '%_')) . '%')
-                    ->setParameter('k2', '%' . strtolower(addcslashes($tabKey[1], '%_')) . '%')
-                    ->setParameter('kw', '%' . strtolower(addcslashes($keyword, '%_')) . '%');
-            } else {
-                $qb->andWhere('
-            LOWER(trainee.firstname) LIKE :kw
-            OR LOWER(trainee.lastname) LIKE :kw
-            OR LOWER(trainee.email) LIKE :kw
-        ')
-                    ->setParameter('kw', '%' . strtolower(addcslashes($keyword, '%_')) . '%');
-            }
+        $keyword = trim($keyword);
 
+        if ($keyword !== '') {
+            $parts = preg_split('/\s+/', $keyword, 2);
+
+            if (count($parts) === 2) {
+                $p1 = '%' . addcslashes(mb_strtolower($parts[0], 'UTF-8'), '%_') . '%';
+                $p2 = '%' . addcslashes(mb_strtolower($parts[1], 'UTF-8'), '%_') . '%';
+
+                $qb->andWhere('
+            (LOWER(trainee.firstname) LIKE :p1 AND LOWER(trainee.lastname) LIKE :p2)
+            OR (LOWER(trainee.firstname) LIKE :p2 AND LOWER(trainee.lastname) LIKE :p1)
+        ')
+                    ->setParameter('p1', $p1)
+                    ->setParameter('p2', $p2);
+            } else {
+                $k = '%' . addcslashes(mb_strtolower($keyword, 'UTF-8'), '%_') . '%';
+                $qb->andWhere('
+            LOWER(trainee.firstname) LIKE :k
+            OR LOWER(trainee.lastname) LIKE :k
+            OR LOWER(trainee.email) LIKE :k
+        ')
+                    ->setParameter('k', $k);
+            }
+        }
 
         // Filtres
         if (!empty($filters['createdAt'])) {
