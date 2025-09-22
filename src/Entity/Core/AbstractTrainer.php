@@ -148,6 +148,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
         $this->organization = $organization;
     }
 
+
     /**
      * @return ArrayCollection
      */
@@ -178,6 +179,46 @@ abstract class AbstractTrainer implements SerializedAccessRights
         }
 
         return $sessions;
+    }
+
+    public function getSessionName(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getName() : null;
+    }
+
+    public function getDateSession(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getDatesString() : null;
+    }
+
+    public function getCommentsSession(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getComments() : null;
     }
 
     /**

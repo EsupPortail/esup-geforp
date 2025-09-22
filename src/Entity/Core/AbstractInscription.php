@@ -3,6 +3,7 @@
 namespace App\Entity\Core;
 
 use App\Entity\Back\Session;
+use App\Entity\Back\Trainer;
 use App\Form\Type\BaseInscriptionType;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
@@ -155,6 +156,23 @@ abstract class AbstractInscription implements SerializedAccessRights
         return $this->session;
     }
 
+    public function getDates(): ?string
+    {
+        return $this->getSession()?->getDatesString();
+    }
+
+    public function getFormateurCivilite(): ?string
+    {
+        $firstTrainer = $this->getSession()?->getTrainers()[0] ?? null;
+        return $firstTrainer?->getTitle();
+    }
+
+    public function getFormationNom(): ?string
+    {
+        $firstSession = $this->getSession() ?? null;
+        return $firstSession?->getName();
+    }
+
     /**
      * @param AbstractTrainee
      */
@@ -169,6 +187,12 @@ abstract class AbstractInscription implements SerializedAccessRights
     public function getTrainee(): AbstractTrainee
     {
         return $this->trainee;
+    }
+
+    public function getComments(): ?string
+    {
+        $comments = $this->getSession() ?? null;
+        return $comments->getComments();
     }
 
     /**

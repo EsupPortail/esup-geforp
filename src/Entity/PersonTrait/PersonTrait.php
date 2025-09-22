@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity\PersonTrait;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -67,6 +68,13 @@ trait PersonTrait
     public function getFirstname(): ?string
     {
         return $this->firstname;
+    }
+
+    public function getTrainees(): Collection
+    {
+        return $this->getInscriptions()->map(function ($inscription) {
+            return $inscription->getTrainee();
+        });
     }
 
     /**

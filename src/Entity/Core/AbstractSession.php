@@ -139,7 +139,9 @@ abstract class AbstractSession implements SerializedAccessRights
     #[ORM\Column(name: 'registration', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected int $registration = self::REGISTRATION_CLOSED;
 
-
+    /**
+     * @Serializer\Groups({"session", "training", "inscription", "api"})
+     */
     #[Groups(['session', 'training', 'inscription', 'api'])]
     #[ORM\Column(name: 'status', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $status = self::STATUS_OPEN;

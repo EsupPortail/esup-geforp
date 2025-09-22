@@ -114,6 +114,72 @@ use Symfony\Component\Serializer\Attribute\Ignore;
         return $this->institution;
     }
 
+    public function getFormationName(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getName() : null;
+    }
+
+    public function getCivilite(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        if (!$last || $last->getTrainers()->isEmpty()) {
+            return null;
+        }
+
+        $trainer = $last->getTrainers()->first();
+        return $trainer ? $trainer->getTitle() : null;
+    }
+
+    public function getCommentsSession(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getComments() : null;
+    }
+
+    public function getDateSession(): ?string
+    {
+        $sessions = $this->getSessions()->toArray();
+
+        if (empty($sessions)) {
+            return null;
+        }
+        usort($sessions, fn($a, $b) => $a->getDateBegin() <=> $b->getDateBegin());
+
+        $last = end($sessions);
+        return $last ? $last->getDatesString() : null;
+    }
+
+    public function getSessions(): Collection
+    {
+        return $this->getInscriptions()
+            ->map(fn($inscription) => $inscription->getSession())
+            ->filter(fn($session) => $session !== null);
+    }
+
     /**
      * {}
      */

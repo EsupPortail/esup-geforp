@@ -218,6 +218,45 @@ class Session extends AbstractSession
         $this->taking = $taking;
     }
 
+    public function getTrainees(): array
+    {
+        $trainees = [];
+
+        foreach ($this->getInscriptions() as $inscription) {
+            $trainee = $inscription->getTrainee();
+            if ($trainee) {
+                $trainees[$trainee->getId()] = $trainee;
+            }
+        }
+
+        return array_values($trainees);
+    }
+
+    public function getFirstname(): ?string
+    {
+        $names = [];
+        foreach ($this->getTrainees() as $trainee) {
+            $firstname = $trainee->getFirstname();
+            if (!in_array($firstname, $names)) {
+                $names[] = $firstname;
+            }
+        }
+        return implode(', ', $names);
+    }
+
+    public function getLastname(): ?string
+    {
+        $names = [];
+        foreach ($this->getTrainees() as $trainee) {
+            $lastname = $trainee->getLastname();
+            if (!in_array($lastname, $names)) {
+                $names[] = $lastname;
+            }
+        }
+        return implode(', ', $names);
+    }
+
+
     #[Groups(['session', 'api.session'])]
     public function getDatesString(): string
     {
