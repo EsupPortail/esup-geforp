@@ -268,7 +268,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             $lines[0]['inscriptions'] = [];
                             foreach ($inscriptions as $insc) {
                                 if ($insc->getInscriptionstatus() == 'Accepté') {
-                                    $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation());
+                                    $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction()];
                                 }
                             }
 
@@ -362,18 +362,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             // On crée le tableau de dates correspondant au tableau des présences
                             $tabDates = [];
                             foreach ($session->getDates() as $dateSes) {
-                                $dateDeb = $dateSes->getDateBegin();
-                                $dateNewS = $dateDeb->format('d/m/Y');
-                                $tab = explode('/', $dateNewS);
-                                $dateNew = new \DateTime();
-                                $dateNew->setDate($tab[2], $tab[1], $tab[0]);
-
-                                $nbJoursDate2 = date_diff($dateSes->getDateEnd(), $dateSes->getDateBegin());
-                                $nbJoursDate = $nbJoursDate2->format('%a');
+                                // Conversion date de début de session
+                                $dateDeb = strtotime(str_replace("/", "-", (string) $dateSes->getDatebegin()->format('d/m/Y')));
                                 // création du tableau des dates suivant le nombre de jours à afficher
-                                for ($j = 0; $j < $nbJoursDate + 1; $j++) {
-                                    $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
-                                    $dateNew->modify('+ 1 days');
+                                for ($j = 0; $j < $session->getDaynumber() + 1; ++$j) {
+                                    $dateNew = date('d/m/Y', $dateDeb + $j * 86400);
+                                    $tabDates[] = ["dateDeb" => $dateNew, "nbHeuresMatin" => $dateSes->getHournumbermorn(), "nbHeuresApr" => $dateSes->getHournumberafter()];
                                 }
                             }
 
@@ -417,7 +411,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $lines[0]['inscriptions'] = [];
                 foreach ($inscriptions as $insc) {
                     if ($insc->getInscriptionstatus() == 'Convoqué') {
-                        $lines[0]['inscriptions'][] = array('nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation());
+                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction()];
                     }
                 }
 
@@ -463,7 +457,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     $lines[$i]['horairesAprem'] = $date->getScheduleAfter();
                     $lines[$i]['lieu'] = $date->getPlace();
                     $lines[$i]['nom'] = $data->nom;
-                    $lines[$i]['commentaires'] = $data->commentaires;
 
                     $lines[$i]['formateur'] = [];
                     foreach ($formateurs as $formateur) {

@@ -456,7 +456,7 @@ SQL;
                         $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', ',', $data[$key]);
-                    } elseif ($key == "session.totalCost") {
+                    }elseif ($key == "session.totalCost") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
 
@@ -476,58 +476,7 @@ SQL;
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', '', (string)$data[$key]);
 
-                    } elseif ($key == "individualcost") {
-                        // Coût total
-                        $totalCost = $accessor->getValue($entity, 'teachingcost')
-                            + $accessor->getValue($entity, 'vacationcost')
-                            + $accessor->getValue($entity, 'accommodationcost')
-                            + $accessor->getValue($entity, 'mealcost')
-                            + $accessor->getValue($entity, 'transportcost')
-                            + $accessor->getValue($entity, 'materialcost');
-
-                        // Nombre de stagiaires en présence partielle ou totale
-                        $statsPresGlobale = array();
-                        /** @var EntityManager $em */
-                        $em    = $this->doctrine->getManager();
-                        $session = $entity;
-                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
-                            $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
-                    JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
-                    WHERE i.session = :session and (s.machinename = :present or s.machinename = :partiel)
-                    GROUP BY s.id')
-                                ->setParameter('session', $session)
-                                ->setParameter('present', "present")
-                                ->setParameter('partiel', "partiel");
-
-                            $result = $query->getResult();
-                            foreach($result as $status) {
-                                $statsPresGlobale[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
-                            }
-                            // On recupere seulement le compteur
-                            if (isset($statsPresGlobale[0]['count']))
-                                $nbPresentsGlob = $statsPresGlobale[0]['count'];
-                            else
-                                $nbPresentsGlob = 0;
-                        } else {
-                            $nbPresentsGlob = 0;
-                        }
-
-                        // si on a des présents, on calcule le coût par stagiare
-                        if (($nbPresentsGlob > 0) && $totalCost) {
-                            $rvalue =  $totalCost/$nbPresentsGlob;
-                        }
-
-                        $data[$key] = ($rvalue) ? $rvalue : '';
-                        // Transformation '.' en ',' pour faciliter Excel
-                        $data[$key] = str_replace('.', ',', $data[$key]);
-
-                    } elseif ($key == "training.tags") {
+                    }elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
 
@@ -588,9 +537,7 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
-                                WHERE ec.organization = :org')
-                            ->setParameter('org', $session->getTraining()->getOrganization());
+                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec');
                         $tabCrit = $query->getResult();
 
                         // On initialise les variables pour la moyenne
@@ -654,7 +601,11 @@ SQL;
                         $data[$key] = $rvalue ?: '';
 
                     } else {
-                        $rvalue = $propertyAccessor->getValue($entity, $key);
+                        try {
+                            $rvalue = $propertyAccessor->getValue($entity, $key);
+                        } catch (\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException $e) {
+                            $rvalue = null;
+                        }
                         // reformat values
                         if (!empty($value['type'])) {
                             if ($value['type'] === 'date') {

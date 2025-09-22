@@ -77,8 +77,8 @@ EmailingBatchOperation extends AbstractBatchOperation
                 }
             }
         }
-        $this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
 
+        $this->parseAndSendMail($targetEntities, $options['subject'] ?? '', $options['message'] ?? '', $options['attachment'] ?? [], false, $options['ical'] ?? false, $options['format'] ?? 0);
 
         return ['', Response::HTTP_NO_CONTENT];
     }
@@ -121,8 +121,8 @@ EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return array[]
      */
-    public function parseAndSendMail($entities, $subject, $body, array $attachments = [], bool $preview = false, $ical = false, $format = 0, $sendresp = 1, array $publipostTemplates = [],
-                                     array $publipostIdList = []): array
+    public function parseAndSendMail($entities, $subject, $body, array $attachments = [], bool $preview = false, $ical = false, $format = 0,   array|string $publipostTemplates = [],
+                                     array|string $publipostIdList = []): array
     {
         $em = null;
         $last = [];
@@ -244,49 +244,12 @@ EmailingBatchOperation extends AbstractBatchOperation
                             $id = $tabDate->getId();
                             $tabEvent[$i] = new CalendarEvent();
                             $dateBegin = clone $tabDate->getDatebegin();
+                            $dateBegin->setTime(8, 0);
+
                             $dateEnd = clone $tabDate->getDateend();
+                            $dateEnd->setTime(18, 0);
                             $startTime = (clone $tabDate->getDatebegin())->setTime(8, 0);
-
-							$schedulemorn = $dateSession->getSchedulemorn();
-                            $scheduleafter = $dateSession->getScheduleafter();
-
-                            // Par défaut, on fixe les horaires à la journée
-                            $horBegin = '+8 hours';
-                            $horEnd = '+18 hours';
-
-                            // récupération des horaires pour exploitation avec le calendrier
-                            $j=0;
-                            $horMod1=[];
-                            $horMod2=[];
-                            // Horaires matin
-                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
-                                    foreach ($matchesMorn[0] as $hor) {
-                                        $partsMorn = explode(':', $hor);
-                                        $horMod1[$j] = "$partsMorn[0]h$partsMorn[1]";
-                                        $horMod2[$j] = "$partsMorn[0] hours $partsMorn[1] minutes";
-                                        $j++;
-                                    }
-                            }
-                            // Horaires après-midi
-                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
-                                    foreach ($matchesAfter[0] as $hor) {
-                                        $partsAfter = explode(':', $hor);
-                                        $horMod1[$j] = "$partsAfter[0]h$partsAfter[1]";
-                                        $horMod2[$j] = "$partsAfter[0] hours $partsAfter[1] minutes";
-                                        $j++;
-                                    }
-                            }
-                            // au moins 2 horaires dans le tableau
-                            if (sizeof($horMod1) >= 2) {
-                                    // Conversion en date pour comparaison
-                                    $heureBegin = \DateTime::createFromFormat('H\hi', $horMod1[0]);
-                                    $heureEnd = \DateTime::createFromFormat('H\hi', end($horMod1));
-                                    // Vérif l'heure de fin est bien > à l'heure de début
-                                    if ($heureBegin<$heureEnd) {
-                                        $horBegin = "+" . $horMod2[0];
-                                        $horEnd = "+" . end($horMod2);
-                                    }
-                            }
+                            $endTime = (clone $tabDate->getDateend())->setTime(18, 0);
 
                             $tabEvent[$i]->setStart($startTime)
                                 ->setEnd($endTime)
