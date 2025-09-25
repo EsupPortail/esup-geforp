@@ -60,7 +60,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
      * @var Collection<AbstractParticipation>
      * @Serializer\Exclude
      */
-    #[Type("Collection<AbstractParticipation::class>")]
+    #[Type("ArrayCollection<AbstractParticipation::class>")]
     #[Serializer\Exclude]
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
     protected Collection $participations;
