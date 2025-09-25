@@ -22,6 +22,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Serializer\Attribute\MaxDepth;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Type;
 
 /**
  * Session.
@@ -99,6 +100,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      * @var Collection<AbstractParticipation>
      */
+    #[Type("Collection<Participation::class>")]
     #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Participation::class, cascade: ['remove'])]
     protected Collection $participations ;
@@ -107,6 +109,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\AbstractInscription>
      */
+    #[Type("Collection<Inscription::class>")]
     #[Groups('session')]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Inscription::class, cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdat' => 'DESC'])]
@@ -227,6 +230,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\ParticipantsSummary>
      */
+    #[Type("Collection<ParticipantsSummary::class>")]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Core\ParticipantsSummary::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     #[Groups('session')]
     protected Collection $participantsSummaries;
@@ -235,6 +239,7 @@ abstract class AbstractSession implements SerializedAccessRights
      * @var Collection<Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
+    #[Type("Collection<Material::class>")]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Material::class, cascade: ['remove', 'persist'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['training', 'session', 'api.attendence'])]

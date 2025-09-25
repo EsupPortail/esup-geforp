@@ -15,6 +15,7 @@ use App\Entity\Term\Trainertype;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
 /**
@@ -59,6 +60,7 @@ abstract class AbstractTrainer implements SerializedAccessRights
      * @var Collection<AbstractParticipation>
      * @Serializer\Exclude
      */
+    #[Type("Collection<AbstractParticipation::class>")]
     #[Serializer\Exclude]
     #[ORM\OneToMany(mappedBy: 'trainer', targetEntity: 'AbstractParticipation', cascade: ['remove'])]
     protected Collection $participations;

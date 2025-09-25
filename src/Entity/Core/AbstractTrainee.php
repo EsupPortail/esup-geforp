@@ -19,6 +19,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Type;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 use App\Form\Type\AbstractTraineeType;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -61,6 +62,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
      * @Serializer\Groups({"trainee"})
      * @var Collection<int, AbstractInscription>|AbstractInscription[]
      */
+    #[Type("ArrayCollection<AbstractInscription::class>")]
     #[Groups(['trainee'])]
     #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: AbstractInscription::class, cascade: ['remove'])]
     protected Collection $inscriptions;
