@@ -2,11 +2,13 @@
 
 namespace App\Controller\Back;
 use App\Entity\Core\AbstractSession;
+use App\Entity\Core\AbstractTraining;
 use DoctrineExtensions\Query\Mysql\Date;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use http\Env\Response;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\SerializerInterface;
 use App\Entity\Back\Participation;
 use App\Entity\Back\Session;
@@ -181,6 +183,35 @@ use Symfony\Component\Form\FormError;
 
      }
 
+     #[Rest\View(SerializerGroups: ['Default', 'api.session'], serializerEnableMaxDepthChecks: true)]
+     #[Route(path: '/duplicatedates/{dates}', name: 'dates.duplicate', options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['POST']) ]
+     public function duplicatedatesAction(Session $session, DateSession $dates, ManagerRegistry $managerRegistry): array
+     {
+         $em = $managerRegistry->getManager();
+         if (!$dates) {
+             throw new NotFoundHttpException();
+         }
+         if ( ! $this->isGranted('CREATE', $dates)) {
+             throw new AccessDeniedException('Action non autorisée');
+         }
+
+         $newDateSession = new DateSession();
+         $newDateSession
+             ->setDatebegin($dates->getDatebegin())
+             ->setDateend($dates->getDateend())
+             ->setSchedulemorn($dates->getSchedulemorn())
+             ->setHournumbermorn($dates->getHournumbermorn())
+             ->setScheduleafter($dates->getScheduleafter())
+             ->setHournumberafter($dates->getHournumberafter())
+             ->setPlace($dates->getPlace())
+             ->setSession($session);
+
+         $em->persist($newDateSession);
+         $em->flush();
+
+         return ['status' => 'success', 'newDateSession' => $newDateSession];
+     }
+
     #[Rest\View(serializerGroups: ['session', 'api.session'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/editdates/{dates}', name: 'dates.edit', options: ['expose' => true], defaults: ['_format' => 'json'])]
     public function editdates(Request $request, ManagerRegistry $managerRegistry, int $dates): array
@@ -216,6 +247,7 @@ use Symfony\Component\Form\FormError;
                         $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
                         $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
                     }
+
                 }
 
                 // Tri des tableaux de dates
@@ -262,118 +294,4 @@ use Symfony\Component\Form\FormError;
         return ['form' => $form->createView(), 'dates' => $dateSession];
     }
 
-    /**
-     *
-     * @Route("/duplicatedates/{dates}", name="dates.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("dates", class="App\Entity\Back\DateSession", options={"id" = "dates"})
-     * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
-     *
-     * @return array
-     */
-    public function duplicatedatesAction(Request $request, ManagerRegistry $doctrine, DateSession $dates)
-    {
-        // we need at least one of both arguments
-        if (!$dates) {
-            throw new MissingOptionsException('You have to pass a dates id');
-        }
-
-        // new session can't be created if user has no rights for it
-        if (!$this->isGranted('EDIT', $dates->getSession()->getTraining())) {
-            throw new AccessDeniedException('Action non autorisée');
-        }
-
-        $cloned = clone $dates;
-        /** @var Session $session */
-        $session = $dates->getSession();
-        $cloned->setSession($session);
-        $daysSum =0;
-        $hoursSum = 0;
-
-        $form = $this->createFormBuilder($cloned)
-            ->add('datebegin', DateType::class, array(
-                'label' => 'Date de début',
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'required' => true,
-            ))
-            ->add('dateend', DateType::class, array(
-                'label' => 'Date de fin',
-                'widget' => 'single_text',
-                'format' => 'dd/MM/yyyy',
-                'html5' => false,
-                'required' => false,
-            ));
-
-        $form = $form->getForm();
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-            if ($form->isSubmitted() && $form->isValid()) {
-                $existingDate = null;
-                $datesBegin = array();
-                $datesEnd = array();
-                /** @var DateSession $existingDate */
-                foreach ($session->getDates() as $existingDate) {
-                    if ($existingDate->getDatebegin() == $cloned->getDatebegin()) {
-                        $form->get('datebegin')->addError(new FormError('Cette date est déjà associé à cet évènement.'));
-                        return array('form' => $form->createView(), 'dates' => $dates);
-                    }
-                    $datesBegin[] = $existingDate->getDatebegin();
-                    $datesEnd[] = $existingDate->getDateend();
-
-                    if (($existingDate->getDatebegin() == $existingDate->getDateend()) || ($existingDate->getDateend() == null)) {
-                        $daysSum++;
-                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter());
-                    } else {
-                        $daysSum += $existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1;
-                        $hoursSum += ($existingDate->getHournumbermorn() + $existingDate->getHournumberafter()) * ($existingDate->getDatebegin()->diff($existingDate->getDateend())->format('%a') + 1);
-                    }
-                }
-
-                if (!$existingDate || ($existingDate->getDatebegin() !== $cloned->getDatebegin())) {
-                    $session->addDates($cloned);
-                    $session->setUpdatedAt(new \DateTime('now'));
-                    $session->getTraining()->setUpdatedAt(new \DateTime('now'));
-                    $datesBegin[] = $cloned->getDatebegin();
-                    $datesEnd[] = $cloned->getDateend();
-
-                    // Calcul nombre de jours
-                    if (($cloned->getDatebegin() == $cloned->getDateend()) || ($cloned->getDateend() == null)) {
-                        $daysSum++;
-                        $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter());
-                    } else {
-                        $daysSum += $cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1;
-                        $hoursSum += ($cloned->getHournumbermorn() + $cloned->getHournumberafter()) * ($cloned->getDatebegin()->diff($cloned->getDateend())->format('%a') + 1);
-                    }
-                }
-
-                // Tri des tableaux de dates
-                usort($datesBegin, function ($a, $b) {
-                    return $a < $b ? -1 : 1;
-                });
-                usort($datesEnd, function ($a, $b) {
-                    return $a < $b ? -1 : 1;
-                });
-
-                // Renseigner le lieu
-                $session->setPlace($session->getDates()[0]->getPlace());
-
-                // Renseigner le nombre d'heures
-                $session->setHournumber($hoursSum);
-
-                // Renseigner le nombre de jours
-                $session->setDaynumber($daysSum);
-
-                // Récupérer les dates min et max début et fin pour les caler dans les dates de session
-                $session->setDatebegin($datesBegin[0]);
-                $session->setDateend($datesEnd[count($datesEnd) - 1]);
-                $em = $doctrine->getManager();
-                $em->persist($cloned);
-                $em->persist($session);
-                $em->flush();
-
-            }
-        }
-        return array('form' => $form->createView(), 'dates' => $dates);
-    }
 }
