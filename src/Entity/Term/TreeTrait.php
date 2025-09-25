@@ -17,6 +17,7 @@ trait TreeTrait
      * @ORM\Column(name="lft", type="integer")
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\Column(name: "lft", type: "integer")]
     private $lft;
 
@@ -25,6 +26,7 @@ trait TreeTrait
      * @ORM\Column(name="lvl", type="integer")
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\Column(name: "lvl", type: "integer")]
     private mixed $lvl;
 
@@ -33,6 +35,7 @@ trait TreeTrait
      * @ORM\Column(name="rgt", type="integer")
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\Column(name: "rgt", type: "integer")]
     private $rgt;
 
@@ -41,6 +44,7 @@ trait TreeTrait
      * @ORM\Column(name="root", type="integer", nullable=true)
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\Column(name: "root", type: "integer", nullable: true)]
     private mixed $root;
 
@@ -51,6 +55,7 @@ trait TreeTrait
      * _ORM\ManyToOne(targetEntity="__SELF__", inversedBy="children")
      * _ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      */
+    #[Serializer\Exclude()]
     #[ORM\ManyToOne(targetEntity: "__SELF__", inversedBy: "children")]
     #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", onDelete: "CASCADE")]
     private mixed $parent;

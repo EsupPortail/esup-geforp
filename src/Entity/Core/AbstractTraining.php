@@ -613,6 +613,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Serializer\VirtualProperty()]
     #[Groups(['Default', 'api'])]
     public static function getTypeLabel(): string
     {
@@ -632,6 +633,8 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Serializer\VirtualProperty()]
+    #[Serializer\VirtualProperty()]
     #[Groups(['session', 'training'])]
     public function getLastsession(): mixed
     {
@@ -655,6 +658,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Serializer\VirtualProperty()]
     #[Groups(['session', 'training'])]
     public function getNextsession(): mixed
     {
@@ -679,6 +683,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Serializer\VirtualProperty()]
     #[Groups(['session', 'training'])]
     public function getSessionscount(): int
     {
@@ -690,6 +695,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      * @Serializer\VirtualProperty
      * @Serializer\Groups({"session", "training"})
      */
+    #[Serializer\VirtualProperty()]
     #[Groups(['session', 'training'])]
     public function getTrainers(): array
     {

@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Core\UploadableTrait;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 
 /**
  * FileMaterial.
@@ -29,6 +30,8 @@ class FileMaterial extends Material
      *
      * @return string
      */
+    #[Serializer\VirtualProperty]
+    #[SerializedName("name")]
     #[Groups([ 'Default','api.attendance'])]
     public function getName(): string
     {

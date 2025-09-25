@@ -34,6 +34,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude]
     #[ORM\Column(name: 'address_type', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
     protected ?int $addresstype = null;
 
@@ -258,6 +259,7 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', "api")]
     #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -275,24 +277,28 @@ abstract class AbstractOrganization implements \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', 'api')]
     #[ORM\Column(name: 'code', type: \Doctrine\DBAL\Types\Types::STRING, length: 32)]
     protected ?string $code = null;
 
     /**
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\OneToMany(mappedBy: 'organization', targetEntity: 'User', cascade: ['persist', 'merge'])]
     private Collection $users;
 
     /**
      * @Serializer\Groups({"api"})
      */
+    #[Groups('api')]
     #[ORM\Column(name: 'trainee_registrable', type: \Doctrine\DBAL\Types\Types::BOOLEAN)]
     protected ?bool $traineeRegistrable = true;
 
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', 'api')]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractInstitution::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?\App\Entity\Core\AbstractInstitution $institution = null;

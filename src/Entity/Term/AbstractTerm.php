@@ -29,6 +29,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', 'api')]
     #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'AUTO')]
@@ -39,6 +40,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', 'api')]
     #[ORM\Column(name: 'name', type: 'string', length: 255)]
     #[Assert\NotBlank]
     private ?string $name = null;
@@ -46,6 +48,7 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
     /**
      * @Serializer\Groups({"Default", "api"})
      */
+    #[Groups('Default', 'api')]
     #[ORM\Column(name: 'private', type: 'boolean')]
     private bool $private = false;
 
@@ -161,6 +164,8 @@ abstract class AbstractTerm implements VocabularyInterface, \Stringable
      *
      * @return int
      */
+    #[Serializer\VirtualProperty()]
+    #[Groups('Default', 'api')]
     public function getOrganizationId(): ?int
     {
         return $this->getOrganization()?->getId();

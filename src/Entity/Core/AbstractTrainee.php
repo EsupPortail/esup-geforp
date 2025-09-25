@@ -54,7 +54,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
      */
     #[ORM\ManyToOne(targetEntity: AbstractInstitution::class)]
     #[Assert\NotNull(message: 'Vous devez renseigner un établissement.')]
-    #[Groups(['trainee', 'session', 'api.profile', 'api.token', 'inscription'])]
+    #[Groups(['trainee', 'session', 'api.profile', 'api.token'])]
     protected ?AbstractInstitution $institution = null;
 
     /**

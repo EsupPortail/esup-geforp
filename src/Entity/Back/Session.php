@@ -85,7 +85,7 @@ class Session extends AbstractSession
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\DateSession> $dates
      * @Serializer\Groups({"session", "api.session"})
      */
-    #[Groups(['api.session'])]
+    #[Groups(['session','api.session'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\DateSession::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
     protected Collection $dates;
@@ -220,40 +220,16 @@ class Session extends AbstractSession
 
     public function getTrainees(): array
     {
-        $trainees = [];
-
-        foreach ($this->getInscriptions() as $inscription) {
-            $trainee = $inscription->getTrainee();
-            if ($trainee) {
-                $trainees[$trainee->getId()] = $trainee;
-            }
-        }
-
-        return array_values($trainees);
+        return $this->getInscriptions()->map(function ($inscription) {
+            return $inscription->getTrainee();
+        })->toArray();
     }
 
-    public function getFirstname(): ?string
+    public function getTraineesFirstNames(): string
     {
-        $names = [];
-        foreach ($this->getTrainees() as $trainee) {
-            $firstname = $trainee->getFirstname();
-            if (!in_array($firstname, $names)) {
-                $names[] = $firstname;
-            }
-        }
-        return implode(', ', $names);
-    }
-
-    public function getLastname(): ?string
-    {
-        $names = [];
-        foreach ($this->getTrainees() as $trainee) {
-            $lastname = $trainee->getLastname();
-            if (!in_array($lastname, $names)) {
-                $names[] = $lastname;
-            }
-        }
-        return implode(', ', $names);
+        return implode(', ', $this->getInscriptions()->map(function ($inscription) {
+            return $inscription->getTrainee()->getFirstname();
+        })->toArray());
     }
 
 

@@ -24,6 +24,7 @@ class EvaluationNotedCriterion
     /**
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Back\Inscription::class, inversedBy: 'criteria')]
     protected ?\App\Entity\Back\Inscription $inscription = null;
 

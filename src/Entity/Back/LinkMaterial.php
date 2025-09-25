@@ -6,6 +6,7 @@ namespace App\Entity\Back;
 use App\Entity\Core\Material;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -19,6 +20,7 @@ class LinkMaterial extends Material
     /**
      * @Serializer\Groups({"Default", "api.attendance"})
      */
+    #[Groups('Default', 'api.attendance')]
     #[ORM\Column(name: 'url', type: \Doctrine\DBAL\Types\Types::STRING)]
     #[Assert\Url(message: 'Url non valide !')]
     private ?string $url = null;

@@ -21,6 +21,7 @@ class ParticipantsSummary
     /**
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
     #[ORM\Id]
     #[ORM\ManyToOne(targetEntity: \App\Entity\Core\AbstractSession::class, inversedBy: 'participantsSummaries')]
     protected ?\App\Entity\Core\AbstractSession $session = null;
