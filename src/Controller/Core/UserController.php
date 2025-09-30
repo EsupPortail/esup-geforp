@@ -136,20 +136,19 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $em = $managerRegistry->getManager();
                 $em->persist($user);
 
-                $scope = $form->get('accessRightScope')->getData();
+/*                $scope = $form->get('accessRightScope')->getData();
                 if ($scope) {
                     //$accessRights = array_keys($this->get('sygefor_core.access_right_registry')->getAccessRights());
                     //$userAccessRights = $getUserAccessRights($scope, $accessRights);
-                }
+                }*/
 
                 // Droits et roles pour test
-                $userAccessRights = [];
+                $userAccessRights = ['a:0:{}'];
                 $user->setAccessRights($userAccessRights);
 
                 // Roles
                 $isAdmin = $form['isAdmin']->getData();
-                $roles = $isAdmin ? ['ROLE_ADMIN'] : [];
-
+                $roles = $isAdmin ? ['ROLE_ADMIN'] : ['a:0:{}'];
                 $user->setRoles($roles);
 
                 $em->flush();
@@ -159,7 +158,6 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 return $this->redirectToRoute('user.index');
             }
         }
-
         return $this->render('Core/views/User/edit.html.twig', ['form' => $form->createView(), 'curUserAdmin' => $curUserAdmin, 'user' => $user, 'isAdmin' => $user->isAdmin()]);
     }
 

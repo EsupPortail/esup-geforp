@@ -176,6 +176,7 @@ final class TraineeSearchRepository extends ServiceEntityRepository
                 'createdat' => $trainee->getCreatedAt()->format('c'),
                 'publictype' => $trainee->getPublictype(),
                 'email' => $trainee->getEmail(),
+                'shibbolethpersistentid' => $trainee->getShibbolethpersistentid(),
                 'inscriptions' => $inscriptions,
             ];
         }

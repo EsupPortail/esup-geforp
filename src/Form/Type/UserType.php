@@ -50,9 +50,8 @@ final class UserType extends AbstractType
         $formBuilder->add('isAdmin', CheckboxType::class, ['label' => 'Administrateur', 'mapped' => false, 'required' => false]);
 
         // add choice list for user creation
-        if (!$options['data']->getId()) {
-            $formBuilder->add('accessRightScope', ChoiceType::class, ['label' => 'Droits d\'accès', 'mapped' => false, 'choices' => ['own.view' => 'Droits locaux de lecture', 'own.manage' => 'Droits locaux de gestion', 'all.view' => 'Tous les droits de lecture', 'all.manage' => 'Tous les droits de gestion'], 'required' => false]);
-        }
+/*        if (!$options['data']->getId()) {
+            $formBuilder->add('accessRightScope', ChoiceType::class, ['label' => 'Droits d\'accès', 'mapped' => false, 'choices' => ['own.view' => 'Droits locaux de lecture', 'own.manage' => 'Droits locaux de gestion', 'all.view' => 'Tous les droits de lecture', 'all.manage' => 'Tous les droits de gestion'], 'required' => false]);*/
 
         // add listeners to handle conditionals fields
         $this->addEventListeners($formBuilder);

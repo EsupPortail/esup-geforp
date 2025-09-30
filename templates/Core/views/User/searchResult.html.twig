@@ -30,7 +30,7 @@
                         </thead>
                         <tbody>
                         {% for trainee in trainees %}
-                            {% set persid = trainee.shibbolethPersistentId is defined ? trainee.shibbolethPersistentId : '' %}
+                            {% set persid = trainee.shibbolethpersistentid is defined ? trainee.shibbolethpersistentid : '' %}
                             <tr>
                                 {% if persid is defined and persid != "" and 'shibboleth' not in persid %}
                                     {% if gest[loop.index0] == 0 %}

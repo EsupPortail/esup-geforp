@@ -6,7 +6,7 @@
         <li><a href="#">Administration</a></li>
         <li><a href="{{ path('user.index') }}">Utilisateurs</a></li>
         {% if not user.id %}
-            <li class="active"><a href="{{ path('user.add') }}">Ajouter un utilisateur</a></li>
+            <li class="active"><a href="{{ path('user.searchadd') }}">Ajouter un utilisateur</a></li>
         {% endif %}
         {% if user.id %}
             <li><a href="{{ path('user.edit', {id: user.id}) }}">{{ user.username }}</a></li>
