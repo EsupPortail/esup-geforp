@@ -50,13 +50,6 @@ trait AttachEmailPublipostAttachment
             $tempDir = rtrim($publipostService->getTempDir(), '/\\') . DIRECTORY_SEPARATOR;
             $filePath = $tempDir . ltrim($relativePdfPath, '/\\');
 
-            if (!file_exists($filePath)) {
-                dump("Fichier non trouvé : $filePath");
-                continue;
-            } else {
-                dump("Attachement du fichier : $filePath");
-            }
-
             // Nom de fichier sécurisé
             $safeName = preg_replace('/[^a-zA-Z0-9-_]/', '_', $publipostTemplate->getName()) . '.pdf';
 

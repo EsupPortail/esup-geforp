@@ -148,10 +148,6 @@ abstract class AbstractInscriptionController extends AbstractController
                 $objectManager->flush();
             }
         }
-        dump([
-            'org' => $inscription->getOrganization(),
-            'traineeOrg' => $inscription->getSession()?->getTraining()->getOrganization(),
-        ]);
 
         return ['form' => $form->createView(), 'inscription' => $inscription,  'fullname' => $inscription->getTrainee()?->getFullname()];
     }

@@ -22,7 +22,7 @@ interface AccessRightInterface
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $attribute, $object = null);
+    public function isGranted(TokenInterface $token, $object = null, $attribute);
 
     public function setId(int $id);
 
