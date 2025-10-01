@@ -71,8 +71,8 @@ class RegistrationAccountController extends AbstractController
         $relanceActif = $this->getParameter('relance_actif');
 
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $inscriptions = $trainee->getInscriptions();
         $upcoming = [];
@@ -108,11 +108,11 @@ class RegistrationAccountController extends AbstractController
      *
      */
     #[Route(path: '/registration/{id}/desist', name: 'front.account.registration.desist')]
-    public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): array
+    public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
@@ -141,8 +141,8 @@ class RegistrationAccountController extends AbstractController
                 // if the inscription is pending, just delete it
                 $em->remove($inscription);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
-                return [$this->redirectToRoute('front.account.registrations')];
+                $this->addFlash('success', 'Votre désistement a bien été enregistré.');
+                return $this->redirectToRoute('front.account.registrations');
             }
             else {
                 // else set the status to "Desist"
@@ -212,13 +212,13 @@ class RegistrationAccountController extends AbstractController
 
                 $mailer->send($message);
 
-                $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
-                return [$this->redirectToRoute('front.account.registrations')];
+                $this->addFlash('success', 'Votre désistement a bien été enregistré.');
+                return $this->redirectToRoute('front.account.registrations');
             }
 
         }
 
-        return ['user' => $trainee, 'registration' => $registration, $this->render('Front/Account/registration/registration-desist.html.twig')];
+        return $this->render('Front/Account/registration/registration-desist.html.twig',['user' => $trainee, 'registration' => $registration]);
     }
 
     /**
@@ -232,7 +232,7 @@ class RegistrationAccountController extends AbstractController
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
 
         if (!$registration->getTrainee()->getEmailSup()) {
-            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas relancer votre demande de validation car vous n\'avez pas renseigné de supérieur hiérarchique.');
+            $this->addFlash('error', 'Vous ne pouvez pas relancer votre demande de validation car vous n\'avez pas renseigné de supérieur hiérarchique.');
             return $this->redirectToRoute('front.account.registrations');
         }
 
@@ -262,16 +262,8 @@ class RegistrationAccountController extends AbstractController
             }
         }
         $newbody = str_replace("[dates]", $Texte, $newbody);
-        $newbody = str_replace("[motivation]", $registration->getMotivation(), $newbody);
         $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
         $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
-        $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
-        $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
-        $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
-        $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
-        $newbody = str_replace("[session.commentaires]", $registration->getSession()->getComments(), $newbody);
-        $newbody = str_replace("[session.nom]", $registration->getSession()->getName(), $newbody);
-
         $newbody = str_replace("[lien]", $lien, $newbody);
 
         $message = (new Email())
@@ -288,7 +280,7 @@ class RegistrationAccountController extends AbstractController
 
         $mailer->send($message);
 
-        $this->get('session')->getFlashBag()->add('success', 'Votre demande d\'autorisation a bien été envoyée.');
+        $this->addFlash('success', 'Votre demande d\'autorisation a bien été envoyée.');
         return $this->redirectToRoute('front.account.registrations');
 
     }
@@ -298,13 +290,13 @@ class RegistrationAccountController extends AbstractController
      *
      */
     #[Route(path: '/registration/{id}/valid', name: 'front.account.registration.valid')]
-    public function valid($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer): ?array
+    public function valid($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer): Response
     {
         // Authentification et récup du mail retourné par Shibboleth
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $traineeUser = $arTraineeUser[0];
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $traineeUser = $arTraineeUser;
 
         $supMail = $user->getCredentials()['mail'];
 
@@ -404,7 +396,7 @@ class RegistrationAccountController extends AbstractController
 
                                 $mailer->send($message);
 
-                                $this->get('session')->getFlashBag()->add('success', 'L\'avis favorable a bien été émis.');
+                                $this->addFlash('success', 'L\'avis favorable a bien été émis.');
 
                             } else {
                                 // Sinon, on modifie le statut de l'inscription à "avis défavorable" et on envoie un mail au stagiaire
@@ -444,7 +436,6 @@ class RegistrationAccountController extends AbstractController
                                     }
                                 }
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
-                                $newbody = str_replace("[refuse]", $registration->getRefuse(), $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
@@ -469,7 +460,7 @@ class RegistrationAccountController extends AbstractController
 
                                 $mailer->send($message);
 
-                                $this->get('session')->getFlashBag()->add('success', 'L\'avis défavorable a bien été émis.');
+                                $this->addFlash('success', 'L\'avis défavorable a bien été émis.');
 
                             }
                         }
@@ -484,11 +475,11 @@ class RegistrationAccountController extends AbstractController
                 // Sinon, on affiche un message d'erreur
                 $access = "Non autorisé";
             }
-            return ['form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
+            return $this->render('Front/Account/registration/registration-valid.html.twig',['form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser]);
         } else {
             // Sinon, on affiche un message d'erreur
             $access = "Inscription non trouvée";
-            return ['form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
+            return $this->render('Front/Account/registration/registration-valid.html.twig',['form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser]);
         }
 
     }

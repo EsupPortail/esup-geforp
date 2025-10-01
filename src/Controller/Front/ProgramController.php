@@ -35,6 +35,8 @@ use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Mailer\MailerInterface;
@@ -43,6 +45,7 @@ use Symfony\Component\Mime\Email;
 #[Route(path: '/program')]
 class ProgramController extends AbstractController
 {
+
     public function index(): \Symfony\Component\HttpFoundation\Response
     {
         // Vérification manuelle de l'authentification de l'utilisateur
@@ -54,20 +57,21 @@ class ProgramController extends AbstractController
         // Vous pouvez continuer avec la logique du contrôleur...
         return $this->render('Front/Public/program/contact.html.twig');
     }
+    
 
     #[Route(path: '/contact', name: 'front.program.contact')]
     public function contact(ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // si pas de trainee enregistré
-        if (!isset($arTrainee[0])) {
+        if (!isset($arTrainee)) {
             // redirect user to registration form
             $url = $this->generateUrl('front.account.register');
             return new RedirectResponse($url);
         } else {
-            $trainee = $arTrainee[0];
+            $trainee = $arTrainee;
         }
 
         // Récupération des établissements de la plate-forme
@@ -85,18 +89,18 @@ class ProgramController extends AbstractController
     {
 
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // si pas de trainee enregistré
-        if (!isset($arTrainee[0])) {
+        if (!isset($arTrainee)) {
             // redirect user to registration form
             $url = $this->generateUrl('front.account.register');
             return new RedirectResponse($url);
         } else {
-            $trainee = $arTrainee[0];
+            $trainee = $arTrainee;
         }
 
-        return $this->render('Front/Public/program/faq.html.twig',['contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url')]);
+        return $this->render('Front/Public/program/faq.html.twig',['contact_mail' => $this->getParameter('contact_mail'), 'front_url' => $this->getParameter('front_url'), 'user' => $trainee]);
     }
 
     /**
@@ -105,10 +109,10 @@ class ProgramController extends AbstractController
      * @param null $sessionId
      *
      *
-     * @return mixed[]|null
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/training/{id}/{sessionId}/{token}', name: 'front.program.training', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null): ?array
+    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null): \Symfony\Component\HttpFoundation\Response
     {
 
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
@@ -116,15 +120,15 @@ class ProgramController extends AbstractController
             throw $this->createNotFoundException();
         }
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // si pas de trainee enregistré
-        if (!isset($arTrainee[0])) {
+        if (!isset($arTrainee)) {
             // redirect user to registration form
             $url = $this->generateUrl('front.account.register');
             return new RedirectResponse($url);
         } else {
-            $trainee = $arTrainee[0];
+            $trainee = $arTrainee;
 
             $focusSession = null;
             foreach ($training->getSessions() as $session) {
@@ -182,9 +186,16 @@ class ProgramController extends AbstractController
 
             // Affichage d'un flag si le stage en public désigné
             if ($training->getDesignatedpublic())
-                $this->get('session')->getFlashBag()->add('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
+                $this->addFlash('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
 
-            return ['user' => $trainee, 'training' => $training, 'session' => $focusSession, 'upcomingSessions' => $upcomingSessions, 'pastSessions' => $pastSessions, 'token' => $token];
+            return $this->render('Front/Public/program/training.html.twig', [
+                'user' => $trainee,
+                'training' => $training,
+                'session' => $focusSession,
+                'upcomingSessions' => $upcomingSessions,
+                'pastSessions' => $pastSessions,
+                'token' => $token,
+            ]);
         }
     }
 
@@ -192,27 +203,27 @@ class ProgramController extends AbstractController
      * @param null $token
      *
      *
-     * @return RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/training/inscription/{id}/{sessionId}/{token}', name: 'front.program.inscription', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id, Session $session, $token = null): RedirectResponse
+    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id,int $sessionId, Session $session, $token = null): \Symfony\Component\HttpFoundation\Response
     {
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
         if (!isset($training)) {
             throw $this->createNotFoundException();
         }
-        $session = $doctrine->getRepository(\App\Entity\Back\Session::class)->find($id);
+        $session = $doctrine->getRepository(\App\Entity\Back\Session::class)->find($sessionId);
         if (!isset($session)) {
             throw $this->createNotFoundException();
         }
         // in case shibboleth authentication
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $inscription = $doctrine->getManager()->getRepository(\App\Entity\Core\AbstractInscription::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if ($inscription) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous êtes déjà inscrit à cette session.");
+            $this->addFlash('warning', "Vous êtes déjà inscrit à cette session.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -235,7 +246,7 @@ class ProgramController extends AbstractController
                     // Test statut de l'inscription pour eliminer les avis défavorables, session annulée, ...
                     if ($insc->getInscriptionstatus()->getStatus() != 3) {
                         $libelleinsc = $insc->getSession()->getName();
-                        $this->get('session')->getFlashBag()->add('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+                        $this->addFlash('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
                     }
                 }
             }
@@ -270,7 +281,7 @@ class ProgramController extends AbstractController
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
                 $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
-                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+                $this->addFlash('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
             $form = $this->createForm(InscriptionType::class, $inscription);
@@ -282,7 +293,7 @@ class ProgramController extends AbstractController
                     $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
-                    $this->get('session')->getFlashBag()->add('success', 'Votre inscription a bien été enregistrée.');
+                    $this->addFlash('success', 'Votre inscription a bien été enregistrée.');
 
                     $id = $inscription->getId();
                     // Lien vers la page d'autorisation
@@ -320,8 +331,6 @@ class ProgramController extends AbstractController
                         $newbody = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastname(), $newbody);
                         $newbody = str_replace("[session.dateDebut]", $inscription->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                         $newbody = str_replace("[session.dateFin]", $inscription->getSession()->getDateend()->format('d/m/Y'), $newbody);
-                        $newbody = str_replace("[session.nom]", $inscription->getSession()->getName(), $newbody);
-                        $newbody = str_replace("[motivation]", $inscription->getMotivation(), $newbody);
                         $newbody = str_replace("[lien]", $lien, $newbody);
 
                         // Envoyer un mail au supérieur hiérarchique
@@ -355,10 +364,10 @@ class ProgramController extends AbstractController
             }
 
 
-            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
+            return $this->render('Front/Public/program/inscription.html.twig',['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
         } else {
-            //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
-            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
+            $this->addFlash('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
+            return $this->redirectToRoute('front.program.myprogram');
         }
     }
 
@@ -382,13 +391,13 @@ class ProgramController extends AbstractController
         }
         // in case shibboleth authentication
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $alert = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
 
         if ($alert) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous êtes déjà inscrit à l'alerte d'ouverture de la session.");
+            $this->addFlash('warning', "Vous êtes déjà inscrit à l'alerte d'ouverture de la session.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -402,7 +411,7 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             $em->persist($alert);
             $em->flush();
-            $this->get('session')->getFlashBag()->add('success', 'Votre alerte a bien été enregistrée.');
+            $this->addFlash('success', 'Votre alerte a bien été enregistrée.');
         }
 
         return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
@@ -427,12 +436,12 @@ class ProgramController extends AbstractController
             throw new Exception('Training not found');
         }
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $alert = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if (!$alert) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous désinscrire de l'alerte.");
+            $this->addFlash('warning', "Vous ne pouvez pas vous désinscrire de l'alerte.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -443,7 +452,7 @@ class ProgramController extends AbstractController
             $em->flush();
         }
 
-        $this->get('session')->getFlashBag()->add('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
+        $this->addFlash('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
 
         return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
     }
@@ -456,14 +465,14 @@ class ProgramController extends AbstractController
     {
         $codes = [];
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $etablissement = $arTrainee[0]->getInstitution()->getName();
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $etablissement = $arTrainee->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->isMultiEtab($arTrainee[0]);
+        $multiEtab = $this->isMultiEtab($arTrainee);
 
         // Recupération des centres de mon établissement
-        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee[0]->getInstitution()]);
+        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee->getInstitution()]);
         foreach ($organizations as $organization) {
             $codes[] = $organization->getCode();
         }
@@ -530,11 +539,11 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
         }
 
         return $this->render('Front/Public/myprogram.html.twig', [
-            'user' => $arTrainee[0],
+            'user' => $arTrainee,
             'search' => $search,
             'img' => '',
             'form' => $form->createView(),
@@ -550,17 +559,17 @@ class ProgramController extends AbstractController
     {
         // Recuperation info du user authentifié
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // Recup allProgram = toutes les formations des centres et établissements liés
         // Récupération des centres de l'établissement du stagiaire
-        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee[0]->getInstitution()]);
+        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee->getInstitution()]);
         $codes = [];
         foreach ($organizations as $centre) {
             $codes[] = $centre->getCode();
         }
         // Récupération des établissements liés
-        $otherEtabs = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+        $otherEtabs = $arTrainee->getInstitution()->getVisuinstitutions();
         if ($otherEtabs != null) {
             // Récupération des centres pour chaque établissement
             foreach ($otherEtabs as $otherEtab) {
@@ -632,7 +641,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
         }
 
         return $this->render('Front/Public/allprogram.html.twig', ['user' => $arTrainee, 'search' => $search, 'img' => '', 'form' => $form->createView()]);
@@ -649,22 +658,22 @@ class ProgramController extends AbstractController
     {
         $organizations = [];
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->isMultiEtab($arTrainee[0]);
+        $multiEtab = $this->isMultiEtab($arTrainee);
 
         if ($centreCode=="tous") {
             $centreCodes = [];
             // Recup allProgram = toutes les formations des centres et établissements liés
             // Récupération des centres de l'établissement du stagiaire
-            $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee[0]->getInstitution()]);
+            $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee->getInstitution()]);
             foreach ($organizations as $centre) {
                 $centreCodes[] = $centre->getCode();
             }
 
             // Récupération des établissements liés
-            $otherEtabs = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+            $otherEtabs = $arTrainee->getInstitution()->getVisuinstitutions();
             if ($otherEtabs != null) {
                 // Récupération des centres pour chaque établissement
                 foreach ($otherEtabs as $otherEtab) {
@@ -709,7 +718,7 @@ class ProgramController extends AbstractController
 
                 $sessionExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Session::class)->findOneBy(['id' => $session->getId()]);
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee[0], 'session'=> $sessionExiste]);
+                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee, 'session'=> $sessionExiste]);
                 if ($alertExiste) {
                     // si l'alerte existe, on coche la case de présence
                     $alert->setAlert(true);
@@ -718,7 +727,7 @@ class ProgramController extends AbstractController
                 }
 
                 $alert->setSessionId($session->getId());
-                $alert->setTraineeId($arTrainee[0]->getId());
+                $alert->setTraineeId($arTrainee->getId());
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -734,14 +743,14 @@ class ProgramController extends AbstractController
                 // On verifie si la session et l'alerte existent déjà
                 $sessionExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Session::class)->findOneBy(['id' => $alert->getSessionId()]);
 
-                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee[0], 'session'=> $sessionExiste]);
+                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee, 'session'=> $sessionExiste]);
 
                 // Si la case est cochée
                 if ($alert->getAlert() == true) {
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($arTrainee[0]);
+                        $alertNew->setTrainee($arTrainee);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);
@@ -759,7 +768,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
         }
 
         return $this->render('Front/Public/searchResult.html.twig', [
@@ -773,19 +782,19 @@ class ProgramController extends AbstractController
     public function search(Request $request, ManagerRegistry $doctrine): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
 
         // Recup param pour l'activation du multi établissement
-        $multiEtab = $this->isMultiEtab($arTrainee[0]);
+        $multiEtab = $this->isMultiEtab($arTrainee);
 
         /** @var EntityManager $em */
         $em = $doctrine->getManager();
         $theme = $em->getRepository(\App\Entity\Term\Theme::class)->findOneBy(['name' => 'Tous les domaines']);
         // Récupération des centres de l'établissement du stagiaire
-        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee[0]->getInstitution()]);
+        $organizations = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $arTrainee->getInstitution()]);
 
         // Récupération des établissements liés
-        $visuInstitutions = $arTrainee[0]->getInstitution()->getVisuinstitutions();
+        $visuInstitutions = $arTrainee->getInstitution()->getVisuinstitutions();
         // creer le tableau des centres liés aux établissements visibles
         foreach($visuInstitutions as $visuInst) {
             $organizationsVisu = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['institution' => $visuInst]);
@@ -796,7 +805,7 @@ class ProgramController extends AbstractController
 
         $defaultData = ['centre' => $organizations[0], 'theme' => $theme, 'texte' => ""];
         $form = $this->createForm(ProgramSearchType::class, $defaultData,
-            ['institution' => $arTrainee[0]->getInstitution(), 'organizations' => $organizations]
+            ['institution' => $arTrainee->getInstitution(), 'organizations' => $organizations]
             );
 
         $centreCode = '';

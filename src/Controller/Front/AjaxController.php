@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+
 Use Elastica\Query;
 Use Elastica\Filter\BoolAnd;
 Use Elastica\Filter\BoolOr;
@@ -49,10 +50,10 @@ final class AjaxController extends AbstractController
      * @return string la liste des sessions au format json
      */
     #[Route(path: '/ajax/completlist', name: 'ajax_completlist')]
-    public function CompletList(): string
+    public function CompletList(Request $request): string
     {
         $json = [];
-        $request = $this->get('request');
+
 
         $term = $request->request->get('motcle');
         $domaine = $request->request->get('domaine');

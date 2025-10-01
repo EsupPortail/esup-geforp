@@ -16,7 +16,6 @@ use Monolog\Logger;
 use App\Form\Type\ProfileType;
 use App\Entity\Back\Trainee;
 use App\Entity\Back\SupannCodeEntite;
-use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +41,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
      *
      */
     #[Route(path: '/register', name: 'front.account.register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): array
+    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
@@ -99,7 +98,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
         }
 
         $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
-        $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
+		$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -155,7 +154,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
             }
             if ($flagDoc == 0) {
                 // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
                 return $this->redirectToRoute('front.public.index');
             }
         } else {
@@ -186,7 +185,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
 
         if ($flagEtab !== 1) {
             // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+            $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
             return $this->redirectToRoute('front.public.index');
 
         }
@@ -299,7 +298,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                             // Mail institutionel ok
                             // on vérifie que le mail du responsable est différent de celui du stagiaire
                             if (strtolower($trainee->getEmailsup()) === strtolower((string) $trainee->getEmail())) {
-                                $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
+                                $this->addFlash('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
                                 $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee);
                                 $trainee->setCreatedAt(new \DateTime('now'));
@@ -308,13 +307,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                                 $em = $managerRegistry->getManager();
                                 $em->persist($trainee);
                                 $em->flush();
-                                $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
+                                $this->addFlash('success', 'Votre profil a bien été créé.');
 
                                 return $this->redirectToRoute('front.program.myprogram');
 
                             }
                         }else {
-                            $this->get('session')->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+                            $this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
 
                     }
@@ -326,13 +325,13 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                     $em = $managerRegistry->getManager();
                     $em->persist($trainee);
                     $em->flush();
-                    $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été créé.');
+                    $this->addFlash('success', 'Votre profil a bien été créé.');
 
-                    return [$this->render('Front/Account/profile/account-registration.html.twig')];
+                    return $this->render('Front/Account/profile/account-registration.html.twig');
                 }
             }
         }
-        return ['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()];
+        return $this->render('Front/Account/profile/account-registration.html.twig',['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()]);
     }
 
     /**

@@ -42,8 +42,8 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup param evaluations
         $evalActif = $this->getParameter('eval_actif');
@@ -56,12 +56,12 @@ class AttendanceAccountController extends AbstractController
     }
 
     #[Route(path: '/attendance/{session}', name: 'front.account.attendance', methods: ['GET'])]
-    public function attendance($session, ManagerRegistry $doctrine): array
+    public function attendance($session, ManagerRegistry $doctrine): Response
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup param pour l'activation des evaluations
         $evalActif = $this->getParameter('eval_actif');
@@ -78,8 +78,8 @@ class AttendanceAccountController extends AbstractController
         }*/
         $attendance->getSession()->setAllMaterials($allMaterials);
 
-        return ['user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif,
-        $this->render('Front/Account/attendance/attendance.html.twig')];
+        return $this->render('Front/Account/attendance/attendance.html.twig', ['user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif,
+        ]);
     }
 
     #[Route(path: '/attendance/{id}/evaluation', name: 'front.account.attendance.evaluation')]
@@ -91,8 +91,8 @@ class AttendanceAccountController extends AbstractController
         }
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup params pour les critères d'évalutation
         $evalCritere0Actif = $this->getParameter('eval_critere_0_actif');
@@ -111,7 +111,7 @@ class AttendanceAccountController extends AbstractController
 
         if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
             // Pb : l'évaluation a déjà été remplie
-            $this->get('session')->getFlashBag()->add('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
+            $this->addFlash('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
             return $this->render('Front/Account/attendance/evaluation.html.twig');
 
         }
@@ -135,12 +135,12 @@ class AttendanceAccountController extends AbstractController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $doctrine->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', "Les réponses ont bien été enregistrées. Merci d'avoir noté la session.");
+                $this->addFlash('success', "Les réponses ont bien été enregistrées. Merci d'avoir noté la session.");
                 return $this->redirectToRoute('front.account.attendance', ['session' => $attendance->getSession()->getId()]);
             }
         }
 
-        return ['user' => $trainee, 'attendance' => $attendance, 'form' => $form->createView()];
+        return $this->render('Front/Account/attendance/evaluation.html.twig',['user' => $trainee, 'attendance' => $attendance, 'form' => $form->createView()]);
     }
 
 
@@ -149,7 +149,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
         $trainee = $arTrainee[0];
 
         $attendance   = $this->getAttendance($doctrine, $session, $trainee);
@@ -184,8 +184,8 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $attendance = $this->getAttendance($doctrine, $session, $trainee);
         $session = $attendance->getSession();
@@ -241,12 +241,12 @@ class AttendanceAccountController extends AbstractController
         foreach ($images as $img) {
             $fileName = $img->getName();
             if(str_contains($fileName, 'logo')){
-                if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                if ($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileLogo = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }
             if(str_contains($fileName, 'signature')){
-                if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                if ($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileSignature = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }

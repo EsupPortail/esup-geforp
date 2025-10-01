@@ -20,7 +20,6 @@ use App\Entity\Back\SupannCodeEntite;
 use Symfony\Component\Routing\Attribute\Route;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Config\Doctrine;
 
 #[Route(path: '/account')]
 final class AccountController extends AbstractController
@@ -59,10 +58,10 @@ final class AccountController extends AbstractController
 
         if (isset($userPersitentId)) {
            // dump($arTrainee);
-            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethPersistentId" => $userPersitentId]);
+            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethpersistentid" => $userPersitentId]);
             if ($arTrainee !== null) {
             } elseif (isset($userEmail)) {
-                $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy($userEmail);
+                $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["email" =>$userEmail]);
                 if (!empty($arTrainee)) {
                     // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on met à jour le persistent id
                     $trainee = $arTrainee[0];
@@ -117,7 +116,7 @@ final class AccountController extends AbstractController
             }
             $this->logger->debug('Shibboleth attributes: ' . json_encode($shibbolethAttributes, JSON_PRETTY_PRINT));
             $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
-            $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
+			$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
             if ($shibbolethAttributes['primary-affiliation'] == "staff") {
                 // Transformation de l'attribut 'staff' en 'employee'
                 $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -174,7 +173,7 @@ final class AccountController extends AbstractController
                 }
                 if ($flagDoc == 0) {
                     // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                    $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                    $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
                     return $this->redirectToRoute('front.public.index');
                 }
             } else {
@@ -205,7 +204,7 @@ final class AccountController extends AbstractController
 
             if ($flagEtab !== 1) {
                 // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-                $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
                 return $this->redirectToRoute('front.public.index');
             }
 
@@ -325,8 +324,8 @@ final class AccountController extends AbstractController
         // Mise à jour du profil avec les attributs récupérés par Shibboleth
         $shibbolethAttributes = $this->getUser()->getCredentials();
         $userEmail = $this->getUser()->getCredentials()['mail'];
-        $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($userEmail);
-        $trainee = $arTrainee[0];
+        $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $userEmail]);
+        $trainee = $arTrainee;
 
         $trainee->setShibbolethpersistentid($shibbolethAttributes['eppn']);
         // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
@@ -373,7 +372,7 @@ final class AccountController extends AbstractController
         }
 
         $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
-        $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
+		$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -434,7 +433,7 @@ final class AccountController extends AbstractController
             }
             if ($flagDoc == 0) {
                 // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
                 return $this->redirectToRoute('front.public.index');
             }
         } else {
@@ -465,7 +464,7 @@ final class AccountController extends AbstractController
 
         if ($flagEtab !== 1) {
             // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+            $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
             return $this->redirectToRoute('front.public.index');
 
         }
