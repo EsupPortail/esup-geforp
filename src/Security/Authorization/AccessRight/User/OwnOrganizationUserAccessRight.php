@@ -29,7 +29,7 @@ final class OwnOrganizationUserAccessRight extends AbstractAccessRight
      * La signature de la méthode doit respecter l'ordre des paramètres :
      * TokenInterface $token, $object (optionnel), $attribute
      */
-    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
         if ($object) {
             // Vérifie si l'organisation de l'objet correspond à celle de l'utilisateur authentifié

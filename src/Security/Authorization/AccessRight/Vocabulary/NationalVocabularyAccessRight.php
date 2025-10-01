@@ -38,7 +38,7 @@ final class NationalVocabularyAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
         if (!is_object($object)) {
             return false;

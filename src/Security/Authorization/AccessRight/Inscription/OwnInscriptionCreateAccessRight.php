@@ -32,7 +32,7 @@ final class OwnInscriptionCreateAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
+    public function isGranted(TokenInterface $token, $object = nulli, $attribute): bool
     {
         if ($attribute !== 'CREATE') {
             return false;
