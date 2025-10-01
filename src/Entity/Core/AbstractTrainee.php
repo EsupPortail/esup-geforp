@@ -62,7 +62,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
      * @Serializer\Groups({"trainee"})
      * @var Collection<int, AbstractInscription>|AbstractInscription[]
      */
-    #[Type("ArrayCollection<AbstractInscription::class>")]
     #[Groups(['trainee'])]
     #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: AbstractInscription::class, cascade: ['remove'])]
     protected Collection $inscriptions;

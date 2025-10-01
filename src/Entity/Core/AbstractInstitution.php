@@ -51,7 +51,6 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     #[ORM\Column(name: 'idp', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
     protected ?string $idp = null;
 
-    #[Type("ArrayCollection<Domain::class>")]
     #[Groups(['Default', 'api'])]
     #[ORM\JoinTable(name: 'institution__institution_domain')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
@@ -59,7 +58,6 @@ abstract class AbstractInstitution implements SerializedAccessRights, \Stringabl
     #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Domain::class)]
     protected Collection $domains;
 
-    #[Type("ArrayCollection<AbstractInstitution::class>")]
     #[Groups(['Default', 'api'])]
     #[ORM\JoinTable(name: 'institution__visuinstitutions')]
     #[ORM\JoinColumn(name: 'institution_id', onDelete: 'cascade')]
