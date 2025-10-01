@@ -298,7 +298,10 @@ parameters:
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
-                    prenom: { property: "Lastname" }
+                    property: "trainees"
+                    fields:
+                        prenom: { property: "firstname" }
+                        nom: { property: "lastname" }
                     formateur: { property: "participations[0].trainer" }
                     nombrePlaces: { property: "maximumnumberofregistrations" }
                     nombreInscrits: { property: "numberofregistrations" }
