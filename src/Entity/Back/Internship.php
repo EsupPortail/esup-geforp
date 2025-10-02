@@ -8,49 +8,52 @@ use JMS\Serializer\Annotation as Serializer;
 use App\Entity\Term\Publictype;
 use App\Entity\Core\AbstractTraining;
 use App\Form\Type\InternshipType;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Stage.
  *
- * @ORM\Entity
- * @ORM\Table(name="internship")
  */
+#[ORM\Table(name: 'internship')]
+#[ORM\Entity]
 class Internship extends AbstractTraining
 {
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Publictype")
-     * @ORM\JoinTable(name="internship__internship_publictype",
-     *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="publictype_id", referencedColumnName="id")}
-     * )
      * @Serializer\Groups({"training", "inscription", "api"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Publictype>
      */
-    protected $publictypes;
+    #[Groups([ 'training','inscription', 'api'])]
+    #[ORM\JoinTable(name: 'internship__internship_publictype')]
+    #[ORM\JoinColumn(name: 'intership_id')]
+    #[ORM\InverseJoinColumn(name: 'publictype_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Publictype::class)]
+    protected \Doctrine\Common\Collections\Collection $publictypes;
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Term\Publictype")
-     * @ORM\JoinTable(name="internship__internship_publictyperestrict",
-     *      joinColumns={@ORM\JoinColumn(name="intership_id", referencedColumnName="id")},
-     *      inverseJoinColumns={@ORM\JoinColumn(name="publictyperestrict_id", referencedColumnName="id")}
-     * )
      * @Serializer\Groups({"training", "inscription", "api"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Term\Publictype>
      */
-    protected $publictypesrestrict;
+    #[Groups([ 'training','inscription', 'api'])]
+    #[ORM\JoinTable(name: 'internship__internship_publictyperestrict')]
+    #[ORM\JoinColumn(name: 'intership_id')]
+    #[ORM\InverseJoinColumn(name: 'publictyperestrict_id', referencedColumnName: 'id')]
+    #[ORM\ManyToMany(targetEntity: \App\Entity\Term\Publictype::class)]
+    protected \Doctrine\Common\Collections\Collection $publictypesrestrict;
 
     /**
-     * @var string
-     * @ORM\Column(name="prerequisites", type="text", nullable=true)
      * @Serializer\Groups({"training", "api"})
      */
-    protected $prerequisites;
+    #[Groups([ 'training','inscription', 'api'])]
+    #[ORM\Column(name: 'prerequisites', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $prerequisites = null;
 
     /**
-     * @ORM\Column(name="designated_public", type="boolean", nullable=true)
      *
-     * @var bool
      * @Serializer\Groups({"training", "api"})
      */
-    protected $designatedpublic;
+    #[Groups([ 'training', 'api'])]
+    #[ORM\Column(name: 'designated_public', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    protected ?bool $designatedpublic = null;
 
 
     public function __construct()
@@ -69,10 +72,7 @@ class Internship extends AbstractTraining
         parent::__construct();
     }
 
-    /**
-     * @param mixed $Publictypes
-     */
-    public function setPublictypes($Publictypes)
+    public function setPublictypes(mixed $Publictypes): void
     {
         $this->publictypes = $Publictypes;
     }
@@ -80,7 +80,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypes()
+    public function getPublictypes(): \Doctrine\Common\Collections\Collection
     {
         return $this->publictypes;
     }
@@ -88,7 +88,7 @@ class Internship extends AbstractTraining
     /**
      * @param Publictype $Publictype
      */
-    public function addPublictype($Publictype)
+    public function addPublictype($Publictype): void
     {
         if (!$this->publictypes->contains($Publictype)) {
             $this->publictypes->add($Publictype);
@@ -98,7 +98,7 @@ class Internship extends AbstractTraining
     /**
      * @param Publictype $Publictype
      */
-    public function removePublictype($Publictype)
+    public function removePublictype($Publictype): void
     {
         if ($this->publictypes->contains($Publictype)) {
             $this->publictypes->removeElement($Publictype);
@@ -107,23 +107,20 @@ class Internship extends AbstractTraining
 
     /**
      * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
-     * @return String
      */
-    public function getPublictypesListString()
+    public function getPublictypesListString(): string
     {
         if (empty($this->publictypes)) return "";
-        $ptNames = array();
-        foreach ($this->publictypes as $pt) {
-            $ptNames[] = $pt->getName();
+
+        $ptNames = [];
+        foreach ($this->publictypes as $publictype) {
+            $ptNames[] = $publictype->getName();
         }
 
         return implode(", ", $ptNames);
     }
 
-    /**
-     * @param mixed $Publictypesrestrict
-     */
-    public function setPublictypesrestrict($Publictypesrestrict)
+    public function setPublictypesrestrict(mixed $Publictypesrestrict): void
     {
         $this->publictypesrestrict = $Publictypesrestrict;
     }
@@ -131,7 +128,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPublictypesrestrict()
+    public function getPublictypesrestrict(): \Doctrine\Common\Collections\Collection
     {
         return $this->publictypesrestrict;
     }
@@ -139,7 +136,7 @@ class Internship extends AbstractTraining
     /**
      * @param Publictype $Publictype
      */
-    public function addPublictyperestrict($Publictype)
+    public function addPublictyperestrict($Publictype): void
     {
         if (!$this->publictypesrestrict->contains($Publictype)) {
             $this->publictypesrestrict->add($Publictype);
@@ -149,7 +146,7 @@ class Internship extends AbstractTraining
     /**
      * @param Publictype $Publictype
      */
-    public function removePublictyperestrict($Publictype)
+    public function removePublictyperestrict($Publictype): void
     {
         if ($this->publictypesrestrict->contains($Publictype)) {
             $this->publictypesrestrict->removeElement($Publictype);
@@ -158,12 +155,12 @@ class Internship extends AbstractTraining
 
     /**
      * HumanReadablePropertyAccessor helper : provides a list of public_old types as string
-     * @return String
      */
-    public function getPublictypesRestrictListString()
+    public function getPublictypesRestrictListString(): string
     {
         if (empty($this->publictypesrestrict)) return "";
-        $ptNames = array();
+
+        $ptNames = [];
         foreach ($this->publictypesrestrict as $pt) {
             $ptNames[] = $pt->getName();
         }
@@ -174,15 +171,12 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getPrerequisites()
+    public function getPrerequisites(): ?string
     {
         return $this->prerequisites;
     }
 
-    /**
-     * @param mixed $prerequisites
-     */
-    public function setPrerequisites($prerequisites)
+    public function setPrerequisites(mixed $prerequisites): void
     {
         $this->prerequisites = $prerequisites;
     }
@@ -190,7 +184,7 @@ class Internship extends AbstractTraining
     /**
      * @return mixed
      */
-    public function getDesignatedpublic()
+    public function getDesignatedpublic(): ?bool
     {
         return $this->designatedpublic;
     }
@@ -198,31 +192,22 @@ class Internship extends AbstractTraining
     /**
      * @param mixed $designatedpublic
      */
-    public function setDesignatedpublic($designatedPublic)
+    public function setDesignatedpublic(?bool $designatedPublic): void
     {
         $this->designatedpublic = $designatedPublic;
     }
 
-    /**
-     * @return string
-     */
-    static public function getType()
+    static public function getType(): string
     {
         return 'internship';
     }
 
-    /**
-     * @return string
-     */
-    static public function getTypeLabel()
+    static public function getTypeLabel(): string
     {
         return 'Stage';
     }
 
-    /**
-     * @return string
-     */
-    static public function getFormType()
+    static public function getFormType(): string
     {
         return InternshipType::class;
     }

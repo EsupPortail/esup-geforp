@@ -9,14 +9,25 @@ use App\Entity\Back\Organization;
  */
 interface VocabularyInterface
 {
-    const VOCABULARY_NATIONAL = 0;
-    const VOCABULARY_LOCAL    = 1;
-    const VOCABULARY_MIXED    = 2;
+    /**
+     * @var int
+     */
+    public const VOCABULARY_NATIONAL = 0;
+
+    /**
+     * @var int
+     */
+    public const VOCABULARY_LOCAL    = 1;
+
+    /**
+     * @var int
+     */
+    public const VOCABULARY_MIXED    = 2;
 
     /**
      * @return bool
      */
-    public static function getVocabularyStatus();
+    public static function getVocabularyStatus(): int;
 
     /**
      * @return Organization|null mixed
@@ -41,5 +52,7 @@ interface VocabularyInterface
     /**
      * @return mixed
      */
-    public function getVocabularyName();
+    public function getVocabularyName(): string;
+
+    public function isLocked();
 }

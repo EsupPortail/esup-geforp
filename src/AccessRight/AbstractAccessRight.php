@@ -9,42 +9,29 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
  */
 abstract class AbstractAccessRight implements AccessRightInterface
 {
-    /**
-     * @var int
-     */
-    private $id;
+    private int $id;
 
-    /**
-     * @return string
-     */
-    public abstract function getLabel();
+    public abstract function getLabel(): string;
 
     /**
      * Checks if the access right supports the given class.
      *
      * @param string
      *
-     * @return bool
      */
-    public abstract function supportsClass($class);
+    public abstract function supportsClass($class): bool;
 
     /**
      * Returns the vote for the given parameters.
      */
     public abstract function isGranted(TokenInterface $token, $object = null, $attribute);
 
-    /**
-     * @param int $id
-     */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
-    /**
-     * @return int
-     */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -52,12 +39,10 @@ abstract class AbstractAccessRight implements AccessRightInterface
     /**
      * Checks if the access right supports the given attribute.
      *
-     * @param string $attribute
      *
-     * @return bool
      */
-    public function supportsAttribute($attribute)
+    public function supportsAttribute(string $attribute): bool
     {
-        return in_array($attribute, array('VIEW', 'EDIT', 'ADD', 'REMOVE', 'CREATE', 'DELETE', 'MANAGEDUPLICATE'), true);
+        return in_array($attribute, ['VIEW', 'EDIT', 'ADD', 'REMOVE', 'CREATE', 'DELETE', 'MANAGEDUPLICATE'], true);
     }
 }

@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Inscription;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllInscriptionCreateAccessRight extends AbstractAccessRight
+final class AllInscriptionCreateAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Créer les inscriptions aux formations de tous les centres';
     }
@@ -26,24 +23,17 @@ class AllInscriptionCreateAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Inscription') {
-            return true;
-        }
-
-        return false;
+        return $class === \App\Entity\Back\Inscription::class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
-        if ($attribute !== 'CREATE') return false;
-
-        return true;
+        return $attribute === 'CREATE';
     }
 }

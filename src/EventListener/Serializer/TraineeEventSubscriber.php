@@ -10,40 +10,34 @@ use App\Entity\Core\AbstractTrainee;
 /**
  * Trainee serialization event subscriber.
  */
-class TraineeEventSubscriber implements EventSubscriberInterface
+final class TraineeEventSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array('event' => 'serializer.post_serialize', 'method' => 'onPostSerialize'),
-        );
+        return [['event' => 'serializer.post_serialize', 'method' => 'onPostSerialize']];
     }
 
     /**
      * On api.profile post serialize, add some data to the trainee.
      *
-     * @param ObjectEvent $event
      */
-    public function onPostSerialize(ObjectEvent $event)
+    public function onPostSerialize(ObjectEvent $objectEvent): void
     {
         //$groups = $event->getContext()->attributes->get('groups');
-        if ($event->getContext()->hasAttribute('groups')) {
-            $groups = $event->getContext()->getAttribute('groups');
-            $trainee = $event->getObject();
+        if ($objectEvent->getContext()->hasAttribute('groups')) {
+            $groups = $objectEvent->getContext()->getAttribute('groups');
+            $trainee = $objectEvent->getObject();
             if ($trainee instanceof AbstractTrainee && in_array('api.token', $groups, true)) {
-                $inscriptions = array();
+                $inscriptions = [];
                 /** @var AbstractInscription $inscription */
                 foreach ($trainee->getInscriptions() as $inscription) {
-                    $inscriptions[] = array(
-                        'id' => $inscription->getId(),
-                        'session' => $inscription->getSession()->getId(),
-                        'inscriptionStatus' => $inscription->getInscriptionstatus()->getId(),
-                    );
+                    $inscriptions[] = ['id' => $inscription->getId(), 'session' => $inscription->getSession()->getId(), 'inscriptionStatus' => $inscription->getInscriptionstatus()->getId()];
                 }
-                $event->getVisitor()->addData('registrations', $inscriptions);
+
+                $objectEvent->getVisitor()->getResult('registrations', $inscriptions);
             }
         }
     }

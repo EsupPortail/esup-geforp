@@ -18,73 +18,48 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
 
-class ProgramSearchType extends AbstractType
+final class ProgramSearchType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
         // Mise en forme des établissements visibles par le stagiaire -> visibilité des centres
-        $institutions = array();
+        $institutions = [];
         $institution = $options['institution'];
         // Récupération des établissements liés
         $visuInstitutions = $institution->getVisuinstitutions();
         // creer le tableau des établissements visibles
         $institutions[0] = $institution;
-        foreach($visuInstitutions as $visuInst) {
-            $institutions[] = $visuInst;
+        foreach($visuInstitutions as $visuInstitution) {
+            $institutions[] = $visuInstitution;
         }
 
         $organizations = $options['organizations'];
 
-        $builder
-            ->add('centre', EntityType::class, array(
-                'label' => 'Centre organisateur',
-                'choice_label' => 'name',
-                'class' => Organization::class,
-                'query_builder' => function (EntityRepository $repository) use ($institutions) {
-                    $qb = $repository->createQueryBuilder('o');
-                    $qb->where('o.institution in (:institution)')
-                        ->setParameter('institution', $institutions)
-                        ->orWhere('o.institution is null');
-
-                    return $qb;
-                },
-            ))
-            ->add('theme', EntityType::class, array(
-                'label' => 'Domaine de formation',
-                'choice_label' => 'name',
-                'class' => Theme::class,
-                'query_builder' => function (EntityRepository $repository) use ($organizations) {
-                    $qb = $repository->createQueryBuilder('th');
-                    $qb->where('th.organization in (:organization)')
-                        ->setParameter('organization', $organizations)
-                        ->orWhere('th.organization is null');
-
-                    return $qb;
-                },
-            ))
-            ->add('texte', null, array(
-                'label' => 'Recherche par mot clé',
-                'required' => false,
-                'attr' => array('placeholder' => 'Tapez un mot clé')
-            ));
+        $formBuilder
+            ->add('centre', EntityType::class, ['label' => 'Centre organisateur', 'choice_label' => 'name', 'class' => Organization::class, 'query_builder' => static function (EntityRepository $entityRepository) use ($institutions) : \Doctrine\ORM\QueryBuilder {
+                $queryBuilder = $entityRepository->createQueryBuilder('o');
+                $queryBuilder->where('o.institution in (:institution)')
+                    ->setParameter('institution', $institutions)
+                    ->orWhere('o.institution is null');
+                return $queryBuilder;
+            }])
+            ->add('theme', EntityType::class, ['label' => 'Domaine de formation', 'choice_label' => 'name', 'class' => Theme::class, 'query_builder' => static function (EntityRepository $entityRepository) use ($organizations) : \Doctrine\ORM\QueryBuilder {
+                $queryBuilder = $entityRepository->createQueryBuilder('th');
+                $queryBuilder->where('th.organization in (:organization)')
+                    ->setParameter('organization', $organizations)
+                    ->orWhere('th.organization is null');
+                return $queryBuilder;
+            }])
+            ->add('texte', null, ['label' => 'Recherche par mot clé', 'required' => false, 'attr' => ['placeholder' => 'Tapez un mot clé']]);
 
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => null,
-            'institution' => null,
-            'organizations' => null,
-            'id' => 'search'
-        ));
+        $optionsResolver->setDefaults(['data_class' => null, 'institution' => null, 'organizations' => null, 'id' => 'search']);
     }
 
-    public function getName()
+    public function getName(): string
     {
         return 'search';
     }

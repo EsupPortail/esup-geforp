@@ -11,26 +11,23 @@ namespace App\Utils\Email;
 /**
  * Class CCRegistry.
  */
-class CCRegistry
+final class CCRegistry
 {
     /**
-     * @var array
+     * @param mixed[] $resolvers
      */
-    private $resolvers;
-
-    public function __construct($resolvers)
+    public function __construct(private $resolvers)
     {
-        $this->resolvers = $resolvers;
     }
 
     /**
      * @param $entity
      *
-     * @return array
+     * @return array<mixed, array{name: string, checked: bool}>
      */
-    public function getSupportedResolvers($entity = null)
+    public function getSupportedResolvers($entity = null): array
     {
-        $resolvers = array();
+        $resolvers = [];
         /** @var EmailResolverInterface $resolver */
         foreach ($this->resolvers as $resolver) {
             if (!$entity || $resolver::supports($entity)) {

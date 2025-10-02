@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Institution;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllInstitutionUpdateAccessRight extends AbstractAccessRight
+final class AllInstitutionUpdateAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Modifier les établissements de tous les centres';
     }
@@ -26,26 +23,17 @@ class AllInstitutionUpdateAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Institution') {
-            return true;
-        }
-
-        return false;
+        return $class === \App\Entity\Back\Institution::class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attributes): bool
     {
-        if ($attribute !== 'EDIT')  {
-            return false;
-        }
-
-        return true;
+        return $attribute === 'EDIT';
     }
 }

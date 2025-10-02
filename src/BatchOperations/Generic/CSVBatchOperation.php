@@ -9,6 +9,7 @@
 
 namespace App\BatchOperations\Generic;
 
+use App\Entity\Back\Session;
 use Doctrine\ORM\EntityManager;
 use App\BatchOperations\AbstractBatchOperation;
 use App\Entity\Core\User;
@@ -18,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 use League\Csv\Writer;
 use League\Csv\CharsetConverter;
 
@@ -28,32 +29,24 @@ use League\Csv\CharsetConverter;
 class CSVBatchOperation extends AbstractBatchOperation
 {
     /**
-     * @var EntityManager
-     */
-    protected $security;
-
-    /**
      * @var array
      */
-    protected $options = array(
-        'volcanus_config' => array(
-            'delimiter' => ';',
-            'enclose' => true,
-            'enclosure' => '"',
-            'escape' => '"',
-            'inputEncoding' => 'UTF-8',
-            'outputEncoding' => 'ISO-8859-1',
-            'writeHeaderLine' => true,
-            'responseFilename' => 'export.csv',
-        ),
-    );
-
+    protected array $options = ['volcanus_config' => ['delimiter' => ';', 'enclose' => true, 'enclosure' => '"', 'escape' => '"', 'inputEncoding' => 'UTF-8', 'outputEncoding' => 'ISO-8859-1', 'writeHeaderLine' => true, 'responseFilename' => 'export.csv']];
+    // Création de la requête de récupération des tags
     /**
-     * @param Security $security
+     * @var string
      */
-    public function __construct(Security $security)
+    private const string SQL = <<<SQL
+        SELECT t.name
+FROM tag t
+JOIN training__training_tag i_t ON i_t.tag_id = t.id
+JOIN training train ON train.id = i_t.training_id
+WHERE train.id = :trainingId 
+SQL;
+
+    public function __construct(protected Security $security)
     {
-        $this->security = $security;
+        parent::__construct();
         $this->options['tempDir'] = sys_get_temp_dir() . '/sygefor/';
         if (!file_exists($this->options['tempDir'])) {
             mkdir($this->options['tempDir'], 0777);
@@ -61,31 +54,30 @@ class CSVBatchOperation extends AbstractBatchOperation
     }
 
     /**
-     * @param array $idList
-     * @param array $options
      *
-     * @return mixed
+     * @return array{fileUrl: string}
      */
-    public function execute(array $idList = array(), array $options = array())
+    public function execute(array $idList = [], array $options = []): array
     {
         $entities = $this->getObjectList($idList);
-
         // accessor
-        $accessor = PropertyAccess::createPropertyAccessor();
+        $propertyAccessor = PropertyAccess::createPropertyAccessor();
+
+
         // lines
-        $lines = array();
+        $lines = [];
         foreach ($entities as $entity) {
 //            if (!$this->securityContext->getToken()->getUser() instanceof User || $this->securityContext->isGranted('VIEW', $entity)) {
-            $data = array();
+            $data = [];
             foreach ($this->options['fields'] as $key => $value) {
                 try {
                     // Cas particuliers
                     // Calcul des stats d'inscriptions pour les sessions
                     if ($key == "inscription.listeatt") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsListe = array();
+                        $statsListe = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -100,26 +92,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsListe[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsListe[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsListe[0]['count']))
-                                $data[$key] = $statsListe[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsListe[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "inscription.refus") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsRefus = array();
+                        $statsRefus = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -134,26 +118,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsRefus[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsRefus[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsRefus[0]['count']))
-                                $data[$key] = $statsRefus[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsRefus[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "inscription.desist") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsListe = array();
+                        $statsListe = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -168,26 +144,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsListe[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsListe[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsListe[0]['count']))
-                                $data[$key] = $statsListe[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsListe[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "inscription.convoke") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsRefus = array();
+                        $statsRefus = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -203,26 +171,18 @@ class CSVBatchOperation extends AbstractBatchOperation
                             $result = $query->getResult();
 
                             foreach($result as $status) {
-                                $statsRefus[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsRefus[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsRefus[0]['count']))
-                                $data[$key] = $statsRefus[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsRefus[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "inscription.presence.nbheures") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsNbHeures = array();
+                        $statsNbHeures = [];
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $session = $entity;
@@ -276,9 +236,11 @@ class CSVBatchOperation extends AbstractBatchOperation
                                             if ($pres->getMorning() == "Présent") {
                                                 $nbHeuresPresence += $dateSes->getHournumbermorn();
                                             }
+
                                             if ($pres->getAfternoon() == "Présent") {
                                                 $nbHeuresPresence += $dateSes->getHournumberafter();
                                             }
+
                                             break;
                                         }
                                 }
@@ -291,9 +253,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                         }
                     }elseif ($key == "session.presence.nbheures") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsPresPart = array();
+                        $statsPresPart = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -310,16 +272,12 @@ class CSVBatchOperation extends AbstractBatchOperation
                             $nbPresPart = 0;
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsPresPart[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsPresPart[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                                 $nbPresPart +=  (int) $status[1];
                             }
+
                             // On recupere le nombre de présences totales et partielles * nombre d'heures théoriques
-                            $data[$key] = $nbPresPart * $accessor->getValue($session, 'hournumber');
+                            $data[$key] = $nbPresPart * $propertyAccessor->getValue($session, 'hournumber');
 
                             // Transformation '.' en ',' pour faciliter Excel
                             $data[$key] = str_replace('.', ',', $data[$key]);
@@ -328,9 +286,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                         }
                     } elseif ($key == "presence.nbheures") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsNbHeures = array();
+                        $statsNbHeures = [];
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $inscription = $entity;
@@ -359,15 +317,17 @@ class CSVBatchOperation extends AbstractBatchOperation
                             $tabPresences = $query->getResult();
 
                             // Pour chaque presence, on compare avec le tableau des dates et on calcule le nombre d'heures
-                            foreach($tabPresences as $pres) {
-                                foreach($tabDatesSes as $dateSes) {
-                                    if ($pres->getDatebegin() == $dateSes->getDatebegin()) {
-                                        if ($pres->getMorning() == "Présent") {
-                                            $nbHeuresPresence += $dateSes->getHournumbermorn();
+                            foreach($tabPresences as $tabPresence) {
+                                foreach($tabDatesSes as $tabDateSe) {
+                                    if ($tabPresence->getDatebegin() == $tabDateSe->getDatebegin()) {
+                                        if ($tabPresence->getMorning() == "Présent") {
+                                            $nbHeuresPresence += $tabDateSe->getHournumbermorn();
                                         }
-                                        if ($pres->getAfternoon() == "Présent") {
-                                            $nbHeuresPresence += $dateSes->getHournumberafter();
+
+                                        if ($tabPresence->getAfternoon() == "Présent") {
+                                            $nbHeuresPresence += $tabDateSe->getHournumberafter();
                                         }
+
                                         break;
                                     }
                                 }
@@ -383,9 +343,9 @@ class CSVBatchOperation extends AbstractBatchOperation
                         }
                     } elseif ($key == "presence.partiel") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsPartiel = array();
+                        $statsPartiel = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -400,26 +360,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsPartiel[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsPartiel[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsPartiel[0]['count']))
-                                $data[$key] = $statsPartiel[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsPartiel[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "presence.absent") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsAbsent = array();
+                        $statsAbsent = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -434,26 +386,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsAbsent[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsAbsent[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsAbsent[0]['count']))
-                                $data[$key] = $statsAbsent[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsAbsent[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "presence.excuse") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsExcuse = array();
+                        $statsExcuse = [];
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
                         $session = $entity;
@@ -468,26 +412,18 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                             $result = $query->getResult();
                             foreach($result as $status) {
-                                $statsExcuse[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
+                                $statsExcuse[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
                             }
-                            // On recupere seulement le compteur
-                            if (isset($statsExcuse[0]['count']))
-                                $data[$key] = $statsExcuse[0]['count'];
-                            else
-                                $data[$key] = '';
+
+                            $data[$key] = $statsExcuse[0]['count'] ?? '';
                         } else {
                             $data[$key] = '';
                         }
                     } elseif ($key == "trainers.fullName") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
-                        $statsRefus = array();
+                        $statsRefus = [];
                         $liste = "";
                         /** @var EntityManager $em */
                         $em    = $this->doctrine->getManager();
@@ -502,115 +438,60 @@ class CSVBatchOperation extends AbstractBatchOperation
 
                         $result = $query->getResult();
                         foreach($result as $trainer) {
-                            $statsTrainer[] = array(
-                                'id'     => $trainer->getId(),
-                                'first'   => $trainer->getFirstName(),
-                                'last' => $trainer->getLastName()
-                            );
+                            $statsTrainer[] = ['id'     => $trainer->getId(), 'first'   => $trainer->getFirstName(), 'last' => $trainer->getLastName()];
                             $liste = $liste . $trainer->getFirstName() ." " . $trainer->getLastName() . " (". ($trainer->getIsorganization() ? "interne" : "externe") . "), ";
                         }
+
                         // On recupere la liste des formateurs
                         $data[$key] = $liste;
 
                     } elseif ($key == "totalCost") {
-                        $rvalue = $accessor->getValue($entity, 'teachingcost')
-                            + $accessor->getValue($entity, 'vacationcost')
-                            + $accessor->getValue($entity, 'accommodationcost')
-                            + $accessor->getValue($entity, 'mealcost')
-                            + $accessor->getValue($entity, 'transportcost')
-                            + $accessor->getValue($entity, 'materialcost');
+                        $rvalue = $propertyAccessor->getValue($entity, 'teachingcost')
+                            + $propertyAccessor->getValue($entity, 'vacationcost')
+                            + $propertyAccessor->getValue($entity, 'accommodationcost')
+                            + $propertyAccessor->getValue($entity, 'mealcost')
+                            + $propertyAccessor->getValue($entity, 'transportcost')
+                            + $propertyAccessor->getValue($entity, 'materialcost');
 
-                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', ',', $data[$key]);
-                    } elseif ($key == "session.totalCost") {
+                    }elseif ($key == "session.totalCost") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $inscription = $entity;
                         $session = $inscription->getSession();
 
-                        $rvalue = $accessor->getValue($session, 'teachingcost')
-                            + $accessor->getValue($session, 'vacationcost')
-                            + $accessor->getValue($session, 'accommodationcost')
-                            + $accessor->getValue($session, 'mealcost')
-                            + $accessor->getValue($session, 'transportcost')
-                            + $accessor->getValue($session, 'materialcost');
+                        $rvalue = $propertyAccessor->getValue($session, 'teachingcost')
+                            + $propertyAccessor->getValue($session, 'vacationcost')
+                            + $propertyAccessor->getValue($session, 'accommodationcost')
+                            + $propertyAccessor->getValue($session, 'mealcost')
+                            + $propertyAccessor->getValue($session, 'transportcost')
+                            + $propertyAccessor->getValue($session, 'materialcost');
 
-                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
-                        $data[$key] = str_replace('.', ',', $data[$key]);
+                        $data[$key] = str_replace('.', '', (string)$data[$key]);
 
-                    } elseif ($key == "individualcost") {
-                        // Coût total
-                        $totalCost = $accessor->getValue($entity, 'teachingcost')
-                            + $accessor->getValue($entity, 'vacationcost')
-                            + $accessor->getValue($entity, 'accommodationcost')
-                            + $accessor->getValue($entity, 'mealcost')
-                            + $accessor->getValue($entity, 'transportcost')
-                            + $accessor->getValue($entity, 'materialcost');
-
-                        // Nombre de stagiaires en présence partielle ou totale
-                        $statsPresGlobale = array();
-                        /** @var EntityManager $em */
-                        $em    = $this->doctrine->getManager();
-                        $session = $entity;
-                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
-                            $query = $em
-                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
-                    JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
-                    WHERE i.session = :session and (s.machinename = :present or s.machinename = :partiel)
-                    GROUP BY s.id')
-                                ->setParameter('session', $session)
-                                ->setParameter('present', "present")
-                                ->setParameter('partiel', "partiel");
-
-                            $result = $query->getResult();
-                            foreach($result as $status) {
-                                $statsPresGlobale[] = array(
-                                    'id'     => $status[0]->getId(),
-                                    'name'   => $status[0]->getName(),
-                                    'status' => $status[0]->getStatus(),
-                                    'count'  => (int) $status[1],
-                                );
-                            }
-                            // On recupere seulement le compteur
-                            if (isset($statsPresGlobale[0]['count']))
-                                $nbPresentsGlob = $statsPresGlobale[0]['count'];
-                            else
-                                $nbPresentsGlob = 0;
-                        } else {
-                            $nbPresentsGlob = 0;
-                        }
-
-                        // si on a des présents, on calcule le coût par stagiare
-                        if (($nbPresentsGlob > 0) && $totalCost) {
-                            $rvalue =  $totalCost/$nbPresentsGlob;
-                        }
-
-                        $data[$key] = ($rvalue) ? $rvalue : '';
-                        // Transformation '.' en ',' pour faciliter Excel
-                        $data[$key] = str_replace('.', ',', $data[$key]);
-
-                    } elseif ($key == "training.tags") {
+                    }elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', '', (string) $key);
 
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $session = $entity;
                         $training = $session->getTraining();
+                        if (!$entity instanceof Session) {
+                            $data[$key] = '';
+                            continue;
+                        }
                         $trainingId = $training->getId();
-
-                        // Création de la requête de récupération des tags
-                        $sql = <<<SQL
-        SELECT t.name FROM tag t, training__training_tag i_t, training train WHERE train.id = :trainingId and i_t.training_id = train.id and i_t.tag_id = t.id 
-SQL;
                         $rsm = new ResultSetMapping();
                         $rsm->addScalarResult('name', 'name');
-                        $query = $em->createNativeQuery($sql, $rsm);
+                        $query = $em->createNativeQuery(self::SQL, $rsm);
                         $query->setParameter('trainingId', $trainingId);
                         $result = $query->getResult();
 
@@ -621,12 +502,12 @@ SQL;
 
                         $rvalue = $tags;
 
-                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        $data[$key] = $rvalue ?: '';
                     } elseif ($key == "date.lieu") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
+                        $key = str_replace('.', ',', (string) $key);
 
-                        $statsNbHeures = array();
+                        $statsNbHeures = [];
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $session = $entity;
@@ -639,20 +520,11 @@ SQL;
                         $tabDatesSes = $query->getResult();
 
                         // on récupère le lieu de la première ligne du tableau de dates
-                        if ((isset($tabDatesSes[0])) &&(null !== $tabDatesSes[0])) {
-                            if (null !== $tabDatesSes[0]->getPlace()) {
-                                $data[$key] = $tabDatesSes[0]->getPlace();
-                            } else {
-                                $data[$key] = '';
-                            }
-                        } else {
-                            $data[$key] = '';
-                        }
+                        $data[$key] = (isset($tabDatesSes[0])) &&(null !== $tabDatesSes[0]) ? $tabDatesSes[0]->getPlace() ?? '' : '';
 
                     } elseif ($key == "evalResume") {
                         // Get the average for a criterion
                         $nb=0;
-                        $average=0;
                         /** @var EntityManager $em */
                         $em = $this->doctrine->getManager();
                         $session = $entity;
@@ -665,22 +537,17 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
-                                WHERE ec.organization = :org')
-                            ->setParameter('org', $session->getTraining()->getOrganization());
+                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec');
                         $tabCrit = $query->getResult();
 
                         // On initialise les variables pour la moyenne
-                        $tabAv = array(); $nb=0;
+                        $tabAv = []; $nb=0;
                         foreach ($tabCrit as $crit) {
                             $tabAv[$crit->getId()]['sum'] = 0;
                             $tabAv[$crit->getId()]['nb'] = 0;
                             $tabAv[$crit->getId()]['av'] = 0;
-                            $tabAv[$crit->getId()]['1et'] = 0;
-                            $tabAv[$crit->getId()]['2et'] = 0;
-                            $tabAv[$crit->getId()]['3et'] = 0;
-                            $tabAv[$crit->getId()]['4et'] = 0;
                         }
+
                         $evalsMsg = '';
 
                         // On parcourt le tableau des inscriptions
@@ -697,24 +564,17 @@ SQL;
                             foreach ($tabCritNot as $critNot) {
                                 if ($critNot->getNote() != 0) {
                                     $tabAv[$critNot->getCriterion()->getId()]['sum'] += $critNot->getNote();
-                                    $tabAv[$critNot->getCriterion()->getId()]['nb']++;
-
-                                    if ($critNot->getNote() == 1)
-                                        $tabAv[$critNot->getCriterion()->getId()]['1et']++;
-                                    if ($critNot->getNote() == 2)
-                                        $tabAv[$critNot->getCriterion()->getId()]['2et']++;
-                                    if ($critNot->getNote() == 3)
-                                        $tabAv[$critNot->getCriterion()->getId()]['3et']++;
-                                    if ($critNot->getNote() == 4)
-                                        $tabAv[$critNot->getCriterion()->getId()]['4et']++;
+                                    ++$tabAv[$critNot->getCriterion()->getId()]['nb'];
                                 }
                             }
+
                             if ($insc->getMessage() != '') {
                                 // Suppression retour chariot
-                                $fixMsg = str_replace( array("\n", "\r"), array(' ', ''), $insc->getMessage() );
+                                $fixMsg = str_replace( ["\n", "\r"], [' ', ''], (string) $insc->getMessage() );
                                 $evalsMsg .= $fixMsg . '// ';
                             }
                         }
+
                         // Calcul moyenne
                         foreach ($tabCrit as $crit) {
                             $nbEvals = $tabAv[$crit->getId()]['nb'];
@@ -723,32 +583,38 @@ SQL;
                             } else
                                 $tabAv[$crit->getId()]['av'] = 0;
                         }
+
                         // Mise en forme string pour sortie csv
                         $rvalue = '';
                         // Moyenne des critères
                         foreach ($tabCrit as $crit) {
-                            $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
+                            $rvalue .= $crit->getName() . ' : ' . $tabAv[$crit->getId()]['av'] . ' | ';
                         }
 
                         // Remarques evals
                         $rvalue .= 'Remarques: ' . $evalsMsg . ' | ';
 
+                        $nbEvals = 0;
                         // Nb d'éval
-                        $rvalue .= "Nb evals : $nbEvals ";
+                        $rvalue .= sprintf('Nb evals : %s ', $nbEvals);
 
-                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        $data[$key] = $rvalue ?: '';
 
                     } else {
-                        $rvalue = $accessor->getValue($entity, $key);
+                        try {
+                            $rvalue = $propertyAccessor->getValue($entity, $key);
+                        } catch (\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException $e) {
+                            $rvalue = null;
+                        }
                         // reformat values
                         if (!empty($value['type'])) {
                             if ($value['type'] === 'date') {
                                 if ($rvalue) {
                                     $rvalue = $rvalue->format('d/m/Y');
                                 }
-                            } else if ($value['type'] === 'boolean') {
+                            } elseif ($value['type'] === 'boolean') {
                                 $rvalue = ($rvalue) ? 'Oui' : 'Non';
-                            } else if ($value['type'] === "typinsc") {
+                            } elseif ($value['type'] === "typinsc") {
                                 switch ($rvalue) {
                                     case 0:
                                         $rvalue = "Désactivées";
@@ -764,7 +630,7 @@ SQL;
                                         break;
 
                                 }
-                            } else if ($value['type'] === "statut") {
+                            } elseif ($value['type'] === "statut") {
                                 switch ($rvalue) {
                                     case 0:
                                         $rvalue = "Ouverte";
@@ -778,29 +644,31 @@ SQL;
                                 }
                             }
                         }
+
                         // Petite mise en forme pour faciliter les manips avec Excel
-                        if (stripos($key,  'cost') !== false) {
+                        if (stripos((string) $key,  'cost') !== false) {
                             // traitement specifique valeur nulle
                             if ($rvalue == '0.0') {
                                 $rvalue = '0,0';
                             }
 
                             // Transformation '.' en ',' pour faciliter Excel
-                            $rvalue = str_replace('.', ',', $rvalue);
+                            $rvalue = str_replace('.', ',', (string) $rvalue);
                         }
 
                         // Transformation '\n' en '|' pour affichage avec saut de ligne
-                        $rvalue = str_replace("\n", "|", $rvalue);
+                        $rvalue = str_replace("\n", "|", (string) $rvalue);
 
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-                        $key = str_replace('.', '', $key);
-                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        $key = str_replace('.', '__', (string) $key);
+                        $data[$key] = $rvalue ?: '';
                     }
-                } catch (UnexpectedTypeException $e) {
-                    $key = str_replace('.', '', $key);
+                } catch (UnexpectedTypeException) {
+                    $key = str_replace('.', '', (string) $key);
                     $data[$key] = '';
                 }
             }
+           // dump($data);
             $lines[$entity->getId()] = $data;
 //            }
         }
@@ -809,18 +677,18 @@ SQL;
 //        $this->reorderByKeys($lines, $idList);
 
         // fields
-        $fields = array();
-        $heads = array();
+        $fields = [];
+        $heads = [];
 
         foreach ($this->options['fields'] as $label => $value) {
             ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
-            $label = str_replace('.', '', $label);
+            $label = str_replace('.', '', (string) $label);
 
             if (isset($value['label'])) {
-                $fields[] = array($label, $value['label']);
+                $fields[] = [$label, $value['label']];
                 $heads[] = $value['label'];
             } else {
-                $fields[] = array($label, $value);
+                $fields[] = [$label, $value];
                 $heads[] = $value;
             }
         }
@@ -829,26 +697,28 @@ SQL;
         if (!empty($this->options['filename'])) {
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
-        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
+
+        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', (string) ($volcanusConfig['responseFilename'] ?? 'default.csv'));
 
         // encodage fichier
-        $encoder = (new CharsetConverter())
-            ->inputEncoding($this->options['volcanus_config']['inputEncoding'])
-            ->outputEncoding($this->options['volcanus_config']['outputEncoding']);
+        $charsetConverter = (new CharsetConverter())
+            ->inputEncoding($volcanusConfig['inputEncoding'] ?? 'UTF-8')
+            ->outputEncoding($volcanusConfig['outputEncoding'] ?? 'UTF-8');
 
-        $csv = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
+        $writer = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
         // Mise en forme fichier
-        $csv->setDelimiter($this->options['volcanus_config']['delimiter']);
-        $csv->setEnclosure($this->options['volcanus_config']['enclosure']);
-        $csv->setEscape($this->options['volcanus_config']['escape']);
-        $csv->addFormatter($encoder);
-        $bom = $csv->getInputBOM();
+        $writer->setDelimiter($volcanusConfig['delimiter'] ?? ';');
+        $writer->setEnclosure($volcanusConfig['enclosure'] ?? '"');
+        $writer->setEscape($volcanusConfig['escape'] ?? '\\');
+        $writer->addFormatter($charsetConverter);
+
+        $writer->getInputBOM();
 
         // Insertion
-        $csv->insertOne($heads);
-        $csv->insertAll($lines);
+        $writer->insertOne($heads);
+        $writer->insertAll($lines);
 
-        return array('fileUrl' => $fileName);
+        return ['fileUrl' => $fileName];
     }
 
     /**
@@ -858,7 +728,7 @@ SQL;
      *
      * @return string|Response
      */
-    public function sendFile($fileName)
+    public function sendFile($fileName): string|Response
     {
         if (file_exists($this->options['tempDir'] . $fileName)) {
             //security check first : if requested file path doesn't correspond to temp dir,
@@ -868,6 +738,7 @@ SQL;
             if (realpath($path_parts['dirname']) !== $this->options['tempDir']) {
                 $response->setContent('Accès non autorisé :' . $path_parts['dirname']);
             }
+
             //if pdf file is asked
 
             $fp = $this->options['tempDir'] . $fileName;

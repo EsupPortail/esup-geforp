@@ -8,94 +8,85 @@ use App\Entity\Back\MultipleAlert;
 use App\Entity\Back\SingleAlert;
 use App\Form\Type\ProgramAlertType;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * This controller regroup actions related to alerts.
  *
- * @Security("is_granted('IS_AUTHENTICATED_FULLY')")
  */
-class AlertAccountController extends AbstractController
+final class AlertAccountController extends AbstractController
 {
     /**
      * All attendances of the trainee
-     * @Route("/account/alerts", name="front.account.alerts")
-     * @Template("Front/Account/alert/alerts.html.twig")
      */
-    public function alertsAction(Request $request, ManagerRegistry $doctrine)
+    #[Route(path: '/account/alerts', name: 'front.account.alerts')]
+    public function alerts(Request $request, ManagerRegistry $managerRegistry): \Symfony\Component\HttpFoundation\Response
     {
+        if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
+            // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
+            throw new AccessDeniedException('Vous devez être pleinement authentifié pour accéder à cette page.');
+        }
         // Récupération des alertes du stagiaire
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository('App\Entity\Back\Trainee')->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
         $alertsTrainee = $trainee->getAlerts();
 
         // creation entites pour recuperer les alertes
-        $alerts = new MultipleAlert();
-        foreach ($alertsTrainee as $a){
+        $multipleAlert = new MultipleAlert();
+        foreach ($alertsTrainee as $alertTrainee){
             $alert = new SingleAlert();
             $alert->setAlert(true);
-            $alert->setSessionId($a->getSession()->getId());
+            $alert->setSessionId($alertTrainee->getSession()->getId());
             $alert->setTraineeId($trainee->getId());
 
-            $alerts->getAlerts()->add($alert);
+            $multipleAlert->getAlerts()->add($alert);
         }
 
         // creation du formulaire d'alertes
-        $form = $this->createForm(ProgramAlertType::class, $alerts);
+        $form = $this->createForm(ProgramAlertType::class, $multipleAlert);
         $form->handleRequest($request);
 
         if (($form->isSubmitted()) && ($form->isValid())) {
-            $arrAlerts = $alerts->getAlerts();
-            $em = $doctrine->getManager();
-            foreach ($arrAlerts as $alert){
+            $arrAlerts = $multipleAlert->getAlerts();
+            $objectManager = $managerRegistry->getManager();
+            foreach ($arrAlerts as $arrAlert){
                 // On verifie si la session et l'alerte existent déjà
-                $sessionExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Session')->findOneBy(array(
-                    'id' => $alert->getSessionId()
-                ));
+                $sessionExiste = $managerRegistry->getManager()->getRepository(\App\Entity\Back\Session::class)->findOneBy(['id' => $arrAlert->getSessionId()]);
 
-                $alertExiste = $doctrine->getManager()->getRepository('App\Entity\Back\Alert')->findOneBy(array(
-                    'trainee' => $trainee,
-                    'session'=> $sessionExiste
-                ));
+                $alertExiste = $managerRegistry->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $trainee, 'session'=> $sessionExiste]);
 
                 // Si la case est cochée
-                if ($alert->getAlert() == true) {
+                if ($arrAlert->getAlert() == true) {
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
-                    if (!$alertExiste) {
+                    if (!$alertExiste instanceof \App\Entity\Back\Alert) {
                         $alertNew = new Alert();
                         $alertNew->setTrainee($trainee);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);
 
-                        $em->persist($alertNew);
-                        $em->flush();
+                        $objectManager->persist($alertNew);
+                        $objectManager->flush();
                     }
-
-                } else {
+                } elseif ($alertExiste instanceof \App\Entity\Back\Alert) {
                     // Si la case n'est pas cochée
                     // Si l'alerte existe, on la supprime, sinon, on ne fait rien
-                    if ($alertExiste) {
-                        $em->remove($alertExiste);
-                        $em->flush();
-                    }
+                    $objectManager->remove($alertExiste);
+                    $objectManager->flush();
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
-            return $this->redirectToRoute('front.account.alerts');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
+
         }
 
-        return array('user' => $trainee, 'alerts' => $alertsTrainee, 'form' => $form->createView());
+        return $this->render('Front/Account/alert/alerts.html.twig',['user' => $trainee, 'alerts' => $alertsTrainee, 'form' => $form->createView()]);
     }
 
 }

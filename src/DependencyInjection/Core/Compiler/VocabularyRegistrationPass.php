@@ -10,30 +10,30 @@ use Symfony\Component\DependencyInjection\Reference;
 /**
  * Class VocabularyRegistrationPass.
  */
-class VocabularyRegistrationPass implements CompilerPassInterface
+final class VocabularyRegistrationPass implements CompilerPassInterface
 {
     /**
-     * @param ContainerBuilder $container
      *
      * @throws \InvalidArgumentException
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $containerBuilder): void
     {
-        if (!$container->hasDefinition('sygefor_core.vocabulary_registry')) {
+        if (!$containerBuilder->hasDefinition('sygefor_core.vocabulary_registry')) {
             return;
         }
 
-        $definition = $container->getDefinition('sygefor_core.vocabulary_registry');
-        $vocabularySevices = $container->findTaggedServiceIds('sygefor_core.vocabulary_provider');
+        $definition = $containerBuilder->getDefinition('sygefor_core.vocabulary_registry');
+        $vocabularySevices = $containerBuilder->findTaggedServiceIds('sygefor_core.vocabulary_provider');
         foreach ($vocabularySevices as $id => $tagAttributes) {
             //checking class
-            $class = $container->getDefinition($id)->getClass();
+            $class = $containerBuilder->getDefinition($id)->getClass();
             if (!$class || !$this->isVocabularyProviderImplementation($class)) {
                 throw new \InvalidArgumentException(sprintf('Vocabulary Registration : %s must implement VocabularyInterface', $class));
             }
-            foreach ($tagAttributes as $attributes) {
+
+            foreach ($tagAttributes as $tagAttribute) {
                 $definition->addMethodCall(
-                    'addVocabulary', array(new Reference($id), $id, $attributes['group'], isset($attributes['label']) ? $attributes['label'] : null)
+                    'addVocabulary', [new Reference($id), $id, $tagAttribute['group'], $tagAttribute['label'] ?? null]
                 );
             }
         }
@@ -42,14 +42,12 @@ class VocabularyRegistrationPass implements CompilerPassInterface
     /**
      * Returns whether the class implements VocabularyInterface.
      *
-     * @param string $class
      *
-     * @return bool
      */
-    private function isVocabularyProviderImplementation($class)
+    private function isVocabularyProviderImplementation(string $class): bool
     {
-        $refl = new \ReflectionClass($class);
+        $reflectionClass = new \ReflectionClass($class);
 
-        return $refl->implementsInterface(VocabularyInterface::class);
+        return $reflectionClass->implementsInterface(VocabularyInterface::class);
     }
 }

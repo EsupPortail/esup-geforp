@@ -11,93 +11,70 @@ namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Email.
  *
- * @ORM\Table(name="email")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'email')]
+#[ORM\Entity]
 class Email
 {
-    /**
-     * @var int id
-     *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var User
-     * @ORM\ManyToOne(targetEntity="User")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL", name="user_from_id")
      * @Serializer\Groups({"user"})
      */
-    protected $userfrom;
+    #[Groups(["user"])]
+    #[ORM\ManyToOne(targetEntity: 'User')]
+    #[ORM\JoinColumn(name: 'user_from_id', onDelete: 'SET NULL')]
+    protected User $userfrom;
 
-    /**
-     * @var string
-     * @ORM\Column(name="emailFrom", type="string", length=128, nullable=true)
-     */
-    protected $emailfrom;
+    #[ORM\Column(name: 'emailFrom', type: \Doctrine\DBAL\Types\Types::STRING, length: 128, nullable: true)]
+    protected ?string $emailfrom = null;
 
     /**
      * @var AbstractTrainee
-     * @ORM\ManyToOne(targetEntity="AbstractTrainee")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
-    protected $trainee;
+    #[ORM\ManyToOne(targetEntity: 'AbstractTrainee')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    protected AbstractTrainee $trainee;
 
     /**
      * @var AbstractTrainer
-     * @ORM\ManyToOne(targetEntity="AbstractTrainer")
-     * @ORM\JoinColumn(nullable=true, onDelete="CASCADE")
      */
-    protected $trainer;
+    #[ORM\ManyToOne(targetEntity: 'AbstractTrainer')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    protected AbstractTrainer $trainer;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession")
-     * @ORM\JoinColumn(nullable=true, onDelete="SET NULL")
      */
-    protected $session;
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    protected AbstractSession $session;
 
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="send_at", type="datetime", nullable=true)
-     */
-    protected $sendat;
+    #[ORM\Column(name: 'send_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE, nullable: true)]
+    protected ?\DateTimeInterface $sendat = null;
 
-    /**
-     * @var string
-     * @ORM\Column(name="subject", type="string", length=512, nullable=true)
-     */
-    protected $subject;
+    #[ORM\Column(name: 'subject', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $subject = null;
 
-    /**
-     * @var array
-     * @ORM\Column(name="cc", type="array", nullable=true)
-     */
-    protected $cc;
+    #[ORM\Column(name: 'cc', type: 'simple_array', nullable: true)]
+    protected array $cc = [];
 
-    /**
-     * @var string
-     * @ORM\Column(name="body", type="text", nullable=true)
-     */
-    protected $body;
-
-    public function __construct()
-    {
-        $this->cc = array();
-    }
+    #[ORM\Column(name: 'body', type: \Doctrine\DBAL\Types\Types::TEXT, nullable: true)]
+    protected ?string $body = null;
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -105,7 +82,7 @@ class Email
     /**
      * @return User
      */
-    public function getUserfrom()
+    public function getUserfrom(): User
     {
         return $this->userfrom;
     }
@@ -113,7 +90,7 @@ class Email
     /**
      * @param User $userFrom
      */
-    public function setUserfrom($userFrom)
+    public function setUserfrom(User $userFrom): void
     {
         $this->userfrom = $userFrom;
     }
@@ -121,7 +98,7 @@ class Email
     /**
      * @return string
      */
-    public function getEmailfrom()
+    public function getEmailfrom(): ?string
     {
         return $this->emailfrom;
     }
@@ -129,7 +106,7 @@ class Email
     /**
      * @param string $emailFrom
      */
-    public function setEmailfrom($emailFrom)
+    public function setEmailfrom(string $emailFrom): void
     {
         $this->emailfrom = $emailFrom;
     }
@@ -137,7 +114,7 @@ class Email
     /**
      * @return AbstractTrainee
      */
-    public function getTrainee()
+    public function getTrainee(): AbstractTrainee
     {
         return $this->trainee;
     }
@@ -145,7 +122,7 @@ class Email
     /**
      * @param AbstractTrainee $trainee
      */
-    public function setTrainee($trainee)
+    public function setTrainee(AbstractTrainee $trainee): void
     {
         $this->trainee = $trainee;
     }
@@ -153,7 +130,7 @@ class Email
     /**
      * @return AbstractTrainer
      */
-    public function getTrainer()
+    public function getTrainer(): AbstractTrainer
     {
         return $this->trainer;
     }
@@ -161,7 +138,7 @@ class Email
     /**
      * @param AbstractTrainee $trainer
      */
-    public function setTrainer($trainer)
+    public function setTrainer(AbstractTrainer $trainer): void
     {
         $this->trainer = $trainer;
     }
@@ -169,7 +146,7 @@ class Email
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
@@ -177,7 +154,7 @@ class Email
     /**
      * @param AbstractSession $session
      */
-    public function setSession($session)
+    public function setSession(AbstractSession $session): void
     {
         $this->session = $session;
     }
@@ -185,7 +162,7 @@ class Email
     /**
      * @return string
      */
-    public function getSendat()
+    public function getSendat(): \DateTimeInterface|string|null
     {
         return $this->sendat;
     }
@@ -193,7 +170,7 @@ class Email
     /**
      * @param string $sendAt
      */
-    public function setSendat($sendAt)
+    public function setSendat(\DateTimeInterface $sendAt): void
     {
         $this->sendat = $sendAt;
     }
@@ -201,7 +178,7 @@ class Email
     /**
      * @return string
      */
-    public function getSubject()
+    public function getSubject(): ?string
     {
         return $this->subject;
     }
@@ -209,23 +186,17 @@ class Email
     /**
      * @param string $subject
      */
-    public function setSubject($subject)
+    public function setSubject(string $subject): void
     {
         $this->subject = $subject;
     }
 
-    /**
-     * @return array
-     */
-    public function getCc()
+    public function getCc(): array
     {
         return $this->cc;
     }
 
-    /**
-     * @param array $cc
-     */
-    public function setCc($cc)
+    public function setCc(array $cc): void
     {
         $this->cc = $cc;
     }
@@ -234,9 +205,8 @@ class Email
      * @param string $cc
      * @param string $name
      *
-     * @return bool
      */
-    public function addCc($cc, $name)
+    public function addCc(string $cc, string $name): bool
     {
         if (!isset($this->cc[$cc])) {
             $this->cc[$cc] = $name;
@@ -250,7 +220,7 @@ class Email
     /**
      * @return string
      */
-    public function getBody()
+    public function getBody(): ?string
     {
         return $this->body;
     }
@@ -258,7 +228,7 @@ class Email
     /**
      * @param string $body
      */
-    public function setBody($body)
+    public function setBody(string $body): void
     {
         $this->body = $body;
     }

@@ -18,22 +18,21 @@ use App\Model\SemesteredTraining;
 /**
  * Class SemesteredTrainingProvider.
  */
-class SemesteredTrainingProvider extends Provider
+final class SemesteredTrainingProvider extends Provider
 {
+    /**
+     * @var array<string, string>
+     */
+    private const OPTIONS = ['indexName' => 'sygefor3', 'typeName' => 'semestered_training'];
     /**
      * SemesteredTrainingProvider constructor.
      *
      * @param ObjectPersisterInterface $objectPersister
      * @param IndexableInterface       $indexable
-     * @param ManagerRegistry          $managerRegistry
      */
-    public function __construct(ObjectPersisterInterface $objectPersister, IndexableInterface $indexable, ManagerRegistry $managerRegistry)
+    public function __construct(ObjectPersisterInterface $objectPersister, IndexableInterface $indexable, \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
-        $options = array(
-          'indexName' => 'sygefor3',
-          'typeName' => 'semestered_training',
-        );
-        parent::__construct($objectPersister, $indexable, 'App\Entity\Core\AbstractTraining', $options, $managerRegistry);
+        parent::__construct($objectPersister, $indexable, \App\Entity\Core\AbstractTraining::class, self::OPTIONS, $managerRegistry);
     }
 
     /**
@@ -46,10 +45,10 @@ class SemesteredTrainingProvider extends Provider
     public function fetchSlice($queryBuilder, $limit, $offset)
     {
         $trainings = parent::fetchSlice($queryBuilder, $limit, $offset);
-        $semTrains = array();
+        $semTrains = [];
 
-        foreach ($trainings as $train) {
-            $tmpSemTrains = SemesteredTraining::getSemesteredTrainingsForTraining($train);
+        foreach ($trainings as $training) {
+            $tmpSemTrains = SemesteredTraining::getSemesteredTrainingsForTraining($training);
             $semTrains = array_merge($semTrains, $tmpSemTrains);
         }
 

@@ -6,35 +6,17 @@ use App\Entity\Term\Presencestatus;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class PresenceStatusVocabularyType extends VocabularyType
+final class PresenceStatusVocabularyType extends VocabularyType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder->add('status', ChoiceType::class, array(
-            'label' => 'Statut élémentaire',
-            'expanded' => true,
-            'multiple' => false,
-            'required' => true,
-            'choices' => array(
-                'Présent' => Presencestatus::STATUS_PRESENT,
-                'Absent' => Presencestatus::STATUS_ABSENT,
-            ),
-        ));
-        $builder->add('machinename', null, array(
-            'label' => 'Libellé court',
-        ));
+        $formBuilder->add('status', ChoiceType::class, ['label' => 'Statut élémentaire', 'expanded' => true, 'multiple' => false, 'required' => true, 'choices' => ['Présent' => Presencestatus::STATUS_PRESENT, 'Absent' => Presencestatus::STATUS_ABSENT]]);
+        $formBuilder->add('machinename', null, ['label' => 'Libellé court']);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return VocabularyType::class;
     }

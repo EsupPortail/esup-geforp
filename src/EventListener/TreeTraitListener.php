@@ -10,29 +10,26 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 /**
  * Class TreeTraitListener.
  */
-class TreeTraitListener implements EventSubscriber
+final class TreeTraitListener implements EventSubscriber
 {
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::loadClassMetadata,
-        );
+        return [Events::loadClassMetadata];
     }
 
     /**
      * Adds mapping to the publishable and publications.
      *
-     * @param LoadClassMetadataEventArgs $eventArgs The event arguments
+     * @param LoadClassMetadataEventArgs $loadClassMetadataEventArgs The event arguments
      */
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $loadClassMetadataEventArgs): void
     {
-        $classMetadata = $eventArgs->getClassMetadata();
-        if (null === $classMetadata->reflClass) {
+        $classMetadata = $loadClassMetadataEventArgs->getClassMetadata();
+        if (!$classMetadata->reflClass instanceof \ReflectionClass) {
             return;
         }
 
@@ -44,51 +41,30 @@ class TreeTraitListener implements EventSubscriber
     /**
      * Checks if entity is a tree.
      *
-     * @param ClassMetadata $classMetadata
      *
-     * @return bool
      */
-    private function isTree(ClassMetadata $classMetadata)
+    private function isTree(ClassMetadata $classMetadata): bool
     {
         $traits = $classMetadata->reflClass->getTraits();
-        foreach ($traits as $class => $trait) {
-            if ($class === 'Sygefor\\Bundle\\CoreBundle\\Entity\\Term\\TreeTrait') {
-                return true;
-            }
-        }
-
-        return false;
+        return array_key_exists('Sygefor\\Bundle\\CoreBundle\\Entity\\Term\\TreeTrait', $traits);
     }
 
     /**
      * Map the tree entity.
      *
-     * @param ClassMetadata $classMetadata
      */
-    private function mapTree(ClassMetadata $classMetadata)
+    private function mapTree(ClassMetadata $classMetadata): void
     {
         if (!$classMetadata->hasAssociation('parent')) {
-            $classMetadata->mapManyToOne(array(
-                'fieldName' => 'parent',
-                'targetEntity' => $classMetadata->name,
-                'inversedBy' => 'children',
-                'joinColumns' => array(array(
-                    'name' => 'parent_id',
-                    'referencedColumnName' => 'id',
-                    'onDelete' => 'SET NULL',
-                )),
-            ));
+            $classMetadata->mapManyToOne(['fieldName' => 'parent', 'targetEntity' => $classMetadata->name, 'inversedBy' => 'children', 'joinColumns' => [['name' => 'parent_id', 'referencedColumnName' => 'id', 'onDelete' => 'SET NULL']]]);
         }
+
         if (!$classMetadata->hasAssociation('children')) {
-            $classMetadata->mapOneToMany(array(
-                'fieldName' => 'children',
-                'mappedBy' => 'parent',
-                'orderBy' => array('lft' => 'ASC'),
-                'targetEntity' => $classMetadata->name,
-            ));
+            $classMetadata->mapOneToMany(['fieldName' => 'children', 'mappedBy' => 'parent', 'orderBy' => ['lft' => 'ASC'], 'targetEntity' => $classMetadata->name]);
         }
-        if (!$classMetadata->customRepositoryClassName) {
-            $classMetadata->setCustomRepositoryClass('Gedmo\\Tree\\Entity\\Repository\\NestedTreeRepository');
+
+        if ($classMetadata->customRepositoryClassName === null) {
+            $classMetadata->setCustomRepositoryClass(\Gedmo\Tree\Entity\Repository\NestedTreeRepository::class);
         }
     }
 }

@@ -2,8 +2,10 @@
 
 namespace App\Entity\Term;
 
+use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Trait TreeTrait.
@@ -15,6 +17,8 @@ trait TreeTrait
      * @ORM\Column(name="lft", type="integer")
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
+    #[ORM\Column(name: "lft", type: "integer")]
     private $lft;
 
     /**
@@ -22,13 +26,17 @@ trait TreeTrait
      * @ORM\Column(name="lvl", type="integer")
      * @Serializer\Exclude
      */
-    private $lvl;
+    #[Serializer\Exclude()]
+    #[ORM\Column(name: "lvl", type: "integer")]
+    private mixed $lvl;
 
     /**
      * @Gedmo\TreeRight
      * @ORM\Column(name="rgt", type="integer")
      * @Serializer\Exclude
      */
+    #[Serializer\Exclude()]
+    #[ORM\Column(name: "rgt", type: "integer")]
     private $rgt;
 
     /**
@@ -36,7 +44,9 @@ trait TreeTrait
      * @ORM\Column(name="root", type="integer", nullable=true)
      * @Serializer\Exclude
      */
-    private $root;
+    #[Serializer\Exclude()]
+    #[ORM\Column(name: "root", type: "integer", nullable: true)]
+    private mixed $root;
 
     /**
      * @Gedmo\TreeParent
@@ -45,7 +55,10 @@ trait TreeTrait
      * _ORM\ManyToOne(targetEntity="__SELF__", inversedBy="children")
      * _ORM\JoinColumn(name="parent_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    private $parent;
+    #[Serializer\Exclude()]
+    #[ORM\ManyToOne(targetEntity: "__SELF__", inversedBy: "children")]
+    #[ORM\JoinColumn(name: "parent_id", referencedColumnName: "id", onDelete: "CASCADE")]
+    private mixed $parent;
 
     /**
      * @Serializer\Groups({"api"})
@@ -53,12 +66,15 @@ trait TreeTrait
      * _ORM\OneToMany(targetEntity="__SELF__", mappedBy="parent")
      * _ORM\OrderBy({"lft" = "ASC"})
      */
-    private $children;
+    #[Groups(['api'])]
+    #[ORM\OneToMany(mappedBy: "parent", targetEntity: "__SELF__")]
+    #[ORM\OrderBy(["lft" => "ASC"])]
+    private mixed $children;
 
     /**
      * @param null $parent
      */
-    public function setParent($parent = null)
+    public function setParent($parent = null): void
     {
         $this->parent = $parent;
     }
@@ -66,7 +82,7 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function getParent()
+    public function getParent(): mixed
     {
         return $this->parent;
     }
@@ -74,15 +90,12 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function getChildren()
+    public function getChildren(): mixed
     {
         return $this->children;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasChildren()
+    public function hasChildren(): bool
     {
         return (bool) count($this->children);
     }
@@ -90,7 +103,7 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function getLvl()
+    public function getLvl(): mixed
     {
         return $this->lvl;
     }
@@ -98,7 +111,7 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function getRoot()
+    public function getRoot(): mixed
     {
         return $this->root;
     }
@@ -106,7 +119,7 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function getRootEntity()
+    public function getRootEntity(): mixed
     {
         $entity = $this;
         while ($entity->getParent()) {
@@ -119,17 +132,13 @@ trait TreeTrait
     /**
      * @return mixed
      */
-    public function belongTo($entity)
+    public function belongTo($entity): bool
     {
         if ($this === $entity) {
             return true;
         }
-        if ($this->getParent()) {
-            if ($this->getParent()->belongTo($entity)) {
-                return true;
-            }
-        }
 
-        return false;
+
+        return (bool) $this->getParent()->belongTo($entity);
     }
 }

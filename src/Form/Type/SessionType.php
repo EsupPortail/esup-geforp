@@ -16,67 +16,32 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 
 /**
  * Class SessionType.
  */
-class SessionType extends AbstractSessionType
+final class SessionType extends AbstractSessionType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        /** @var AbstractSession $session */
-        $session = isset($options['data']) ? $options['data'] : null;
+        $formBuilder
+            ->add('name', TextType::class, ['label'    => "Intitulé", 'required' => false])
+            ->add('teachingcost', TextType::class, ['label'    => "Coûts pédagogiques", 'required' => false])
+            ->add('vacationcost', TextType::class, ['label'    => "Coûts en vacation", 'required' => false])
+            ->add('accommodationcost', TextType::class, ['label'    => "Frais de mission : hébergement", 'required' => false])
+            ->add('mealcost', TextType::class, ['label'    => "Frais de mission : repas", 'required' => false])
+            ->add('transportcost', TextType::class, ['label'    => "Frais de mission : transports", 'required' => false])
+            ->add('materialcost', TextType::class, ['label'    => "Frais de supports", 'required' => false])
+            ->add('taking', TextType::class, ['label'    => "Frais de supports", 'required' => false])
+            ->add('price', TextType::class, ['label'    => "Prix", 'required' => false]);
 
-        $builder
-            ->add('name', TextType::class, array(
-                'label'    => "Intitulé",
-                'required' => false
-            ))
-            ->add('teachingcost', TextType::class, array(
-                'label'    => "Coûts pédagogiques",
-                'required' => false
-            ))
-            ->add('vacationcost', TextType::class, array(
-                'label'    => "Coûts en vacation",
-                'required' => false
-            ))
-            ->add('accommodationcost', TextType::class, array(
-                'label'    => "Frais de mission : hébergement",
-                'required' => false
-            ))
-            ->add('mealcost', TextType::class, array(
-                'label'    => "Frais de mission : repas",
-                'required' => false
-            ))
-            ->add('transportcost', TextType::class, array(
-                'label'    => "Frais de mission : transports",
-                'required' => false
-            ))
-            ->add('materialcost', TextType::class, array(
-                'label'    => "Frais de supports",
-                'required' => false
-            ))
-            ->add('taking', TextType::class, array(
-                'label'    => "Frais de supports",
-                'required' => false
-            ))
-            ->add('price', TextType::class, array(
-                'label'    => "Prix",
-                'required' => false
-            ));
-
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array('data_class' => Session::class)
+        $optionsResolver->setDefaults(['data_class' => Session::class]
         );
     }
 

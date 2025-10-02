@@ -1,0 +1,108 @@
+{# templates/menu/knp_menu_bootstrap.html.twig #}
+{% extends 'knp_menu_base.html.twig' %}
+
+{% macro attributes(attributes) %}
+    {% for name, value in attributes %}
+        {%- if value is not none and value is not same as(false) -%}
+            {{- ' %s="%s"'|format(name, value is same as(true) ? name|e : value|e)|raw -}}
+        {%- endif -%}
+    {% endfor %}
+{% endmacro %}
+
+{# ROOT UL with Bootstrap navbar-nav classes #}
+{% block root %}
+    {% import _self as knp_menu %}
+	{% set listAttributes = item.childrenAttributes|merge({
+        class: (item.childrenAttribute('class')|default('') ~ ' navbar-nav ')|trim
+    }) %}
+    <ul{{ knp_menu.attributes(listAttributes) }}>
+        {{ block('children') }}
+    </ul>
+{% endblock %}
+
+{# Children block #}
+{% block children %}
+    {% for item in item.children %}
+        {{ block('item') }}
+    {% endfor %}
+{% endblock %}
+
+{# Item block with dropdown & active link support #}
+{% block item %}
+    {% if item.displayed %}
+        {% import _self as knp_menu %}
+
+        {% set is_dropdown = item.hasChildren and item.displayChildren %}
+        {% set li_classes = ['nav-item'] %}
+        {% set link_classes = ['nav-link'] %}
+
+        {% if is_dropdown %}
+            {% set li_classes = li_classes|merge(['dropdown']) %}
+            {% set link_classes = link_classes|merge(['dropdown-toggle']) %}
+        {% endif %}
+
+        {% if matcher.isCurrent(item) %}
+            {% set li_classes = li_classes|merge([options.currentClass]) %}
+            {% set link_classes = link_classes|merge(['active']) %}
+        {% elseif matcher.isAncestor(item, options.matchingDepth) %}
+            {% set li_classes = li_classes|merge([options.ancestorClass]) %}
+        {% endif %}
+
+        {% set attributes = item.attributes|merge({
+            class: li_classes|join(' ')
+        }) %}
+
+        {% set linkAttributes = item.linkAttributes|merge({
+            class: link_classes|join(' ')
+        }) %}
+
+        {# Dropdown toggle attributes #}
+        {% if is_dropdown %}
+            {% set linkAttributes = linkAttributes|merge({
+                'data-bs-toggle': 'dropdown',
+                'aria-expanded': 'false',
+                'role': 'button'
+            }) %}
+        {% endif %}
+
+        <li{{ knp_menu.attributes(attributes) }}>
+            {% if item.uri and (not matcher.isCurrent(item) or options.currentAsLink) %}
+                <a href="{{ item.uri }}"{{ knp_menu.attributes(linkAttributes) }}>
+                    {{ block('label') }}
+                </a>
+            {% else %}
+                <span{{ knp_menu.attributes(linkAttributes) }}>
+                    {{ block('label') }}
+                </span>
+            {% endif %}
+
+            {% if is_dropdown %}
+                {% set submenuAttributes = item.childrenAttributes|merge({
+                    class: (item.childrenAttribute('class')|default('') ~ ' dropdown-menu')|trim
+                }) %}
+                <ul{{ knp_menu.attributes(submenuAttributes) }}>
+                    {{ block('children') }}
+                </ul>
+            {% endif %}
+        </li>
+    {% endif %}
+{% endblock %}
+
+{# Label block with icon support #}
+{% block label %}
+    {% set icon = item.extra('icon') %}
+    {% if icon %}
+        <i class="fa fa-{{ icon }}"></i> 
+    {% endif %}
+
+    {% if options.allow_safe_labels and item.extra('safe_label', false) %}
+        {{ item.label|raw }}
+    {% else %}
+        {{ item.label }}
+    {% endif %}
+
+    {# Ajoute caret si sous-menu #}
+    {% if item.hasChildren and item.displayChildren %}
+        <i class="caret"></i>
+    {% endif %}
+{% endblock %}

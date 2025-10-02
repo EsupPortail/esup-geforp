@@ -15,33 +15,27 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
-class EmailTemplateVocabularyType extends VocabularyType
+final class EmailTemplateVocabularyType extends VocabularyType
 {
-    /** @var CCRegistry */
-//    protected $ccRegistry;
-
-    /**
-     * @param CCRegistry
-     */
- /*   public function setCCRegistry($ccRegistry)
+    public function __construct(
+        /** @var CCRegistry */
+        //    protected $ccRegistry;
+        /**
+         * @param CCRegistry
+         */
+        /*   public function setCCRegistry($ccRegistry)
+            {
+                $this->ccRegistry = $ccRegistry;
+            }
+         */
+        private readonly Security $security
+    )
     {
-        $this->ccRegistry = $ccRegistry;
-    }
- */
-    private $security;
-
-    public function __construct(Security $security)
-    {
-        $this->security = $security;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
 /*        $ccResolvers = $this->ccRegistry->getSupportedResolvers();
@@ -51,9 +45,7 @@ class EmailTemplateVocabularyType extends VocabularyType
         }*/
 
         $builder
-            ->add('subject', TextType::class, array(
-                'label' => 'Sujet',
-            ))
+            ->add('subject', TextType::class, ['label' => 'Sujet'])
 /*            ->add('cc', ChoiceType::class, array(
                 'label' => 'CC',
                 'multiple' => true,
@@ -61,61 +53,44 @@ class EmailTemplateVocabularyType extends VocabularyType
                 'choices' => $choices,
                 'required' => false,
             ))*/
-            ->add('body', TextareaType::class, array(
-                'label' => 'Corps',
-                'attr' => array(
-                    'rows' => 10,
-                    'ckeditor' => 'ckeditor',
-                ),
-            ))
+            ->add('body', TextareaType::class, ['label' => 'Corps', 'attr' => ['rows' => 10, 'ckeditor' => 'ckeditor']])
 /*	        ->add('forceEmailSending', CheckboxType::class, array(
 		        'label' => 'Abonnement',
 		        'widget_suffix' => 'Envoi le courriel même si le stagiaire a désactivé les lettres d\'informations',
 		        'required' => false,
 	        ))*/
-            ->add('inscriptionstatus', EntityType::class, array(
-                'label' => "Status d'inscription",
-                'class' => Inscriptionstatus::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('i')
-                        ->where('i.organization = :orgId')
-                        ->orWhere('i.organization is null')
-                        ->orderBy('i.name')
-                        ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId());
-                },
+            ->add('inscriptionstatus', EntityType::class, ['label' => "Status d'inscription", 'class' => Inscriptionstatus::class, 'query_builder' => fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('i')
+                ->where('i.organization = :orgId')
+                ->orWhere('i.organization is null')
+                ->orderBy('i.name')
+                ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId()), 'required' => false])
+            ->add('attachmentTemplates', EntityType::class, ['label' => 'Modèles de pièces jointes', 'class' => Publiposttemplate::class, 'multiple' => 'true', 'query_builder' => static function (EntityRepository $entityRepository) use ($options) : \Doctrine\ORM\QueryBuilder {
+                $data = $options['data'];
+                $organization = null;
+                if ($data && $data->getOrganization()) {
+                    $organization = $data->getOrganization();
+                }
+                return $entityRepository->createQueryBuilder('d')
+                    ->orWhere('d.organization = :organization')
+                    ->orWhere('d.organization is null')
+                    ->setParameter('organization', $organization->getId())
+                    ->orderBy('d.name');
+            }, 'required' => false])
+            ->add('presencestatus', EntityType::class, ['label' => 'Statut de présence', 'class' => Presencestatus::class, 'query_builder' => fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('p')
+                ->where('p.organization = :orgId')
+                ->orWhere('p.organization is null')
+                ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId()), 'required' => false])
+/*            ->add('cc', ChoiceType::class, [
+                'label' => 'Envoyer une copie au N+1 et correspondant formation ',
+                'choices' => [
+                    'NON' => 0,
+                    'OUI' => 1,
+                ],
+                'expanded' => true,
+                'multiple' => true,
                 'required' => false,
-            ))
-            ->add('attachmentTemplates', EntityType::class, array(
-                'label' => 'Modèles de pièces jointes',
-                'class' => Publiposttemplate::class,
-                'multiple' => 'true',
-                'query_builder' => function (EntityRepository $er) use ($options) {
-                    $data = $options['data'];
-                    $organization = null;
-                    if ($data && $data->getOrganization()) {
-                        $organization = $data->getOrganization();
-                    }
-
-                    return $er->createQueryBuilder('d')
-                        ->orWhere('d.organization = :organization')
-                        ->orWhere('d.organization is null')
-                        ->setParameter('organization', $organization->getId())
-                        ->orderBy('d.name');
-                },
-                'required' => false,
-            ))
-            ->add('presencestatus', EntityType::class, array(
-                'label' => 'Statut de présence',
-                'class' => Presencestatus::class,
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('p')
-                        ->where('p.organization = :orgId')
-                        ->orWhere('p.organization is null')
-                        ->setParameter('orgId', $this->security->getUser()->getOrganization()->getId());
-                },
-                'required' => false,
-            ))
-            ->add('machinename', ChoiceType::class, array(
+            ])*/
+			->add('machinename', ChoiceType::class, array(
                 'label' => 'Envoyer une copie au N+1 et correspondant formation',
                 'choices'  => [
                     'OUI' => 1,
@@ -123,28 +98,16 @@ class EmailTemplateVocabularyType extends VocabularyType
                 ],
                 'placeholder' => false
             ))
-            ->add('private', CheckboxType::class, array(
-                'label' => 'Lien calendrier',
-                'required' => false
-            ))
-            ->add('position', ChoiceType::class, array(
-                'label' => 'Format HTML',
-                'choices'  => [
-                    'NON' => 0,
-                    'OUI' => 1,
-                ],
-                'placeholder' => false
-            ));
+            ->add('private', CheckboxType::class, ['label' => 'Lien calendrier', 'required' => false])
+            ->add('position', ChoiceType::class, ['label' => 'Format HTML', 'choices'  => [
+                'NON' => 0,
+                'OUI' => 1,
+            ], 'placeholder' => false, 'required' => false]);
 
     }
 
-    /**
-     * @param OptionsResolver $resolver
-     */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => Emailtemplate::class,
-        ));
+        $resolver->setDefaults(['data_class' => Emailtemplate::class]);
     }
 }

@@ -9,14 +9,15 @@
 
 namespace App\Controller\Core;
 
+use _PHPStan_e52dec71a\Nette\Utils\Json;
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Participation;
 use App\Repository\ParticipationRepository;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
+use mysql_xdevapi\Exception;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Utils\Search\SearchService;
 use App\Entity\Core\AbstractParticipation;
 use App\Entity\Core\AbstractSession;
@@ -25,26 +26,36 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * Class ParticipationController.
  *
- * @Route("/participation")
  */
+#[Route(path: '/participation')]
 abstract class AbstractParticipationController extends AbstractController
 {
-    protected $participationClass = AbstractParticipation::class;
+    protected string $participationClass = AbstractParticipation::class;
+    // Recherche pour aggs et query_filters
+    /**
+     * @var mixed[]
+     */
+    private const array TAB_AGGS = [];
 
     /**
-     * @Route("/participation/search", name="participation.search", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerGroups={"Default", "trainer"}, serializerEnableMaxDepthChecks=true)
+     * @return array
      */
-    public function participationSearchAction(Request $request, ManagerRegistry $doctrine, ParticipationRepository $participationRepository, AccessRightRegistry $accessRightRegistry)
+    #[Rest\View(serializerGroups: ['Default', 'trainer'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/participation/search', name: 'participation.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function participationSearch(Request $request, ManagerRegistry $managerRegistry, ParticipationRepository $participationRepository, AccessRightRegistry $accessRightRegistry): array
     {
         $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', array());
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $filters = $request->request->all('filters') ?: [];
+        $request->request->all('query_filters')  ?? [];
+        $request->request->all('aggs') ?? [];
+
 
         // security check : trainer : 'sygefor_trainer.rights.trainer.all.view' -> id=33
         if(!$accessRightRegistry->hasAccessRight(33)) {
@@ -54,27 +65,27 @@ abstract class AbstractParticipationController extends AbstractController
 
         // Recherche avec les filtres
         $participations = $participationRepository->getParticipationsList($keywords, $filters);
-        $nbParticipations  = count($participations);
+        $nbParticipations  = is_countable($participations) ? count((array)$participations) : 0;
 
-        // Recherche pour aggs et query_filters
-        $tabAggs = array();
 
-        $ret = array(
-            'total' => $nbParticipations,
-            'pageSize' => 0,
-            'items' => $participations,
-            'aggs' => $tabAggs
-        );
-        return $ret;
+
+        return ['total' => $nbParticipations, 'pageSize' => 0, 'items' => $participations, 'aggs' => self::TAB_AGGS];
     }
 
     /**
-     * @Route("/{session}/add", name="participation.add", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
+     * @return JsonResponse
      */
-    public function addParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractSession $session)
+    #[Rest\View(serializerGroups: ['Default', 'session', 'participation'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/{session}/add', name: 'participation.add', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function addParticipation(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, AbstractSession $session): array
     {
+
+        $session = $managerRegistry->getRepository(AbstractSession::class)->find($session);
+
+        if (!$session){
+            throw new AccessDeniedException('Aucune session trouvé');
+        }
         if (!$this->isGranted('EDIT', $session->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
         }
@@ -83,10 +94,11 @@ abstract class AbstractParticipationController extends AbstractController
         $participation = new $this->participationClass();
         $participation->setSession($session);
         $participation->setOrganization($session->getTraining()->getOrganization());
+
         $form = $this->createForm($participation::getFormType(), $participation);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
-            if ($form->isValid()) {
+            if ($form->isSubmitted() && $form->isValid()) {
                 $existingParticipation = null;
                 /** @var AbstractParticipation $existingParticipation */
                 foreach ($session->getParticipations() as $existingParticipation) {
@@ -96,29 +108,34 @@ abstract class AbstractParticipationController extends AbstractController
                     }
                 }
 
-                if (!$existingParticipation || ($existingParticipation->getTrainer() !== $participation->getTrainer())) {
+                if (!$existingParticipation instanceof \App\Entity\Core\AbstractParticipation || ($existingParticipation->getTrainer() !== $participation->getTrainer())) {
                     $session->addParticipation($participation);
                     //$session->updateTimestamps();
                     $session->setUpdatedAt(New \DateTime('now'));
                     //$session->getTraining()->updateTimestamps();
                     $session->getTraining()->setUpdatedAt(New \DateTime('now'));
-                    $em = $doctrine->getManager();
-                    $em->persist($participation);
-                    $em->flush();
+                    $objectManager = $managerRegistry->getManager();
+                    $objectManager->persist($participation);
+                    $objectManager->flush();
                 }
             }
         }
 
-        return array('form' => $form->createView(), 'participation' => $participation);
+        return ['form' => $form->createView(), 'participation' => $participation];
     }
 
     /**
-     * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="participation.edit", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("participation", class="App\Entity\Core\AbstractParticipation", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "participation", "session"}, serializerEnableMaxDepthChecks=true)
+     * @return array{form: \Symfony\Component\Form\FormView, participation: \App\Entity\Core\AbstractParticipation}
      */
-    public function editParticipationAction(Request $request, ManagerRegistry $doctrine, AbstractParticipation $participation)
+    #[Rest\View(serializerGroups: ['Default', 'participation', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/{id}/edit', name: 'participation.edit', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function editParticipation(Request $request, ManagerRegistry $managerRegistry, AbstractParticipation $participation, int $id): array
     {
+        $participation = $managerRegistry->getRepository(AbstractParticipation::class)->find($id);
+        if (!$participation){
+            throw new AccessDeniedException('Aucune participation trouvé');
+        }
         // participation can't be created if user has no rights for it
         if (!$this->isGranted('EDIT', $participation->getSession()->getTraining())) {
             throw new AccessDeniedException('Action non autorisée');
@@ -130,32 +147,35 @@ abstract class AbstractParticipationController extends AbstractController
             if ($form->isValid()) {
                 //$participation->getSession()->updateTimestamps();
                 $participation->getSession()->setUpdatedAt(New \DateTime('now'));
-                $doctrine->getManager()->flush();
+                $managerRegistry->getManager()->flush();
             }
         }
 
-        return array('form' => $form->createView(), 'participation' => $participation);
+        return ['form' => $form->createView(), 'participation' => $participation];
     }
 
     /**
-     * @Route("/{session}/remove/{participation}", name="participation.remove", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Method("POST")
-     * @IsGranted("EDIT", subject="session")
-     * @ParamConverter("session", class="App\Entity\Core\AbstractSession", options={"id" = "session"})
-     * @ParamConverter("participation", class="App\Entity\Core\AbstractParticipation", options={"id" = "participation"})
+     *
      * @Rest\View(serializerGroups={"Default", "session"}, serializerEnableMaxDepthChecks=true)
      */
-    public function removeParticipationAction(AbstractSession $session, ManagerRegistry $doctrine, AbstractParticipation $participation)
+    #[Rest\View(serializerGroups: ['Default', 'session'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/{session}/remove/{participation}', name: 'participation.remove', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[IsGranted('EDIT', subject: 'session')]
+    public function removeParticipation(AbstractSession $session, ManagerRegistry $managerRegistry, AbstractParticipation $participation): void
     {
+        if (!$session){
+            throw new AccessDeniedException('Aucune session trouvé');
+        }
+
+        if (!$participation){
+            throw new AccessDeniedException('Aucune participation trouvé');
+        }
         $session->removeParticipation($participation);
 //        $session->updateTimestamps();
 //        $session->getTraining()->updateTimestamps();
         $session->setUpdatedAt(New \DateTime('now'));
         $session->getTraining()->setUpdatedAt(New \DateTime('now'));
-        $doctrine->getManager()->remove($participation);
-        $doctrine->getManager()->flush();
-//        $this->get('fos_elastica.index')->refresh();
-
-        return;
+        $managerRegistry->getManager()->remove($participation);
+        $managerRegistry->getManager()->flush();
     }
 }

@@ -12,19 +12,21 @@
             <div class="col-xs-12">
                 <table class="table table-search table-hover">
                     <thead>
-                        <tr>
-                            <th>Nom</th>
-                            <th>Code</th>
-                            <th>Etablissement</th>
-                            <th>Email</th>
-                            <th>Numéro de téléphone</th>
-                            <th>Site internet</th>
-                        </tr>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Code</th>
+                        <th>Etablissement</th>
+                        <th>Email</th>
+                        <th>Numéro de téléphone</th>
+                        <th>Site internet</th>
+                    </tr>
                     </thead>
                     <tbody>
                     {% for organization in organizations %}
                         <tr>
-                            <td><a href="{{ path('organization.edit', { 'id': organization.id }) }}">{{ organization.name }}</a></td>
+                            <td>
+                                <a href="{{ path('organization.edit', { 'id': organization.id }) }}">{{ organization.name }}</a>
+                            </td>
                             <td>{{ organization.code }}</td>
                             <td>{{ organization.institution.name }}</td>
                             <td><a href="mailto:{{ organization.email }}">{{ organization.email }}</a></td>
@@ -34,7 +36,8 @@
                     {% endfor %}
                     </tbody>
                 </table>
-                <a class="btn btn-primary" href="{{ path('organization.add') }}" role="button"><i class="fa fa-plus"></i> Ajouter un centre</a>
+                <a class="btn btn-primary" href="{{ path('organization.add') }}" role="button"><i
+                            class="fa fa-plus"></i> Ajouter un centre</a>
             </div>
         </div>
     </div>

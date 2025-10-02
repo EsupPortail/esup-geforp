@@ -22,59 +22,46 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 /**
  * Class AccessRightType.
  */
-class AccessRightType extends AbstractType
+final class AccessRightType extends AbstractType
 {
-    /**
-     * @var AccessRightRegistry
-     */
-    private $accessRightsRegistry;
-
-    /**
-     * @param AccessRightRegistry $registry
-     */
-    public function __construct(AccessRightRegistry $registry)
+    public function __construct(private readonly AccessRightRegistry $accessRightRegistry)
     {
-        $this->accessRightsRegistry = $registry;
     }
 
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, array($this, 'preSubmit'));
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, $this->preSubmit(...));
     }
 
     /**
      * This PRESUBMIT listener check if unauthorized right has been changed.
      *
-     * @param FormEvent $event
      */
-    public function preSubmit(FormEvent $event)
+    public function preSubmit(FormEvent $formEvent): void
     {
-        $form = $event->getForm();
-        $rights = $event->getData();
+        $form = $formEvent->getForm();
+        $rights = $formEvent->getData();
 
         // $form->getData() return an array with index reseted
         // we need to set the right key for each initial right
-        $initialRights = array();
+        $initialRights = [];
         $choices = $form->getConfig()->getOption('choices');
         // Transformer le tableau
-        $newChoices = array();
+        $newChoices = [];
         foreach ($choices as $choice) {
                 $newChoices = array_merge($newChoices, $choice);
         }
+
         foreach ($form->getData() as $right) {
-            $key = array_search($right, $newChoices);
+            $key = array_search($right, $newChoices, true);
             $initialRights[$key] = $right;
         }
 
         // foreach initial rights,
         foreach ($initialRights as $key => $right) {
             // if unauthorized, force it the the submitted value
-            if (!$this->accessRightsRegistry->hasAccessRight($right)) {
+            if (!$this->accessRightRegistry->hasAccessRight($right)) {
                 $rights[$key] =  $right;
             }
         }
@@ -82,50 +69,45 @@ class AccessRightType extends AbstractType
         // foreach submitted right
         foreach ($rights as $key => $right) {
             // if unauthorized & not in initial rights, remove it
-            if (!$this->accessRightsRegistry->hasAccessRight($right)) {
-                if (!in_array($right, $initialRights, true)) {
-                    unset($rights[$key]);
-                }
+            if ($this->accessRightRegistry->hasAccessRight($right)) {
+                continue;
             }
+            if (in_array($right, $initialRights, true)) {
+                continue;
+            }
+            unset($rights[$key]);
         }
 
         // set the reworked rights
-        $event->setData($rights);
+        $formEvent->setData($rights);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $choices = array();
-        $rightsGroups = $this->accessRightsRegistry->getGroups();
+        $choices = [];
+        $rightsGroups = $this->accessRightRegistry->getGroups();
 
         //building choices list on the form of a double dimension array : category -> rights
         foreach ($rightsGroups as $cat => $rightsIds) {
-            $choices[$cat] = array();
+            $choices[$cat] = [];
             foreach ($rightsIds as $rightId) {
 //                $choices[$cat][$rightId] = $this->accessRightsRegistry->getAccessRightById($rightId)->getLabel();
-                $choices[$cat][$this->accessRightsRegistry->getAccessRightById($rightId)->getLabel()] = $rightId;
+                $choices[$cat][$this->accessRightRegistry->getAccessRightById($rightId)->getLabel()] = $rightId;
             }
         }
 
-        $resolver->setDefaults(array(
-            'expanded' => true,
-            'multiple' => true,
-            'choices' => $choices,
-        ));
+        $resolver->setDefaults(['expanded' => true, 'multiple' => true, 'choices' => $choices]);
     }
 
     /**
      * Disabled all unauthorized rights.
      *
-     * @param FormView      $view
-     * @param FormInterface $form
-     * @param array         $options
      */
-    public function finishView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $formView, FormInterface $form, array $options): void
     {
-        foreach ($view->children as $key => $item) {
+        foreach ($formView->children as $item) {
             $value = $item->vars['value'];
-            if (!$this->accessRightsRegistry->hasAccessRight($value)) {
+            if (!$this->accessRightRegistry->hasAccessRight($value)) {
                 $item->vars['attr']['disabled'] = 'disabled';
                 $item->vars['attr']['title'] = "Vous ne pouvez pas modifier ce droit d'accès.";
             }
@@ -137,15 +119,12 @@ class AccessRightType extends AbstractType
      *
      * @return string The name of this type
      */
-    public function getName()
+    public function getName(): string
     {
         return 'access_rights';
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): string
     {
         return ChoiceType::class;
     }

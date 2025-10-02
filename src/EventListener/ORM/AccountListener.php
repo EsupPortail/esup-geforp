@@ -2,12 +2,14 @@
 
 namespace App\EventListener\ORM;
 
-use Doctrine\Common\EventSubscriber;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Events;
-use Html2Text\Html2Text;
 use App\Entity\Core\AbstractTrainee;
-use Symfony\Component\DependencyInjection\Container;
+use Doctrine\Common\EventSubscriber;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Mime\Address;
+use Twig\Environment;
+use Html2Text\Html2Text;
 
 /**
  * This listener :
@@ -15,38 +17,30 @@ use Symfony\Component\DependencyInjection\Container;
  *  - encode and save the password if a new plain password has been set
  *  - generate new password and send credentials to the trainee if the property sendCredentialsEmail has been set to true.
  */
-class AccountListener implements EventSubscriber
+final class AccountListener implements EventSubscriber
 {
-    protected $container;
-
-    /**
-     * @param Container $container
-     */
-    public function __construct(Container $container)
+    public function __construct(private readonly MailerInterface $mailer,
+                                private readonly Environment $twig,
+                                private readonly UrlGeneratorInterface $router,
+                                private readonly string $frontUrl,
+                                private readonly string $mailerFrom)
     {
-        $this->container = $container;
     }
 
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-          Events::prePersist,
-          Events::preUpdate,
-          Events::postPersist,
-          Events::postUpdate,
-        );
+        return [Events::prePersist, Events::preUpdate, Events::postPersist, Events::postUpdate];
     }
 
     /**
      * preProcess
      * Encode the new password.
      */
-    public function preProcess($trainee, $new = false)
+    public function preProcess($trainee, $new = false): void
     {
         if ($trainee instanceof AbstractTrainee && $trainee->getPlainPassword()) {
             $factory = $this->container->get('security.encoder_factory');
@@ -62,13 +56,14 @@ class AccountListener implements EventSubscriber
      * postProcess
      * Send credentials to the trainee
      */
-    public function postProcess($trainee, $new = false)
+    public function postProcess($trainee, $new = false): void
     {
         if (get_parent_class($trainee) == AbstractTrainee::class) {
             // send some mails to the trainee
             if ($trainee->isSendCredentialsMail()) {
                 $this->sendCredentialsMail($trainee, $new);
             }
+
             if ($trainee->getSendActivationMail()) {
                 $this->sendActivationMail($trainee, $new);
             }
@@ -78,107 +73,91 @@ class AccountListener implements EventSubscriber
     /**
      * prePersist.
      */
-    public function prePersist(LifecycleEventArgs $eventArgs)
-    {
-        $this->preProcess($eventArgs->getEntity(), true);
-    }
+
 
     /**
      * preUpdate.
      */
-    public function preUpdate(LifecycleEventArgs $eventArgs)
-    {
-        $this->preProcess($eventArgs->getEntity(), false);
-    }
+
 
     /**
      * postPersist.
      */
-    public function postPersist(LifecycleEventArgs $eventArgs)
-    {
-        $this->postProcess($eventArgs->getEntity(), true);
-    }
+
 
     /**
      * postUpdate.
      */
-    public function postUpdate(LifecycleEventArgs $eventArgs)
-    {
-        $this->postProcess($eventArgs->getEntity(), false);
-    }
+
 
     /**
      * sendMail.
      */
-    protected function sendCredentialsMail(AbstractTrainee $trainee, $new)
+    public function sendCredentialsMail(AbstractTrainee $trainee, bool $new): void
     {
-        // prepare the body
-        $parameters = array(
-          'trainee' => $trainee,
-          'password' => $trainee->getPlainPassword(),
-          'new' => $new,
-          'url' => $this->container->getParameter('front_url'),
-        );
+        $template = $trainee->getShibbolethpersistentid()
+            ? 'trainee/welcome.shibboleth.html.twig'
+            : 'trainee/welcome.html.twig';
 
-        $template = 'welcome.html.twig';
-        if ($trainee->getShibbolethPersistentId()) {
-            // if shibboleth, send special message
-            $template = 'welcome.shibboleth.html.twig';
-        }
+        $params = [
+            'trainee' => $trainee,
+            'password' => $trainee->getPlainPassword(),
+            'new' => $new,
+            'url' => $this->frontUrl,
+        ];
 
-        $body = $this->container->get('templating')->render('trainee/'.$template, $parameters);
+        $htmlBody = $this->twig->render($template, $params);
+        $textBody = (new Html2Text($htmlBody))->getText();
 
-        // send the mail
-        $message = \Swift_Message::newInstance(null, null, 'text/html', null)
-          ->setFrom($this->container->getParameter('mailer_from'), $trainee->getOrganization()->getName())
-          ->setReplyTo($trainee->getOrganization()->getEmail())
-          ->setSubject('Bienvenue sur la plateforme SYGEFOR !')
-          ->setTo($trainee->getEmail())
-          ->setBody($body);
-        $message->addPart(Html2Text::convert($message->getBody()), 'text/plain');
-        $this->container->get('mailer')->send($message);
+        $email = (new Email())
+            ->from(new Address($this->mailerFrom, $trainee->getOrganization()->getName()))
+            ->replyTo($trainee->getOrganization()->getEmail())
+            ->to($trainee->getEmail())
+            ->subject('Bienvenue sur la plateforme SYGEFOR !')
+            ->text($textBody)
+            ->html($htmlBody);
+
+        $this->mailer->send($email);
         $trainee->setSendCredentialsMail(false);
     }
 
     /**
      * sendMail.
      */
-    protected function sendActivationMail(AbstractTrainee $trainee, $new)
+    public function sendActivationMail(AbstractTrainee $trainee, bool $new): void
     {
         $options = $trainee->getSendActivationMail();
 
-        // generate token & url
-        $token = hash('sha256', $trainee->getId());
-        $params = array(
-          'id' => $trainee->getId(),
-          'token' => $token,
-          'email' => $trainee->getEmail(),
-        );
+        $params = [
+            'id' => $trainee->getId(),
+            'token' => hash('sha256', $trainee->getId()),
+            'email' => $trainee->getEmail(),
+        ];
+
         if (!empty($options['redirect'])) {
             $params['redirect'] = $options['redirect'];
         }
-        $url = $this->container->get('router')->generate('api.account.activate', $params, true);
 
-        // prepare the body
-        $parameters = array(
-          'trainee' => $trainee,
-          'new' => $new,
-          'url' => $url,
-        );
+        $url = $this->router->generate('api.account.activate', $params, UrlGeneratorInterface::ABSOLUTE_URL);
 
-        // generate body
-        $body = $this->container->get('templating')->render('trainee/activation.html.twig', $parameters);
+        $templateVars = [
+            'trainee' => $trainee,
+            'new' => $new,
+            'url' => $url,
+        ];
 
-        // send the mail
-        $message = \Swift_Message::newInstance(null, null, 'text/html', null)
-          ->setFrom($this->container->getParameter('mailer_from'), $trainee->getOrganization()->getName())
-          ->setReplyTo($trainee->getOrganization()->getEmail())
-          ->setSubject('SYGEFOR : Activation de votre compte')
-          ->setTo($trainee->getEmail())
-          ->setBody($body);
-        $message->addPart(Html2Text::convert($message->getBody()), 'text/plain');
+        $htmlBody = $this->twig->render('trainee/activation.html.twig', $templateVars);
+        $textBody = (new Html2Text($htmlBody))->getText();
 
-        $this->container->get('mailer')->send($message);
+        $email = (new Email())
+            ->from(new Address($this->mailerFrom, $trainee->getOrganization()->getName()))
+            ->replyTo($trainee->getOrganization()->getEmail())
+            ->to($trainee->getEmail())
+            ->subject('SYGEFOR : Activation de votre compte')
+            ->text($textBody)
+            ->html($htmlBody);
+
+        $this->mailer->send($email);
         $trainee->setSendActivationMail(false);
     }
 }

@@ -6,12 +6,9 @@ use App\Vocabulary\VocabularyInterface;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class OwnOrganizationVocabularyAccessRight extends AbstractAccessRight
+final class OwnOrganizationVocabularyAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Gestion des vocabulaires locaux de son propre centre';
     }
@@ -21,39 +18,38 @@ class OwnOrganizationVocabularyAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Vocabulary\VocabularyInterface') {
+        if ($class === \App\Vocabulary\VocabularyInterface::class) {
             return true;
         }
 
         try {
-            $refl = new \ReflectionClass($class);
+            $reflectionClass = new \ReflectionClass($class);
 
-            return $refl->isSubclassOf('App\Entity\Term\VocabularyInterface');
+            return $reflectionClass->isSubclassOf(\App\Entity\Term\VocabularyInterface::class);
         }
-        catch (\ReflectionException $re) {
+        catch (\ReflectionException) {
             return false;
         }
-
-        return false;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
-        if (is_string($object)) {
-            return true;
+        if (!is_object($object) || !$object instanceof VocabularyInterface) {
+            return false;
         }
-        else if ($object) {
-            return $object->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && $object->getOrganization() === $token->getUser()->getOrganization();
+
+        if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
+            return false;
         }
-        else {
-            return true;
-        }
+
+        return $object->getOrganization() === $token->getUser()->getOrganization();
     }
+
+
 }

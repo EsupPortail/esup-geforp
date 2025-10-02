@@ -5,6 +5,8 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 
 parameters:
+    app.default_pdf_template: 'PDF/attestation.pdf.twig'
+    .container.dumper.inline_factories: true
     router.request_context.scheme: 'https'
     asset.request_context.secure: true
     front_url: '%env(front_host)%'
@@ -36,12 +38,13 @@ parameters:
         session_id: 'Shib-Session-ID'
         remote_user: '%env(REMOTE_USER)%'
     batch:
+
         convert_type:
             semestered_training:
                 class: 'App\Entity\Core\AbstractTraining'
         csv:
             user:
-                class: 'App\Entity\Back\User'
+                class: 'App\Entity\Core\User'
                 filename: 'utilisateurs.csv'
                 fields:
                     username: Nom
@@ -52,7 +55,6 @@ parameters:
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
-                    training.number: "Numéro de stage"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
                     training.theme.name: "Thématique"
@@ -87,8 +89,6 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
-                    taking: "Recettes"
-                    individualcost: "Coût par stagiaire"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
                     comments: "Commentaires"
                     evalResume: "Evaluations"
@@ -168,7 +168,6 @@ parameters:
                     session.training.supervisor.name: "Nom du responsable pédagogique"
                     session.training.supervisor.first_name: "Prénom du responsable pédagogique"
                     session.training.theme.name: "Domaine de formation"
-                    session.training.category.name: "Type de formation"
                     session.dayNumber: "Nombre de jours"
                     session.totalCost: "Coût total de la session"
                     inscriptionStatus.name: "Statut de l'inscription"
@@ -178,10 +177,9 @@ parameters:
                     dif: { label: "CPF", type: "boolean" }
             institution:
                 class: 'App\Entity\Core\AbstractInstitution'
-                filename: 'unite.csv'
+                filename: 'test.csv'
                 fields:
                     name: "Nom"
-                    organization.name: "Centre"
                     createdAt: { label: "Date de création", type: "date" }
                     address: "Adresse"
                     zip: "Code postal"
@@ -212,7 +210,10 @@ parameters:
                     presences: { property: presences }
                     statutInscription: { property: inscriptionstatus.name }
                     statutPresence: { property: presencestatus.name }
-                    dates: { property: session.dates }
+                    formateur: { property: formateurCivilite }
+                    formation: { property: formationNom }
+                    dates: { property: dates }
+                    commentaires: { property: comments }
                     dateDebut: { property: session.dateDebut }
                     domaine: { property: session.formation.theme }
                     typeAction: { property: actiontype }
@@ -229,8 +230,8 @@ parameters:
                     civilite: { property: title }
                     nomComplet: { property: fullname }
                     nomNaissance: { property: maidenName }
-                    nom: { property: lastname }
-                    prenom: { property: firstname }
+                    nom: { property: Lastname }
+                    prenom: { property: Firstname }
                     emailSup: { property: emailSup }
                     emailCorr: { property: emailCorr }
                     # CoordinatesTrait
@@ -241,6 +242,7 @@ parameters:
                     telephone: { property: phonenumber }
                     # ProfessionalSituationTrait
                     institution: { property: institution }
+                    stagiaire: { property: Trainees }
                     service: { property: service }
                     corps: { property: corps }
                     bap: { property: bap }
@@ -249,6 +251,10 @@ parameters:
                     statut: { property: status }
                     payant: { property: isPaying }
                     # Trainee
+                    dates: { property: DateSession }
+                    commentaires: { property: CommentsSession }
+                    formateur: { property: Civilite }
+                    formation: { property: FormationName}
                     inscriptions: { property: inscriptions }
             trainer:
                 class: 'App\Entity\Back\Trainer'
@@ -257,13 +263,17 @@ parameters:
                 emailPath: 'email'
                 fields:
                     #personTrait
-                    civilite: { property: title }
+                    civilite: { property: getTitle }
+                    formateur: { property: getTitle }
                     nomComplet: { property: fullname }
+                    formation: { property: SessionName }
                     nom: { property: lastname }
                     prenom: { property: firstname }
                     # CoordinatesTrait
                     adresse: { property: address }
                     codePostal: { property: zip }
+                    dates: { property: DateSession }
+                    commentaires: { property: CommentsSession }
                     ville: { property: city }
                     email: { property: email }
                     fax: { property: faxnumber }
@@ -284,10 +294,14 @@ parameters:
                     id: { property: "id" }
                     dateDebut: { property: "datebegin", type: "date" }
                     dateFin: { property: "dateend", type: "date" }
-                    dates: { property: "dates" }
+                    dates: { property: "datesString" }
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
+                    property: "trainees"
+                    fields:
+                        prenom: { property: "firstname" }
+                        nom: { property: "lastname" }
                     formateur: { property: "participations[0].trainer" }
                     nombrePlaces: { property: "maximumnumberofregistrations" }
                     nombreInscrits: { property: "numberofregistrations" }
@@ -327,7 +341,6 @@ parameters:
                     categorie: { property: category.name }
                     typeIntervention: { property: interventionType }
                     initiativeExterne: { property: externalInitiative }
-                    commentaires: { property: comments }
                     # Internship && Long training
                     prerequis: { property: prerequisites }
                     public: { property: publictype.name }
@@ -406,7 +419,26 @@ parameters:
 #    - { resource: "packages/batch.yml" }
 
 services:
+    App\Service\TrainingBalanceSheet:
+        arguments:
+            $doctrine: '@doctrine'
+    sygefor_core.batch.pdf.inscription.attestation:
+        class: App\BatchOperations\Generic\PDFBatchOperation
+        arguments:
+                - '@knp_snappy.pdf'
+                - '@security.helper'
+                - '@twig'
+                - '@parameter_bag'
+        tags:
+                - { name: sygefor.batch_operation, type:
+                              inscription, label: 'PDF : Attestation', domain: 'sygefor_core' }
     # default configuration for services in *this* file
+    Symfony\Component\Security\Core\Security: '@Symfony\Bundle\SecurityBundle\Security'
+    Symfony\Component\DependencyInjection\ContainerInterface: '@service_container'
+    Namespace\ImportService:
+        arguments:
+            - '@service_container'
+ # Injection explicite du service conteneur
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -426,23 +458,21 @@ services:
     app.menu_builder:
         class: App\Menu\MenuBuilder
         arguments:
-            - "@knp_menu.factory"
-            - "@security.authorization_checker"
-            - "@router"
+            $menuFactory: '@knp_menu.factory'  # Utilisation de la factory KnpMenuFactory
+            $router: '@router'
         tags:
-            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main } # The alias is what is used to retrieve the menu
+            - { name: knp_menu.menu_builder, method: createMainMenu, alias: main }
 
     App\Listener\TrainingListener:
         tags:
             - { name: doctrine.event_subscriber }
 
-    App\Listener\SessionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
 
-    App\EventListener\ORM\InscriptionListener:
-        tags:
-            - { name: doctrine.event_subscriber }
+    App\Twig\SpacelessExtension:
+        tags: ['twig.extension']
+
+    App\Vocabulary\VocabularyRegistry: ~
+
 
     shibbundle.sup_service:
         class: App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider

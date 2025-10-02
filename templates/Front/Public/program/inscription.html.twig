@@ -27,7 +27,9 @@
         <div class="container">
             <ol class="breadcrumb">
                 <li><a href="{{ path('front.public.index') }}">Accueil</a></li>
-                <li><a href="{{ path('front.program.training', {id: training.id, sessionId: session.id, token: token}) }}">{{ training.name }}</a></li>
+                <li>
+                    <a href="{{ path('front.program.training', {id: training.id, sessionId: session.id, token: token}) }}">{{ training.name }}</a>
+                </li>
                 <li><a class="active" href="">Inscription</a></li>
             </ol>
         </div>
@@ -45,7 +47,7 @@
                         {{ form_row(form.children.motivation) }}
                         {{ form_errors(form.children.motivation) }}
                         {{ form_row(form.children.actiontype) }}
-                        <div style='display:none' >
+                        <div style='display:none'>
                             {{ form_row(form.children.dif) }}
                         </div>
                         {{ form_widget(form.children.authorization) }}
@@ -61,16 +63,22 @@
                     {% else %}
                         {% if flag==0 %}
                             <h2> Inscription refusée </h2>
-                            <p>Vous ne pouvez pas vous inscrire à cette session car vous ne faites par partie des publics cibles autorisés à s'inscrire.</p>
+                            <p>Vous ne pouvez pas vous inscrire à cette session car vous ne faites par partie des
+                                publics cibles autorisés à s'inscrire.</p>
                         {% else %}
                             {% if flag==2 %}
                                 <h2> Inscription impossible </h2>
-                                <h4>Vous ne pouvez pas vous inscrire à cette session car vous n'avez pas renseigné de supérieur hiérarchique. </h4>
-                                <p>Merci de compléter les champs "responsable hiérarchique" dans la rubrique "Mon compte", onglet "Mon profil". Attention, l'email saisi doit être l'email institutionnel personnel de votre responsable : pas d'adresse générique, pas de compte de laboratoire... </p>
-                                <p>Vous pourrez ensuite retourner au programme des formations et vous inscrire à la session choisie.</p>
-                            {%  else %}
+                                <h4>Vous ne pouvez pas vous inscrire à cette session car vous n'avez pas renseigné de
+                                    supérieur hiérarchique. </h4>
+                                <p>Merci de compléter les champs "responsable hiérarchique" dans la rubrique "Mon
+                                    compte", onglet "Mon profil". Attention, l'email saisi doit être l'email
+                                    institutionnel personnel de votre responsable : pas d'adresse générique, pas de
+                                    compte de laboratoire... </p>
+                                <p>Vous pourrez ensuite retourner au programme des formations et vous inscrire à la
+                                    session choisie.</p>
+                            {% else %}
                                 <h2> Inscription refusée </h2>
-                            {% endif%}
+                            {% endif %}
                         {% endif %}
                     {% endif %}
 
@@ -83,7 +91,8 @@
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab" id="headingOne">
                                 <p class="panel-title text-center">
-                                    <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
+                                    <a role="button" data-toggle="collapse" data-parent="#accordion"
+                                       href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
                                         {% if session.sessionType != "A venir" %}
                                             {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
                                         {% else %}
@@ -92,14 +101,15 @@
                                     </a>
                                 </p>
                             </div>
-                            <div id="session{{ session.id }}" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                            <div id="session{{ session.id }}" class="panel-collapse collapse in" role="tabpanel"
+                                 aria-labelledby="headingOne">
                                 <div class="panel-body">
                                     <ul class="list-unstyled text-center">
                                         {% if session.displayOnline == true %}
                                             {% if session.name is defined and session.name != "" %}
                                                 <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
                                             {% endif %}
-                                        {#    {% if session.place.name is defined %}
+                                            {#    {% if session.place.name is defined %}
                                                 <li title="Lieu de la session"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;&nbsp;{{ session.place.name }}</li>
                                             {% endif %}
                                             {% if session.hourNumber is defined and session.dayNumber is defined %}
@@ -114,17 +124,24 @@
                                                         <table style="margin: auto">
                                                             <thead>
                                                             <tr>
-                                                                <th class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;</th>
-                                                                <th class="text-center"><i class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;</th>
-                                                                <th class="text-center"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;</th>
+                                                                <th class="text-center"><i
+                                                                            class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;
+                                                                </th>
+                                                                <th class="text-center"><i
+                                                                            class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;
+                                                                </th>
+                                                                <th class="text-center"><i
+                                                                            class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;
+                                                                </th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
                                                             {% for date in session.dates %}
-                                                                <tr >
+                                                                <tr>
                                                                     {% if date.dateEnd is defined and date.dateEnd is not null %}
-                                                                        {%  if date.dateEnd != date.dateBegin %}
-                                                                            <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                                                        {% if date.dateEnd != date.dateBegin %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }}
+                                                                                -> {{ date.dateEnd | date('d/m/y') }}</td>
                                                                         {% else %}
                                                                             <td>{{ date.dateBegin | date('d/m/y') }} </td>
                                                                         {% endif %}
@@ -133,7 +150,8 @@
                                                                     {% endif %}
                                                                     {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
                                                                         {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
-                                                                            <td>{{ date.scheduleMorn }}, {{ date.scheduleAfter }}</td>
+                                                                            <td>{{ date.scheduleMorn }}
+                                                                                , {{ date.scheduleAfter }}</td>
                                                                         {% else %}
                                                                             <td>{{ date.scheduleMorn }}</td>
                                                                         {% endif %}
@@ -153,11 +171,14 @@
                                                 {% endif %}
                                             {% else %}
                                                 <li title="Dates">
-                                                    <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
+                                                    <div class="session__avenir"><span class="label radius">Programmation à venir</span>
+                                                    </div>
                                                 </li>
                                             {% endif %}
                                             {% if user.isPaying is defined and user.isPaying and session.price is defined %}
-                                                <li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;</li>
+                                                <li title="Tarif de la formation">
+                                                    <strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;
+                                                </li>
                                             {% endif %}
                                         {% endif %}
                                     </ul>
@@ -176,10 +197,16 @@
                     <address>
                         <div>{{ training.organization.name }}</div>
                         <div>{{ training.organization.fullAddress | nl2br }}</div>
-                        <div><span class="glyphicon glyphicon-phone-alt"></span> <a href="tel:{{ training.organization.phoneNumber | u.replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a></div>
-                        <div><span class="glyphicon glyphicon-envelope"></span> <a href="mailto:{{ training.organization.email }}">&nbsp;{{ training.organization.email }}</a></div>
+                        <div><span class="glyphicon glyphicon-phone-alt"></span> <a
+                                    href="tel:{{ training.organization.phoneNumber | u.replace(' ', '') }}">&nbsp;{{ training.organization.phoneNumber }}</a>
+                        </div>
+                        <div><span class="glyphicon glyphicon-envelope"></span> <a
+                                    href="mailto:{{ training.organization.email }}">&nbsp;{{ training.organization.email }}</a>
+                        </div>
                         {% if training.organization.website is defined and training.organization.website | length > 0 %}
-                            <div><span class="glyphicon glyphicon-globe"></span> <a href="{{ training.organization.website }}" target="_blank">&nbsp;{{ training.organization.website }}</a></div>
+                            <div><span class="glyphicon glyphicon-globe"></span> <a
+                                        href="{{ training.organization.website }}"
+                                        target="_blank">&nbsp;{{ training.organization.website }}</a></div>
                         {% endif %}
                     </address>
                 </div>

@@ -16,23 +16,21 @@ interface BatchOperationInterface
      *
      * @return mixed
      */
-    public function setId($id);
+    public function setId($id): mixed;
 
     /**
      * @return mixed
      */
-    public function getId();
+    public function getId(): mixed;
 
     /**
-     * @param array $idList
-     * @param array $options
      *
      * @return mixed
      */
-    public function execute(array $idList = array(), array $options = array());
+    public function execute(array $idList = [], array $options = []): mixed;
 
     /**
      * @return array modal window modal config options
      */
-    public function getModalConfig($options = array());
+    public function getModalConfig($options = []): array;
 }

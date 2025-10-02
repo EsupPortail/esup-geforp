@@ -4,20 +4,9 @@ namespace App\Controller\Back;
 
 use App\Controller\Core\AbstractParticipationController;
 use App\Entity\Back\Participation;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\FormError;
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Routing\Attribute\Route;
 
-
-
-/**
- * @Route("/participation")
- */
-class ParticipationController extends AbstractParticipationController
+ #[Route("/participation")]final class ParticipationController extends AbstractParticipationController
 {
-    protected $participationClass = Participation::class;
+    protected string $participationClass = Participation::class;
 }

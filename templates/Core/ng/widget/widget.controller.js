@@ -1,7 +1,7 @@
 /**
  * WidgetListController
  */
-sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$timeout', '$listState', '$dialog', 'options', function($scope, $searchFactory, $timeout, $listState, $dialog, options) {
+sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$timeout', '$listState', '$dialog', 'options', function ($scope, $searchFactory, $timeout, $listState, $dialog, options) {
 
     // create search service
     $scope.search = new $searchFactory(options.route);
@@ -12,7 +12,7 @@ sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$tim
     $scope.search.query.sorts = options.sorts;
     $scope.search.query.filters = options.filters ? options.filters : {};
 
-    $scope.$watch("search.result.total", function(total) {
+    $scope.$watch("search.result.total", function (total) {
         options.subtitle = (total > 0 ? ' (' + total + ')' : '');
     });
 
@@ -20,9 +20,9 @@ sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$tim
      * Refresh the widget
      * @private
      */
-    $scope.refresh = function() {
+    $scope.refresh = function () {
         $scope.loading = true;
-        $scope.search.search().then(function(result) {
+        $scope.search.search().then(function (result) {
             $scope.items = result.items;
             $scope.loading = false;
         });
@@ -33,7 +33,7 @@ sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$tim
      * @private
      */
     if (typeof $scope.options.open == "undefined") {
-        $scope.open = function() {
+        $scope.open = function () {
             // copy the query
             var q = angular.copy($scope.search.query);
             // remove the size param
@@ -41,16 +41,15 @@ sygeforApp.controller('WidgetListController', ['$scope', '$searchFactory', '$tim
             // go the the configured state
             $listState.go(options.state, {q: angular.toJson(q)});
         }
-    }
-    else if($scope.options.open) {
+    } else if ($scope.options.open) {
         $scope.open = $scope.options.open;
     }
 
     /**
      * query page/size watcher
      */
-    $scope.$watch('[search.query.page, search.query.size]', function(newValue, oldValue){
-        if(!angular.equals(newValue, oldValue)) {
+    $scope.$watch('[search.query.page, search.query.size]', function (newValue, oldValue) {
+        if (!angular.equals(newValue, oldValue)) {
             $scope.refresh();
         }
     }, true);

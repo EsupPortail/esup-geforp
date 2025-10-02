@@ -20,28 +20,19 @@ use Symfony\Component\Form\Extension\Core\Type\TextAreaType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-class AlertType extends AbstractType
+final class AlertType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-            ->add('alert', CheckboxType::class, array(
-                'label' => false,
-                'required' => false
-            ))
+        $formBuilder
+            ->add('alert', CheckboxType::class, ['label' => false, 'required' => false])
             ->add('session_id', HiddenType::class)
             ->add('trainee_id', HiddenType::class);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class' => SingleAlert::class,
-        ));
+        $optionsResolver->setDefaults(['data_class' => SingleAlert::class]);
     }
 
 

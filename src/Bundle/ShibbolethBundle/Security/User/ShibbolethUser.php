@@ -2,36 +2,27 @@
 
 namespace App\Bundle\ShibbolethBundle\Security\User;
 
+use App\Entity\Core\User;
+use Stringable;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 
-class ShibbolethUser implements UserInterface, EquatableInterface
+final class ShibbolethUser implements UserInterface, EquatableInterface, Stringable
 {
-    private $username;
-    private $password;
-    private $salt;
-    private $roles;
-    private $credentials;
-
-    public function __construct($username, $password, $salt, array $credentials, array $roles)
+    public function __construct(private $username, private readonly array $credentials, private array $roles)
     {
-        $this->username = $username;
-        $this->password = $password;
-        $this->salt = $salt;
-        $this->roles = $roles;
-        $this->credentials = $credentials;
     }
 
-    public function setRoles($roles)
+    public function setRoles($roles): void
     {
         $this->roles[] = $roles;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         $roles = $this->roles;
-
         // guarantees that a user always has at least one role for security
         $roles[] = 'ROLE_SHIB_AUTHENTICATED';
 
@@ -39,46 +30,45 @@ class ShibbolethUser implements UserInterface, EquatableInterface
         return $this->roles;
     }
 
-    public function getPassword()
+    public function getPassword(): null
     {
         return null;
     }
 
-    public function getSalt()
+    public function getSalt(): null
     {
         return null;
     }
 
-    public function getUsername()
+    public function getUsername(): string
     {
-        return $this->username;
+        return $this->getUserIdentifier();
     }
 
-    public function getCredentials()
+    public function getCredentials(): array
     {
         return $this->credentials;
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 
-    public function isEqualTo(UserInterface $user)
+    public function isEqualTo(UserInterface $user): bool
     {
         if (!$user instanceof ShibbolethUser) {
             return false;
         }
-
-
-        if ($this->username !== $user->getUsername()) {
-            return false;
-        }
-
-        return true;
+        return $this->username === $user->getUserIdentifier();
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return (string) $this->getUsername();
+        return $this->username;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->username;
     }
 }

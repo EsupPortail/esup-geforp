@@ -1,10 +1,10 @@
 /**
  * directive : sfHref
  */
-sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', function($state, $injector, $compile) {
+sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', function ($state, $injector, $compile) {
     return {
         restrict: 'A',
-        compile: function(element, attrs) {
+        compile: function (element, attrs) {
             var initialHtml = element.html();
 
             /**
@@ -15,12 +15,12 @@ sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', functio
             function extractBreadcrumb(state, scope) {
                 var breadcrumb = [];
 
-                if(state.self.breadcrumb !== undefined) {
+                if (state.self.breadcrumb !== undefined) {
                     var options = state.self.breadcrumb;
                     compileBreadcrumbPart(state, options, scope, breadcrumb);
                 }
 
-                if(state.parent) {
+                if (state.parent) {
                     var parts = extractBreadcrumb(state.parent, scope);
                     breadcrumb.unshift.apply(breadcrumb, parts);
                 }
@@ -38,21 +38,21 @@ sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', functio
             function compileBreadcrumbPart(state, options, scope, breadcrumb) {
                 var html = null;
 
-                if(typeof options == "function") {
+                if (typeof options == "function") {
                     options = $injector.invoke(options, null, state.locals.globals);
-                    if(!options) {
+                    if (!options) {
                         return null;
                     }
                 }
 
-                if(Array.isArray(options)) {
-                    for(var i=0; i<options.length; i++) {
+                if (Array.isArray(options)) {
+                    for (var i = 0; i < options.length; i++) {
                         compileBreadcrumbPart(state, options[i], scope, breadcrumb);
                     }
                     return;
                 }
 
-                if(typeof options == "string") {
+                if (typeof options == "string") {
                     html = options;
                 } else {
                     var label = options.label;
@@ -62,7 +62,7 @@ sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', functio
                     html = '<a ui-sref="' + sref + '" ui-sref-opts=\'' + angular.toJson(options) + '\'>' + label + '</a>';
                 }
 
-                if(!html) {
+                if (!html) {
                     return null;
                 }
 
@@ -79,22 +79,21 @@ sygeforApp.directive('uiBreadcrumb', ['$state', '$injector', '$compile', functio
             /**
              * Link
              */
-            return function(scope, element, attrs)
-            {
-                scope.$on("$stateChangeSuccess", function() {
+            return function (scope, element, attrs) {
+                scope.$on("$stateChangeSuccess", function () {
                     var breadcrumb = extractBreadcrumb($state.$current, scope);
                     element.html(initialHtml);
-                    for(var i in breadcrumb) {
+                    for (var i in breadcrumb) {
                         element.append(breadcrumb[i]);
                     }
                     $("li", element).removeClass("active");
                     $("li:last", element).addClass("active");
                 });
 
-                scope.$on("$breadcrumbUpdate", function() {
+                scope.$on("$breadcrumbUpdate", function () {
                     var breadcrumb = extractBreadcrumb($state.$current, scope);
                     element.html(initialHtml);
-                    for(var i in breadcrumb) {
+                    for (var i in breadcrumb) {
                         element.append(breadcrumb[i]);
                     }
                     $("li", element).removeClass("active");

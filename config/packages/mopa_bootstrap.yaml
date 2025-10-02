@@ -11,4 +11,6 @@ mopa_bootstrap:
         horizontal_label_offset_class:  col-sm-offset-2
         horizontal_input_wrapper_class:  col-sm-10
         checkbox_label: both
-    menu: ~  # enables twig helpers for menu
+    menu:
+        enabled: true
+#    menu: ~  # enables twig helpers for menu

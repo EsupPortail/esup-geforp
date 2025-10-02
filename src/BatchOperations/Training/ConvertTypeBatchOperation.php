@@ -9,21 +9,15 @@ use App\Utils\Search\SearchService;
 use App\Model\SemesteredTraining;
 use App\Entity\Core\AbstractTraining;
 use App\Utils\TrainingTypeRegistry;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Bundle\SecurityBundle\Security;
 
 class ConvertTypeBatchOperation extends AbstractBatchOperation
 {
-    /** @var EntityManager $security */
-    protected $security;
-
-    /** @var TrainingTypeRegistry $trainingTypeRegistry | get new entity type class */
-    protected $trainingTypeRegistry;
-
     /** @var array $correspondanceBetweenTrainings */
-    protected $correspondanceBetweenTrainings = array();
+    protected $correspondanceBetweenTrainings = [];
 
     /** @var array $clonedTrainingNumbers */
-    protected $clonedTrainingNumbers = array();
+    protected $clonedTrainingNumbers = [];
 
     /** @var SearchService $semesteredTrainingSearch */
     protected $semesteredTrainingSearch;
@@ -34,32 +28,28 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
     /**
      * ConvertTypeBatchOperation constructor.
      *
-     * @param Security              $security
-     * @param TrainingTypeRegistry $trainingTypeRegistry
-     * @param SearchService        $semesteredTrainingSearch
+     * @param SearchService $searchService
      * @param Type                 $semesteredTrainingType
      */
-    public function __construct(Security $securityContext, TrainingTypeRegistry $trainingTypeRegistry,
-                                SearchService $semesteredTrainingSearch, Type $semesteredTrainingType)
+    public function __construct(protected Security $security, /** @var TrainingTypeRegistry $trainingTypeRegistry | get new entity type class */
+    protected TrainingTypeRegistry $trainingTypeRegistry,
+                                SearchService $searchService, Type $semesteredTrainingType)
     {
-        $this->security = $securityContext;
-        $this->trainingTypeRegistry = $trainingTypeRegistry;
-        $this->semesteredTrainingSearch = $semesteredTrainingSearch;
+        parent::__construct();
+        $this->semesteredTrainingSearch = $searchService;
         $this->semesteredTrainingType = $semesteredTrainingType;
     }
 
     /**
-     * @param array $idList
-     * @param array $options
      *
      * @return mixed
      */
-    public function execute(array $idList = array(), array $options = array())
+    public function execute(array $idList = [], array $options = []): mixed
     {
         $type = $options[0]['type'];
         // get trainings from semestered trainings and verify if there are not several times the same training
         // not transform same training type and meetings
-        $entities = SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager(), array($type, 'meeting'));
+        $entities = SemesteredTraining::getTrainingsByIds($idList, $this->doctrine->getManager(), [$type, 'meeting']);
 
         // first create new entities and get old entity sessions
         foreach ($entities as $key => $entity) {
@@ -73,6 +63,7 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
                     $session->setTraining($this->correspondanceBetweenTrainings[$entity->getId()]);
                     $clonedTrainingSessions->add($session);
                 }
+
                 // remove sessions for old entity
                 $entitySessions = new ArrayCollection();
                 $entity->setSessions($entitySessions);
@@ -81,31 +72,34 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
                 $this->correspondanceBetweenTrainings[$entity->getId()]->setSessions($clonedTrainingSessions);
             }
         }
+
         $this->doctrine->getManager()->flush();
 
         // then remove old entities
-        $entityRemovedIds = array();
+        $entityRemovedIds = [];
         foreach ($entities as $entity) {
             if ($this->security->isGranted('EDIT', $entity)) {
                 $entityRemovedIds[] = $entity->getId();
                 $this->doctrine->getManager()->remove($entity);
             }
         }
+
         $this->doctrine->getManager()->flush();
         // then reattributes old entities number to new ones
-        foreach ($this->clonedTrainingNumbers as $values) {
-            $values['entity']->setNumber($values['number']);
+        foreach ($this->clonedTrainingNumbers as $clonedTrainingNumber) {
+            $clonedTrainingNumber['entity']->setNumber($clonedTrainingNumber['number']);
         }
+
         $this->doctrine->getManager()->flush();
 
         // remove cascade semestered training
         // some of them are not found by elastica because the semestered training could not have the same id because of session moved from old trainings to new one
-        if (!empty($entityRemovedIds)) {
+        if ($entityRemovedIds !== []) {
             // search wrong existing documents
-            $trainingIdFilter = new Terms('training.id', $entityRemovedIds);
-            $this->semesteredTrainingSearch->addFilter('training.id', $trainingIdFilter);
+            $terms = new Terms('training.id', $entityRemovedIds);
+            $this->semesteredTrainingSearch->addFilter('training.id', $terms);
             $this->semesteredTrainingSearch->setSize(9999);
-            $result = $this->semesteredTrainingSearch->search();
+            $this->semesteredTrainingSearch->search();
 
             // delete them
 /*            if (!empty($result['items'])) {
@@ -124,15 +118,13 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
     }
 
     /**
-     * @param AbstractTraining $training
      * @param string           $type
-     * @param EntityManager    $em
      * @param int              $key
      */
-    protected function createAndCopyEntity(AbstractTraining $training, $type, EntityManager $em, $key)
+    protected function createAndCopyEntity(AbstractTraining $training, $type, EntityManager $entityManager, $key)
     {
         // get database max number for organization
-        $query = $em->createQuery('SELECT MAX(t.number) FROM App\Entity\Core\AbstractTraining t WHERE t.organization = :organization')
+        $query = $entityManager->createQuery('SELECT MAX(t.number) FROM App\Entity\Core\AbstractTraining t WHERE t.organization = :organization')
             ->setParameter('organization', $training->getOrganization());
         $max = (int) $query->getSingleScalarResult();
 
@@ -144,14 +136,15 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
 
         // set max number + entity array key because max number is always the same till we do not flush
         $cloned->setNumber($max + $key + 1);
-        $em->persist($cloned);
+
+        $entityManager->persist($cloned);
 
         // copy array collection elements
         $this->mergeArrayCollectionsAndFlush($cloned, $training);
 
         // some flags for following operations
         $this->correspondanceBetweenTrainings[$training->getId()] = $cloned;
-        $this->clonedTrainingNumbers[] = array('entity' => $cloned, 'number' => $training->getNumber());
+        $this->clonedTrainingNumbers[] = ['entity' => $cloned, 'number' => $training->getNumber()];
     }
 
     /**
@@ -163,8 +156,8 @@ class ConvertTypeBatchOperation extends AbstractBatchOperation
         // clone duplicate materials
         $tmpMaterials = $source->getMaterials();
         if (!empty($tmpMaterials)) {
-            foreach ($tmpMaterials as $material) {
-                $newMat = clone $material;
+            foreach ($tmpMaterials as $tmpMaterial) {
+                $newMat = clone $tmpMaterial;
                 $dest->addMaterial($newMat);
             }
         }

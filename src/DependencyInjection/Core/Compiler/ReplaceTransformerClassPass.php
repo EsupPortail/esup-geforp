@@ -21,9 +21,8 @@ class ReplaceTransformerClassPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // replace the fos_elastica.model_to_elastica_transformer.class parameter
         $container->setParameter('fos_elastica.model_to_elastica_transformer.class', ModelToElasticaTransformer::class);

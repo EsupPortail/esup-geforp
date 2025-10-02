@@ -1,23 +1,25 @@
 /**
  * InstitutionBundle
  */
-sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateProvider, $dialogProvider) {
+sygeforApp.config(["$listStateProvider", "$dialogProvider", function ($listStateProvider, $dialogProvider) {
 
     // institution states
     $listStateProvider.state('institution', {
         url: "/institution?q",
         abstract: true,
         templateUrl: "list.html",
-        controller:"InstitutionListController",
+        controller: "InstitutionListController",
         breadcrumb: [
-            { label: "Etablissements", sref: "institution.table" }
+            {label: "Etablissements", sref: "institution.table"}
         ],
         resolve: {
             search: function ($searchFactory, $stateParams, $user) {
                 var search = $searchFactory('institution.search');
                 search.query.sorts = {'name.source': 'asc'};
                 search.extendQueryFromJson($stateParams.q);
-                return search.search().then(function() { return search; });
+                return search.search().then(function () {
+                    return search;
+                });
             }
         },
         states: {
@@ -36,7 +38,7 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
                 weight: 1,
                 templateUrl: "states/detail/detail.html",
                 controller: 'ListDetailController',
-                data:{
+                data: {
                     resultTemplateUrl: "institution/states/detail/result.html"
                 },
                 states: {
@@ -45,9 +47,11 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
                         templateUrl: "institution/states/detail/institution.html",
                         controller: 'InstitutionDetailViewController',
                         resolve: {
-                            data: function($http, $stateParams) {
+                            data: function ($http, $stateParams) {
                                 var url = Routing.generate('institution.view', {id: $stateParams.id});
-                                return $http({method: 'GET', url: url}).then (function (data) { return data.data; });
+                                return $http({method: 'GET', url: url}).then(function (data) {
+                                    return data.data;
+                                });
                             }
                         },
                         breadcrumb: {
@@ -64,17 +68,17 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
      */
     $dialogProvider.dialog('institution.create', /* @ngInject */ {
         templateUrl: 'institution/dialogs/create.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
             $scope.form = form;
-            $scope.onSuccess = function(data) {
+            $scope.onSuccess = function (data) {
                 growl.addSuccessMessage("L'établissement a bien été créé.");
                 $scope.dialog.close(data);
             };
         },
-        resolve:{
-            form: function ($http){
+        resolve: {
+            form: function ($http) {
                 return $http.get(Routing.generate('institution.create')).then(function (response) {
                     return response.data.form;
                 });
@@ -87,12 +91,12 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function($listStateP
      */
     $dialogProvider.dialog('institution.delete', /* @ngInject */ {
         templateUrl: 'institution/dialogs/delete.html',
-        controller: function($scope, $modalInstance, $dialogParams, $state, $http, growl) {
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, growl) {
             $scope.dialog = $modalInstance;
             $scope.dialog.params = $dialogParams;
-            $scope.ok = function() {
+            $scope.ok = function () {
                 var url = Routing.generate('institution.remove', {id: $dialogParams.institution.id});
-                $http.post(url).then(function (response){
+                $http.post(url).then(function (response) {
                     growl.addSuccessMessage("L'établissement a bien été supprimé.");
                     $scope.dialog.close(response.data);
                 });

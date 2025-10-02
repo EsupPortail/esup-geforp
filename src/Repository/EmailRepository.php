@@ -9,52 +9,52 @@ use App\Entity\back\Trainee;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class EmailRepository extends ServiceEntityRepository
+final class EmailRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Email::class);
+        parent::__construct($managerRegistry, Email::class);
     }
 
-    public function getEmailsList($keyword, $filters)
+    public function getEmailsList($keyword, $filters) //int $limit = 200
     {
-        $qb = $this->createQueryBuilder('e');
-        $qb
+        $queryBuilder = $this->createQueryBuilder('e');
+        $queryBuilder
             ->select('e')
             /* Keyword (recherche par mot clé) */
             // FILTRE KEYWORD
             ->where('e.subject LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
+
 
 
         // FILTRE TRAINEE
         if (isset($filters['trainee.id'])) {
-            $qb
+            $queryBuilder
                 ->andWhere('e.trainee = :id')
                 ->setParameter('id', $filters['trainee.id']);
         }
 
         // FILTRE FORMATEUR
         if( isset($filters['trainer.id']) ) {
-            $qb
+            $queryBuilder
                 ->andWhere('e.trainer = :id')
                 ->setParameter('id', $filters['trainer.id']);
         }
 
         // FILTRE SESSION
         if( isset($filters['session.id']) ) {
-            $qb
+            $queryBuilder
                 ->andWhere('e.session = :id')
                 ->setParameter('id', $filters['session.id']);
         }
 
-        $qb->addOrderBy('e.sendat', 'DESC');
+        $queryBuilder->addOrderBy('e.sendat', 'DESC');
 
-        $query = $qb->getQuery();
-        $result = $query->getResult();
+        $query = $queryBuilder->getQuery();
 
-        return $result;
+        return $query->getResult();
     }
 
 

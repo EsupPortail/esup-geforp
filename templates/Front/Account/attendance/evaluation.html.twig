@@ -11,8 +11,12 @@
             </div>
             <ul class="nav nav-tabs">
                 <li><a href="{{ path('front.account.profile') }}" class="button secondary">Mon profil</a></li>
-                <li><a href="{{ path('front.account.registrations') }}" title="Pour gérer vos demandes d'inscription en cours et retrouver vos anciennes demandes" class="button secondary">Mes demandes d'inscription</a></li>
-                <li class="active"><a href="{{ path('front.account.attendances') }}" title="Pour retrouver toutes les formations suivies et accéder à leurs documents" class="button secondary">Mes formations suivies</a></li>
+                <li><a href="{{ path('front.account.registrations') }}"
+                       title="Pour gérer vos demandes d'inscription en cours et retrouver vos anciennes demandes"
+                       class="button secondary">Mes demandes d'inscription</a></li>
+                <li class="active"><a href="{{ path('front.account.attendances') }}"
+                                      title="Pour retrouver toutes les formations suivies et accéder à leurs documents"
+                                      class="button secondary">Mes formations suivies</a></li>
             </ul>
         </div>
     </header>
@@ -25,7 +29,9 @@
                 <li><a href="{{ path('front.public.index') }}">Accueil</a></li>
                 <li><a href="{{ path('front.account') }}">Mon compte</a></li>
                 <li><a href="{{ path('front.account.attendances') }}">Mes formations suivies</a></li>
-                <li><a href="{{ path('front.account.attendance', {session: attendance.session.id}) }}">{{ attendance.session.training.name }}</a></li>
+                <li>
+                    <a href="{{ path('front.account.attendance', {session: attendance.session.id}) }}">{{ attendance.session.training.name }}</a>
+                </li>
                 <li><a class="active" href="">Evaluation</a></li>
             </ol>
         </div>

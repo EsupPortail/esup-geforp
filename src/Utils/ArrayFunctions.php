@@ -6,7 +6,7 @@ namespace App\Utils;
  * Class ArrayFunctions
  * @package Sygefor\Bundle\CoreBundle\Utils
  */
-class ArrayFunctions
+final class ArrayFunctions
 {
     /**
      * Walks through given array and replaces every found empty array
@@ -31,13 +31,9 @@ class ArrayFunctions
      */
     public static function emptyArraysToStringsRecursive(array $values)
     {
-        array_walk($values, function (&$item, $key) {
+        array_walk($values, static function (&$item, $key) : void {
             if (is_array($item)) {
-                if (empty($item)) {
-                    $item = '';
-                } else {
-                    $item = self::emptyArraysToStringsRecursive($item);
-                }
+                $item = $item === [] ? '' : self::emptyArraysToStringsRecursive($item);
             }
         });
 

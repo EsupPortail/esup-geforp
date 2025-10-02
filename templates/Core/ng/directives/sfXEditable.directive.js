@@ -18,8 +18,7 @@ sygeforApp.directive('sfXeditableForm', ['$http', '$timeout', function ($http, $
             for (var key in formView.children) {
                 angular.extend(data, extractData(formView.children[key]));
             }
-        }
-        else {
+        } else {
             if (formView.type === "choice") {
                 var hasNullOption = formView.choices.length > 0 && formView.choices[0].v === undefined;
                 if (hasNullOption && formView.choices[0].l === formView.value) {
@@ -29,8 +28,7 @@ sygeforApp.directive('sfXeditableForm', ['$http', '$timeout', function ($http, $
             if (typeof formView.checked != "undefined") {
                 // get the data from the checked property
                 data = formView.checked;
-            }
-            else {
+            } else {
                 // get the data from the value property
                 data = formView.value;
             }
@@ -105,8 +103,7 @@ sygeforApp.directive('sfXeditableForm', ['$http', '$timeout', function ($http, $
 
                                 // old way displaying an error occured
                                 //return deferred.reject('Erreur lors de la soumission du formulaire');
-                            }
-                            else if ($element.hasClass('editable-unsaved')) {
+                            } else if ($element.hasClass('editable-unsaved')) {
                                 $element.removeClass('editable-unsaved');
                             }
                         }
@@ -313,8 +310,7 @@ sygeforApp.directive('sfXeditable', ['$timeout', function ($timeout) {
                     for (var key in options) {
                         $element.editable('option', key, options[key]);
                     }
-                }
-                else {
+                } else {
                     // else, initialize the element
                     $element.editable(options);
 

@@ -1,7 +1,7 @@
 /**
  * Directive sfFileUpload
  **/
-sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function(growl, $timeout) {
+sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function (growl, $timeout) {
     return {
         scope: {
             addCallback: '=',
@@ -15,7 +15,7 @@ sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function(growl, $time
 
             scope.options = {
                 //overloading add callback in order to manage filesize limit.
-                add: function(e, data) {
+                add: function (e, data) {
                     var time = new Date().getTime();
 
                     //resetting errors list if old
@@ -23,12 +23,11 @@ sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function(growl, $time
                         scope.errorsTime = time;
                     }
 
-                    if (data.files[0]['size'] > scope.options.maxFileSize ) {
-                        $timeout(function() {
+                    if (data.files[0]['size'] > scope.options.maxFileSize) {
+                        $timeout(function () {
                             growl.addErrorMessage("Le fichier " + data.files[0]['name'] + " est trop volumineux");
                         });
-                    }
-                    else {
+                    } else {
                         var files = data.files;
                         var file = files[0];
 
@@ -71,7 +70,7 @@ sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function(growl, $time
             };
 
             /* callback for changing file status when upload ok */
-            element.find('#fileupload').bind('fileuploaddone', function(e, data) {
+            element.find('#fileupload').bind('fileuploaddone', function (e, data) {
                 //new file was added and is returned
                 if (data.files) {
                     for (var key in data.files) {
@@ -90,8 +89,8 @@ sygeforApp.directive('sfFileUpload', ['growl', '$timeout', function(growl, $time
             });
         },
         template: '' +
-        '<form id="fileupload" method="POST" enctype="multipart/form-data" file-upload="options" auto-upload="true">' +
-        '   <input type="file" name="files[]" accept="{{ accept }}" multiple>' +
-        '</form>'
+            '<form id="fileupload" method="POST" enctype="multipart/form-data" file-upload="options" auto-upload="true">' +
+            '   <input type="file" name="files[]" accept="{{ accept }}" multiple>' +
+            '</form>'
     }
 }]);

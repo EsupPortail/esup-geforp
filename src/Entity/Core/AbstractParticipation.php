@@ -2,70 +2,79 @@
 
 namespace App\Entity\Core;
 
+use App\Entity\Back\Trainer;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\AbstractParticipationType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 /**
  * Participation.
  *
- * @ORM\Entity
- * @ORM\Table(name="participation")
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @UniqueEntity(fields={"session", "trainer"}, message="Cet intervenant est déjà associé à cet évènement.")
  */
+#[ORM\Table(name: 'participation')]
+#[ORM\Entity]
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[UniqueEntity(fields: ['session', 'trainer'], message: 'Cet intervenant est déjà associé à cet évènement.')]
 abstract class AbstractParticipation
 {
     /**
-     * @var int id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api", "session", "participation"})
      */
-    protected $id;
+    #[Groups(["Default", "api", "session", "participation"])]
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
      * @var AbstractTrainer
-     * @ORM\ManyToOne(targetEntity="AbstractTrainer", inversedBy="participations")
-     * @ORM\JoinColumn(name="trainer_id", referencedColumnName="id")
-     * @Assert\NotNull(message="Vous devez sélectionner un intervenant")
      * @Serializer\Groups({"participation", "session", "api.training", "api"})
      */
-    protected $trainer;
+    #[Groups(["api.training", "api", "session", "participation"])]
+    #[ORM\ManyToOne(targetEntity: AbstractTrainer::class, inversedBy: 'participations')]
+    #[ORM\JoinColumn(name: 'trainer_id')]
+    #[Assert\NotNull(message: 'Vous devez sélectionner un intervenant')]
+    #[MaxDepth(1)]
+    protected AbstractTrainer $trainer;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession", inversedBy="participations")
-     * @ORM\JoinColumn(name="session_id", referencedColumnName="id")
-     * @Assert\NotNull()
      * @Serializer\Groups({"participation", "session", "trainer", "api"})
      */
-    protected $session;
+    #[Groups([ "api", "session", "participation", "trainer"])]
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'participations')]
+    #[ORM\JoinColumn(name: 'session_id')]
+    #[Assert\NotNull]
+    #[MaxDepth(1)]
+    protected AbstractSession $session;
 
     /**
-     * @var bool
-     * @ORM\Column(name="is_organization", type="boolean", nullable=true)
      * @Serializer\Groups({"participation"})
      */
-    protected $isOrganization;
+    #[Groups(["participation"])]
+    #[ORM\Column(name: 'is_organization', type: \Doctrine\DBAL\Types\Types::BOOLEAN, nullable: true)]
+    #[MaxDepth(1)]
+    protected ?bool $isOrganization = null;
 
     /**
      * @var AbstractOrganization
-     * @ORM\ManyToOne(targetEntity="AbstractOrganization")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Groups({"Default", "api"})
      * @Serializer\Groups({"participation"})
      */
-    protected $organization;
+    #[Groups(["participation", "Default", "api"])]
+    #[ORM\ManyToOne(targetEntity: 'AbstractOrganization')]
+    #[ORM\JoinColumn]
+    #[MaxDepth(1)]
+    protected AbstractOrganization $organization;
 
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -73,7 +82,7 @@ abstract class AbstractParticipation
     /**
      * @return AbstractTrainer
      */
-    public function getTrainer()
+    public function getTrainer(): AbstractTrainer
     {
         return $this->trainer;
     }
@@ -81,7 +90,7 @@ abstract class AbstractParticipation
     /**
      * @param AbstractTrainer
      */
-    public function setTrainer($trainer)
+    public function setTrainer($trainer): void
     {
         $this->trainer = $trainer;
     }
@@ -89,55 +98,49 @@ abstract class AbstractParticipation
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
 
     /**
-     * @param AbstractSession
+     * @param AbstractSession $session
      */
-    public function setSession($session)
+    public function setSession(AbstractSession $session): void
     {
         $this->session = $session;
     }
 
     /**
-     * @return mixed
+     * @return bool|null
      */
-    public function getIsOrganization()
+    public function getIsOrganization(): ?bool
     {
         return $this->isOrganization;
     }
 
-    /**
-     * @param mixed $isOrganization
-     */
-    public function setIsOrganization($isOrganization)
+    public function setIsOrganization(mixed $isOrganization): void
     {
         $this->isOrganization = $isOrganization;
     }
 
     /**
-     * @return mixed
+     * @return AbstractOrganization
      */
-    public function getOrganization()
+    public function getOrganization(): AbstractOrganization
     {
         return $this->organization;
     }
 
-    /**
-     * @param mixed $organization
-     */
-    public function setOrganization($organization)
+    public function setOrganization(mixed $organization): void
     {
         $this->organization = $organization;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return AbstractParticipationType::class;
     }
@@ -145,7 +148,7 @@ abstract class AbstractParticipation
     /**
      * @return string
      */
-    public static function getType()
+    public static function getType(): string
     {
         return 'participation';
     }

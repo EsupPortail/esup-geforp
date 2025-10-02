@@ -8,56 +8,33 @@ use App\Entity\Core\AbstractOrganization;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
  * Class AbstractTrainingType.
  */
-class AbstractTrainingType extends AbstractType
+final class AbstractTrainingType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    private const array SEMESTER_CHOICES = [
+        '1er semestre' => '1',
+        '2nd semestre' => '2',
+    ];
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('name', null, array(
-                'label' => 'Titre',
-            ))
+            ->add('name', null, ['label' => 'Titre'])
             // this field will be removed by a listener after a failed rights check
-            ->add('organization', EntityType::class, array(
-                'required' => true,
-                'class' => AbstractOrganization::class,
-                'label' => 'Centre',
-                'query_builder' => function (EntityRepository $er) {
-                    return $er->createQueryBuilder('o')->orderBy('o.name', 'ASC');
-                },
-            ))
-            ->add('firstSessionPeriodSemester', ChoiceType::class, array(
-                'label' => '1ère session',
-                'choices' => array('1' => '1er semestre', '2' => '2nd semestre'),
-                'required' => true,
-            ))
-            ->add('firstSessionPeriodYear', null, array(
-                'label' => 'Année',
-                'required' => true,
-            ))
-            ->add('comments', null, array(
-                'label' => 'Commentaires',
-                'required' => false,
-            ));
+            ->add('organization', EntityType::class, ['required' => true, 'class' => AbstractOrganization::class, 'label' => 'Centre', 'query_builder' => static fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('o')->orderBy('o.name', 'ASC')])
+            ->add('firstSessionPeriodSemester', ChoiceType::class, ['label' => '1ère session', 'choices' => self::SEMESTER_CHOICES, 'required' => true])
+            ->add('firstSessionPeriodYear', IntegerType::class, ['label' => 'Année', 'required' => true, 'empty_data' => '0'])
+            ->add('comments', null, ['label' => 'Commentaires', 'required' => false]);
     }
 
-	/**
-	 * @param OptionsResolver $resolver
-	 */
-	public function configureOptions(OptionsResolver $resolver)
+	public function configureOptions(OptionsResolver $resolver): void
 	{
-		$resolver->setDefaults(array(
-			'data_class' => AbstractTraining::class,
-			'validation_groups' => ['Default', 'training', 'organization'],
-		));
+		$resolver->setDefaults(['data_class' => AbstractTraining::class, 'validation_groups' => ['Default', 'training', 'organization']]);
 	}
 }

@@ -14,7 +14,7 @@ require_once __DIR__.'/../../../vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.
 /**
  * Service for OpenTBS Bundle.
  */
-class CustomOpenTBS extends CustomTinyButStrong
+final class CustomOpenTBS extends CustomTinyButStrong
 {
     public function __construct()
     {

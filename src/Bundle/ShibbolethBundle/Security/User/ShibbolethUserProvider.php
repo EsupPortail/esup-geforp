@@ -2,39 +2,46 @@
 
 namespace App\Bundle\ShibbolethBundle\Security\User;
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProviderInterface;
+use App\Bundle\ShibbolethBundle\Security\ShibbolethGuardAuthenticator;
 
-class ShibbolethUserProvider implements ShibbolethUserProviderInterface
+final class ShibbolethUserProvider implements ShibbolethUserProviderInterface
 {
 
-    public function loadUserByUsername($login)
+    public function loadUserByIdentifier($identifier): ShibbolethUser
     {
-        $roles = array();
-        return new ShibbolethUser($login, '', '', array(), $roles);
+	$credentials = [];
+        $roles = [];
+        return new ShibbolethUser($identifier, $credentials, $roles);
     }
 
-    public function loadUser($credentials)
+    public function loadUser($credentials): ShibbolethUser
     {
-        $roles = array();
-        return new ShibbolethUser($credentials['username'], '', '', $credentials, $roles);
+        if (!isset($credentials['username'])) {
+            throw new \InvalidArgumentException('Username not provided.');
+        }
+        $roles = [];
+
+        return new ShibbolethUser($credentials['username'], $credentials, $roles);
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): ShibbolethUser
     {
         if (!$user instanceof ShibbolethUser) {
             throw new UnsupportedUserException(
-                sprintf('Instances of "%s" are not supported.', get_class($user))
+                sprintf('Instances of "%s" are not supported.', $user::class)
             );
         }
 
-        return $this->loadUserByUsername($user->getUsername());
+        return $this->loadUserByIdentifier($user->getUserIdentifier());
     }
 
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
         return ShibbolethUser::class === $class;
     }

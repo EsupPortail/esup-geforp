@@ -11,31 +11,28 @@ use JMS\Serializer\Metadata\StaticPropertyMetadata;
 /**
  * Training serialization event subscriber.
  */
-class TrainingEventSubscriber implements EventSubscriberInterface
+final class TrainingEventSubscriber implements EventSubscriberInterface
 {
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array('event' => 'serializer.post_serialize', 'method' => 'onPostSerialize'),
-        );
+        return [['event' => 'serializer.post_serialize', 'method' => 'onPostSerialize']];
     }
 
     /**
      * On post serialize, add type.
      *
-     * @param ObjectEvent $event
      */
-    public function onPostSerialize(ObjectEvent $event)
+    public function onPostSerialize(ObjectEvent $objectEvent): void
     {
-        $training = $event->getObject();
+        $training = $objectEvent->getObject();
         if ($training instanceof AbstractTraining) {
             try {
                 //$event->getVisitor()->addData('type', $training->getType());
-                $event->getVisitor()->visitProperty(new StaticPropertyMetadata('', 'type', null), $training->getType());
-            } catch (InvalidArgumentException $e) {
+                $objectEvent->getVisitor()->visitProperty(new StaticPropertyMetadata('', 'type', null), $training->getType());
+            } catch (InvalidArgumentException) {
                 // nothing to do
             }
         }

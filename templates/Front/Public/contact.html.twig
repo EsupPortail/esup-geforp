@@ -14,18 +14,21 @@
 {% endblock %}
 
 {% block body %}
-<div class="container">
-    <br><br>
-    <h3>Pour toute question sur le Plan de Formation de votre établissement ou les modalités d'inscription aux formations, vous pouvez contacter :
-    <br><br>
-        {%  for institution in etablissements %}
-            <div>{{ institution.name }}</div>
-            <div style="text-align: center"><a href="mailto:{{ institution.email }}">{{ institution.email }}</a></div>
-            {% if institution.website is defined %}
-                <div style="text-align: center"><a href="{{ institution.website }}">{{ institution.website }}</a></div>
-            {% endif %}
-        {% endfor %}
-    <br><br>
-    </h3>
-</div>
+    <div class="container">
+        <br><br>
+        <h3>Pour toute question sur le Plan de Formation de votre établissement ou les modalités d'inscription aux
+            formations, vous pouvez contacter :
+            <br><br>
+            {% for institution in etablissements %}
+                <div>{{ institution.name }}</div>
+                <div style="text-align: center"><a href="mailto:{{ institution.email }}">{{ institution.email }}</a>
+                </div>
+                {% if institution.website is defined %}
+                    <div style="text-align: center"><a href="{{ institution.website }}">{{ institution.website }}</a>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <br><br>
+        </h3>
+    </div>
 {% endblock body %}

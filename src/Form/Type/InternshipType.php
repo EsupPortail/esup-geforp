@@ -11,38 +11,16 @@ use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 /**
  * Class InternshipType.
  */
-class InternshipType extends TrainingType
+final class InternshipType extends TrainingType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder
-                                    ->add('publictypes', EntityType::class, array(
-                                        'label' => 'Publics prioritaires',
-                                        'class' => Publictype::class,
-                                        'choice_label' => 'name',
-                                        'multiple' => true,
-                                        'required' => false,
-                                    ))
-                                   ->add('publictypesrestrict', EntityType::class, array(
-                                       'label' => 'Publics cibles',
-                                       'class' => Publictype::class,
-                                       'choice_label' => 'name',
-                                       'multiple' => true,
-                                       'required' => false,
-                                   ))
-                                   ->add('prerequisites', null, array(
-                            'label'    => 'Pré-requis',
-                            'required' => false,
-                        ))
-                       ->add('designatedpublic', CheckboxType::class, array(
-                            'label'    => 'Public désigné',
-                            'required' => false,
-                        ));
+        $formBuilder
+                                    ->add('publictypes', EntityType::class, ['label' => 'Publics prioritaires', 'class' => Publictype::class, 'choice_label' => 'name', 'multiple' => true, 'required' => false])
+                                   ->add('publictypesrestrict', EntityType::class, ['label' => 'Publics cibles', 'class' => Publictype::class, 'choice_label' => 'name', 'multiple' => true, 'required' => false])
+                                   ->add('prerequisites', null, ['label'    => 'Pré-requis', 'required' => false])
+                       ->add('designatedpublic', CheckboxType::class, ['label'    => 'Public désigné', 'required' => false]);
 
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
     }
 }

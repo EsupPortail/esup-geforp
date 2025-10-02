@@ -3,23 +3,29 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Back\Session;
+use App\Entity\Core\AbstractTrainee;
+use App\Entity\Term\Sessiontype;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
+use App\Entity\Term\Trainingcategory;
+use App\Form\Type\AbstractTrainingType;
+use App\Service\TrainingBalanceSheet;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
-use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Bundle\SecurityBundle\Security;
 use JMS\Serializer\SerializationContext;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
 use App\Repository\TrainingRepository;
@@ -27,27 +33,39 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * @Route("/training")
- */
+#[Route(path: '/training')]
 abstract class AbstractTrainingController extends AbstractController
 {
     protected $sessionClass = AbstractSession::class;
 
+    private TrainingBalanceSheet $trainingBalanceSheet;
     /**
-     * @Route("/search", name="training.search", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
+     * @var int[]
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry)
+    private const array ALL_SEMESTERS = [1, 2];
+    /**
+     * @var int[]
+     */
+    private const array ALL_PROMOTE = [0, 1];
+
+    public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', array());
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
-        $page = $request->request->get('page', 'NO PAGE');
-        $size = $request->request->get('size', 'NO SIZE');
-        $sorts = $request->request->get('sorts', 'NO SORTS');
+    }
+    #[Groups(['Default', 'training'])]
+    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/search', name: 'training.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(SerializerInterface $serializer, Request $request, ManagerRegistry $managerRegistry, TrainingRepository $trainingRepository, AccessRightRegistry $accessRightRegistry): array
+    {
+        $keywords = (string)$request->request->get('keywords', '');
+        $filters = $request->request->all('filters') ?: [];
+        $query_filters = $request->request->all('query_filters') ?: [];
+        $aggs = $request->request->all('aggs') ?: [];
+        $page = $request->request->get('page', 1);
+        $size = $request->request->get('size', 10);
+        $sorts = $request->request->all('sorts') ?: [];
 
 
         // security check : training : 'sygefor_training.rights.inscription.all.view' -> id=9
@@ -57,11 +75,8 @@ abstract class AbstractTrainingController extends AbstractController
         }
 
         // Recherche avec les filtres
-        $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size, $sorts);
-
-        // Recherche pour aggs et query_filters
-        $tabAggs = array();
-        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $doctrine, $trainingRepository);
+        $ret = $trainingRepository->getTrainingsList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sorts: $sorts);
+        $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $trainingRepository);
 
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
@@ -69,11 +84,10 @@ abstract class AbstractTrainingController extends AbstractController
         return $ret;
     }
 
-    /**
-     * @Route("/create/{type}", name="training.create", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function createAction(Request $request, ManagerRegistry $doctrine, $type)
+    #[Groups(['Default', 'training'])]
+    #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/create/{type}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function create(Request $request, ManagerRegistry $managerRegistry): array
     {
         $class = Internship::class;
         /** @var AbstractTraining $training */
@@ -82,8 +96,8 @@ abstract class AbstractTrainingController extends AbstractController
             $training->setOrganization($this->getUser()->getOrganization());
             $training->setInstitution($this->getUser()->getOrganization()->getInstitution());
         }
-        catch (\Exception $e) {
-            return array($e->getMessage());
+        catch (\Exception $exception) {
+            return [$exception->getMessage()];
         }
 
         //training can't be created if user has no rights for it
@@ -97,30 +111,29 @@ abstract class AbstractTrainingController extends AbstractController
             if ($form->isSubmitted() && $form->isValid()) {
                 $training->setCreatedAt(new \DateTime('now'));
                 $training->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->persist($training);
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($training);
+                $objectManager->flush();
             }
         }
 
-        return array('training' => $training, 'form' => $form->createView());
+        return ['training' => $training, 'form' => $form->createView()];
         //return new Response(json_encode(array('training' => $training, 'form' => $form->createView())));
 
     }
-
-    /**
-     * This action attach a form to the return array when the user has the permission to edit the training.
-     *
-     * @Route("/{id}/view", requirements={"id" = "\d+"}, name="training.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @IsGranted("VIEW", subject="training")
-     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function viewAction(Request $request,ManagerRegistry $doctrine, AbstractTraining $training)
+    #[Groups(['Default', 'training'])]
+    #[Route(path: '/{id}/view', name: 'training.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[IsGranted('VIEW', subject: 'training')]
+    #[Rest\View(serializerGroups: ["Default", "training"] ,serializerEnableMaxDepthChecks: true)]
+    public function view(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): view|array
     {
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
+        if (!$training) {
+            throw new NotFoundHttpException();
+        }
         if (!$this->isGranted('EDIT', $training)) {
             if ($this->isGranted('VIEW', $training)) {
-                return array('training' => $training);
+                return ['training' => $training];
             }
 
             throw new AccessDeniedException('Action non autorisée');
@@ -131,16 +144,17 @@ abstract class AbstractTrainingController extends AbstractController
             $form->handleRequest($request);
             if ($form->isSubmitted() && $form->isValid()) {
                 $training->setUpdatedAt(new \DateTime('now'));
-                $em = $doctrine->getManager();
-                $em->flush();
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->flush();
             }
         }
-        $return = array('form' => $form->createView(), 'training' => $training);
+
+        $return = ['form' => $form->createView(), 'training' => $training];
 
         // if the training is single session, add 'session' to the serialization groups
         if ($training instanceof SingleSessionTraining) {
             $view = new View($return);
-            $view->setSerializationContext(SerializationContext::create()->setGroups(array('Default', 'training', 'session')));
+            $view->setSerializationContext(SerializationContext::create()->setGroups(['Default', 'training', 'session']));
 
             return $view;
         }
@@ -148,60 +162,54 @@ abstract class AbstractTrainingController extends AbstractController
         return $return;
     }
 
-    /**
-     * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="training.remove", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Method("POST")
-     * @IsGranted("DELETE", subject="training")
-     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining", options={"id" = "id"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function removeAction(ManagerRegistry $doctrine, AbstractTraining $training)
+
+    #[Route(path: '/{id}/remove', name: 'training.remove', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'], methods: ['POST'])]
+    #[IsGranted('DELETE', subject: 'training')]
+    public function remove(ManagerRegistry $managerRegistry, AbstractTraining $training, int $id): \Symfony\Component\HttpFoundation\RedirectResponse
     {
-        $em = $doctrine->getManager();
-        $em->remove($training);
-        $em->flush();
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
+        if (!$training) {
+            throw new NotFoundHttpException();
+        }
+        $objectManager = $managerRegistry->getManager();
+        $objectManager->remove($training);
+        $objectManager->flush();
 //        $this->get('fos_elastica.index')->refresh();
 
-        return $this->redirect($this->generateUrl('training.search'));
+        return $this->redirectToRoute('training.search');
     }
 
-    /**
-     * @Route("/choosetypeduplicate", name="training.choosetypeduplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function chooseTypeDuplicateAction(Request $request)
+    #[Route(path: '/choosetypeduplicate', name: 'training.choosetypeduplicate', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function chooseTypeDuplicate(SerializerInterface $serializer, Request $request): JsonResponse
     {
-        $typeChoices = array();
+        $typeChoices = [];
         foreach ($this->get('sygefor_training.type.registry')->getTypes() as $type => $entity) {
             $typeChoices[$type] = $entity['label'];
         }
+
         $form = $this->createFormBuilder()
-            ->add('duplicatedType', 'choice', array(
-                'label'    => 'Type de stage',
-                'choices'  => $typeChoices,
-                'required' => true,
-                'attr'     => array(
-                    'title' => 'Type de la formation ciblée',
-                ),
-            ))->getForm();
+            ->add('duplicatedType', 'choice', ['label'    => 'Type de stage', 'choices'  => $typeChoices, 'required' => true, 'attr'     => ['title' => 'Type de la formation ciblée']])->getForm();
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                return array('type' => $form->get('duplicatedType')->getData());
+                return new JsonResponse(['type' => $form->get('duplicatedType')->getData()]);
             }
         }
+        $dataTb = ['form' => $form->createView()];
+        $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+        return new JsonResponse($json, 200, [], true);
 
-        return array('form' => $form->createView());
     }
 
-    /**
-     * @Route("/duplicate/{id}/{type}", name="training.duplicate", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("training", class="App\Entity\Core\AbstractTraining")
-     * @Rest\View(serializerGroups={"Default", "training"}, serializerEnableMaxDepthChecks=true)
-     */
-    public function duplicateAction(Request $request, AbstractTraining $training, $type)
+
+    #[Route(path: '/duplicate/{id}/{type}', name: 'training.duplicate', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function duplicate(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training, $type, int $id): JsonResponse
     {
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
+        if (!$training) {
+            throw new NotFoundHttpException();
+        }
         //training can't be created if user has no rights for it
         if ( ! $this->isGranted('CREATE', $training)) {
             throw new AccessDeniedException('Action non autorisée');
@@ -224,25 +232,22 @@ abstract class AbstractTrainingController extends AbstractController
         if ($typeClass['label'] === 'Rencontre scientifique') {
             if ($training->getType() === 'meeting') {
                 $session = clone $cloned->getSession();
+            } elseif ($training->getSessions() instanceof \Doctrine\Common\Collections\ArrayCollection && $training->getSessions()->count() > 0) {
+                $session = clone $training->getSessions()->last();
+            } else {
+                $session = new $this->sessionClass;
             }
-            else {
-                if ($training->getSessions() && $training->getSessions()->count() > 0) {
-                    $session = clone $training->getSessions()->last();
-                }
-                else {
-                    $session = new $this->sessionClass;
-                }
-            }
+
             $session->setNumberOfRegistrations(0);
             $session->setTraining($cloned);
             $cloned->setSession($session);
         }
 
         // verify if training category matches with new type
-        /** @var RepositoryFactory $repository */
-        $repository = $this->getDoctrine()->getRepository('SygeforTrainingBundle:Training\Term\Trainingcategory');
+        /** @var RepositoryFactory $objectRepository */
+        $objectRepository = $this->managerRegistry->getRepository('SygeforTrainingBundle:Training\Term\Trainingcategory');
         /** @var QueryBuilder $qb */
-        $qb = $repository->createQueryBuilder('t')
+        $qb = $objectRepository->createQueryBuilder('t')
             ->where('t.trainingType = :trainingType')
             ->orWhere('t.trainingType IS NULL')
             ->setParameter('trainingType', $training->getType());
@@ -257,6 +262,7 @@ abstract class AbstractTrainingController extends AbstractController
                 }
             }
         }
+
         if (!$found) {
             $cloned->setCategory(null);
         }
@@ -269,22 +275,23 @@ abstract class AbstractTrainingController extends AbstractController
                 if ($cloned->getType() === 'meeting') {
                     $cloned->getSession()->setTraining($cloned);
                 }
+
                 $this->mergeArrayCollectionsAndFlush($cloned, $training);
 
-                return array('form' => $form->createView(), 'training' => $cloned);
+                $dataTb = ['form' => $form->createView(), 'training' => $cloned];
+                $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+                return new JsonResponse($json, 200, [], true);
             }
         }
 
-        return array('form' => $form->createView());
+        $dataTb = ['form' => $form->createView()];
+        $json = $serializer->serialize($dataTb, 'json', ['groups' => ['training']]);
+        return new JsonResponse($json, 200, [], true);
     }
 
-    /**
-     * @param AbstractTraining $dest
-     * @param AbstractTraining $source
-     */
-    protected function mergeArrayCollectionsAndFlush($dest, $source)
+    protected function mergeArrayCollectionsAndFlush(AbstractTraining $dest, AbstractTraining $source): void
     {
-        $em = $this->getDoctrine()->getManager();
+        $objectManager = $this->managerRegistry->getManager();
 
         // clone common arrayCollections
         if (method_exists($source, 'getTags')) {
@@ -294,125 +301,194 @@ abstract class AbstractTrainingController extends AbstractController
         // clone duplicate materials
         $tmpMaterials = $source->getMaterials();
         if ( ! empty($tmpMaterials)) {
-            foreach ($tmpMaterials as $material) {
-                $newMat = clone $material;
+            foreach ($tmpMaterials as $tmpMaterial) {
+                $newMat = clone $tmpMaterial;
                 $dest->addMaterial($newMat);
             }
         }
 
-        $em->persist($dest);
-        $em->flush();
+        $objectManager->persist($dest);
+        $objectManager->flush();
     }
 
-    /**
-     * @Route("/{id}/bilan.{_format}", requirements={"id" = "\d+"}, name="training.balancesheet", options={"expose"=true}, defaults={"_format" = "xls"}, requirements={"_format"="csv|xls|xlsx"})
-     * @Method("GET")
-     * @ParamConverter("training", class="SygeforTrainingBundle:Training\AbstractTraining", options={"id" = "id"})
-     */
-    public function balanceSheetAction(AbstractTraining $training)
+    #[Route(path: '/{id}/bilan.{_format}', name: 'training.balancesheet', requirements: ['_format' => 'csv|xls|xlsx'], options: ['expose' => true], defaults: ['_format' => 'xls'], methods: 'GET')]
+    public function balanceSheet(AbstractTraining $training, ManagerRegistry $managerRegistry, int $id, trainingBalanceSheet $trainingBalanceSheet): Response
     {
-        $bs = new TrainingBalanceSheet($training, $this->get('phpexcel'), $this->container);
+        $training = $managerRegistry->getRepository(AbstractTraining::class)->find($id);
+        if (!$training) {
+            throw new NotFoundHttpException();
+        }
 
-        return $bs->getResponse();
+        return $trainingBalanceSheet->getCsvResponse($training);
     }
 
-    private function constructAggs($aggs, $keyword, $query_filters, $doctrine, $trainingRepository)
+    private function constructAggs($aggs, $keyword, $query_filters, \Doctrine\Persistence\ManagerRegistry $managerRegistry, \App\Repository\TrainingRepository $trainingRepository): array
     {
-        $tabAggs = array();
+        $tabAggs = [];
 
         // CONSTRUCTION CENTRES
         if(isset( $aggs['training.organization.name.source'])){
-            $allOrganizations = $doctrine->getRepository(Organization::class)->findAll();
+            $allOrganizations = $managerRegistry->getRepository(Organization::class)->findAll();
 
-            $i = 0; $tabOrg = array();
+            $i = 0; $tabOrg = [];
             //Pour chaque centre on teste la requête
-            foreach($allOrganizations as $organization){
-                $nbTrainingsOrg = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $organization->getName());
-                if ($nbTrainingsOrg > 0) {
-                    $tabOrg[$i] = [ 'key' => $organization->getName(), 'doc_count' => $nbTrainingsOrg];
-                    $i++;
+            foreach($allOrganizations as $allOrganization){
+                $nbTrainingsOrg = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allOrganization->getName());
+                if ($nbTrainingsOrg['total'] > 0) {
+                    $tabOrg[$i] = [ 'key' => $allOrganization->getName(), 'doc_count' => $nbTrainingsOrg['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['training.organization.name.source']['buckets'] = $tabOrg;
         }
 
         // CONSTRUCTION ANNEES
         if (isset($aggs['year'])) {
             $curYear = date('Y');
-            $allYears = array();
-            for($i=2017; $i<=$curYear; $i++){
+            $allYears = [];
+            for($i=2017; $i<=$curYear; ++$i){
                 $allYears[] = $i;
             }
-            $i = 0; $tabYears = array();
+
+            $i = 0; $tabYears = [];
             //Pour chaque année on teste la requête
-            foreach($allYears as $year){
-                $nbTrainingsYear = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $year);
-                if ($nbTrainingsYear > 0) {
-                    $tabYears[$i] = [ 'key' => $year, 'doc_count' => $nbTrainingsYear];
-                    $i++;
+            foreach($allYears as $allYear){
+                $nbTrainingsYear = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allYear);
+                if ($nbTrainingsYear['total'] > 0) {
+                    $tabYears[$i] = [ 'key' => $allYear, 'doc_count' => $nbTrainingsYear['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['year']['buckets'] = $tabYears;
         }
 
         // CONSTRUCTION SEMESTRE
         if (isset($aggs['semester'])) {
-            $allSemesters = array(1, 2);
-            $i = 0; $tabSemesters = array();
+
+            $tabSemesters = [];
+            $i = 0;
             //Pour chaque semestre on teste la requête
-            foreach($allSemesters as $semester){
-                $nbTrainingsSem = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $semester);
-                if ($nbTrainingsSem > 0) {
-                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbTrainingsSem];
-                    $i++;
+            foreach(self::ALL_SEMESTERS as $semester){
+                $nbTrainingsSem = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $semester, 'semester');
+                if ($nbTrainingsSem['total'] > 0) {
+                    $tabSemesters[$i] = [ 'key' => $semester, 'doc_count' => $nbTrainingsSem['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['semester']['buckets'] = $tabSemesters;
+        }
+
+        // CONSTRUCTION NUMÉRO
+        if (isset($aggs['training.number'])) {
+            $allNumbers = $managerRegistry->getRepository(AbstractTraining::class)->findAll();
+
+            $i = 0; $tabNumbers = [];
+            //Pour chaque semestre on teste la requête
+            foreach($allNumbers as $allNumber){
+                $trainingNumber = $allNumber->getNumber();
+                $nbTrainingsNum = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $trainingNumber, 'training.number');
+
+                if ($nbTrainingsNum['total'] > 0) {
+                    $tabNumbers[$i] = [ 'key' => $allNumber, 'doc_count' => $nbTrainingsNum['total']];
+                    ++$i;
+                }
+            }
+
+            $tabAggs['training.number']['buckets'] = $tabNumbers;
         }
 
         // CONSTRUCTION THEMES
         if(isset( $aggs['theme.name'])){
-            $allThemes = $doctrine->getRepository(Theme::class)->findAll();
+            $allThemes = $managerRegistry->getRepository(Theme::class)->findAll();
 
-            $i = 0; $tabThemes = array();
+            $i = 0; $tabThemes = [];
             //Pour chaque thème on teste la requête
-            foreach($allThemes as $theme){
-                $nbTrainingsThemes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $theme->getName());
-                if ($nbTrainingsThemes > 0) {
-                    $tabThemes[$i] = [ 'key' => $theme->getName(), 'doc_count' => $nbTrainingsThemes];
-                    $i++;
+            foreach($allThemes as $allTheme){
+                $nbTrainingsThemes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allTheme->getName());
+                if ($nbTrainingsThemes['total'] > 0) {
+                    $tabThemes[$i] = [ 'key' => $allTheme->getName(), 'doc_count' => $nbTrainingsThemes['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['theme.name']['buckets'] = $tabThemes;
         }
 
-        // CONSTRUCTION PROMOTION (true,false) = (0,1)
-        if( isset($aggs['nextSession.promote']) ) {
-            $allPromote = array(0, 1);
-            $i = 0; $tabPro = array();
-            //Pour chaque promote on teste la requête
-            foreach($allPromote as $promote){
-                $nbTrainingsPro = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $promote);
-                if ($nbTrainingsPro > 0) {
-                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbTrainingsPro];
-                    $i++;
+        $tabAggs['training.typeLabel.source'] = ['buckets' => []];
+        // CONSTRUCTION TYPE
+        if(isset( $aggs['training.typeLabel.source'])){
+            $allTypes = $managerRegistry->getRepository(Session::class)
+                ->createQueryBuilder('s')
+                ->select('DISTINCT tc.trainingType')
+                ->join('s.training', 't')
+                ->join('t.category', 'tc')
+                ->getQuery()
+                ->getSingleColumnResult();
+
+            $tabTypes = [];
+            //Pour chaque type on teste la requête
+            foreach($allTypes as $allType){
+                $nbTrainingsTypes = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allType);
+                 //dump($allType, $nbTrainingsTypes);
+                if ($nbTrainingsTypes['total'] > 0) {
+                    $tabTypes[] = [ 'key' => $allType, 'doc_count' => $nbTrainingsTypes['total']];
                 }
             }
+
+            $tabAggs['training.typeLabel.source']['buckets'] = $tabTypes;
+        }
+
+        // CONSTRUCTION CATÉGORIE
+        if (isset($aggs['training.category.source'])) {
+            $allCategories = $managerRegistry->getRepository(\App\Entity\Term\Trainingcategory::class)->findAll();
+
+            $tabCategory = [];
+            foreach ($allCategories as $category) {
+                $nbCategory = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $category->getName(), 'training.category');
+
+                if ($nbCategory['total'] > 0) {
+                    $tabCategory[] = [
+                        'key'       => $category->getName(),
+                        'filter'    => $category->getName(),
+                        'doc_count' => $nbCategory['total']
+                    ];
+                }
+            }
+            $tabAggs['training.category.source']['buckets'] = $tabCategory;
+        }
+
+
+        // CONSTRUCTION PROMOTION (true,false) = (0,1)
+        if( isset($aggs['nextSession.promote']) ) {
+            $i = 0; $tabPro = [];
+            //Pour chaque promote on teste la requête
+            foreach(self::ALL_PROMOTE as $promote){
+                $nbTrainingsPro = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $promote);
+                if ($nbTrainingsPro['total'] > 0) {
+                    $tabPro[$i] = [ 'key' => $promote, 'doc_count' => $nbTrainingsPro['total']];
+                    ++$i;
+                }
+            }
+
             $tabAggs['nextSession.promote']['buckets'] = $tabPro;
         }
 
         // CONSTRUCTION FORMATEUR
         if( isset($aggs['trainers.fullName']) ) {
-            $allTrainers = $doctrine->getRepository(Trainer::class)->findAll();
-            $i = 0; $tabTra = array();
+            $allTrainers = $managerRegistry->getRepository(Trainer::class)->findAll();
+            $i = 0; $tabTra = [];
             //Pour chaque trainer on teste la requête
-            foreach($allTrainers as $trainer){
-                $nbTrainingsTra = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $trainer->getId());
-                if ($nbTrainingsTra > 0) {
-                    $tabTra[$i] = [ 'key' => $trainer->getFullname(), 'doc_count' => $nbTrainingsTra];
-                    $i++;
+            foreach($allTrainers as $allTrainer){
+                $nbTrainingsTra = $trainingRepository->getNbTrainings($query_filters, $keyword, $aggs, $allTrainer->getId());
+                if ($nbTrainingsTra['total'] > 0) {
+                    $tabTra[$i] = [ 'key' => $allTrainer->getFullname(), 'doc_count' => $nbTrainingsTra['total']];
+                    ++$i;
                 }
             }
+
             $tabAggs['trainers.fullName']['buckets'] = $tabTra;
         }
 

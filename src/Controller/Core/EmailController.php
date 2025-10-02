@@ -12,9 +12,7 @@ namespace App\Controller\Core;
 use App\Repository\EmailRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
+use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Core\Email;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,44 +20,45 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * Class EmailController.
  *
- * @Route("/email")
  */
-class EmailController extends AbstractController
+#[Route(path: '/email')]final class EmailController extends AbstractController
 {
+    // Recherche pour aggs et query_filters
     /**
-     * @Route("/search", name="email.search", options={"expose"=true}, defaults={"_format" = "json"})
-     * @Rest\View(serializerGroups={"Default", "email"}, serializerEnableMaxDepthChecks=true)
+     * @var mixed[]
      */
-    public function searchAction(Request $request, ManagerRegistry $doctrine, EmailRepository $emailRepository)
+    private const TAB_AGGS = [];
+    /**
+     * @Rest\View(serializerGroups={"Default", "email"}, serializerEnableMaxDepthChecks=true)
+     * @return array{total: int, pageSize: int, items: mixed, aggs: never[]}
+     */
+    #[Rest\View(serializerGroups: ['Default', 'email'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/search', name: 'email.search', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function search(Request $request, ManagerRegistry $managerRegistry, EmailRepository $emailRepository): array
     {
-        $keywords = $request->request->get('keywords', 'NO KEYWORDS');
-        $filters = $request->request->get('filters', 'NO FILTERS');
-        $query_filters = $request->request->get('query_filters', 'NO QUERY FILTERS');
-        $aggs = $request->request->get('aggs', 'NO AGGS');
+        $keywords = $request->request->get('keywords', '');
+        $filters = $request->request->all('filters')?:[];
+        $request->request->all('query_filters' ?: []);
+        $request->request->all('aggs') ?? [];
 
         // Recherche avec les filtres
-        $emails = $emailRepository->getEmailsList($keywords, $filters);
-        $nbEmails  = count($emails);
-
-        // Recherche pour aggs et query_filters
-        $tabAggs = array();
-
-        $ret = array(
-            'total' => $nbEmails,
-            'pageSize' => 0,
-            'items' => $emails,
-            'aggs' => $tabAggs
-        );
-        return $ret;
+        $emails = $emailRepository->getEmailsList($keywords, $filters, 100);
+        $nbEmails  = is_countable($emails) ? count((array)$emails) : 0;
+        return ['total' => $nbEmails, 'pageSize' => 0, 'items' => $emails, 'aggs' => self::TAB_AGGS];
     }
 
     /**
-     * @Route("/view/{id}", requirements={"id" = "\d+"}, name="email.view", options={"expose"=true}, defaults={"_format" = "json"})
-     * @ParamConverter("email", class="App\Entity\Core\Email", options={"id" = "id"})
      * @Rest\View(serializerGroups={"Default", "session", "user"}, serializerEnableMaxDepthChecks=true)
+     * @return array{email: \App\Entity\Core\Email}
      */
-    public function viewAction(Email $email)
+    #[Rest\View(serializerGroups: ['Default', 'session', 'user'], serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/view/{id}', name: 'email.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function view(Email $email, ManagerRegistry $managerRegistry, int $id): array
     {
-        return array('email' => $email);
+        $email = $managerRegistry->getRepository(Email::class)->find($id);
+        if (!$email) {
+            throw $this->createNotFoundException();
+        }
+        return ['email' => $email];
     }
 }

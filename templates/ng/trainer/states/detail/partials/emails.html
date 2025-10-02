@@ -1,11 +1,14 @@
 <div>
-    <h3><span class="fa fa-send"></span> Messages envoyés <span class="badge">{{ search.result.total ? search.result.total : 0 }}</span></h3><hr/>
+    <h3><span class="fa fa-send"></span> Messages envoyés <span class="badge">{{ search.result.total ? search.result.total : 0 }}</span>
+    </h3>
+    <hr/>
 
     <div ng-if="!search.result.total" class="well well-empty well-sm">
         Aucun message n'a été envoyé à ce formateur.
     </div>
 
-    <table ng-if="search.result.total" class="table table-hover table-responsive table-search.result table-condensed table-nohead">
+    <table ng-if="search.result.total"
+           class="table table-hover table-responsive table-search.result table-condensed table-nohead">
         <!--thead>
             <tr>
                 <th>Sujet</th>

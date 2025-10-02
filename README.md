@@ -1,7 +1,7 @@
 Geforp2 : gestion des formations
 ======
 
-Geforp2 : nouvelle version sous Symfony 5.4
+Geforp2 : nouvelle version sous Symfony 6.4
 
 Documentation
 ------------
@@ -12,7 +12,7 @@ Configuration requise
 
 ### PHP
 
-* version 7.4 minimum 
+* version 8.1 minimum 
 * extensions :
     * json
     * ctype
@@ -24,7 +24,7 @@ Configuration requise
     * curl
     * fileinfo
 
-### Symfony5.4
+### Symfony6.4
 
 ### MySQL
 

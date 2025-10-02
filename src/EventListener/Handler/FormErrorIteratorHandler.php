@@ -12,44 +12,29 @@ use Symfony\Component\Form\FormErrorIterator;
 /**
  * Class FormErrorIteratorHandler.
  */
-class FormErrorIteratorHandler implements SubscribingHandlerInterface
+final class FormErrorIteratorHandler implements SubscribingHandlerInterface
 {
-    /**
-     * @return array
-     */
-    public static function getSubscribingMethods()
+    public static function getSubscribingMethods(): array
     {
-        return array(
-            array(
-                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
-                'format' => 'json',
-                'type' => 'Symfony\\Component\\Form\\FormErrorIterator',
-                'method' => 'serializeToJson',
-            ),
-        );
+        return [['direction' => GraphNavigator::DIRECTION_SERIALIZATION, 'format' => 'json', 'type' => \Symfony\Component\Form\FormErrorIterator::class, 'method' => 'serializeToJson']];
     }
 
     /**
-     * @param JsonSerializationVisitor $visitor
-     * @param FormErrorIterator        $formErrorIterator
-     * @param array                    $type
-     * @param SerializationContext     $context
      *
      * @return mixed
      */
-    public function serializeToJson(JsonSerializationVisitor $visitor, FormErrorIterator $formErrorIterator, array $type, SerializationContext $context)
+    public function serializeToJson(JsonSerializationVisitor $jsonSerializationVisitor, FormErrorIterator $formErrorIterator, array $type, SerializationContext $serializationContext): mixed
     {
-        return $context->getNavigator()->accept($this->getErrors($formErrorIterator->getForm()), array('name' => 'array'), $context);
+        return $serializationContext->getNavigator()->accept($this->getErrors($formErrorIterator->getForm()), ['name' => 'array'], $serializationContext);
     }
 
     /**
-     * @param Form $form
      *
-     * @return array
+     * @return string[]|mixed[][]
      */
-    protected function getErrors(Form $form)
+    private function getErrors(Form $form): array
     {
-        $errors = array();
+        $errors = [];
 
         foreach ($form->getErrors() as $error) {
             $errors[] = $error->getMessage();

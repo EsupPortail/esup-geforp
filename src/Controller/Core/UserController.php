@@ -13,15 +13,17 @@ use App\AccessRight\AccessRightRegistry;
 use App\Form\Type\AccessRightType;
 use App\Form\Type\TraineeSearchType;
 use App\Repository\TraineeSearchRepository;
-use ClassesWithParents\D;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use JMS\SecurityExtraBundle\Annotation\SecureParam;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
+use PHPUnit\Util\Json;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Bundle\SecurityBundle\Security;
 use App\Entity\Core\User;
 use App\Repository\UserRepository;
 use App\Form\Type\AccountType;
@@ -31,22 +33,36 @@ use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
-/**
- * @Route("/admin/users")
- */
-class UserController extends AbstractController
+#[Route(path: '/admin/users')]final class UserController extends AbstractController
 {
     /**
-     * @Route("/", name="user.index")
+     * @var int
      */
-    public function indexAction(ManagerRegistry $doctrine, AccessRightRegistry $accessRightRegistry)
+    private const int PAGE = 1;
+    /**
+     * @var int
+     */
+    private const int PAGE_SIZE = 100000;
+    /**
+     * @var string[]
+     */
+    private const array SORT = ['lastName.source'];
+    /**
+     * @var string
+     */
+    private const string FIELDS = '';
+
+    #[Route(path: '/', name: 'user.index')]
+    public function index(ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\Response
     {
         /* @var EntityManager */
-        $em = $doctrine->getManager();
-        $repository = $em->getRepository(User::class);
+        $objectManager = $managerRegistry->getManager();
+        $objectRepository = $objectManager->getRepository(User::class);
 
         $organization = $this->getUser()->getOrganization();
         $userAccessRights = $this->getUser()->getAccessRights();
@@ -57,105 +73,74 @@ class UserController extends AbstractController
         }
 
         /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $repository->createQueryBuilder('u');
-        if (!$hasAccessRightForAll) {
+        $queryBuilder = $objectRepository->createQueryBuilder('u');
+        if ($hasAccessRightForAll === 0) {
             $queryBuilder->where('u.organization = :organization')
                 ->setParameter('organization', $organization);
         }
 
         $users = $queryBuilder->orderBy('u.username')->getQuery()->getResult();
 
-        return $this->render('Core/views/User/index.html.twig', array(
-            'users' => $users,
-            'isAdmin' => $this->getUser()->isAdmin(),
-        ));
+        return $this->render('Core/views/User/index.html.twig', ['users' => $users, 'isAdmin' => $this->getUser()->isAdmin()]);
     }
 
     /**
-     * @param User $user
      *
-     * @Route("/{id}", requirements={"id" = "\d+"}, name="user.view", options={"expose"=true}, defaults={"_format" = "json"})
      * @Rest\View(serializerEnableMaxDepthChecks=true)
-     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
      *
      * @return User
      */
-    public function viewAction(User $user)
+    #[Rest\View(serializerEnableMaxDepthChecks: true)]
+    #[Route(path: '/{id}', name: 'user.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function view(User $user, ManagerRegistry $managerRegistry, int $id): User
     {
+        $user = $managerRegistry->getRepository(User::class)->find($id);
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
         return $user;
     }
 
     /**
-     * @param Request $request
-     * @param ManagerRegistry $doctrine
+     * @param ManagerRegistry $managerRegistry eppn
+     * @param Request $request email
      * @param AccessRightRegistry $accessRightRegistry
-     * @param null eppn
-     * @param null email
-     * @Route("/add/{eppn}/{email}", name="user.add")
-     *
-     * @return array|RedirectResponse
+     * @param string $eppn
+     * @param string $email
+     * @return Response
      */
-    public function addAction(ManagerRegistry $doctrine, Request $request, AccessRightRegistry $accessRightRegistry, $eppn=null, $email=null)
+    #[Route(path: '/add/{eppn}/{email}', name: 'user.add')]
+    public function add(ManagerRegistry $managerRegistry, Request $request, AccessRightRegistry $accessRightRegistry, string $eppn, string $email): \Symfony\Component\HttpFoundation\Response
     {
         // Test si current user is admin
         $curUserRoles = $this->getUser()->getRoles();
-        $key = array_search('ROLE_ADMIN', $curUserRoles);
-        if ($key !== false) {
-            // si le user est admin
-            $curUserAdmin = true;
-        } else {
-            // si le user n'est pas admin
-            $curUserAdmin = false;
-        }
+        $key = in_array('ROLE_ADMIN', $curUserRoles, true);
+        $curUserAdmin = $key !== false;
 
         $user = new User();
         $user->setUsername($eppn);
         $user->setEmail($email);
         $user->setPassword('xyz123456!');
+
         $curOrg = $this->getUser()->getOrganization();
-        $user ->setOrganization($curOrg);
+        $user->setOrganization($curOrg);
 
         $form = $this->createForm(UserType::class, $user);
 
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
             if ($form->isValid()) {
-                $currentDate = new \DateTime('now');
-                $user->setLastLogin($currentDate);
+                $dateTime = new \DateTime('now');
+                $user->setLastLogin($dateTime);
 
-                $em = $doctrine->getManager();
+                $em = $managerRegistry->getManager();
                 $em->persist($user);
 
-                $scope = $form->get('accessRightScope')->getData();
+/*                $scope = $form->get('accessRightScope')->getData();
                 if ($scope) {
-                    $getUserAccessRights = function ($scope, array $accessRights) {
-                        if (!is_string($scope)) {
-                            throw new \UnexpectedValueException('String expected, '.gettype($scope).' given.');
-                        }
-                        $availableExts = call_user_func(function () use (&$scope) {
-                            switch ($scope) {
-                                case 'own.view':   return ['.own.view'];
-                                case 'own.manage': return ['.own'];
-                                case 'all.view':   return ['.all.view', '.own.view'];
-                                case 'all.manage': return ['.all', '.own', '.national'];
-                                default:           return [];
-                            }
-                        });
-                        $userAccessRights = [];
-                        foreach ($accessRights as $accessRight) {
-                            for ($i = 0, $count = count($availableExts); $i < $count; ++$i) {
-                                if (strpos($accessRight, $availableExts[$i]) !== false || $scope === 'all.manage') {
-                                    $userAccessRights[] = $accessRight;
-                                }
-                            }
-                        }
-
-                        return $userAccessRights;
-                    };
-
                     //$accessRights = array_keys($this->get('sygefor_core.access_right_registry')->getAccessRights());
                     //$userAccessRights = $getUserAccessRights($scope, $accessRights);
-                }
+                }*/
 
                 // Droits et roles pour test
                 $userAccessRights = ['a:0:{}'];
@@ -163,47 +148,36 @@ class UserController extends AbstractController
 
                 // Roles
                 $isAdmin = $form['isAdmin']->getData();
-                if($isAdmin) {
-                    // on ajoute le role 'admin' au user
-                    $roles = ['ROLE_ADMIN'];
-                } else {
-                    $roles = ['a:0:{}'];
-                }
+                $roles = $isAdmin ? ['ROLE_ADMIN'] : ['a:0:{}'];
                 $user->setRoles($roles);
 
                 $em->flush();
 
-                $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été ajouté.');
+                $this->addFlash('success', 'L\'utilisateur a bien été ajouté.');
 
-                return $this->redirect($this->generateUrl('user.index'));
+                return $this->redirectToRoute('user.index');
             }
         }
-
-        return $this->render('Core/views/User/edit.html.twig', array(
-            'form' => $form->createView(),
-            'curUserAdmin' => $curUserAdmin,
-            'user' => $user,
-            'isAdmin' => $user->isAdmin(),
-        ));
+        return $this->render('Core/views/User/edit.html.twig', ['form' => $form->createView(), 'curUserAdmin' => $curUserAdmin, 'user' => $user, 'isAdmin' => $user->isAdmin()]);
     }
 
     /**
-     * @param Request $request
      *
-     * @Route("/searchadd", name="user.searchadd")
      *
-     * @return array|RedirectResponse
+     * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function searchaddAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
+    #[Route(path: '/searchadd', name: 'user.searchadd')]
+    public function searchadd(ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $userPasswordHasher): \Symfony\Component\HttpFoundation\Response
     {
+        $filters = [];
         /** @var User $curUser */
         $curUser = $this->getUser();
         $institution = $curUser->getOrganization()->getInstitution();
-        $defaultData = array('institution' => $institution, 'nom' => "");
+        $defaultData = ['institution' => $institution, 'nom' => ""];
 
         // Fonction de recherche
-        $traineeSearch = new TraineeSearchRepository($doctrine);
-
+        $traineeSearchRepository = new TraineeSearchRepository($managerRegistry);
+        $etab = '';
         $form = $this->createForm(TraineeSearchType::class, $defaultData);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -212,75 +186,53 @@ class UserController extends AbstractController
                 if (!empty($institutionF)) {
                     $etab = $institutionF->getName();
                 }
-                $nom = $form['nom']->getData();
 
-                $keyword = $nom;
+                $keyword = $form['nom']->getData();
                 $filters['institution.name.source'] = $etab;
-                $page = 1;
-                $pageSize = 100000;
-                $sort = array('lastName.source');
-                $fields = '';
 
-                $resSearch = $traineeSearch->getTraineesList($keyword, $filters, $page, $pageSize, $sort, $fields);
+                $resSearch = $traineeSearchRepository->getTraineesList($keyword = "", $filters, self::PAGE, self::PAGE_SIZE, self::SORT, (array)self::FIELDS);
                 $trainees = $resSearch['items'];
 
-                // Tableau pour test si trainee est deja gestionnaire
-                $tabTrainees = array();
-
-                // On prepare la requete sur les utilisateurs
-                $em = $doctrine->getManager();
-                $repository = $em->getRepository(User::class);
-                foreach($trainees as $trainee) {
-                    // On teste si le trainee est dejà gestionnaire
-                    $rUser = $repository->findByEmail($trainee->getEmail());
-                    if($rUser)
-                        $tabTrainees[] = 1;
-                    else
-                        $tabTrainees[] = 0;
+                if (!is_string($keyword)) {
+                    return $keyword;
                 }
 
-                return $this->render('Core/views/User/searchResult.html.twig', array(
-                    'user' => $curUser,
-                    'isAdmin' => $curUser->isAdmin(),
-                    'trainees' => $trainees,
-                    'gest' => $tabTrainees
-                ));
+                // Tableau pour test si trainee est deja gestionnaire
+                $tabTrainees = [];
+
+                // On prepare la requete sur les utilisateurs
+                $em = $managerRegistry->getManager();
+                $repository = $em->getRepository(User::class);
+               foreach ($trainees as $trainee) {
+                   // On teste si le trainee est dejà gestionnaire
+                   $email = $trainee['email'] ?? null;
+                   $rUser = $email ? $repository->findOneBy(['email' => $email]) : null;
+                    $tabTrainees[] = $rUser ? 1 : 0;
+                }
+
+                return $this->render('Core/views/User/searchResult.html.twig', ['user' => $curUser, 'isAdmin' => $curUser->isAdmin(), 'trainees' => $trainees, 'gest' => $tabTrainees]);
 
             }
         }
 
-        return $this->render('Core/views/User/search.html.twig', array(
-            'form' => $form->createView(),
-            'user' => $curUser,
-            'isAdmin' => $curUser->isAdmin(),
-        ));
+        return $this->render('Core/views/User/search.html.twig', ['form' => $form->createView(), 'user' => $curUser, 'isAdmin' => $curUser->isAdmin()]);
     }
 
-    /**
-     * @param Request $request
-     * @param User    $user
-     *
-     * @Route("/{id}/edit", requirements={"id" = "\d+"}, name="user.edit", options={"expose"=true})
-     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
-     *
-     * @return array|RedirectResponse
-     */
-    public function editAction(ManagerRegistry $doctrine, Request $request, User $user, UserPasswordHasherInterface $passwordHasher)
+    #[Route(path: '/{id}/edit', name: 'user.edit', requirements: ['id' => '\d+'], options: ['expose' => true])]
+    public function edit(ManagerRegistry $managerRegistry, Request $request, User $user, UserPasswordHasherInterface $userPasswordHasher, int $id): \Symfony\Component\HttpFoundation\Response
     {
+        $user = $managerRegistry->getRepository(User::class)->find($id);
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
         // Test si current user is admin
         $curUserRoles = $this->getUser()->getRoles();
-        $key = array_search('ROLE_ADMIN', $curUserRoles);
-        if ($key !== false) {
-            // si le user est admin
-            $curUserAdmin = true;
-        } else {
-            // si le user n'est pas admin
-            $curUserAdmin = false;
-        }
+        $key = array_search('ROLE_ADMIN', $curUserRoles, true);
+        $curUserAdmin = $key !== false;
 
         $form = $this->createForm(UserType::class, $user);
         $roles = $user->getRoles();
-        $key = array_search('ROLE_ADMIN', $roles);
+        $key = array_search('ROLE_ADMIN', $roles, true);
         if ($key !== false) {
             // si le user est admin, on coche la case du formulaire
             $form->get('isAdmin')->setData(true);
@@ -296,49 +248,34 @@ class UserController extends AbstractController
 
                 if ($key !== false) {
                     // si le user etait admin
-                    if($isAdmin) {
+                    if ($isAdmin) {
                         // on ne change rien
                     } else {
                         // on supprime le role 'admin'
                         unset($roles[$key]);
                         $user->setRoles($roles);
                     }
-                } else {
+                } elseif ($isAdmin) {
                     // si le user n'était pas admin
-                    if($isAdmin) {
-                        // on ajoute le role 'admin' au user
-                        $roles[] = 'ROLE_ADMIN';
-                        $user->setRoles($roles);
-                    } else {
-                        // on ne change rien
-                    }
+                    // on ajoute le role 'admin' au user
+                    $roles[] = 'ROLE_ADMIN';
+                    $user->setRoles($roles);
                 }
 
-                $em = $doctrine->getManager();
-                $em->persist($user);
-                $em->flush();
-                $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été mis à jour.');
+                $objectManager = $managerRegistry->getManager();
+                $objectManager->persist($user);
+                $objectManager->flush();
+                $this->addFlash('success', 'L\'utilisateur a bien été mis à jour.');//'success', 'L\'utilisateur a bien été mis à jour.'
 
-                return $this->redirect($this->generateUrl('user.index'));
+                return $this->redirectToRoute('user.index');
             }
         }
 
-        return $this->render('Core/views/User/edit.html.twig', array(
-            'form' => $form->createView(),
-            'curUserAdmin' => $curUserAdmin,
-            'user' => $user,
-            'isAdmin' => $user->isAdmin(),
-        ));
+        return $this->render('Core/views/User/edit.html.twig', ['form' => $form->createView(), 'curUserAdmin' => $curUserAdmin, 'user' => $user, 'isAdmin' => $user->isAdmin()]);
     }
 
-    /**
-     * @param Request $request
-     *
-     * @Route("/account", name="user.account", options={"expose"=true})
-     *
-     * @return array|RedirectResponse
-     */
-    public function accountAction(ManagerRegistry $doctrine, Request $request, UserPasswordHasherInterface $passwordHasher)
+    #[Route(path: '/account', name: 'user.account', options: ['expose' => true])]
+    public function account(ManagerRegistry $managerRegistry, Request $request, UserPasswordHasherInterface $userPasswordHasher): \Symfony\Component\HttpFoundation\Response
     {
         $user = $this->getUser();
         $form = $this->createForm(AccountType::class, $user);
@@ -347,101 +284,87 @@ class UserController extends AbstractController
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $doctrine->getManager()->persist($user);
-                $doctrine->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Votre profil a bien été mis à jour.');
+                $managerRegistry->getManager()->persist($user);
+                $managerRegistry->getManager()->flush();
+                $this->addFlash('success', 'Votre profil a bien été mis à jour.');//'success', 'Votre profil a bien été mis à jour.';
 
-                return $this->redirect($this->generateUrl('user.account'));
+                return $this->redirectToRoute('user.account');
             }
         }
 
-        return $this->render('Core/views/User/profil.html.twig', array(
-            'form' => $form->createView(),
-            'user' => $this->getUser(),
-        ));
+        return $this->render('Core/views/User/profil.html.twig', ['form' => $form->createView(), 'user' => $this->getUser()]);
     }
 
-    /**
-     * @Route("/{id}/access-rights", requirements={"id" = "\d+"}, name="user.access_rights", options={"expose"=true})
-     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
-     */
-    public function accessRightsAction(Request $request, User $user, ManagerRegistry $doctrine, Security $security)
+    #[Route(path: '/{id}/access-rights', name: 'user.access_rights', requirements: ['id' => '\d+'], options: ['expose' => true])]
+    public function accessRights(Request $request, User $user, ManagerRegistry $managerRegistry, Security $security, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
-        $accessReg = new AccessRightRegistry($security);
-        // Transformation user rights
-        $rights = $user->getAccessRights(); $newRights = [];
-        foreach ($rights as $right) {
-            $newRights[]= $accessReg->getByName($right);
+        $user = $managerRegistry->getRepository(User::class)->find($id);
+
+        if (!$user) {
+            throw new AccessDeniedHttpException();
         }
-        $user->setAccessRights($newRights);
 
-        $builder = $this->createFormBuilder($user);
-        $builder->add('accessRights', AccessRightType::class, array('label' => 'Droits d\'accès'));
-        $form = $builder->getForm();
+        $formBuilder = $this->createFormBuilder($user);
+        $formBuilder->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès']);
 
+        $form = $formBuilder->getForm();
 
-        if ($request->getMethod() === 'POST') {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                // Transformation user rights
-                $rights = $user->getAccessRights(); $newRights = [];
-                foreach ($rights as $right) {
-                    $newRights[]= $accessReg->getNameById($right);
-                }
-                $user->setAccessRights($newRights);
-                $doctrine->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', "Les droits d'accès ont bien été enregistrés.");
-
-                return $this->redirect($this->generateUrl('user.access_rights', array('id' => $user->getId())));
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $selectedRights = $user->getAccessRights();
+            if (!empty($selectedRights) && is_object(reset($selectedRights))) {
+                $user->setAccessRights(array_map(fn($right) => $right->getName(), $selectedRights));
             }
+            $managerRegistry->getManager()->flush();
+            $this->addFlash('success', "Les droits d'accès ont bien été enregistrés.");//'success', "Les droits d'accès ont bien été enregistrés.";
+
+            return $this->render('Core/views/User/accessRights.html.twig', ['form' => $form->createView(), 'user' => $user]);
         }
 
-        return $this->render('Core/views/User/accessRights.html.twig', array(
-            'form' => $form->createView(),
-            'user' => $user,
-        ));
+
+        return $this->render('Core/views/User/accessRights.html.twig', ['form' => $form->createView(), 'user' => $user]);
     }
 
-    /**
-     * @Route("/{id}/remove", requirements={"id" = "\d+"}, name="user.remove")
-     * @ParamConverter("user", class="App\Entity\Core\User", options={"id" = "id"})
-     */
-    public function removeAction(ManagerRegistry $doctrine,Request $request, User $user)
+    #[Route(path: '/{id}/remove', name: 'user.remove', requirements: ['id' => '\d+'])]
+    public function remove(ManagerRegistry $managerRegistry,Request $request, User $user, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
+        $user = $managerRegistry->getRepository(User::class)->find($id);
+        if (!$user) {
+            throw new AccessDeniedHttpException();
+        }
         if ($request->getMethod() === 'POST') {
             if ($user->isAdmin()) {
-                $this->get('session')->getFlashBag()->add('error', 'L\'utilisateur actuel est administrateur et ne peut pas être supprimé.');
+                $this->getSubscribedServices();//'error', 'L\'utilisateur actuel est administrateur et ne peut pas être supprimé.';
 
-                return $this->redirect($this->generateUrl('user.edit', array('id' => $user->getId())));
+                return $this->redirectToRoute('user.edit', ['id' => $user->getId()]);
             }
-            $em = $doctrine->getManager();
+
+            $em = $managerRegistry->getManager();
             $em->remove($user);
             $em->flush();
-            $this->get('session')->getFlashBag()->add('success', 'L\'utilisateur a bien été supprimé.');
+            $this->addFlash('success', 'L\'utilisateur a bien été supprimé.');//'success', 'L\'utilisateur a bien été supprimé.';
 
-            return $this->redirect($this->generateUrl('user.index'));
+            return $this->redirectToRoute('user.index');
         }
 
-        return $this->render('Core/views/User/remove.html.twig', array(
-            'user' => $user,
-        ));
+        return $this->render('Core/views/User/remove.html.twig', ['user' => $user]);
     }
 
     /**
-     * @Route("/{id}/login", requirements={"id" = "\d+"}, name="user.login")
-     *
-     * @param User $loginAsUser
-     *
-     * @return RedirectResponse
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function loginAsAction(User $loginAsUser)
+    #[Route(path: '/{id}/login', name: 'user.login', requirements: ['id' => '\d+'])]
+    public function loginAs(User $loginAsUser, TokenStorageInterface $tokenStorage): \Symfony\Component\HttpFoundation\RedirectResponse
     {
         if (!$this->getUser()->isAdmin()) {
-            throw new AccessDeniedHttpException('You can\'t do this action');
+            throw new AccessDeniedHttpException("You can't do this action");
         }
-        $token = new UsernamePasswordToken($loginAsUser, null, 'user_db', $loginAsUser->getRoles());
-        $this->container->get('security.context')->setToken($token);
 
-        return $this->redirect($this->generateUrl('core.index'));
+        $usernamePasswordToken = new UsernamePasswordToken($loginAsUser, (string)'user_db', $loginAsUser->getRoles());
+        $tokenStorage->setToken($usernamePasswordToken,(string)'user_db');
+       // $this->container->get(TokenStorageInterface::class)->setToken($usernamePasswordToken);
+
+        return $this->redirectToRoute('core.index');
     }
 }

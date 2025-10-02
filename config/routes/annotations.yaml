@@ -1,16 +1,16 @@
 back_controllers:
     resource: ../../src/Controller/Back
-    type: annotation
+    type: attribute
     host: '%back_host%'
 
 core_controllers:
     resource: ../../src/Controller/Core
-    type: annotation
+    type: attribute
     host: '%back_host%'
 
 front_controllers:
     resource: ../../src/Controller/Front
-    type: annotation
+    type: attribute
     host: '%front_host%'
 
 homepage:
@@ -20,4 +20,4 @@ homepage:
 
 kernel:
     resource: ../../src/Kernel.php
-    type: annotation
+    type: attribute

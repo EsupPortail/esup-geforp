@@ -1,11 +1,4 @@
 <?php
-
-/**
- * Created by PhpStorm.
- * User: erwan
- * Date: 5/25/16
- * Time: 10:14 AM.
- */
 namespace App\Entity\Term;
 
 use Doctrine\ORM\Mapping as ORM;
@@ -13,60 +6,54 @@ use App\Entity\Term\AbstractTerm;
 use App\Entity\Term\VocabularyInterface;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\PublictypeVocabularyType;
-
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Type de personnel.
- *
- * @ORM\Table(name="publictype")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'publictype')]
+#[ORM\Entity]
 class Publictype extends AbstractTerm implements VocabularyInterface
 {
-    /**
-     * @var int
-     * @ORM\Column(name="machine_name", type="string", length=255)
-     * @Serializer\Groups({"Default", "api"})
-     */
-    protected $machinename;
+
 
     /**
-     * @param int $machinename
+     * @param string $machineName
      */
-    public function setMachinename($machinename)
+    public function setMachinename(string $machineName): void
     {
-        $this->machinename = $machinename;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMachinename()
-    {
-        return $this->machinename;
-    }
-
-    public static function getVocabularyStatus()
-    {
-        return VocabularyInterface::VOCABULARY_NATIONAL;
+        $this->machinename = $machineName;
     }
 
     /**
      * @return string
      */
-    public function getVocabularyName()
+    public function getMachinename(): ?string
+    {
+        return $this->machinename;
+    }
+
+    public function __toString(): string
+    {
+        return $this->machinename;
+    }
+
+    public static function getVocabularyStatus(): int
+    {
+        return VocabularyInterface::VOCABULARY_NATIONAL;
+    }
+
+    public function getVocabularyName(): string
     {
         return 'Type de personnel';
     }
 
     /**
      * returns the form type name for template edition.
-     *
-     * @return string
      */
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return PublictypeVocabularyType::class;
     }
-
 }
+

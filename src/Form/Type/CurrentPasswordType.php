@@ -11,30 +11,20 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 /**
  * Class CurrentPasswordType.
  */
-class CurrentPasswordType extends AbstractType
+final class CurrentPasswordType extends AbstractType
 {
 	/**
 	 * @return string|\Symfony\Component\Form\FormTypeInterface|null
 	 */
-	public function getParent()
+	public function getParent(): ?string
     {
         return PasswordType::class;
     }
 
-	/**
-	 * @param OptionsResolver $resolver
-	 */
-	public function configureOptions(OptionsResolver $resolver)
+	public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver
-            ->setDefaults(array(
-                'mapped' => false,
-                'label' => 'Mot de passe actuel',
-                'constraints' => array(
-                    new NotBlank(array('message' => 'Veuillez renseigner votre mot de passe actuel')),
-                    new UserPassword(array('message' => "Mot de passe invalide")),
-                ),
-            ))
+        $optionsResolver
+            ->setDefaults(['mapped' => false, 'label' => 'Mot de passe actuel', 'constraints' => [new NotBlank(['message' => 'Veuillez renseigner votre mot de passe actuel']), new UserPassword(['message' => "Mot de passe invalide"])]])
         ;
     }
 }

@@ -1,431 +1,305 @@
 <?php
 
-/**
- * Class used to create objects
- * Created by PhpStorm.
- * User: maxime
- * Date: 16/04/14
- * Time: 11:13.
- */
-
 namespace App\Model;
 
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\Expr\Join;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Core\AbstractTraining;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Query\Expr\Join;
+use Doctrine\Persistence\ObjectManager;
 
-class SemesteredTraining
+final class SemesteredTraining
 {
-    /**
-     * @var int
-     */
-    private $year;
+    /** @var AbstractSession[]|null */
+    private ?array $sessions = [];
 
-    /**
-     * @var int
-     */
-    private $semester;
-
-    /**
-     * @var AbstractTraining
-     */
-    private $training;
-
-    /**
-     * @var AbstractSession[]
-     */
-    private $sessions;
-
-    public function __construct($year, $semester, $training, $sessions = null)
-    {
-        $this->year = $year;
-        $this->semester = $semester;
-        $this->training = $training;
+    public function __construct(
+        private int $year,
+        private int $semester,
+        private AbstractTraining $training,
+        ?array $sessions = null
+    ) {
         $this->setSessions($sessions);
     }
 
-    /**
-     * @param int $semester
-     */
-    public function setSemester($semester)
+
+    public function getDateBegin(): ?\DateTimeInterface
     {
-        $this->semester = $semester;
+        if (empty($this->sessions)) {
+            return null;
+        }
+
+        // Retourne la date la plus petite parmi toutes les sessions
+        $dates = array_map(fn($s) => $s->getDateBegin(), $this->sessions);
+        sort($dates);
+        return $dates[0];
     }
 
-    /**
-     * @return int
-     */
-    public function getSemester()
+    public function getDateEnd(): ?\DateTimeInterface
+    {
+        if (empty($this->sessions)) {
+            return null;
+        }
+
+        // Retourne la date la plus grande parmi toutes les sessions
+        $dates = array_map(fn($s) => $s->getDateEnd(), $this->sessions);
+        rsort($dates);
+        return $dates[0];
+    }
+
+    public function getId(): string
+    {
+        return sprintf('%s_%d_%d', $this->training->getId(), $this->year, $this->semester);
+    }
+
+    public function getYear(): int
+    {
+        return $this->year;
+    }
+
+    public function setYear(int $year): void
+    {
+        $this->year = $year;
+    }
+
+    public function getSemester(): int
     {
         return $this->semester;
     }
 
-    /**
-     * @param array $sessions
-     */
-    public function setSessions($sessions = null)
+    public function setSemester(int $semester): void
     {
-        if (is_array($sessions) && !empty($sessions)) {
-            $this->sessions = $sessions;
-            $this->orderSessions();
-        } else {
-            $this->setSessionsFromTrainingAndDate();
-        }
+        $this->semester = $semester;
+    }
+
+    public function getTraining(): AbstractTraining
+    {
+        return $this->training;
+    }
+
+    public function setTraining(AbstractTraining $training): void
+    {
+        $this->training = $training;
     }
 
     /**
-     * @return array
+     * @return AbstractSession[]|null
      */
-    public function getSessions()
+    public function getSessions(): ?array
     {
         return $this->sessions;
     }
 
     /**
-     * @param mixed $training
+     * @param AbstractSession[]|null $sessions
      */
-    public function setTraining($training)
+    public function setSessions(?array $sessions = null): void
     {
-        $this->training = $training;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTraining()
-    {
-        return $this->training;
-    }
-
-    /**
-     * @param int $year
-     */
-    public function setYear($year)
-    {
-        $this->year = $year;
-    }
-
-    /**
-     * @return int
-     */
-    public function getYear()
-    {
-        return $this->year;
-    }
-
-    /**
-     * @return string
-     */
-    public function getId()
-    {
-        return $this->training->getId().'_'.$this->getYear().'_'.$this->getSemester();
-    }
-
-    /**
-     * @return AbstractSession
-     */
-    public function getLastSession()
-    {
-        if (empty($this->sessions)) {
-            return;
-        }
-        $now = new \DateTime();
-
-        $result = null;
-        $maxdif = 9999999999;
-        foreach ($this->sessions as $session) {
-            $dif = $now->getTimestamp() - $session->getDatebegin()->getTimeStamp();
-            if (($dif > 0) && ($dif < $maxdif)) {
-                $result = $session;
-                $maxdif = $dif;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return AbstractSession
-     */
-    public function getNextSession()
-    {
-        if (empty($this->sessions)) {
-            return;
-        }
-        $now = new \DateTime();
-
-        $result = null;
-        $maxdif = 9999999999;
-        foreach ($this->sessions as $session) {
-            $dif = $session->getDatebegin()->getTimestamp() - $now->getTimeStamp();
-            if (($dif > 0) && ($dif < $maxdif)) {
-                $result = $session;
-                $maxdif = $dif;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns the number of sessions belonging to semesteredtraining.
-     *
-     * @return int
-     */
-    public function getSessionscount()
-    {
-        if (empty($this->sessions)) {
-            return 0;
-        }
-
-        return count($this->sessions);
-    }
-
-    /**
-     * sets the sessions list given the current objects training and year/semester values.
-     */
-    private function setSessionsFromTrainingAndDate()
-    {
-        $sessions = $this->training->getSessions();
-
-        $tmpSessions = array();
         if (!empty($sessions)) {
-            foreach ($sessions as $session) {
-                /** @var \DateTime $date */
+            $this->sessions = $sessions;
+        } else {
+            $this->sessions = array_filter($this->training->getSessions()->toArray(), function (AbstractSession $session) {
                 $date = $session->getDatebegin();
-
-                $year = $date->format('Y');
-                $semester = ($date->format('m') <= 6) ? 1 : 2;
-
-                if ($year === $this->year && $semester === $this->semester) {
-                    $tmpSessions[] = $session;
-                }
-            }
-
-            $this->sessions = $tmpSessions;
-            $this->orderSessions();
+                return $date->format('Y') == $this->year &&
+                    (($date->format('m') <= 6 && $this->semester === 1) ||
+                        ($date->format('m') > 6 && $this->semester === 2));
+            });
         }
+
+        usort($this->sessions, fn($a, $b) => $a->getDatebegin() <=> $b->getDatebegin());
     }
 
-    /**
-     * Get array of trainer.
-     *
-     * @return array
-     */
-    public function getTrainers()
+    public function getSessionsCount(): int
     {
-        $trainers = array();
-        if ($this->sessions) {
-            foreach ($this->sessions as $session) {
-                if ($session->getParticipations() && $session->getParticipations()->count() > 0) {
-                    foreach ($session->getParticipations() as $participation) {
-                        // do not add several times the same trainer
-                        $trainers[$participation->getTrainer()->getId()] = $participation->getTrainer();
-                    }
-                }
-            }
+        return count($this->sessions ?? []);
+    }
+
+    public function getLastSession(): ?AbstractSession
+    {
+        if (empty($this->sessions)) {
+            return null;
         }
 
+        $now = new \DateTime();
+        return array_reduce($this->sessions, function (?AbstractSession $carry, AbstractSession $session) use ($now) {
+            $diff = $now->getTimestamp() - $session->getDatebegin()->getTimestamp();
+            return ($diff > 0 && ($carry === null || $diff < $now->getTimestamp() - $carry->getDatebegin()->getTimestamp()))
+                ? $session
+                : $carry;
+        }, null);
+    }
+
+    public function getNextSession(): ?AbstractSession
+    {
+        if (empty($this->sessions)) {
+            return null;
+        }
+
+        $now = new \DateTime();
+        return array_reduce($this->sessions, function (?AbstractSession $carry, AbstractSession $session) use ($now) {
+            $diff = $session->getDatebegin()->getTimestamp() - $now->getTimestamp();
+            return ($diff > 0 && ($carry === null || $diff < $carry->getDatebegin()->getTimestamp() - $now->getTimestamp()))
+                ? $session
+                : $carry;
+        }, null);
+    }
+
+    public function getTrainers(): array
+    {
+        $trainers = [];
+        foreach ($this->sessions ?? [] as $session) {
+            foreach ($session->getParticipations() ?? [] as $participation) {
+                $trainer = $participation->getTrainer();
+                $trainers[$trainer->getId()] = $trainer;
+            }
+        }
         return $trainers;
     }
 
-    /**
-     * builds and returns SemesteredTraining objects array corresponding to Training object.
-     *
-     * @param AbstractTraining $training
-     *
-     * @return array
-     */
-    public static function getSemesteredTrainingsForTraining(AbstractTraining $training)
+    public static function getSemesteredTrainingsForTraining(AbstractTraining $training): array
     {
-        /** @var AbstractSession[] $sessions */
         $sessions = $training->getSessions();
+        $grouped = [];
 
-        //sorting sessions per year/semester
-        $orderedSessions = array();
-        if (count($sessions) !== 0) {
-            foreach ($sessions as $session) {
-                //if (!$session ){die();}
-                /** @var \DateTime $date */
-                $date = $session->getDatebegin();
-
-                $year = $date->format('Y');
-                $semester = ($date->format('m') <= 6) ? 1 : 2;
-
-                if (!isset($orderedSessions[$year])) {
-                    $orderedSessions[$year] = array();
-                }
-
-                if (!isset($orderedSessions[$year][$semester])) {
-                    $orderedSessions[$year][$semester] = array();
-                }
-                $orderedSessions[$year][$semester][] = $session;
-            }
-
-            $semTrainings = array();
-
-            //SemesteredTrainings objects are built around each sessions list
-            foreach ($orderedSessions as $year => $semesters) {
-                foreach ($semesters as $sem => $sessions) {
-                    $tempSemTraining = new self($year, $sem, $training);
-                    $tempSemTraining->setSessions($sessions);
-
-                    $semTrainings[] = $tempSemTraining;
-                }
-            }
-
-            return $semTrainings;
-        } else { // no session found : we build a single semestered training on first session year/semester.
-            $year = $training->getFirstSessionPeriodYear();
-            $semester = $training->getFirstSessionPeriodSemester();
-
-            $semTraining = new self($year, $semester, $training, array());
-
-            return array($semTraining);
+        foreach ($sessions as $session) {
+            $date = $session->getDatebegin();
+            $year = (int)$date->format('Y');
+            $semester = ((int)$date->format('m') <= 6) ? 1 : 2;
+            $grouped[$year][$semester][] = $session;
         }
+
+        $results = [];
+        foreach ($grouped as $year => $semesters) {
+            foreach ($semesters as $semester => $sessions) {
+                $results[] = new self($year, $semester, $training, $sessions);
+            }
+        }
+
+        if (empty($results)) {
+            $year = $training->getFirstSessionPeriodYear() ?? (int)date('Y');
+            $semester = $training->getFirstSessionPeriodSemester() ?? ((int)date('n') <= 6 ? 1 : 2);
+            $results[] = new self($year, $semester, $training, []);
+        }
+
+        return $results;
     }
 
-    /**
-     * Return an array of training and remove duplicates from semestered training list.
-     *
-     * @param array         $idList
-     * @param EntityManager $em
-     * @param array         $excludedTypes
-     */
-    public static function getTrainingsByIds(array $idList, EntityManager $em, $excludedTypes)
+    public static function getTrainingsByIds(array $ids, ObjectManager $em, array $excludedTypes): array
     {
-        $arrayIds = array();
-        foreach ($idList as $semesteredTrainingId) {
-            $arrayIds[] = explode('_', $semesteredTrainingId)[0];
-        }
-        $arrayIds = array_unique($arrayIds);
+        $trainingIds = array_unique(array_map(fn($id) => explode('_', (string)$id)[0] ?? null, $ids));
+        $trainings = $em->getRepository(AbstractTraining::class)->findBy(['id' => $trainingIds]);
 
-        $allEntities = $em->getRepository(AbstractTraining::class)
-            ->findBy(array('id' => $arrayIds));
-
-        $notMeetingEntities = array();
-        foreach ($allEntities as $entity) {
-            if (!in_array($entity->getType(), $excludedTypes, true)) {
-                $notMeetingEntities[] = $entity;
-            }
-        }
-
-        return $notMeetingEntities;
+        return array_filter($trainings, fn($training) => !in_array($training->getType(), $excludedTypes, true));
     }
 
     /**
-     * Returns an array of semestered trainings corresponding to given list of ids.
-     *
-     * @param array         $idList
-     * @param EntityManager $em
-     *
      * @return SemesteredTraining[]
      */
-    public static function getSemesteredTrainingsByIds(array $idList, EntityManager $em)
+    public static function getSemesteredTrainingsByIds(array $idList, ObjectManager $em): array
     {
-        //building DQL query to get needed sessions objects
+        if (empty($idList)) {
+            return [];
+        }
+
         $qb = $em->createQueryBuilder()
-            ->select('s')
-            ->from(AbstractTraining::class, 't')
-                ->leftJoin(AbstractSession::class, 's', Join::WITH, 't = s.training');
+            ->select('s', 't')
+            ->from(AbstractSession::class, 's')
+            ->join('s.training', 't');
 
-        $paramCount = 0;
-        $parameters = array();
-        foreach ($idList as $tId) {
-            //var_dump($tId);
-            $params = explode('_', $tId);
+        $orX = $qb->expr()->orX();
+        $parameters = [];
+        $normalizedIds = [];
+        $now = new \DateTime();
 
-            if (count($params) === 3) {
-                $dateFrom = ($params[2] === 2) ? $params[1].'-01-07 00:00:00' : $params[1].'-01-01 00:00:00';
-                $dateTo = ($params[2] === 2) ? $params[1].'-31-12 23:59:59' : $params[1].'-30-06 23:59:59';
+        foreach ($idList as $rawId) {
+            $id = trim(preg_replace('/"{2,}/', '"', trim($rawId, "\"' ")), "\"' ");
+            $parts = explode('_', $id);
 
-                $qb->orWhere('( t.id = :id'.$paramCount.' AND s.datebegin < :dateTo'.$paramCount.' AND s.datebegin > :dateFrom'.$paramCount.')');
-                $parameters = array_merge($parameters, array(
-                    'id'.$paramCount => $params[0],
-                    'dateTo'.$paramCount => $dateTo,
-                    'dateFrom'.$paramCount => $dateFrom,
-                ));
-                ++$paramCount;
-            }
-        }
-
-        //echo $qb->getQuery()->getDQL(); die();
-        $qb->setParameters($parameters);
-        $tmpArray = $qb->getQuery()->getResult();
-
-        //objects are grouped by training / year / semester
-        $sessions = array();
-        foreach ($tmpArray as $re) {
-            if (!empty($re)) {
-                $ys = self::getYearAndSemesterFromDate($re->getDatebegin());
-                $tId = $re->getTraining()->getId();
-                if (!isset($sessions[$tId])) {
-                    $sessions[$tId] = array();
-                }
-                if (!isset($sessions[$tId][$ys[0]])) {
-                    $sessions[$tId][$ys[0]] = array();
-                }
-                if (!isset($sessions[$tId][$ys[0]][$ys[1]])) {
-                    $sessions[$tId][$ys[0]][$ys[1]] = array();
-                }
-                $sessions[$tId][$ys[0]][$ys[1]][] = $re;
-            }
-        }
-        $semTrains = array();
-        //for each training / year / semester, a SemesteredTraining object is built
-        foreach ($idList as $id) {
-            $params = explode('_', $id);
-
-            /*
-            if (count($params) === 3) {
-                if (!empty($sessions[$params[0]][$params[1]][$params[2]])) {
-                    //getting sessions
-                    $tmpSessions = $sessions[$params[0]][$params[1]][$params[2]];
-                    $semTrains[] = new self($params[1], $params[2], $tmpSessions[0]->getTraining(), $tmpSessions);
-                } else {
-                    $semTrains[] = new self($params[1], $params[2], $em->getRepository(AbstractTraining::class)->find($params[0]), array());
-                }
-            }*/
-
-            // Construction semestered training
-            $train = $em->getRepository(AbstractTraining::class)->find($params[0]);
-            $semTrains[] = new self($train->getFirstsessionperiodyear(), $train->getFirstsessionperiodsemester(), $em->getRepository(AbstractTraining::class)->find($params[0]), array());
-
-        }
-        //var_dump($qb->getQuery());
-        return $semTrains;
-    }
-
-    /**
-     * helper for getting year+ semester.
-     *
-     * @param \DateTime $date
-     *
-     * @return array
-     */
-    public static function getYearAndSemesterFromDate(\DateTime $date)
-    {
-        $year = $date->format('Y');
-        $semester = ($date->format('m') <= 6) ? 1 : 2;
-
-        return array($year, $semester);
-    }
-
-    /**
-     * ordering.
-     */
-    private function orderSessions()
-    {
-        @usort($this->sessions, function ($a, $b) {
-            $ad = $a->getDatebegin();
-            $bd = $b->getDatebegin();
-
-            if ($ad === $bd) {
-                return 0;
+            if (count($parts) === 1 && ctype_digit($parts[0])) {
+                $year = (int)$now->format('Y');
+                $semester = ((int)$now->format('m') <= 6) ? 1 : 2;
+                $id = sprintf('%d_%d_%d', $parts[0], $year, $semester);
+                $parts = explode('_', $id);
             }
 
-            return $ad < $bd ? 1 : -1;
-        });
+            if (count($parts) !== 3) continue;
+
+            [$trainingId, $year, $semester] = $parts;
+
+            if (!ctype_digit($trainingId) || !ctype_digit($year) || !in_array($semester, ['1', '2'], true)) {
+                continue;
+            }
+
+            $normalizedIds[] = $id;
+
+            $dateFrom = new \DateTime(sprintf('%d-%02d-01', $year, $semester === '1' ? 1 : 7));
+            $dateTo   = new \DateTime(sprintf('%d-%02d-%d', $year, $semester === '1' ? 6 : 12, $semester === '1' ? 30 : 31));
+
+            $paramKey = "id_{$trainingId}_{$year}_{$semester}";
+            $orX->add(
+                $qb->expr()->andX(
+                    $qb->expr()->eq('t.id', ":{$paramKey}_t"),
+                    $qb->expr()->between('s.datebegin', ":{$paramKey}_from", ":{$paramKey}_to")
+                )
+            );
+
+            $parameters["{$paramKey}_t"] = (int)$trainingId;
+            $parameters["{$paramKey}_from"] = $dateFrom;
+            $parameters["{$paramKey}_to"] = $dateTo;
+        }
+
+        if ($orX->count() === 0) return [];
+
+        $sessions = $qb->where($orX)
+            ->setParameters($parameters)
+            ->getQuery()
+            ->getResult();
+
+        $grouped = [];
+        foreach ($sessions as $session) {
+            $training = $session->getTraining();
+            $year = (int)$session->getDatebegin()->format('Y');
+            $semester = ((int)$session->getDatebegin()->format('m') <= 6) ? 1 : 2;
+            $key = sprintf('%d_%d_%d', $training->getId(), $year, $semester);
+            $grouped[$key][] = $session;
+        }
+
+        $results = [];
+        foreach ($normalizedIds as $id) {
+            [$trainingId, $year, $semester] = explode('_', $id);
+            $training = $em->getRepository(AbstractTraining::class)->find($trainingId);
+            if (!$training) continue;
+
+            // Toutes les sessions du semestre ciblé
+            $sessionsForThisSemester = $grouped[$id] ?? [];
+
+            // Toutes les sessions de ce training, tous semestres confondus
+            $allSessionsForTraining = $em->getRepository(AbstractSession::class)
+                ->findBy(['training' => $training], ['datebegin' => 'ASC']);
+
+            $defaultDateBegin = new \DateTime(sprintf('%d-%02d-01', $year, $semester === '1' ? 1 : 7));
+
+            // Première session du semestre
+            $dateBegin = !empty($sessionsForThisSemester)
+                ? $sessionsForThisSemester[0]->getDatebegin() ?? $defaultDateBegin
+                : $defaultDateBegin;
+
+            // Dernière session de l'entraînement (n'importe quel semestre)
+            $lastSessiondateBegin = !empty($allSessionsForTraining)
+                ? end($allSessionsForTraining)->getDatebegin() ?? $dateBegin
+                : $dateBegin;
+
+            $results[] = new self(
+                (int)$year,
+                (int)$semester,
+                $training,
+                $sessionsForThisSemester,
+                $dateBegin,
+                $lastSessiondateBegin
+            );
+        }
+
+        return $results;
     }
+
 }

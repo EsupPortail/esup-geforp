@@ -12,33 +12,19 @@ use App\Form\Type\VocabularyType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormBuilderInterface;
 
-class SupervisorType extends VocabularyType
+final class SupervisorType extends VocabularyType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        parent::buildForm($builder, $options);
+        parent::buildForm($formBuilder, $options);
 
-        $builder
-            ->add('firstName', null, array(
-                'label' => 'Prénom',
-            ))
-            ->add('email', EmailType::class, array(
-                'label' => 'Email',
-            ))
-            ->add('phoneNumber', null, array(
-                'label'    => 'Numéro de téléphone',
-                'required' => false,
-            ));
+        $formBuilder
+            ->add('firstName', null, ['label' => 'Prénom'])
+            ->add('email', EmailType::class, ['label' => 'Email'])
+            ->add('phoneNumber', null, ['label'    => 'Numéro de téléphone', 'required' => false]);
     }
 
-    /**
-     * @return string
-     */
-    public function getParent()
+    public function getParent(): ?string
     {
         return VocabularyType::class;
     }

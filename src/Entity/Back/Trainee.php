@@ -4,123 +4,108 @@ namespace App\Entity\Back;
 
 
 use App\Entity\Core\AbstractInscription;
+use App\Entity\PersonTrait\PersonTrait;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Form\Type\AbstractTraineeType;
 use App\Entity\Core\AbstractTrainee;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use App\Entity\Core\User;
 
-/**
- *
- * @ORM\Table(name="trainee")
- * @ORM\Entity
- * @UniqueEntity(fields={"email", "institution"}, message="Cette adresse email est déjà utilisée.", ignoreNull=true, groups={"Default", "trainee"})
- */
-class Trainee extends AbstractTrainee implements UserInterface
+#[ORM\Table(name: 'trainee')]
+#[ORM\Entity]
+#[UniqueEntity(fields: ['email', 'institution'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainee'])]
+class Trainee extends AbstractTrainee
 {
-    /**
-     * @ORM\Column(name="birth_date", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $birthdate;
+    
+    use PersonTrait;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'birth_date', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $birthdate = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'amu_statut', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $amustatut = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'bap', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $bap = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'corps', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $corps = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'category', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $category = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'campus', type: \Doctrine\DBAL\Types\Types::STRING, length: 20)]
+    protected ?string $campus = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'first_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $firstnamesup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'last_name_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $lastnamesup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'email_sup', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $emailsup = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'first_name_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $firstnamecorr = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'last_name_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $lastnamecorr = null;
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'email_corr', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $emailcorr = null;
+
+
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'fonction', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $fonction = null;
 
     /**
-     * @ORM\Column(name="amu_statut", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
+     * @var \Doctrine\Common\Collections\Collection<Alert>
      */
-    protected $amustatut;
-
-    /**
-     * @ORM\Column(name="bap", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $bap;
-
-    /**
-     * @ORM\Column(name="corps", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $corps;
-
-    /**
-     * @ORM\Column(name="category", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $category;
-
-    /**
-     * @ORM\Column(name="campus", type="string", length=20)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $campus;
-
-    /**
-     * @ORM\Column(name="first_name_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $firstnamesup;
-
-    /**
-     * @ORM\Column(name="last_name_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $lastnamesup;
-
-    /**
-     * @ORM\Column(name="email_sup", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $emailsup;
-
-    /**
-     * @ORM\Column(name="first_name_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $firstnamecorr;
-
-    /**
-     * @ORM\Column(name="last_name_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $lastnamecorr;
-
-    /**
-     * @ORM\Column(name="email_corr", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $emailcorr;
-
-    /**
-     * @ORM\Column(name="fonction", type="string", length=255)
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $fonction;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\Alert", mappedBy="trainee", cascade={"remove"})
-     * @Serializer\Groups({"Default", "trainee", "api"})
-     */
-    protected $alerts;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\OneToMany(mappedBy: 'trainee', targetEntity: Alert::class, cascade: ['remove'])]
+    protected \Doctrine\Common\Collections\Collection $alerts;
 
     /**
      * @return mixed
      */
-    static public function getFormType()
+    static public function getFormType(): string
     {
         return AbstractTraineeType::class;
     }
 
     /**
-     * Set birth date
+     * Set shibboleth persistent id
+     * Set shibboleth persistent id
      *
-     * @param mixed $birthDate
      *
      * @return Trainee
      */
-    public function setBirthdate($birthDate)
+
+    /**
+     * Set birth date
+     *
+     *
+     * @return Trainee
+     */
+    public function setBirthdate(mixed $birthDate): static
     {
         $this->birthdate = $birthDate;
 
@@ -131,7 +116,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get birth date
      *
      */
-    public function getBirthdate()
+    public function getBirthdate(): ?string
     {
         return $this->birthdate;
     }
@@ -139,11 +124,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set amuStatut
      *
-     * @param mixed $amuStatut
      *
      * @return Trainee
      */
-    public function setAmustatut($amuStatut)
+    public function setAmustatut(mixed $amuStatut): static
     {
         $this->amustatut = $amuStatut;
 
@@ -154,7 +138,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get amuStatut
      *
      */
-    public function getAmustatut()
+    public function getAmustatut(): ?string
     {
         return $this->amustatut;
     }
@@ -162,11 +146,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set bap
      *
-     * @param mixed $bap
      *
      * @return Trainee
      */
-    public function setBap($bap)
+    public function setBap(mixed $bap): static
     {
         $this->bap = $bap;
 
@@ -177,7 +160,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get bap
      *
      */
-    public function getBap()
+    public function getBap(): ?string
     {
         return $this->bap;
     }
@@ -186,11 +169,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set corps
      *
-     * @param mixed $corps
      *
      * @return Trainee
      */
-    public function setCorps($corps)
+    public function setCorps(mixed $corps): static
     {
         $this->corps = $corps;
 
@@ -201,7 +183,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get corps
      *
      */
-    public function getCorps()
+    public function getCorps(): ?string
     {
         return $this->corps;
     }
@@ -209,11 +191,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set category
      *
-     * @param mixed $category
      *
      * @return Trainee
      */
-    public function setCategory($category)
+    public function setCategory(mixed $category): static
     {
         $this->category = $category;
 
@@ -224,7 +205,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get category
      *
      */
-    public function getCategory()
+    public function getCategory(): ?string
     {
         return $this->category;
     }
@@ -232,11 +213,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set campus
      *
-     * @param mixed $campus
      *
      * @return Trainee
      */
-    public function setCampus($campus)
+    public function setCampus(mixed $campus): static
     {
         $this->campus = $campus;
 
@@ -247,7 +227,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      * Get campus
      *
      */
-    public function getCampus()
+    public function getCampus(): ?string
     {
         return $this->campus;
     }
@@ -259,7 +239,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setFirstnamesup($firstNameSup)
+    public function setFirstnamesup($firstNameSup): static
     {
         $this->firstnamesup = $firstNameSup;
 
@@ -271,7 +251,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getFirstnamesup()
+    public function getFirstnamesup(): ?string
     {
         return $this->firstnamesup;
     }
@@ -283,7 +263,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setLastnamesup($lastNameSup)
+    public function setLastnamesup($lastNameSup): static
     {
         $this->lastnamesup = $lastNameSup;
 
@@ -295,7 +275,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getLastnamesup()
+    public function getLastnamesup(): ?string
     {
         return $this->lastnamesup;
     }
@@ -307,7 +287,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setEmailsup($emailSup)
+    public function setEmailsup(string $emailSup): static
     {
         $this->emailsup = $emailSup;
 
@@ -319,7 +299,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getEmailsup()
+    public function getEmailsup(): ?string
     {
         return $this->emailsup;
     }
@@ -327,11 +307,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Set firstnameCorr
      *
-     * @param string $firstnamecorr
-     *
+     * @param $firstNameCorr
      * @return Trainee
      */
-    public function setFirstnamecorr($firstNameCorr)
+    public function setFirstnamecorr($firstNameCorr): static
     {
         $this->firstnamecorr = $firstNameCorr;
 
@@ -343,7 +322,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getFirstnamecorr()
+    public function getFirstnamecorr(): ?string
     {
         return $this->firstnamecorr;
     }
@@ -355,7 +334,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setLastnamecorr($lastNameCorr)
+    public function setLastnamecorr(string $lastNameCorr): static
     {
         $this->lastnamecorr = $lastNameCorr;
 
@@ -367,7 +346,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getLastnamecorr()
+    public function getLastnamecorr(): ?string
     {
         return $this->lastnamecorr;
     }
@@ -379,7 +358,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setEmailcorr($emailCorr)
+    public function setEmailcorr(string $emailCorr): static
     {
         $this->emailcorr = $emailCorr;
 
@@ -391,7 +370,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getEmailcorr()
+    public function getEmailcorr(): ?string
     {
         return $this->emailcorr;
     }
@@ -403,7 +382,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return Trainee
      */
-    public function setFonction($fonction)
+    public function setFonction(string $fonction): static
     {
         $this->fonction = $fonction;
 
@@ -415,7 +394,7 @@ class Trainee extends AbstractTrainee implements UserInterface
      *
      * @return string
      */
-    public function getFonction()
+    public function getFonction(): ?string
     {
         return $this->fonction;
     }
@@ -423,11 +402,10 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Add inscription
      *
-     * @param \App\Entity\Core\AbstractInscription $inscription
      *
      * @return Trainee
      */
-    public function addInscription(AbstractInscription $inscription)
+    public function addInscription(AbstractInscription $inscription): static
     {
         $this->inscriptions[] = $inscription;
 
@@ -437,17 +415,16 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * Remove inscription
      *
-     * @param \App\Entity\Core\AbstractInscription $inscription
      */
-    public function removeInscription(AbstractInscription $inscription)
+    public function removeInscription(AbstractInscription $inscription): void
     {
         $this->inscriptions->removeElement($inscription);
     }
 
     /**
-     * @return ArrayCollection
+     * @return \Doctrine\Common\Collections\ArrayCollection|\Doctrine\Common\Collections\Collection
      */
-    public function getAlerts()
+    public function getAlerts(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->alerts;
     }
@@ -455,7 +432,7 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param ArrayCollection $alerts
      */
-    public function setAlerts($alerts)
+    public function setAlerts(ArrayCollection $alerts): void
     {
         $this->alerts = $alerts;
     }
@@ -463,9 +440,8 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param Alert $alerts
      *
-     * @return bool
      */
-    public function addAlert($alert)
+    public function addAlert($alert): bool
     {
         if (!$this->alerts->contains($alert)) {
             $this->alerts->add($alert);
@@ -479,9 +455,8 @@ class Trainee extends AbstractTrainee implements UserInterface
     /**
      * @param Alert $alert
      *
-     * @return bool
      */
-    public function removeAlert($alert)
+    public function removeAlert(Alert $alert): bool
     {
         if ($this->alerts->contains($alert)) {
             $this->alerts->removeElement($alert);
@@ -490,5 +465,21 @@ class Trainee extends AbstractTrainee implements UserInterface
         }
 
         return false;
+    }
+    public function __construct()
+    {
+        parent::__construct();
+        $this->alerts = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    public function __serialize(): array
+    {
+        return array();// TODO: Implement __serialize() method.
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->$data = $data;
+        // TODO: Implement __unserialize() method.
     }
 }

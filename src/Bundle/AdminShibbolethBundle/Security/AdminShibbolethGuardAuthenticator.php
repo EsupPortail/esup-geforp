@@ -11,43 +11,28 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
 use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProviderInterface;
+use App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProvider;
+use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\CustomCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 
 /**
  * Class AdminShibbolethGuardAuthenticator
  * @package App\Bundle\AdminShibbolethBundle\Security
  */
-class AdminShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
+final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
 {
-
-    /**
-     * @var array
-     */
-    private $config;
-
-    /**
-     * @var Router
-     */
-    private $router;
-
-    /**
-     * @var TokenStorageInterface
-     */
-    private $tokenStorage;
 
     /**
      * @var string
      */
     private $login_path;
-
-    /**
-     * @var string
-     */
-    private $logout_path;
 
     /**
      * @var string
@@ -67,21 +52,15 @@ class AdminShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
     /**
      * @var array
      */
-    private $attributes;
+    private $attributes = [];
+
 
     /**
      * ShibbolethGuardAuthenticator constructor.
-     * @param array $config
-     * @param Router $router
-     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(array $config, Router $router, TokenStorageInterface $tokenStorage)
+    public function __construct(array $config, private readonly Router $router, private readonly AdminShibbolethUserProvider $shibUserProvider)
     {
-        $this->config = $config;
-        $this->router = $router;
-        $this->tokenStorage = $tokenStorage;
         $this->login_path = $config['login_path'];
-        $this->logout_path = $config['logout_path'];
         $this->login_target = $config['login_target'];
         $this->session_id = $config['session_id'];
         $this->username = $config['username'];
@@ -90,106 +69,105 @@ class AdminShibbolethGuardAuthenticator extends AbstractGuardAuthenticator
             throw new InvalidConfigurationException("Shibboleth configuration error : the value of username parameter must be in attributes list parameter");
     }
 
-    /**
-     * @param Request $request
-     * @return bool
-     */
-    public function supports(Request $request){
+    public function supports(Request $request): bool{
         if (!empty($this->getAttribute($request, $this->session_id))) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * @param Request $request
-     * @param AuthenticationException|null $authException
-     * @return RedirectResponse
+     * @param AuthenticationException|null $authenticationException
      */
-    public function start(Request $request, AuthenticationException $authException = null)
+    public function start(Request $request, AuthenticationException $authenticationException = null): Response
     {
-        return new RedirectResponse("{$request->getSchemeAndHttpHost()}/".trim($this->login_path, '/')."?target=".(empty($this->login_target)? $request->getUri() : "{$request->getSchemeAndHttpHost()}{$this->router->generate($this->login_target)}"));
+        return new RedirectResponse(sprintf('%s/', $request->getSchemeAndHttpHost()).trim($this->login_path, '/')."?target=".(empty($this->login_target)? $request->getUri() : $request->getSchemeAndHttpHost() . $this->router->generate($this->login_target)));
     }
 
-    /**
-     * @param Request $request
-     * @return array|null
-     */
-    public function getCredentials(Request $request)
+    public function getCredentials(Request $request): ?array
     {
-        $credentials = array();
+        $credentials = [];
         $credentials['username'] = $this->getAttribute($request, $this->username);
         foreach($this->attributes as $attribute){
             $credentials[$attribute] = $this->getAttribute($request, $attribute);
         }
+        error_log(print_r($credentials, true));
         return $credentials;
     }
 
-    /**
-     * @param mixed $credentials
-     * @param UserProviderInterface $userProvider
-     * @return UserInterface
-     */
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    public function getUser(mixed $credentials, UserProviderInterface $userProvider): ?UserInterface
     {
-        if(empty($credentials['username']))
-            throw new UsernameNotFoundException("The username attribute is empty");
-        if($userProvider instanceof ShibbolethUserProviderInterface)
+        if(empty($credentials['username'])) {
+            throw new UserNotFoundException("The username attribute is empty");
+        }
+        if($userProvider instanceof AdminShibbolethUserProviderInterface) {
             return $userProvider->loadUser($credentials);
-        else if($userProvider instanceof  UserProviderInterface)
-            return $userProvider->loadUserByUsername($credentials['username']);
+        }
+        return $userProvider->loadUserByIdentifier($credentials['username']);
+
         return null;
 
     }
 
-    /**
-     * @param mixed $credentials
-     * @param UserInterface $user
-     * @return bool
-     */
-    public function checkCredentials($credentials, UserInterface $user)
+    public function checkCredentials(mixed $credentials, UserInterface $user): bool
     {
         return true;
     }
 
     /**
-     * @param Request $request
-     * @param AuthenticationException $exception
      * @return JsonResponse
      */
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
+    public function onAuthenticationFailure(Request $request, AuthenticationException $authenticationException): Response
     {
 //        return new JsonResponse(array('message' => $exception->getMessageKey()), Response::HTTP_FORBIDDEN);
-        return new JsonResponse(array('message' => "Vous n'avez pas les droits pour accéder à cette application"), Response::HTTP_FORBIDDEN);
+        return new JsonResponse(['message' => "Vous n'avez pas les droits pour accéder à cette application"], Response::HTTP_FORBIDDEN);
     }
 
     /**
-     * @param Request $request
-     * @param TokenInterface $token
      * @param string $providerKey
      * @return null
      */
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
+    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey): ?Response
     {
         return null;
     }
 
-    /**
-     * @return bool
-     */
-    public function supportsRememberMe()
+    public function supportsRememberMe(): bool
     {
         return false;
     }
 
     /**
-     * @param Request $request
      * @param $name
      * @return mixed
      */
-    private function getAttribute(Request $request, $name){
-        $attributes = array($name, strtoupper($name), "HTTP_".strtoupper($name), "REDIRECT_{$name}");
+    private function getAttribute(Request $request, string $name){
+        $attributes = [$name, strtoupper($name), "HTTP_".strtoupper($name), sprintf('REDIRECT_%s', $name)];
         foreach($attributes as $attribute)
             if(!empty($request->server->has($attribute))) return $request->server->get($attribute);
+
+            return null;
+    }
+
+    public function authenticate(Request $request): Passport
+    {
+        $credentials = $this->getCredentials($request);
+        
+	if (empty($credentials ['username'])) {
+            throw new UserNotFoundException("The username attribute is empty");
+        }
+
+        $userBadge = new UserBadge($credentials['username'], function ($userIdentifier) {
+                // optionally pass a callback to load the User manually
+                $user = $this->shibUserProvider->loadUserByIdentifier($userIdentifier);
+                if (!$user) {
+                    throw new UserNotFoundException();
+                }
+
+                return $user;
+            });
+	$pass = new Passport($userBadge, new CustomCredentials(fn($credentials, $user) => true, $credentials['username']));
+        return $pass;
     }
 }

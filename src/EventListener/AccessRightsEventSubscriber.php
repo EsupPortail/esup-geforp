@@ -12,65 +12,50 @@ use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 /**
  * Class AccessRightsEventSubscriber.
  */
-class AccessRightsEventSubscriber implements EventSubscriberInterface
+final class AccessRightsEventSubscriber implements EventSubscriberInterface
 {
-    /**
-     * @var AuthorizationCheckerInterface
-     */
-    protected $authorizationCheckerInterface;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(AuthorizationCheckerInterface $authorizationCheckerInterface)
+    public function __construct(protected AuthorizationCheckerInterface $authorizationChecker)
     {
-        $this->authorizationCheckerInterface = $authorizationCheckerInterface;
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function getSubscribedEvents()
+    public static function getSubscribedEvents(): array
     {
-        return array(
-            array('event' => 'serializer.post_serialize', 'method' => 'onPostSerialize'),
-        );
+        return [['event' => 'serializer.post_serialize', 'method' => 'onPostSerialize']];
     }
 
     /**
      * If the object is a instance of SerializedAccessRights, add access rights to the
      * serialized object.
      *
-     * @param ObjectEvent $event
      */
-    public function onPostSerialize(ObjectEvent $event)
+    public function onPostSerialize(ObjectEvent $objectEvent): void
     {
-        if (!$this->isApiGroup($event->getContext())) {
-            $object = $event->getObject();
+        if (!$this->isApiGroup($objectEvent->getContext())) {
+            $object = $objectEvent->getObject();
             if ($object instanceof SerializedAccessRights) {
                 //$event->getVisitor()->addData('_accessRights', array(
-                $event->getVisitor()->visitProperty(new StaticPropertyMetadata('', '_accessRights', null), array(
-                    'view' => $this->authorizationCheckerInterface->isGranted('VIEW', $object),
-                    'edit' => $this->authorizationCheckerInterface->isGranted('EDIT', $object),
-                    'delete' => $this->authorizationCheckerInterface->isGranted('DELETE', $object),
-                ));
+                $objectEvent->getVisitor()->visitProperty(new StaticPropertyMetadata('', '_accessRights', null), ['view' => $this->authorizationChecker->isGranted('VIEW', $object), 'edit' => $this->authorizationChecker->isGranted('EDIT', $object), 'delete' => $this->authorizationChecker->isGranted('DELETE', $object)]);
             }
         }
     }
 
-    /**
-     * @param Context $context
-     *
-     * @return bool
-     */
-    protected function isApiGroup(Context $context)
+    private function isApiGroup(Context $context): bool
     {
 //        $groups = $context->attributes->get('groups');
 //        foreach ($groups->getOrElse(array()) as $group) {
        if ($context->hasAttribute('groups')) {
            $groups = $context->getAttribute('groups');
            foreach ($groups as $group) {
-               if ($group === 'api' || strpos($group, 'api.') === 0) {
+               if ($group === 'api') {
+                   return true;
+               }
+               if (str_starts_with((string) $group, 'api.')) {
                    return true;
                }
            }

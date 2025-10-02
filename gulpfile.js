@@ -25,7 +25,10 @@ gulp.task('scripts', ['templates', 'ckeditor'], function(){
         .pipe(concat('scss.js'))
         .pipe(gulp.dest('public/build'));
 
-    gulp.src(assets.scripts["front-add"])
+	gulp.src(assets.scripts.bootstrapbundle)
+        .pipe(gulp.dest('public/build'));
+    
+	gulp.src(assets.scripts["front-add"])
             .pipe(gulp.dest('public/build'));
 
 

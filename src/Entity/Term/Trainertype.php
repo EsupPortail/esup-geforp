@@ -15,20 +15,17 @@ use App\Entity\Term\VocabularyInterface;
 /**
  * Type de personnel.
  *
- * @ORM\Table(name="trainer_type")
- * @ORM\Entity
  */
+#[ORM\Table(name: 'trainer_type')]
+#[ORM\Entity]
 class Trainertype extends AbstractTerm implements VocabularyInterface
 {
-    public static function getVocabularyStatus()
+    public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
     }
 
-    /**
-     * @return string
-     */
-    public function getVocabularyName()
+    public function getVocabularyName(): string
     {
         return "Type d'intervenant";
     }

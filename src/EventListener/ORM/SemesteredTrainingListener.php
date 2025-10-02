@@ -11,7 +11,6 @@ namespace App\EventListener\ORM;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\ORM\Events;
-use Elastica\Query\Match;
 use Elastica\Type;
 use FOS\ElasticaBundle\Doctrine\Listener;
 use FOS\ElasticaBundle\Persister\ObjectPersisterInterface;
@@ -23,36 +22,29 @@ use App\Model\SemesteredTraining;
 /**
  * Class SemesteredTrainingListener.
  */
-class SemesteredTrainingListener extends Listener
+final class SemesteredTrainingListener extends Listener
 {
-    /** @var Type $index */
-    private $index;
-
-    public function __construct(ObjectPersisterInterface $objectPersister, IndexableInterface $indexable, Type $index, array $config = array(), $logger = null)
+    public $events;
+    /**
+     * @var mixed[]|string[]
+     */
+    public $scheduledForDeletion = [];
+    public $scheduledForUpdate;
+    public $scheduledForInsertion;
+    /**
+     * @var string[]
+     */
+    private const EVENTS = [Events::preRemove, Events::postPersist, Events::postUpdate, Events::preFlush, Events::postFlush];
+    public function __construct(ObjectPersisterInterface $objectPersister, IndexableInterface $indexable, Type $type, array $config = [], $logger = null)
     {
-        $events = array(
-            Events::preRemove,
-            Events::postPersist,
-            Events::postUpdate,
-            Events::preFlush,
-            Events::postFlush,
-        );
+        $config = ['identifier' => 'id', 'indexName' => 'sygefor3', 'typeName' => 'semestered_training'];
 
-        $config = array(
-          'identifier' => 'id',
-          'indexName' => 'sygefor3',
-          'typeName' => 'semestered_training',
-        );
-
-        $this->index = $index;
-
-        parent::__construct($objectPersister, $events, $indexable, $config);
+        parent::__construct($objectPersister, self::EVENTS, $indexable, $config);
     }
 
     /**
      * Provides unified method for retrieving a doctrine object from an EventArgs instance.
      *
-     * @param EventArgs $eventArgs
      *
      * @throws \RuntimeException if no valid getter is found
      *
@@ -62,9 +54,11 @@ class SemesteredTrainingListener extends Listener
     {
         if (method_exists($eventArgs, 'getObject')) {
             return $eventArgs->getObject();
-        } elseif (method_exists($eventArgs, 'getEntity')) {
+        }
+        if (method_exists($eventArgs, 'getEntity')) {
             return $eventArgs->getEntity();
-        } elseif (method_exists($eventArgs, 'getDocument')) {
+        }
+        elseif (method_exists($eventArgs, 'getDocument')) {
             return $eventArgs->getDocument();
         }
 
@@ -81,27 +75,26 @@ class SemesteredTrainingListener extends Listener
         return $this->events;
     }
 
-    /**
-     * @param EventArgs $eventArgs
-     */
-    public function preRemove(EventArgs $eventArgs)
+    public function preRemove(EventArgs $eventArgs): void
     {
         $object = $this->getDoctrineObject($eventArgs);
 
-        if (in_array(AbstractTraining::class, class_parents(get_class($object)), true)) {
+        if (in_array(AbstractTraining::class, class_parents($object::class), true)) {
             $semTrainings = SemesteredTraining::getSemesteredTrainingsForTraining($object);
             foreach ($semTrainings as $semT) {
                 $this->scheduledForDeletion[] = $semT->getId();
             }
+
             $this->scheduledForDeletion[] = $object->getId().'_'.$object->getFirstSessionPeriodYear().'_'.$object->getFirstSessionPeriodSemester();
-        } elseif (get_class($object) === AbstractSession::class) {
+        } elseif ($object::class === AbstractSession::class) {
             $training = $object->getTraining();
             if ($training) {
                 // remove all semestered training associated to this training because of root id change possibility
                 $semTrainings = SemesteredTraining::getSemesteredTrainingsForTraining($training);
-                foreach ($semTrainings as $semT) {
-                    $this->scheduledForDeletion[] = $semT->getId();
+                foreach ($semTrainings as $semTraining) {
+                    $this->scheduledForDeletion[] = $semTraining->getId();
                 }
+
                 $this->scheduledForDeletion[] = $training->getId().'_'.$training->getFirstSessionPeriodYear().'_'.$training->getFirstSessionPeriodSemester();
                 $this->scheduledForDeletion[] = $training->getId().'_'.$object->getYear().'_'.$object->getSemester();
 
@@ -116,17 +109,14 @@ class SemesteredTrainingListener extends Listener
         }
     }
 
-    /**
-     * @param EventArgs $eventArgs
-     */
-    public function postPersist(EventArgs $eventArgs)
+    public function postPersist(EventArgs $eventArgs): void
     {
         $object = $this->getDoctrineObject($eventArgs);
 
-        if (in_array(AbstractTraining::class, class_parents(get_class($object)), true)) {
+        if (in_array(AbstractTraining::class, class_parents($object::class), true)) {
             $semTrainings = SemesteredTraining::getSemesteredTrainingsForTraining($object);
             $this->scheduledForInsertion = array_merge($this->scheduledForInsertion, $semTrainings);
-        } elseif (get_class($object) === AbstractSession::class) {
+        } elseif ($object::class === AbstractSession::class) {
             //building SemesteredTraining object
             $training = $object->getTraining();
             if ($training) {
@@ -146,26 +136,25 @@ class SemesteredTrainingListener extends Listener
                         break;
                     }
                 }
+
                 if (!$keepInitialSemesteredTraining) {
                     $this->scheduledForDeletion[] = $training->getId().'_'.$training->getFirstSessionPeriodYear().'_'.$training->getFirstSessionPeriodSemester();
                 }
+
                 $this->scheduledForUpdate[] = $semesteredTraining;
             }
         }
     }
 
-    /**
-     * @param EventArgs $eventArgs
-     */
-    public function postUpdate(EventArgs $eventArgs)
+    public function postUpdate(EventArgs $eventArgs): void
     {
         /** @var AbstractSession $object */
         $object = $this->getDoctrineObject($eventArgs);
 
-        if (in_array(AbstractTraining::class, class_parents(get_class($object)), true)) {
+        if (in_array(AbstractTraining::class, class_parents($object::class), true)) {
             $semTrainings = SemesteredTraining::getSemesteredTrainingsForTraining($object);
             $this->scheduledForUpdate = array_merge($this->scheduledForUpdate, $semTrainings);
-        } elseif (get_class($object) === AbstractSession::class) {
+        } elseif ($object::class === AbstractSession::class) {
             $training = $object->getTraining();
             if ($training) {
 /*                $query = new Match();

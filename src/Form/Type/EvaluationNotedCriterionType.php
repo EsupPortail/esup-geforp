@@ -20,34 +20,20 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class EvaluationNotedCriterionType extends AbstractType
+final class EvaluationNotedCriterionType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $tabEval = $options['tab_eval'];
-        $builder
-            ->add('inscription', EntityHiddenType::class, array(
-                'label' => 'Inscription',
-                'class' => Inscription::class
-            ))
-            ->add('criterion', EntityHiddenType::class, array(
-                'label' => 'Critère',
-                'class' => EvaluationCriterion::class
-            ));
+        $formBuilder
+            ->add('inscription', EntityHiddenType::class, ['label' => 'Inscription', 'class' => Inscription::class])
+            ->add('criterion', EntityHiddenType::class, ['label' => 'Critère', 'class' => EvaluationCriterion::class]);
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
-            $notes = $event->getData();
-            $form = $event->getForm();
+        $formBuilder->addEventListener(FormEvents::PRE_SET_DATA, static function (FormEvent $formEvent) : void {
+            $notes = $formEvent->getData();
+            $form = $formEvent->getForm();
             $config = $form->getConfig()->getOptions();
-            $form->add('note', ChoiceType::class, array('label' => $notes->getCriterion()->getName(),
-                'choices' => $config['tab_eval']
-            ));
+            $form->add('note', ChoiceType::class, ['label' => $notes->getCriterion()->getName(), 'choices' => $config['tab_eval']]);
         });
 
     }
@@ -55,16 +41,8 @@ class EvaluationNotedCriterionType extends AbstractType
     /**
      * @param $resolver
      */
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(array(
-            'data_class'        => EvaluationNotedCriterion::class,
-            'tab_eval'         => array(
-                "Tout à fait d'accord" => 4,
-                "Plutôt d'accord" => 3,
-                "Pas vraiment d'accord" => 2,
-                "Pas du tout d'accord" => 1),
-            'validation_groups' => array('Correspondent'),
-        ));
+        $optionsResolver->setDefaults(['data_class'        => EvaluationNotedCriterion::class, 'tab_eval'         => ["Tout à fait d'accord" => 4, "Plutôt d'accord" => 3, "Pas vraiment d'accord" => 2, "Pas du tout d'accord" => 1], 'validation_groups' => ['Correspondent']]);
     }
 }

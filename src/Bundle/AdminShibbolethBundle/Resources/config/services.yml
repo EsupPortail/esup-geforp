@@ -1,7 +1,7 @@
 services:
   admin_shibboleth_authenticator:
     class: App\Bundle\AdminShibbolethBundle\Security\AdminShibbolethGuardAuthenticator
-    arguments: ['%shibboleth%', "@router", "@security.token_storage"]
+    arguments: ['%shibboleth%', "@router", '@App\Bundle\AdminShibbolethBundle\Security\User\AdminShibbolethUserProvider']
 
   admin_shibboleth_logout_event:
     class: App\Bundle\AdminShibbolethBundle\Event\LogoutSuccessHandler

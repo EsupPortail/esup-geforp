@@ -1,16 +1,16 @@
 /**
  * Created by maxime on 15/07/14.
  */
-sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$trainingBundle', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function($scope, $taxonomy, $trainingBundle, $dialog, $http, $window, $user, $state, search, data) {
+sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$trainingBundle', '$dialog', '$http', '$window', '$user', '$state', 'search', 'data', function ($scope, $taxonomy, $trainingBundle, $dialog, $http, $window, $user, $state, search, data) {
     $scope.training = data.training;
     $scope.form = data.form ? data.form : false;
     $scope.$moment = moment;
     $scope.$trainingBundle = $trainingBundle;
 
     // put the first session in global object
-    if($scope.training.session) {
+    if ($scope.training.session) {
         $scope.session = $scope.training.session;
-        $scope.$watch("training.session", function(session) {
+        $scope.$watch("training.session", function (session) {
             $scope.session = session;
         });
     }
@@ -19,7 +19,7 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * Find sessions without module for longTrainings
      * @returns {Array}
      */
-    $scope.getSessionWithoutModule = function() {
+    $scope.getSessionWithoutModule = function () {
         var sessionsWithoutModules = [];
         for (var keySession in $scope.training.sessions) {
             var found = false;
@@ -54,9 +54,9 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      *
      * @param data
      */
-    $scope.onSuccess = function(data) {
+    $scope.onSuccess = function (data) {
         $scope.training = data.training;
-	    $scope.updateActiveItem($scope.training, 'training');
+        $scope.updateActiveItem($scope.training, 'training');
     };
 
     /**
@@ -72,8 +72,8 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * @param material
      */
     $scope.removeMaterial = function (material) {
-        return $dialog.open('material.remove', {material: material}).then(function() {
-            for (var i = 0 ; $scope.training.materials ; i ++) {
+        return $dialog.open('material.remove', {material: material}).then(function () {
+            for (var i = 0; $scope.training.materials; i++) {
                 if ($scope.training.materials[i].id === material.id) {
                     $scope.training.materials.splice(i, 1);
                     break;
@@ -88,7 +88,7 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
     $scope.duplicate = function () {
         $dialog.open('training.choosetypeduplicate', {training: $scope.training}).then(function (result) {
             $dialog.open('training.duplicate', {training: $scope.training, type: result.type}).then(function (result) {
-                $state.go('training.detail.view', {id: result.id}, { reload: true });
+                $state.go('training.detail.view', {id: result.id}, {reload: true});
             });
         });
     };
@@ -98,15 +98,15 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      */
     $scope.delete = function () {
         $dialog.open('training.delete', {training: $scope.training}).then(function () {
-            $state.go('training.table', null, { reload:true });
+            $state.go('training.table', null, {reload: true});
         });
     };
 
     /**
      * Add a module
      */
-    $scope.addModule = function() {
-        $dialog.open('training.module.add', {training: $scope.training}).then(function(data) {
+    $scope.addModule = function () {
+        $dialog.open('training.module.add', {training: $scope.training}).then(function (data) {
             $scope.training.modules = data.modules;
         });
     };
@@ -115,8 +115,8 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * Edit or delete a module
      * @param module
      */
-    $scope.editModule = function(module) {
-        $dialog.open('training.module.edit', {module: module}).then(function(data) {
+    $scope.editModule = function (module) {
+        $dialog.open('training.module.edit', {module: module}).then(function (data) {
             $scope.training.modules = data.modules;
         });
     };
@@ -126,7 +126,7 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * Retrieve new created module and session module for DOM update
      */
     $scope.addSession = function () {
-        $dialog.open('session.create', {training: $scope.training}).then(function(data) {
+        $dialog.open('session.create', {training: $scope.training}).then(function (data) {
             $scope.training.sessions.push(data.session);
             /*            if ($scope.training.modules) {
                             if ($scope.training.modules.length !== data.training.modules.length) {
@@ -174,7 +174,7 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * calls callback
      * @param element
      */
-    $scope.addToMaterialList = function(element) {
+    $scope.addToMaterialList = function (element) {
         $scope.training.materials.push(element);
     };
 

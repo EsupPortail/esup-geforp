@@ -13,14 +13,17 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
-class InstitutionRepository extends ServiceEntityRepository
+final class InstitutionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $managerRegistry)
     {
-        parent::__construct($registry, Institution::class);
+        parent::__construct($managerRegistry, Institution::class);
     }
 
-    public function getInstitutionsList($keyword, $filters, $page, $pageSize)
+    /**
+     * @return array{total: int, pageSize: mixed, items: mixed[]}
+     */
+    public function getInstitutionsList($keyword, $filters, $page, $pageSize): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -29,14 +32,14 @@ class InstitutionRepository extends ServiceEntityRepository
             // FILTRE KEYWORD
             ->where('i.name LIKE :keyword')
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+            ->setParameter('keyword', '%' . addcslashes((string) $keyword, '%_') . '%');
 
         // FILTRE VILLE
-        if (isset($filters['city.source'])) {
+        if (isset($filters['city.source']) && is_array($filters['city.source'])) {
             $qb
                 /* On récupère l'année du dateBegin (à l'aide d'une doctrine extension) */
                 ->andWhere('i.city in (:cities)')
-                ->setParameter('cities', $filters['city.source']);
+                ->setParameter('cities', array_values($filters['city.source']));
         }
 
         // TRI DES RESULTATS
@@ -52,47 +55,42 @@ class InstitutionRepository extends ServiceEntityRepository
         $paginator = new Paginator($query, $fetchJoinCollection = true);
 
         $c = count($paginator);
-        $tabInst = array();
+        $tabInst = [];
         foreach($paginator as $inst)
             $tabInst[] = $inst;
 
-        $res = array('total' => $c,
-            'pageSize' => $pageSize,
-            'items' => $tabInst);
-
-        return $res;
+        return ['total' => $c, 'pageSize' => $pageSize, 'items' => $tabInst];
     }
 
-    public function getNbInstitutions($query_filters, $keyword, $aggs, $name)
+    public function getNbInstitutions($query_filters, $keyword, $aggs, $name): array
     {
-        $qb = $this->createQueryBuilder('i');
-        $qb
-            ->select('i')
+        $qb = $this->createQueryBuilder('i')
+            ->select('COUNT(DISTINCT i.id)');
 
-            // FILTRE KEYWORD
-            ->where('i.name LIKE :keyword')
-            /* addcslashes empêchera des manipulations malveillantes éventuelles */
-            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
-
-        // FILTRE ANNEE
-        if (isset($aggs['city.source'])) {
-            $qb
-                ->andWhere('i.city = :city')
-                ->setParameter('city', $name);
-        } elseif (isset($query_filters['year'])) {
-            $qb
-                ->andWhere('i.city in (:cities)')
-                ->setParameter('cities', $query_filters['city.source']);
+        // Filtre mot-clé
+        if ($keyword) {
+            $qb->andWhere('i.name LIKE :keyword')
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
         }
 
+        // Cas d’agrégation : on force une seule ville (= $name)
+        if (isset($aggs['city'])) {
+            $qb->andWhere('i.city = :city')
+                ->setParameter('city', $name);
+        }
         // On compte le nb de sessions en résultat
-        $paginator = new \Doctrine\ORM\Tools\Pagination\Paginator($qb->getQuery());
-        $totalRows = count($paginator);
+        $total = (int) $qb->getQuery()->getSingleScalarResult();
 
-        return $totalRows;
+        return [
+            'total' => $total,
+            'items' => [],
+        ];
     }
 
-    public function getAllCities()
+    /**
+     * @return mixed[]
+     */
+    public function getAllCities(): array
     {
         $qb = $this->createQueryBuilder('i');
         $qb
@@ -102,8 +100,9 @@ class InstitutionRepository extends ServiceEntityRepository
         $query = $qb->getQuery();
         $result = $query->getResult();
 
-        $tabCities = array();
-        for ($i=0; $i<count($result); $i++){
+        $tabCities = [];
+        $resultCount = count($result);
+        for ($i=0; $i<(is_countable($result) ? $resultCount : 0); ++$i){
             $tabCities[] = $result[$i]["city"];
         }
 

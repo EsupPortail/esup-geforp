@@ -8,14 +8,10 @@ use Symfony\Component\Form\FormBuilderInterface;
 /**
  * Class UpdatePasswordType.
  */
-class UpdatePasswordType extends AbstractType
+final class UpdatePasswordType extends AbstractType
 {
-    /**
-     * @param FormBuilderInterface $builder
-     * @param array                $options
-     */
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
-        $builder->add('plainPassword', StrongPasswordType::class, ['attr' => ['user' => $options['data']]]);
+        $formBuilder->add('plainPassword', StrongPasswordType::class, ['attr' => ['user' => $options['data']]]);
     }
 }

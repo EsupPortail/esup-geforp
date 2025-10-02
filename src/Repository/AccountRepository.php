@@ -3,9 +3,10 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
-use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
+use Symfony\Component\Security\Core\Exception\UserNotFoundException; // remplacer par userNotFoundException
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
@@ -14,46 +15,54 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
  *
  * @see http://symfony.com/fr/doc/current/cookbook/security/entity_provider.html
  */
-class AccountRepository extends EntityRepository implements UserProviderInterface
+final class AccountRepository extends EntityRepository implements UserProviderInterface
 {
     /**
-     * @param string $email
+     * @var string
+     */
+    private const CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    /**
+     * @param $identifier
      *
-     * @throws UsernameNotFoundException
+     * @throws UserNotFoundException
+     *
+     * @throws NonUniqueResultException
      *
      * @return mixed
      */
-    public function loadUserByUsername($email)
+    public function loadUserByIdentifier($identifier): UserInterface
     {
-        $q = $this
+        $query = $this
           ->createQueryBuilder('t')
           ->where('LOWER(t.email) = LOWER(:email)')
-          ->setParameter('email', $email)
+          ->setParameter('email', $identifier)
           ->getQuery();
 
         try {
-            $user = $q->getSingleResult();
-        } catch (NoResultException $e) {
+            $user = $query->getSingleResult();
+        } catch (NoResultException $noResultException) {
             $message = sprintf(
                 'Unable to find an active trainee identified by "%s".',
-                $email
+                $identifier
             );
-            throw new UsernameNotFoundException($message, 0, $e);
+            throw new UserNotFoundException($message, 0, $noResultException);
+        } catch (NonUniqueResultException $nonUniqueResultException) {
+            $message = sprintf('Multiple users found with the identifier "%s".', $identifier);
+            throw new NonUniqueResultException($message, 0, $nonUniqueResultException);
         }
 
         return $user;
     }
 
     /**
-     * @param UserInterface $user
      *
      * @throws UnsupportedUserException
      *
      * @return object
      */
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): \Symfony\Component\Security\Core\User\UserInterface
     {
-        $class = get_class($user);
+        $class = $user::class;
         if (!$this->supportsClass($class)) {
             throw new UnsupportedUserException(
                 sprintf(
@@ -63,34 +72,29 @@ class AccountRepository extends EntityRepository implements UserProviderInterfac
             );
         }
 
-        return $this->find($user->getId());
+        return $this->find($user->getUserIdentifier());
     }
 
-    /**
-     * @param string $class
-     *
-     * @return bool
-     */
-    public function supportsClass($class)
+    public function supportsClass(string $class): bool
     {
-        return $this->getEntityName() === $class || is_subclass_of($class, $this->getEntityName());
+        if ($this->getEntityName() === $class) {
+            return true;
+        }
+        return is_subclass_of($class, $this->getEntityName());
     }
 
     /**
      * Generate a password.
      *
-     * @param int $length
      *
-     * @return string
      */
-    public static function generatePassword($length = 12)
+    public static function generatePassword(int $length = 12): string
     {
-        $chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-        $count = mb_strlen($chars);
+        $count = mb_strlen((string) self::CHARS);
 
         for ($i = 0, $result = ''; $i < $length; ++$i) {
-            $index = rand(0, $count - 1);
-            $result .= mb_substr($chars, $index, 1);
+            $index = random_int(0, $count - 1);
+            $result .= mb_substr((string) self::CHARS, $index, 1);
         }
 
         return $result;

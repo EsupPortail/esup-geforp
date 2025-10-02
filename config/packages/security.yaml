@@ -1,5 +1,5 @@
 security:
-    enable_authenticator_manager: true
+
     password_hashers:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
         App\Entity\Core\User:
@@ -22,11 +22,10 @@ security:
             host: '%env(resolve:back_host)%'
             lazy: true
             provider: shib_admins
-            guard:
-                authenticators:
-                    - admin_shibboleth_authenticator
-            anonymous: false
+            custom_authenticators:
+                - admin_shibboleth_authenticator
             security: true
+            #anonymous: false plus utilisé, remplacer par lazy true
             logout:
                 path: app_logout
                 target: '/Shibboleth.sso/Logout'
@@ -35,10 +34,9 @@ security:
             host: '%env(resolve:front_host)%'
             pattern: ^/api/shibboleth|^/account|^/program|^/training/inscription
             provider: shib_users
-            guard:
-                authenticators:
-                    - shibboleth_authenticator
-            anonymous: false
+            custom_authenticators:
+                - shibboleth_authenticator
+            #anonymous: false plus utilisé, remplacer par lazy true
             security: true
             logout:
                 path: front.account.logout
@@ -58,7 +56,7 @@ security:
         - { path: ^/login, role: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/, role: IS_AUTHENTICATED_FULLY }
         # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        # - { path: ^/account/, roles: ROLE_USER }
 
     role_hierarchy:
         ROLE_RESP: IS_AUTHENTICATED_FULLY

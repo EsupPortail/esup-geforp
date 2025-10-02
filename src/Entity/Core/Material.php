@@ -4,57 +4,60 @@ namespace App\Entity\Core;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Material.
  *
- * @ORM\Entity
- * @ORM\Table(name="material")
- * @ORM\DiscriminatorColumn(name="type", type="string")
- * @ORM\DiscriminatorMap({})
- * @ORM\InheritanceType("JOINED")
  */
+#[ORM\Table(name: 'material')]
+#[ORM\Entity]
+#[ORM\DiscriminatorColumn(name: 'type', type: 'string')]
+#[ORM\DiscriminatorMap([])]
+#[ORM\InheritanceType('JOINED')]
 abstract class Material
 {
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $id;
+    #[Groups(["Default", "api.attendance"])]
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @var string
-     * @ORM\Column(name="name", type="string", length=255, nullable=true)
      * @Serializer\Groups({"Default", "api.attendance"})
      */
-    protected $name;
+    #[Groups(["Default", "api.attendance"])]
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255, nullable: true)]
+    protected ?string $name = null;
 
     /**
      * @var AbstractTraining
-     * @ORM\ManyToOne(targetEntity="AbstractTraining")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Exclude
      */
-    protected $training;
+    #[Serializer\Exclude()]
+    #[ORM\ManyToOne(targetEntity: 'AbstractTraining', inversedBy: 'materials')]
+    #[ORM\JoinColumn]
+    protected AbstractTraining $training;
 
     /**
      * @var AbstractSession
-     * @ORM\ManyToOne(targetEntity="AbstractSession")
-     * @ORM\JoinColumn(nullable=true)
      * @Serializer\Exclude
      */
-    protected $session;
+    #[Serializer\Exclude()]
+    #[ORM\ManyToOne(targetEntity: 'AbstractSession', inversedBy: 'materials')]
+    #[ORM\JoinColumn(nullable: true)]
+    protected AbstractSession $session;
 
     /**
      * Get id.
      *
      * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -66,7 +69,7 @@ abstract class Material
      *
      * @return self
      */
-    public function setName($name)
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -78,15 +81,15 @@ abstract class Material
      *
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
 
     /**
-     * @param AbstractTraining $training
+     * @param AbstractTraining|null $training
      */
-    public function setTraining($training = null)
+    public function setTraining(AbstractTraining $training = null): void
     {
         $this->training = $training;
     }
@@ -94,7 +97,7 @@ abstract class Material
     /**
      * @return AbstractTraining
      */
-    public function getTraining()
+    public function getTraining(): AbstractTraining
     {
         return $this->training;
     }
@@ -102,15 +105,15 @@ abstract class Material
     /**
      * @return AbstractSession
      */
-    public function getSession()
+    public function getSession(): AbstractSession
     {
         return $this->session;
     }
 
     /**
-     * @param AbstractSession $session
+     * @param AbstractSession|null $session
      */
-    public function setSession($session = null)
+    public function setSession(AbstractSession $session = null): void
     {
         $this->session = $session;
     }

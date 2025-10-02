@@ -22,9 +22,8 @@ class DisableListenersPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // read the config
         $configs = $container->getExtensionConfig('sygefor_elastica');

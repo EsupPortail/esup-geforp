@@ -5,6 +5,7 @@ namespace App\Entity\Core;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 /**
  * Timestampable Trait
@@ -13,29 +14,29 @@ use Gedmo\Mapping\Annotation as Gedmo;
 trait TimestampableTrait
 {
     /**
-     * @var \DateTime
-     * @Gedmo\Timestampable(on="create")
-     * @ORM\Column(name="created_at", type="datetime")
+     * @var \DateTimeInterface
+     *
      */
     #[Gedmo\Timestampable(on: 'create')]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    protected $createdat;
+    #[ORM\Column(name: 'created_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    #[Groups(['institution', 'trainer', 'inscription'])]
+    protected \DateTimeInterface $createdat;
 
     /**
-     * @var \DateTime
-     * @Gedmo\Timestampable(on="update")
-     * @ORM\Column(name="updated_at", type="datetime")
+     * @var \DateTimeInterface
+     *
      */
     #[Gedmo\Timestampable(on: 'update')]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    protected $updatedat;
+    #[ORM\Column(name: 'updated_at', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    #[Groups(['institution', 'trainer', 'inscription'])]
+    protected \DateTimeInterface $updatedat;
 
     /**
      * Sets createdAt.
      *
      * @return $this
      */
-    public function setCreatedat(\DateTime $createdAt)
+    public function setCreatedat(\DateTime $createdAt): static
     {
         $this->createdat = $createdAt;
 
@@ -45,9 +46,9 @@ trait TimestampableTrait
     /**
      * Returns createdAt.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getCreatedat()
+    public function getCreatedat(): \DateTimeInterface
     {
         return $this->createdat;
     }
@@ -57,7 +58,7 @@ trait TimestampableTrait
      *
      * @return $this
      */
-    public function setUpdatedat(\DateTime $updatedAt)
+    public function setUpdatedat(\DateTime $updatedAt): static
     {
         $this->updatedat = $updatedAt;
 
@@ -67,9 +68,9 @@ trait TimestampableTrait
     /**
      * Returns updatedAt.
      *
-     * @return \DateTime
+     * @return \DateTimeInterface
      */
-    public function getUpdatedat()
+    public function getUpdatedat(): \DateTimeInterface
     {
         return $this->updatedat;
     }

@@ -4,93 +4,104 @@ namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Core\AbstractSession;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
 use App\Form\Type\SessionType;
 use App\Entity\Back\DateSession;
 use App\Entity\Back\Alert;
+use JMS\Serializer\Annotation\VirtualProperty;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
-/**
- *
- * @ORM\Table(name="session")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'session')]
+#[ORM\Entity]
 class Session extends AbstractSession
 {
     /**
-     * @var string
-     * @ORM\Column(name="name", type="string", length=255)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $name;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'name', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $name = null;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $price;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $price = null;
 
     /**
-     * @ORM\Column(name="teaching_cost",type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $teachingcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'teaching_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $teachingcost = null;
 
     /**
-     * @ORM\Column(name="vacation_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $vacationcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'vacation_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $vacationcost = null;
 
     /**
-     * @ORM\Column(name="accommodation_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $accommodationcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'accommodation_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $accommodationcost = null;
 
     /**
-     * @ORM\Column(name="meal_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $mealcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'meal_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $mealcost = null;
 
     /**
-     * @ORM\Column(name="transport_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $transportcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'transport_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $transportcost = null;
 
     /**
-     * @ORM\Column(name="material_cost", type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $materialcost;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(name: 'material_cost', type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $materialcost = null;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
      * @Serializer\Groups({"session", "inscription", "api"})
      */
-    protected $taking;
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $taking = null;
 
     /**
-     * @var ArrayCollection $dates
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\DateSession", mappedBy="session", cascade={"persist", "remove"})
-     * @ORM\OrderBy({"datebegin" = "ASC"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\DateSession> $dates
      * @Serializer\Groups({"session", "api.session"})
      */
-    protected $dates;
+    #[Groups(['session','api.session'])]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\DateSession::class, cascade: ['persist', 'remove'])]
+    #[ORM\OrderBy(['datebegin' => 'ASC'])]
+    protected Collection $dates;
 
     /**
-     * @var ArrayCollection $alerts
-     * @ORM\OneToMany(targetEntity="App\Entity\Back\Alert", mappedBy="session", cascade={"persist", "remove"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\Alert> $alerts
      * @Serializer\Groups({"session", "api.session"})
      */
-    protected $alerts;
+    #[Groups(['session', 'api.session'])]
+    #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Back\Alert::class, cascade: ['persist', 'remove'])]
+    protected \Doctrine\Common\Collections\Collection $alerts;
 
     /**
      * @return string
      */
-    public function getName()
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -98,143 +109,194 @@ class Session extends AbstractSession
     /**
      * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
         $this->name = $name;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getPrice()
+    public function getPrice(): ?float
     {
         return $this->price;
     }
 
-    /**
-     * @param mixed $price
-     */
-    public function setPrice($price)
+    public function setPrice(mixed $price): void
     {
         $this->price = $price;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTeachingcost()
+    public function getTeachingcost(): ?float
     {
         return $this->teachingcost;
     }
 
-    /**
-     * @param mixed $teachingCost
-     */
-    public function setTeachingcost($teachingCost)
+    public function setTeachingcost(?float $teachingCost): void
     {
         $this->teachingcost = $teachingCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getVacationcost()
+    public function getVacationcost(): ?float
     {
         return $this->vacationcost;
     }
 
-    /**
-     * @param mixed $vacationCost
-     */
-    public function setVacationCost($vacationCost)
+    public function setVacationCost(mixed $vacationCost): void
     {
         $this->vacationcost = $vacationCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getAccommodationcost()
+    public function getAccommodationcost(): ?float
     {
         return $this->accommodationcost;
     }
 
-    /**
-     * @param mixed $accommodationCost
-     */
-    public function setAccommodationcost($accommodationCost)
+    public function setAccommodationcost(mixed $accommodationCost): void
     {
         $this->accommodationcost = $accommodationCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getMealcost()
+    public function getMealcost(): ?float
     {
         return $this->mealcost;
     }
 
-    /**
-     * @param mixed $mealCost
-     */
-    public function setMealcost($mealCost)
+    public function setMealcost(mixed $mealCost): void
     {
         $this->mealcost = $mealCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTransportcost()
+    public function getTransportcost(): ?float
     {
         return $this->transportcost;
     }
 
-    /**
-     * @param mixed $transportCost
-     */
-    public function setTransportcost($transportCost)
+    public function setTransportcost(mixed $transportCost): void
     {
         $this->transportcost = $transportCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getMaterialcost()
+    public function getMaterialcost(): ?float
     {
         return $this->materialcost;
     }
 
-    /**
-     * @param mixed $materialCost
-     */
-    public function setMaterialcost($materialCost)
+    public function setMaterialcost(mixed $materialCost): void
     {
         $this->materialcost = $materialCost;
     }
 
     /**
-     * @return mixed
+     * @return float|null
      */
-    public function getTaking()
+    public function getTaking(): ?float
     {
         return $this->taking;
     }
 
-    /**
-     * @param mixed $taking
-     */
-    public function setTaking($taking)
+    public function setTaking(mixed $taking): void
     {
         $this->taking = $taking;
     }
 
+    public function getTrainees(): array
+    {
+        return $this->getInscriptions()->map(function ($inscription) {
+            return $inscription->getTrainee();
+        })->toArray();
+    }
+
+    public function getTraineesFirstNames(): string
+    {
+        return implode(', ', $this->getInscriptions()->map(function ($inscription) {
+            return $inscription->getTrainee()->getFirstname();
+        })->toArray());
+    }
+
+
+    #[Groups(['session', 'api.session'])]
+    public function getDatesString(): string
+    {
+        if ($this->dates->isEmpty()) {
+            return '';
+        }
+
+        $formattedDates = [];
+
+
+        foreach ($this->dates as $date) {
+            $start = $date->getDatebegin()?->format('d/m/Y');
+            $end   = $date->getDateend()?->format('d/m/Y');
+
+            $formatted = function ($val) {
+                if ($val instanceof \DateTimeInterface) {
+                    return $val->format('H:i');
+                }
+                if (!$val) {
+                    return '';
+                }
+
+                $s = trim((string) $val);
+
+                // Cas "9" ou "09"
+                if (preg_match('/^(\d{1,2})$/', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':00';
+                }
+
+                // Cas "9h" ou "09h"
+                if (preg_match('/^(\d{1,2})h$/i', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':00';
+                }
+
+                // Cas "9h30" ou "09h30"
+                if (preg_match('/^(\d{1,2})h(\d{1,2})$/i', $s, $m)) {
+                    return str_pad($m[1], 2, '0', STR_PAD_LEFT) . ':' . str_pad($m[2], 2, '0', STR_PAD_LEFT);
+                }
+
+                // Cas "09:30" ou déjà au bon format
+                if (preg_match('/^\d{1,2}:\d{2}$/', $s)) {
+                    return $s;
+                }
+
+                return $s; // fallback
+            };
+
+            $hMorn = $formatted($date->getSchedulemorn());
+            $hAfter = $formatted($date->getScheduleafter());
+
+            if ($start && $end) {
+                $formattedDates[] = "du $start $hAfter au $end $hMorn";
+            } elseif ($start) {
+                $formattedDates[] = $start . ($hMorn || $hAfter ? ' ' . trim($hMorn . ' ' . $hAfter) : '');
+            }
+        }
+
+        return implode(', ', $formattedDates);
+    }
+
     /**
-     * @return ArrayCollection
+     * @return ArrayCollection|Collection
      */
-    public function getDates()
+    public function getDates(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->dates;
     }
@@ -242,7 +304,7 @@ class Session extends AbstractSession
     /**
      * @param ArrayCollection $dates
      */
-    public function setDates($dates)
+    public function setDates(ArrayCollection $dates): void
     {
         $this->dates = $dates;
     }
@@ -250,9 +312,8 @@ class Session extends AbstractSession
     /**
      * @param DateSession $dates
      *
-     * @return bool
      */
-    public function addDates($dates)
+    public function addDates(\App\Entity\Back\DateSession $dates): bool
     {
         if (!$this->dates->contains($dates)) {
             $this->dates->add($dates);
@@ -266,9 +327,8 @@ class Session extends AbstractSession
     /**
      * @param DateSession $dates
      *
-     * @return bool
      */
-    public function removeDate($dates)
+    public function removeDate(\App\Entity\Back\DateSession $dates): bool
     {
         if ($this->dates->contains($dates)) {
             $this->dates->removeElement($dates);
@@ -282,7 +342,7 @@ class Session extends AbstractSession
     /**
      * @return ArrayCollection
      */
-    public function getAlerts()
+    public function getAlerts(): ArrayCollection|\Doctrine\Common\Collections\Collection
     {
         return $this->alerts;
     }
@@ -290,7 +350,7 @@ class Session extends AbstractSession
     /**
      * @param ArrayCollection $alerts
      */
-    public function setAlerts($alerts)
+    public function setAlerts(ArrayCollection $alerts): void
     {
         $this->alerts = $alerts;
     }
@@ -298,9 +358,8 @@ class Session extends AbstractSession
     /**
      * @param Alert $alerts
      *
-     * @return bool
      */
-    public function addAlert($alert)
+    public function addAlert($alert): bool
     {
         if (!$this->alerts->contains($alert)) {
             $this->alerts->add($alert);
@@ -314,9 +373,8 @@ class Session extends AbstractSession
     /**
      * @param Alert $alert
      *
-     * @return bool
      */
-    public function removeAlert($alert)
+    public function removeAlert(\App\Entity\Back\Alert $alert): bool
     {
         if ($this->alerts->contains($alert)) {
             $this->alerts->removeElement($alert);
@@ -327,15 +385,16 @@ class Session extends AbstractSession
         return false;
     }
 
-    function __construct()
+   public function __construct()
     {
         $this->dates          = new ArrayCollection();
         $this->alerts          = new ArrayCollection();
+        parent::__Construct();
     }
 
     public function __clone()
     {
-        $this->setId(null);
+        $this->setId((int)null);
         $this->dates         = new ArrayCollection();
         $this->alerts          = new ArrayCollection();
     }
@@ -343,38 +402,33 @@ class Session extends AbstractSession
     /**
      * @Serializer\VirtualProperty
      *
-     * @param $front_root_url
-     * @param $apiSerialization
+     * @param string $front_root_url
+     * @param false $apiSerialization
      *
-     * @return string
-     * @return string
      */
-    public function getFronturl($front_root_url = 'https://sygefor3.univ-amu.fr', $apiSerialization = false)
+    public function getFronturl(string $front_root_url = 'https://sygefor3.univ-amu.fr', false $apiSerialization = false): string
     {
         $url = $front_root_url . '/training/' . $this->getTraining()->getId() . '/';
-        if (!$apiSerialization) {
-            // URL permitting to register a private session
-            if ($this->getRegistration() === self::REGISTRATION_PRIVATE && (!method_exists($this, 'getModule') || !$this->getModule())) {
-                return $url . $this->getId() . '/' . md5($this->getId() + $this->getTraining()->getId());
-            }
-            // URL permitting to register a module sessions
-            else if (method_exists($this, 'getModule') && $this->getModule()) {
-                return $url . '/' . md5($this->training->getType() . $this->getTraining()->getId());
-            }
+        if ($apiSerialization) {
+            // return public_old URL
+            return $url . $this->getId();
+        }
+        if (method_exists($this, 'getModule') && $this->getModule()) {
+            return $url . '/' . md5($this->training->getType() . $this->getTraining()->getId());
         }
 
         // return public_old URL
         return $url . $this->getId();
     }
 
-    function __toString()
+    function __toString(): string
     {
-        $name = $this->getName() ? $this->getName() : $this->getTraining()->getName();
+        $name = $this->name ?: $this->getTraining()->getName();
 
         return $name . " - " . $this->getDateRange();
     }
 
-    public static function getFormType()
+    public static function getFormType(): string
     {
         return SessionType::class;
     }

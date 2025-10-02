@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\User;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllOrganizationUserAccessRight extends AbstractAccessRight
+final class AllOrganizationUserAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Gestion des utilisateurs de tous les centres';
     }
@@ -26,17 +23,16 @@ class AllOrganizationUserAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        return 'App\Entity\Core\User' === $class;
+        return \App\Entity\Core\User::class === $class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attribute): true
     {
         return true;
     }

@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Training;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class OwnTrainingViewAccessRight extends AbstractAccessRight
+final class OwnTrainingViewAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Voir les formations de son propre centre';
     }
@@ -26,21 +23,24 @@ class OwnTrainingViewAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Internship'
-            || $class === 'App\Entity\Back\Session'
-            || $class === 'App\Model\SemesteredTraining'
-        ) {
+        if ($class === \App\Entity\Back\Internship::class) {
             return true;
         }
-        try {
-            $refl = new \ReflectionClass($class);
+        if ($class === \App\Entity\Back\Session::class) {
+            return true;
+        }
+        if ($class === \App\Model\SemesteredTraining::class) {
+            return true;
+        }
 
-            return $refl ? $refl->isSubclassOf('App\Entity\Back\Internship') : false;
-        } catch (\ReflectionException $re){
+        try {
+            $reflectionClass = new \ReflectionClass($class);
+
+            return $reflectionClass->isSubclassOf(\App\Entity\Back\Internship::class);
+        } catch (\ReflectionException){
             return false;
         }
     }
@@ -48,18 +48,16 @@ class OwnTrainingViewAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
         if ($attribute !== 'VIEW') return false;
 
-        if ($object) {
-            if (method_exists($object, 'getOrganization')) {
-                return $object->getOrganization() === $token->getUser()->getOrganization();
-            } else {
-                return $object->getTraining()->getOrganization() === $token->getUser()->getOrganization();
-            }
-        } else {
+        if (!$object) {
             return true;
         }
+        if (method_exists($object, 'getOrganization')) {
+            return $object->getOrganization() === $token->getUser()->getOrganization();
+        }
+        return $object->getTraining()->getOrganization() === $token->getUser()->getOrganization();
     }
 }

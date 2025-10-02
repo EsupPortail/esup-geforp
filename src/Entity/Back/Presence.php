@@ -9,52 +9,55 @@
 namespace App\Entity\Back;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- *
- * @ORM\Table(name="presence")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'presence')]
+#[ORM\Entity]
 class Presence
 {
     /**
-     * @var int
+     * @var \Doctrine\Common\Collections\ArrayCollection
+     */
+    public ArrayCollection $session;
+    /**
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[ORM\Column(name: 'id', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[Groups(['Default', 'api'])]
+    protected int $id;
 
     /**
-     * @ORM\Column(name="dateBegin", type="datetime")
-     * @Assert\NotBlank(message="Vous devez préciser une date de début.")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $datebegin;
+    #[Groups(['Default', 'api'])]
+    #[ORM\Column(name: 'dateBegin', type: \Doctrine\DBAL\Types\Types::DATETIME_MUTABLE)]
+    #[Assert\NotBlank(message: 'Vous devez préciser une date de début.')]
+    protected ?\DateTimeInterface $datebegin = null;
+
+    #[ORM\Column(name: 'morning', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $morning = null;
+
+    #[ORM\Column(name: 'afternoon', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $afternoon = null;
 
     /**
-     * @ORM\Column(name="morning", type="string", length=512, nullable=true)
-     * @var String
-     */
-    protected $morning;
-
-    /**
-     * @ORM\Column(name="afternoon", type="string", length=512, nullable=true)
-     * @var String
-     */
-    protected $afternoon;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Inscription", inversedBy="presences")
-     * @ORM\JoinColumn(onDelete="CASCADE")
      * @Serializer\Groups({"session", "trainee", "trainer", "api"})
      */
-    protected $inscription;
+    #[Groups(['session', 'trainee', 'trainer', 'api'])]
+    #[ORM\ManyToOne(targetEntity: 'Inscription', inversedBy: 'presences')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    #[Ignore]
+    protected Inscription $inscription;
 
     public function __construct()
     {
@@ -69,7 +72,7 @@ class Presence
     /**
      * @return int
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -77,71 +80,60 @@ class Presence
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
 
     /**
-     * @return mixed
+     * @return \DateTimeInterface|null
      */
-    public function getDatebegin()
+    public function getDatebegin(): ?\DateTimeInterface
     {
         return $this->datebegin;
     }
 
-    /**
-     * @param mixed $dateBegin
-     */
-    public function setDatebegin($dateBegin)
+    public function setDatebegin(mixed $dateBegin): void
     {
         $this->datebegin = $dateBegin;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getMorning()
+    public function getMorning(): ?string
     {
         return $this->morning;
     }
 
-    /**
-     * @param mixed $morning
-     */
-    public function setMorning($morning)
+    public function setMorning(mixed $morning): void
     {
         $this->morning = $morning;
     }
 
     /**
-     * @return mixed
+     * @return string|null
      */
-    public function getAfternoon()
+    public function getAfternoon(): ?string
     {
         return $this->afternoon;
     }
 
-    /**
-     * @param mixed $afternoon
-     */
-    public function setAfternoon($afternoon)
+    public function setAfternoon(mixed $afternoon): void
     {
         $this->afternoon = $afternoon;
     }
 
     /**
-     * @return ArrayCollection
+     * @return Inscription
      */
-    public function getInscription()
+
+    public function getInscriptionId(): int
     {
-        return $this->inscription;
+        return $this->inscription->getId();
     }
 
-    /**
-     * @param mixed $inscription
-     */
-    public function setInscription($inscription)
+    public function setInscription(mixed $inscription): void
     {
         $this->inscription = $inscription;
     }

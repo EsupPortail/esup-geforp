@@ -20,9 +20,8 @@ class MappingProviderPass implements CompilerPassInterface
     /**
      * Process the compiler pass.
      *
-     * @param ContainerBuilder $container
      */
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
         // extract current config source
         $sourceConfigs = $container->getDefinition('fos_elastica.config_source.container')->getArgument(0);

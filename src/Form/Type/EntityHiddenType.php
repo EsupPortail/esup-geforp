@@ -17,43 +17,31 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Exception\MissingOptionsException;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class EntityHiddenType extends AbstractType
+final class EntityHiddenType extends AbstractType
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $em;
-
-    /**
-     * @param EntityManagerInterface $em
-     */
-    public function __construct(EntityManagerInterface $em)
+    public function __construct(private readonly EntityManagerInterface $entityManager)
     {
-        $this->em = $em;
     }
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
         if ($options['class'] === null) {
             throw new MissingOptionsException('Missing required class option ');
-        } else {
-            $transformer = new EntityToIdTransformer($this->em);
-            $transformer->setEntityClass($options['class']);
-            $builder->addViewTransformer($transformer);
         }
+        $entityToIdTransformer = new EntityToIdTransformer($this->entityManager);
+        $entityToIdTransformer->setEntityClass($options['class']);
+
+        $formBuilder->addViewTransformer($entityToIdTransformer);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function configureOptions(OptionsResolver $optionsResolver): void
     {
-        $resolver->setDefaults(
-            array(
-                'class' => null,
-                'error_bubbling' => false,
-            )
+        $optionsResolver->setDefaults(
+            ['class' => null, 'error_bubbling' => false]
         );
     }
 
-    public function getParent()
+    public function getParent(): ?string
     {
         return HiddenType::class;
     }

@@ -15,7 +15,7 @@ class CustomTinyButStrong extends \clsTinyButStrong
         $Txt = $BDef->Src;
         $LocLst = &$BDef->LocLst;
         $iMax = $BDef->LocNbr;
-        $PosMax = strlen($Txt);
+        $PosMax = strlen((string) $Txt);
 
         if ($Src === false) { // Erase all fields
             $x = '';
@@ -53,6 +53,7 @@ class CustomTinyButStrong extends \clsTinyButStrong
                     } else {
                         $this->meth_Locator_Replace($Txt, $LocLst[$i], $Src->CurrRec, 0);
                     }
+
                     if ($LocLst[$i]->Enlarged) {
                         $PosMax = $LocLst[$i]->PosBeg;
                         $LocLst[$i]->PosBeg = $LocLst[$i]->PosBeg0;
@@ -72,11 +73,13 @@ class CustomTinyButStrong extends \clsTinyButStrong
                         $Pos = $this->meth_Locator_Replace($Txt, $Loc, $val, 0);
                     }
                 }
+
                 $Pos = 0;
                 $Name = $BlockName.'.#';
                 while ($Loc = $this->meth_Locator_FindTbs($Txt, $Name, $Pos, '.')) {
                     $Pos = $this->meth_Locator_Replace($Txt, $Loc, $Src->RecNum, 0);
                 }
+
                 $Pos = 0;
                 $Name = $BlockName.'.$';
                 while ($Loc = $this->meth_Locator_FindTbs($Txt, $Name, $Pos, '.')) {
@@ -94,31 +97,34 @@ class CustomTinyButStrong extends \clsTinyButStrong
                 if ($col === true) {
                     $col = '';
                 }
-                $col_opt = (substr($col, 0, 1) === '(') && (substr($col, -1, 1) === ')');
+
+                $col_opt = (str_starts_with((string) $col, '(')) && (str_ends_with((string) $col, ')'));
                 if ($col_opt) {
-                    $col = substr($col, 1, strlen($col) - 2);
+                    $col = substr((string) $col, 1, strlen((string) $col) - 2);
                 }
+
                 if ($col === '') {
                     // $col_opt cannot be used here because values which are not array nore object are reformated by $Src into an array with keys 'key' and 'val'
                     $data = &$Src->CurrRec;
                 } elseif (is_object($Src->CurrRec)) {
                     $data = $Src->CurrRec->$col;
+                } elseif (array_key_exists($col, $Src->CurrRec)) {
+                    $data = &$Src->CurrRec[$col];
                 } else {
-                    if (array_key_exists($col, $Src->CurrRec)) {
-                        $data = &$Src->CurrRec[$col];
-                    } else {
-                        if (!$col_opt) {
-                            $this->meth_Misc_Alert('for merging the automatic sub-block ['.$name.']', 'key \''.$col.'\' is not found in record #'.$Src->RecNum.' of block ['.$BDef->Name.']. This key can become optional if you designate it with parenthesis in the main block, i.e.: sub'.$i.'=('.$col.')');
-                        }
-                        unset($data);
-                        $data = array();
+                    if (!$col_opt) {
+                        $this->meth_Misc_Alert('for merging the automatic sub-block ['.$name.']', "key '".$col."' is not found in record #".$Src->RecNum.' of block ['.$BDef->Name.']. This key can become optional if you designate it with parenthesis in the main block, i.e.: sub'.$i.'=('.$col.')');
                     }
+
+                    unset($data);
+                    $data = [];
                 }
+
                 if (is_string($data)) {
                     $data = explode(',', $data);
                 } elseif (is_null($data) || ($data === false)) {
-                    $data = array();
+                    $data = [];
                 }
+
                 $this->meth_Merge_Block($Txt, $name, $data, $query, false, 0, false);
             }
         }

@@ -11,37 +11,37 @@ namespace App\Entity\Back;
 
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Mapping\ClassMetadata;
 
-/**
- *
- * @ORM\Table(name="supanncodeentite")
- * @ORM\Entity
- */
+#[ORM\Table(name: 'supanncodeentite')]
+#[ORM\Entity]
 class SupannCodeEntite
 {
     /**
-     * @var int
      *
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
      * @Serializer\Groups({"Default", "api"})
      */
-    protected $id;
+    #[Groups(['Default', 'api'])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    protected ?int $id = null;
 
     /**
-     * @ORM\Column(name="supannCodeEntite", type="string", length=255)
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $supannCodeEntite;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'supannCodeEntite', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
+    protected ?string $supannCodeEntite = null;
 
     /**
-     * @ORM\Column(name="Description", type="string")
      * @Serializer\Groups({"Default", "trainee", "api"})
      */
-    protected $description;
+    #[Groups(['Default', 'trainee', 'api'])]
+    #[ORM\Column(name: 'Description', type: \Doctrine\DBAL\Types\Types::STRING)]
+    protected ?string $description = null;
 
     /**
      * @return int
@@ -54,7 +54,7 @@ class SupannCodeEntite
     /**
      * @param int $id
      */
-    public function setId($id)
+    public function setId($id): void
     {
         $this->id = $id;
     }
@@ -62,10 +62,9 @@ class SupannCodeEntite
     /**
      * Set supanncodeentite
      *
-     * @param mixed $supannCodeEntite
      *
      */
-    public function setSupannCodeEntite($supannCodeEntite)
+    public function setSupannCodeEntite(mixed $supannCodeEntite): void
     {
         $this->supannCodeEntite = $supannCodeEntite;
     }
@@ -82,10 +81,9 @@ class SupannCodeEntite
     /**
      * Set description
      *
-     * @param mixed $description
      *
      */
-    public function setDescription($description)
+    public function setDescription(mixed $description): void
     {
         $this->description = $description;
     }

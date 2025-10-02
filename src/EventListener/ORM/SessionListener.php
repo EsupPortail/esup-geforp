@@ -11,29 +11,26 @@ use App\Entity\Core\AbstractSession;
  * Populate the Training discriminator map
  * + auto-increment local number.
  */
-class SessionListener implements EventSubscriber
+final class SessionListener implements EventSubscriber
 {
     /**
      * Returns hash of events, that this listener is bound to.
      *
-     * @return array
      */
-    public function getSubscribedEvents()
+    public function getSubscribedEvents(): array
     {
-        return array(
-            Events::loadClassMetadata,
-        );
+        return [Events::loadClassMetadata];
     }
 
     /**
      * Populate the Training discriminator map.
      *
-     * @param LoadClassMetadataEventArgs $eventArgs The event arguments
+     * @param LoadClassMetadataEventArgs $loadClassMetadataEventArgs The event arguments
      */
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+    public function loadClassMetadata(LoadClassMetadataEventArgs $loadClassMetadataEventArgs): void
     {
-        $classMetadata = $eventArgs->getClassMetadata();
-        if (null === $classMetadata->reflClass) {
+        $classMetadata = $loadClassMetadataEventArgs->getClassMetadata();
+        if (!$classMetadata->reflClass instanceof \ReflectionClass) {
             return;
         }
 

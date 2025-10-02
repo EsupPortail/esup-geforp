@@ -5,24 +5,31 @@
 <form sf-href="session.duplicate({id: session.id, inscriptionIds: inscriptions})" sf-form="form" json-path="form"
       on-success="onSuccess(data)" class="form-horizontal" novalidate>
     <div class="modal-body center-block">
-        <div class="form-group" ng-if="form.children['name']" ng-class="{'has-error': form.children['name'].errors.length }">
-            <label class="col-sm-3 control-label" for="{{ form.children['name'].id }}">{{ form.children['name'].label }}</label>
+        <div class="form-group" ng-if="form.children['name']"
+             ng-class="{'has-error': form.children['name'].errors.length }">
+            <label class="col-sm-3 control-label" for="{{ form.children['name'].id }}">{{ form.children['name'].label
+                }}</label>
             <div class="col-sm-9">
                 <span sf-form-widget="form.children['name']" class="form-control"/>
-                <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children['name'].errors" class="help-block">{{ error }}</div>
+                <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children['name'].errors"
+                     class="help-block">{{ error }}
+                </div>
             </div>
         </div>
-        
+
         <div class="form-group">
             <label class="col-sm-3 control-label" for="form.children.datebegin.id">Date(s)</label>
             <div class="col-sm-9">
-                <div class="controls form-inline input-daterange" bs-datepicker bs-datepicker-view-date="{{ $moment().add('month', 6).year() }}-{{ $moment().add('month', 6).quarter() < 3 ? '01' : '07' }}-01">
+                <div class="controls form-inline input-daterange" bs-datepicker
+                     bs-datepicker-view-date="{{ $moment().add('month', 6).year() }}-{{ $moment().add('month', 6).quarter() < 3 ? '01' : '07' }}-01">
                     <span ng-class="{'has-error': form.children.datebegin.errors.length }">
-                        <input type="text" class="form-control input-datepicker" ng-model="form.children.datebegin.value" />
+                        <input type="text" class="form-control input-datepicker"
+                               ng-model="form.children.datebegin.value"/>
                     </span>
                     <label>au</label>
                     <span ng-class="{'has-error': form.children.dateend.errors.length }">
-                        <input type="text" class="form-control input-datepicker" ng-model="form.children.dateend.value" />
+                        <input type="text" class="form-control input-datepicker"
+                               ng-model="form.children.dateend.value"/>
                     </span>
                 </div>
                 <span ng-class="{'has-error': form.children.datebegin.errors.length+form.children.dateend.errors }">
@@ -32,17 +39,21 @@
             </div>
         </div>
 
-        <div class="form-group" ng-if="form.children['inscriptionManagement']" ng-class="{'has-error': form.children['inscriptionManagement'].errors.length }">
-            <label class="col-sm-3 control-label" for="{{ form.children['inscriptionManagement'].id }}">{{ form.children['inscriptionManagement'].label }}</label>
+        <div class="form-group" ng-if="form.children['inscriptionManagement']"
+             ng-class="{'has-error': form.children['inscriptionManagement'].errors.length }">
+            <label class="col-sm-3 control-label" for="{{ form.children['inscriptionManagement'].id }}">{{
+                form.children['inscriptionManagement'].label }}</label>
             <div class="col-sm-9">
                 <span sf-form-widget="form.children['inscriptionManagement']" class="form-control"/>
-                <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children['inscriptionManagement'].errors" class="help-block">{{ error }}</div>
+                <div ng-if="error.length" ng-if="error.length"
+                     ng-repeat="error in form.children['inscriptionManagement'].errors" class="help-block">{{ error }}
+                </div>
             </div>
         </div>
 
     </div>
     <div class="modal-footer">
         <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>
-        <input class="btn btn-primary" type="submit" value="Valider" />
+        <input class="btn btn-primary" type="submit" value="Valider"/>
     </div>
 </form>

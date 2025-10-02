@@ -10,20 +10,27 @@
         </tr>
         </thead>
         <tbody>
-            <tr ng-repeat="item in items">
-                <td>{{ item.createdat|date: 'dd/MM/yyyy' }}</td>
-                <td><a href="" ui-sref="trainee.detail.view({ id: item.id })" ui-sref-widget-opts>{{ item.fullname }}</a></td>
-                <td>{{ item.publictype.name }}</td>
-                <td>{{ item.institution.name }}</td>
-                <td>
-                    <span class="label" ng-class="{'label-danger' : item.isactive == false, 'label-default' : item.isactive == true}">
+        <tr ng-repeat="item in items">
+            <td>{{ item.createdat|date: 'dd/MM/yyyy' }}</td>
+            <td><a href="" ui-sref="trainee.detail.view({ id: item.id })" ui-sref-widget-opts>{{ item.fullname }}</a>
+            </td>
+            <td>{{ item.publictype.name }}</td>
+            <td>{{ item.institution.name }}</td>
+            <td>
+                    <span class="label"
+                          style="color: black"
+                          ng-class="{'label-danger' : item.isactive == false, 'label-default' : item.isactive == true}">
                         {{ item.isactive ? 'Oui' : 'Non' }}
                     </span>
-                </td>
-            </tr>
+            </td>
+        </tr>
         </tbody>
     </table>
-    <pagination ng-if="search.result.total > search.query.size" total-items="search.result.total" items-per-page="search.query.size" ng-model="search.query.page" class="pagination-sm" max-size="5" previous-text="&lsaquo;" next-text="&rsaquo;"></pagination>
+    <pagination ng-if="search.result.total > search.query.size" total-items="search.result.total"
+                items-per-page="search.query.size" ng-model="search.query.page" class="pagination-sm" max-size="5"
+                previous-text="&lsaquo;" next-text="&rsaquo;"></pagination>
 </div>
 
-<div class="widget-empty-msg" ng-if="!items.length && !loading">{{ options.emptymsg || 'Aucun stagiaire dans cette liste' }}</div>
+<div class="widget-empty-msg" ng-if="!items.length && !loading">{{ options.emptymsg || 'Aucun stagiaire dans cette
+    liste' }}
+</div>

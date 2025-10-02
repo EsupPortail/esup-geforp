@@ -11,12 +11,9 @@ namespace App\Security\Authorization\AccessRight\Institution;
 use App\AccessRight\AbstractAccessRight;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-class AllInstitutionDeleteAccessRight extends AbstractAccessRight
+final class AllInstitutionDeleteAccessRight extends AbstractAccessRight
 {
-    /**
-     * @return string
-     */
-    public function getLabel()
+    public function getLabel(): string
     {
         return 'Supprimer les établissements de tous les centres';
     }
@@ -26,26 +23,17 @@ class AllInstitutionDeleteAccessRight extends AbstractAccessRight
      *
      * @param string
      *
-     * @return bool
      */
-    public function supportsClass($class)
+    public function supportsClass($class): bool
     {
-        if ($class === 'App\Entity\Back\Institution') {
-            return true;
-        }
-
-        return false;
+        return $class === \App\Entity\Back\Institution::class;
     }
 
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $object = null, $attribute)
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
-        if ($attribute !== 'DELETE') {
-            return false;
-        }
-
-        return true;
+        return $attribute === 'DELETE';
     }
 }
