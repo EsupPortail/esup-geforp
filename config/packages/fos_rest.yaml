@@ -2,6 +2,6 @@
 fos_rest:
     body_listener: true
     format_listener: false
-    body_converter: { enabled: true }
+#    body_converter: { enabled: true }
     view:
         view_response_listener: true
