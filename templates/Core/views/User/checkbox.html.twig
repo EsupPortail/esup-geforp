@@ -1,5 +1,30 @@
+{% use "bootstrap_5_horizontal_layout.html.twig" %}
+
+{# Surcharge complète du form_row avec colonnes perso #}
+{% block form_row %}
+        <div class="form-group">
+            {{ form_label(form, null, {
+                label_attr: { class: 'control-label' }
+            }) }}
+            <div class="col-sm-10">
+                {{ form_widget(form, { attr: { class: 'form-control' } }) }}
+                {{ form_errors(form) }}
+            </div>
+        </div>
+{% endblock %}
+
 {% block checkbox_widget %}
+        <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+        <label  for="{{ id }}" style="margin-left: 5px">{{ label}} </label>
+{% endblock %}
 
-    <input type="checkbox" {{ block('widget_attributes') }}{% if value is defined %} value="{{ value }}"{% endif %}{% if checked %} checked="checked"{% endif %} />
+{% block file_widget %}
+    <input type="file" {{ block('widget_attributes') }} />
+{% endblock %}
 
-{% endblock checkbox_widget %}
+{#% block form_widget_simple %}
+    <label>
+        <input type="{{ type|default('text') }}" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}" {% endif %}/>
+    </label>
+{% endblock %#}
+
