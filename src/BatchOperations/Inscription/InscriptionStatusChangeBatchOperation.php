@@ -165,7 +165,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
                     $tabAllAttach[] = $att;
 
                 //sending with e-mail service
-                $this->emailingBatchOperation->parseAndSendMail($arrayInscriptionGranted, $options['subject'], $options['message'], $attachments, $options['preview'] ?? false, $options['ical'] ?? false, $options['format'] ?? 0);
+                $this->emailingBatchOperation->parseAndSendMail($arrayInscriptionGranted, $options['subject'], $options['message'], $attachments, $options['preview'] ?? false, $options['ical'] ?? false, $options['format'] ?? 0, $options['sendresp'] ?? 1);
 
             }
 
