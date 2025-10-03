@@ -296,14 +296,18 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
     }
 
     #[Route(path: '/{id}/access-rights', name: 'user.access_rights', requirements: ['id' => '\d+'], options: ['expose' => true])]
-    public function accessRights(Request $request, User $user, ManagerRegistry $managerRegistry, Security $security, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
+    public function accessRights(Request $request, ManagerRegistry $managerRegistry, Security $security, int $id): \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
     {
         $user = $managerRegistry->getRepository(User::class)->find($id);
 
-        if (!$user) {
-            throw new AccessDeniedHttpException();
+	$accessReg = new AccessRightRegistry($security);
+        // Transformation user rights
+        $rights = $user->getAccessRights(); $newRights = [];
+        foreach ($rights as $right) {
+            $newRights[]= $accessReg->getByName($right);
         }
-
+        $user->setAccessRights($newRights);
+dump($user);
         $formBuilder = $this->createFormBuilder($user);
         $formBuilder->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès']);
 
@@ -311,14 +315,16 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $selectedRights = $user->getAccessRights();
-            if (!empty($selectedRights) && is_object(reset($selectedRights))) {
-                $user->setAccessRights(array_map(fn($right) => $right->getName(), $selectedRights));
+	    // Transformation user rights
+            $rights = $user->getAccessRights(); $newRights = [];
+            foreach ($rights as $right) {
+                    $newRights[]= $accessReg->getNameById($right);
             }
+            $user->setAccessRights($newRights);
             $managerRegistry->getManager()->flush();
             $this->addFlash('success', "Les droits d'accès ont bien été enregistrés.");//'success', "Les droits d'accès ont bien été enregistrés.";
 
-            return $this->render('Core/views/User/accessRights.html.twig', ['form' => $form->createView(), 'user' => $user]);
+            return $this->redirect($this->generateUrl('user.access_rights', array('id' => $user->getId())));
         }
 
 
