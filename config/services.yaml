@@ -55,6 +55,7 @@ parameters:
                 filename: 'session.csv'
                 fields:
                     id: "Numéro"
+                    training.number: "Numéro de stage"
                     training.name: "Nom du stage"
                     name: "Nom de la session"
                     training.theme.name: "Thématique"
@@ -89,6 +90,8 @@ parameters:
                     transportcost: "Coût transport"
                     materialcost: "Coût support"
                     totalCost: "Coût total"
+                    taking: "Recettes"
+                    individualcost: "Coût par stagiaire"
                     training.designated_public: { label: "Public désigné", type: "boolean" }
                     comments: "Commentaires"
                     evalResume: "Evaluations"
@@ -180,6 +183,7 @@ parameters:
                 filename: 'test.csv'
                 fields:
                     name: "Nom"
+		    organization.name: "Centre"
                     createdAt: { label: "Date de création", type: "date" }
                     address: "Adresse"
                     zip: "Code postal"
@@ -212,7 +216,7 @@ parameters:
                     statutPresence: { property: presencestatus.name }
                     formateur: { property: formateurCivilite }
                     formation: { property: formationNom }
-                    dates: { property: dates }
+                    dates: { property: session.dates }
                     commentaires: { property: comments }
                     dateDebut: { property: session.dateDebut }
                     domaine: { property: session.formation.theme }
@@ -242,7 +246,6 @@ parameters:
                     telephone: { property: phonenumber }
                     # ProfessionalSituationTrait
                     institution: { property: institution }
-                    stagiaire: { property: Trainees }
                     service: { property: service }
                     corps: { property: corps }
                     bap: { property: bap }
@@ -251,10 +254,6 @@ parameters:
                     statut: { property: status }
                     payant: { property: isPaying }
                     # Trainee
-                    dates: { property: DateSession }
-                    commentaires: { property: CommentsSession }
-                    formateur: { property: Civilite }
-                    formation: { property: FormationName}
                     inscriptions: { property: inscriptions }
             trainer:
                 class: 'App\Entity\Back\Trainer'
@@ -263,17 +262,13 @@ parameters:
                 emailPath: 'email'
                 fields:
                     #personTrait
-                    civilite: { property: getTitle }
-                    formateur: { property: getTitle }
+                    civilite: { property: title }
                     nomComplet: { property: fullname }
-                    formation: { property: SessionName }
                     nom: { property: lastname }
                     prenom: { property: firstname }
                     # CoordinatesTrait
                     adresse: { property: address }
                     codePostal: { property: zip }
-                    dates: { property: DateSession }
-                    commentaires: { property: CommentsSession }
                     ville: { property: city }
                     email: { property: email }
                     fax: { property: faxnumber }
@@ -298,11 +293,7 @@ parameters:
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
-                    property: "trainees"
-                    fields:
-                        prenom: { property: "firstname" }
-                        nom: { property: "lastname" }
-                    formateur: { property: "participations[0].trainer" }
+		    formateur: { property: "participations[0].trainer" }
                     nombrePlaces: { property: "maximumnumberofregistrations" }
                     nombreInscrits: { property: "numberofregistrations" }
                     dateLimiteInscription: { property: "limitregistrationdate" }
@@ -341,6 +332,7 @@ parameters:
                     categorie: { property: category.name }
                     typeIntervention: { property: interventionType }
                     initiativeExterne: { property: externalInitiative }
+		    commentaires: { property: comments }
                     # Internship && Long training
                     prerequis: { property: prerequisites }
                     public: { property: publictype.name }
