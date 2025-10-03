@@ -40,7 +40,7 @@ final class NationalVocabularyAccessRight extends AbstractAccessRight
      */
     public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
-        if (!is_object($object)) {
+/*        if (!is_object($object)) {
             return false;
         }
 
@@ -49,6 +49,18 @@ final class NationalVocabularyAccessRight extends AbstractAccessRight
         }
 
             return !$object->getOrganization();
+        }*/
+	if (is_string($token)) {
+            return true;
         }
+        else if ($object) {
+            return
+                $object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL ||
+                ($object->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && !$object->getOrganization());
+        }
+        else {
+            return true;
+        }
+    }
 
 }

@@ -40,15 +40,23 @@ final class OwnOrganizationVocabularyAccessRight extends AbstractAccessRight
      */
     public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
-        if (!is_object($object) || !$object instanceof VocabularyInterface) {
+/*        if (!is_object($object) || !$object instanceof VocabularyInterface) {
             return false;
         }
 
         if ($object->getVocabularyStatus() === VocabularyInterface::VOCABULARY_NATIONAL) {
             return false;
         }
-
-        return $object->getOrganization() === $token->getUser()->getOrganization();
+        return $object->getOrganization() === $token->getUser()->getOrganization();*/
+	if (is_string($object)) {
+            return true;
+        }
+        else if ($object) {
+            return $object->getVocabularyStatus() !== VocabularyInterface::VOCABULARY_NATIONAL && $object->getOrganization() === $token->getUser()->getOrganization();
+        }
+        else {
+            return true;
+        }
     }
 
 

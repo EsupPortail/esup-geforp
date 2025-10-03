@@ -51,7 +51,7 @@ final readonly class AccessRightVoter implements VoterInterface
         if (!($token->getUser() instanceof User)) {
             return VoterInterface::ACCESS_ABSTAIN;
         }
-//dump($object);
+	
         // support of Doctrine namespace alias
         if (is_string($object) && strpos($object, ':') && $this->entityManager instanceof \Doctrine\ORM\EntityManager) {
             [$alias, $class] = explode(':', $object);
@@ -66,19 +66,15 @@ final readonly class AccessRightVoter implements VoterInterface
                 //$accessRight = $this->registry->getAccessRightById($accessRightId);
                 $id = $this->accessRightRegistry->getByName($accessRightId);
                 $accessRight = $this->accessRightRegistry->getAccessRightById($id);
-//dump($accessRight);
                 if (!$accessRight) {
                     continue;
                 }
-//dump($className); dump($object);
                 if (!$accessRight->supportsClass($className)) {
                     continue;
                 }
-//dump($accessRight);
                 if (!$accessRight->supportsAttribute($attribute)) {
                     continue;
                 }
-//dump($accessRight);
                 if ($accessRight->isGranted($token, is_object($object) ? $object : null, $attribute)) {
                     return VoterInterface::ACCESS_GRANTED;
                 }
