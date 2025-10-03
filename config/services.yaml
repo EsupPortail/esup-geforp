@@ -183,7 +183,7 @@ parameters:
                 filename: 'test.csv'
                 fields:
                     name: "Nom"
-		    organization.name: "Centre"
+                    organization.name: "Centre"
                     createdAt: { label: "Date de création", type: "date" }
                     address: "Adresse"
                     zip: "Code postal"
@@ -293,7 +293,7 @@ parameters:
                     formation: { property: "training" }
                     formateurs: { property: "trainersListString" }
                     listeFormateurs: { property: "trainers" }
-		    formateur: { property: "participations[0].trainer" }
+                    formateur: { property: "participations[0].trainer" }
                     nombrePlaces: { property: "maximumnumberofregistrations" }
                     nombreInscrits: { property: "numberofregistrations" }
                     dateLimiteInscription: { property: "limitregistrationdate" }
@@ -332,7 +332,7 @@ parameters:
                     categorie: { property: category.name }
                     typeIntervention: { property: interventionType }
                     initiativeExterne: { property: externalInitiative }
-		    commentaires: { property: comments }
+                    commentaires: { property: comments }
                     # Internship && Long training
                     prerequis: { property: prerequisites }
                     public: { property: publictype.name }
