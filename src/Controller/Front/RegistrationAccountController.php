@@ -141,7 +141,7 @@ class RegistrationAccountController extends AbstractController
                 // if the inscription is pending, just delete it
                 $em->remove($inscription);
                 $em->flush();
-                $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
+                $this->addFlash('success', 'Votre désistement a bien été enregistré.');
                 return [$this->redirectToRoute('front.account.registrations')];
             }
             else {
@@ -212,7 +212,7 @@ class RegistrationAccountController extends AbstractController
 
                 $mailer->send($message);
 
-                $this->get('session')->getFlashBag()->add('success', 'Votre désistement a bien été enregistré.');
+                $this->addFlash('success', 'Votre désistement a bien été enregistré.');
                 return [$this->redirectToRoute('front.account.registrations')];
             }
 
@@ -232,7 +232,7 @@ class RegistrationAccountController extends AbstractController
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
 
         if (!$registration->getTrainee()->getEmailSup()) {
-            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas relancer votre demande de validation car vous n\'avez pas renseigné de supérieur hiérarchique.');
+            $this->addFlash('error', 'Vous ne pouvez pas relancer votre demande de validation car vous n\'avez pas renseigné de supérieur hiérarchique.');
             return $this->redirectToRoute('front.account.registrations');
         }
 
@@ -288,7 +288,7 @@ class RegistrationAccountController extends AbstractController
 
         $mailer->send($message);
 
-        $this->get('session')->getFlashBag()->add('success', 'Votre demande d\'autorisation a bien été envoyée.');
+        $this->addFlash('success', 'Votre demande d\'autorisation a bien été envoyée.');
         return $this->redirectToRoute('front.account.registrations');
 
     }
@@ -404,7 +404,7 @@ class RegistrationAccountController extends AbstractController
 
                                 $mailer->send($message);
 
-                                $this->get('session')->getFlashBag()->add('success', 'L\'avis favorable a bien été émis.');
+                                $this->addFlash('success', 'L\'avis favorable a bien été émis.');
 
                             } else {
                                 // Sinon, on modifie le statut de l'inscription à "avis défavorable" et on envoie un mail au stagiaire
@@ -469,7 +469,7 @@ class RegistrationAccountController extends AbstractController
 
                                 $mailer->send($message);
 
-                                $this->get('session')->getFlashBag()->add('success', 'L\'avis défavorable a bien été émis.');
+                                $this->addFlash('success', 'L\'avis défavorable a bien été émis.');
 
                             }
                         }

@@ -174,7 +174,7 @@ final class AccountController extends AbstractController
                 }
                 if ($flagDoc == 0) {
                     // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                    $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                    $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
                     return $this->redirectToRoute('front.public.index');
                 }
             } else {
@@ -205,7 +205,7 @@ final class AccountController extends AbstractController
 
             if ($flagEtab !== 1) {
                 // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-                $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
                 return $this->redirectToRoute('front.public.index');
             }
 
@@ -434,7 +434,7 @@ final class AccountController extends AbstractController
             }
             if ($flagDoc == 0) {
                 // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
                 return $this->redirectToRoute('front.public.index');
             }
         } else {
@@ -465,7 +465,7 @@ final class AccountController extends AbstractController
 
         if ($flagEtab !== 1) {
             // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-            $this->get('session')->getFlashBag()->add('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
+            $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
             return $this->redirectToRoute('front.public.index');
 
         }
@@ -577,20 +577,20 @@ final class AccountController extends AbstractController
                             // Mail institutionel ok
                             // on vérifie que le mail du responsable est différent de clui du stagiaire
                             if (strtolower((string) $trainee->getEmailSup()) === strtolower((string) $trainee->getEmail())) {
-                                $request->getSession()->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
+                                $this->addFlash('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
                             } else {
                                 $em = $managerRegistry->getManager();
                                 $em->flush();
-                                $request->getSession()->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
+                                $this->addFlash('success', 'Votre profil a été mis à jour.');
                             }
                         } else {
-                            $request->getSession()->getFlashBag()->add('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+                            $request->$this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
                     }
                 } else {
                     $em = $managerRegistry->getManager();
                     $em->flush();
-                    $request->getSession()->getFlashBag()->add('success', 'Votre profil a été mis à jour.');
+                    $this->addFlash('success', 'Votre profil a été mis à jour.');
                 }
             }
         }

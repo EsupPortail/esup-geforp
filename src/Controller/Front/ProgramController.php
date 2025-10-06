@@ -108,7 +108,7 @@ class ProgramController extends AbstractController
      * @return mixed[]|null
      */
     #[Route(path: '/training/{id}/{sessionId}/{token}', name: 'front.program.training', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null): ?array
+    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null)
     {
 
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
@@ -182,9 +182,19 @@ class ProgramController extends AbstractController
 
             // Affichage d'un flag si le stage en public désigné
             if ($training->getDesignatedpublic())
-                $this->get('session')->getFlashBag()->add('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
+                $this->addFlash('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
 
-            return ['user' => $trainee, 'training' => $training, 'session' => $focusSession, 'upcomingSessions' => $upcomingSessions, 'pastSessions' => $pastSessions, 'token' => $token];
+            usort($pastSessions, function($a, $b) {
+                return $b->getDatebegin() <=> $a->getDatebegin();
+            });
+            return $this->render('Front/Public/program/training.html.twig', [
+                'user' => $trainee,
+                'training' => $training,
+                'session' => $focusSession,
+                'upcomingSessions' => $upcomingSessions,
+                'pastSessions' => $pastSessions,
+                'token' => $token
+            ]);
         }
     }
 
@@ -212,7 +222,7 @@ class ProgramController extends AbstractController
 
         $inscription = $doctrine->getManager()->getRepository(\App\Entity\Core\AbstractInscription::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if ($inscription) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous êtes déjà inscrit à cette session.");
+            $this->addFlash('warning', "Vous êtes déjà inscrit à cette session.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -235,7 +245,7 @@ class ProgramController extends AbstractController
                     // Test statut de l'inscription pour eliminer les avis défavorables, session annulée, ...
                     if ($insc->getInscriptionstatus()->getStatus() != 3) {
                         $libelleinsc = $insc->getSession()->getName();
-                        $this->get('session')->getFlashBag()->add('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
+                        $this->addFlash('error', 'Attention : les dates de cette session peuvent chevaucher une session pour laquelle vous avez déjà réalisé une inscription !');
                     }
                 }
             }
@@ -270,7 +280,7 @@ class ProgramController extends AbstractController
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
                 $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
-                $this->get('session')->getFlashBag()->add('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+                $this->addFlash('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
             $form = $this->createForm(InscriptionType::class, $inscription);
@@ -282,7 +292,7 @@ class ProgramController extends AbstractController
                     $em = $doctrine->getManager();
                     $em->persist($inscription);
                     $em->flush();
-                    $this->get('session')->getFlashBag()->add('success', 'Votre inscription a bien été enregistrée.');
+                    $this->addFlash('success', 'Votre inscription a bien été enregistrée.');
 
                     $id = $inscription->getId();
                     // Lien vers la page d'autorisation
@@ -388,7 +398,7 @@ class ProgramController extends AbstractController
         $alert = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
 
         if ($alert) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous êtes déjà inscrit à l'alerte d'ouverture de la session.");
+            $this->addFlash('warning', "Vous êtes déjà inscrit à l'alerte d'ouverture de la session.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -402,7 +412,7 @@ class ProgramController extends AbstractController
             $em = $doctrine->getManager();
             $em->persist($alert);
             $em->flush();
-            $this->get('session')->getFlashBag()->add('success', 'Votre alerte a bien été enregistrée.');
+            $this->addFlash('success', 'Votre alerte a bien été enregistrée.');
         }
 
         return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
@@ -432,7 +442,7 @@ class ProgramController extends AbstractController
 
         $alert = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if (!$alert) {
-            $this->get('session')->getFlashBag()->add('warning', "Vous ne pouvez pas vous désinscrire de l'alerte.");
+            $this->addFlash('warning', "Vous ne pouvez pas vous désinscrire de l'alerte.");
             return $this->redirectToRoute('front.account.registrations');
             //throw new ForbiddenOverwriteException('An inscription has already been found');
         }
@@ -443,7 +453,7 @@ class ProgramController extends AbstractController
             $em->flush();
         }
 
-        $this->get('session')->getFlashBag()->add('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
+        $this->addFlash('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
 
         return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
     }
@@ -530,8 +540,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
-        }
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');}
 
         return $this->render('Front/Public/myprogram.html.twig', [
             'user' => $arTrainee[0],
@@ -632,7 +641,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
         }
 
         return $this->render('Front/Public/allprogram.html.twig', ['user' => $arTrainee, 'search' => $search, 'img' => '', 'form' => $form->createView()]);
@@ -759,7 +768,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
         }
 
         return $this->render('Front/Public/searchResult.html.twig', [

@@ -111,7 +111,7 @@ class AttendanceAccountController extends AbstractController
 
         if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
             // Pb : l'évaluation a déjà été remplie
-            $this->get('session')->getFlashBag()->add('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
+            $this->addFlash('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
             return $this->render('Front/Account/attendance/evaluation.html.twig');
 
         }
@@ -135,7 +135,7 @@ class AttendanceAccountController extends AbstractController
             $form->handleRequest($request);
             if ($form->isValid()) {
                 $doctrine->getManager()->flush();
-                $this->get('session')->getFlashBag()->add('success', "Les réponses ont bien été enregistrées. Merci d'avoir noté la session.");
+                $this->addFlash('success', "Les réponses ont bien été enregistrées. Merci d'avoir noté la session.");
                 return $this->redirectToRoute('front.account.attendance', ['session' => $attendance->getSession()->getId()]);
             }
         }

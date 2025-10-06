@@ -32,7 +32,7 @@ class PublicController extends AbstractController
     {
         if ($request->get('shibboleth') == 1) {
             if ($request->get('error') == "activation") {
-                $this->get('session')->getFlashBag()->add('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
+                $this->addFlash('warning', "Votre compte doit être activé par un administrateur avant de pouvoir vous connecter.");
             }
         }
         

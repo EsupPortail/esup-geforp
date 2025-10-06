@@ -82,7 +82,7 @@ final class AlertAccountController extends AbstractController
                 }
             }
 
-            $this->get('session')->getFlashBag()->add('success', 'Vos modifications ont bien été enregistrées.');
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
 
         }
 
