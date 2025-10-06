@@ -78,7 +78,7 @@ EmailingBatchOperation extends AbstractBatchOperation
             }
         }
 
-	$this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : null, false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
+	$this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : [], false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
 
         return ['', Response::HTTP_NO_CONTENT];
     }
