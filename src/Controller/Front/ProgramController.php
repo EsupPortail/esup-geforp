@@ -27,7 +27,7 @@ use App\Form\Type\InscriptionType;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Client\Response;
+use Symfony\Component\HttpFoundation\Response;
 use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -205,13 +205,13 @@ class ProgramController extends AbstractController
      * @return RedirectResponse
      */
     #[Route(path: '/training/inscription/{id}/{sessionId}/{token}', name: 'front.program.inscription', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id, Session $session, $token = null): RedirectResponse
+    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id, int $sessionId, $token = null): Response
     {
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
         if (!isset($training)) {
             throw $this->createNotFoundException();
         }
-        $session = $doctrine->getRepository(\App\Entity\Back\Session::class)->find($id);
+        $session = $doctrine->getRepository(\App\Entity\Back\Session::class)->find($sessionId);
         if (!isset($session)) {
             throw $this->createNotFoundException();
         }
@@ -220,6 +220,9 @@ class ProgramController extends AbstractController
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
         $trainee = $arTrainee[0];
 
+        if (!$trainee) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé.');
+        }
         $inscription = $doctrine->getManager()->getRepository(\App\Entity\Core\AbstractInscription::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if ($inscription) {
             $this->addFlash('warning', "Vous êtes déjà inscrit à cette session.");
@@ -365,11 +368,25 @@ class ProgramController extends AbstractController
             }
 
 
-            return $this->redirectToRoute(('program_inscription'),['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
-        } else {
-            //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
-            return $this->redirectToRoute(('program_inscription'),['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
+
+            return $this->render('Front/Public/program/inscription.html.twig', [
+                'user' => $trainee,
+                'form' => $form->createView(),
+                'training' => $training,
+                'session' => $session,
+                'token' => $token,
+                'flag' => $flagInsc,
+            ]);
         }
+
+
+        return $this->render('Front/Public/program/inscription.html.twig', [
+            'user' => $trainee,
+            'training' => $training,
+            'session' => $session,
+            'token' => $token,
+            'flag' => $flagInsc,
+        ]);
     }
 
     /**

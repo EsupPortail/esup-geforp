@@ -72,6 +72,9 @@ class RegistrationAccountController extends AbstractController
 
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        if (!$arTrainee || count($arTrainee) === 0) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé à cet utilisateur.');
+        }
         $trainee = $arTrainee[0];
 
         $inscriptions = $trainee->getInscriptions();
@@ -112,6 +115,9 @@ class RegistrationAccountController extends AbstractController
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        if (!$arTrainee || count($arTrainee) === 0) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé à cet utilisateur.');
+        }
         $trainee = $arTrainee[0];
 
         $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
@@ -245,13 +251,22 @@ class RegistrationAccountController extends AbstractController
         $repo = $em->getRepository($templateTerm::class);
         /** @var Emailtemplate $template */
         $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
-        $formathtml = $templates[0]->getPosition();
-        if ($formathtml)
-            $newline = "<br>";
-        else
-            $newline = "\n";
-        $subject = $templates[0]->getSubject();
-        $body = $templates[0]->getBody();
+        if (!$templates || count($templates) === 0) {
+            if (!$templates || count($templates) === 0) {
+
+                $subject = "Demande de validation d'inscription";
+                $body = "Bonjour,\nUne demande de relance pour une inscription est en attente de validation.";
+                $formathtml = 0;
+                $newline = "\n";
+            } else {
+                $template = $templates[0];
+                $formathtml = $template->getPosition();
+                $newline = $formathtml ? "<br>" : "\n";
+                $subject = $template->getSubject();
+                $body = $template->getBody();
+            }
+        }
+
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
         $Texte = "";
         foreach ($registration->getSession()->getDates() as $date) {
@@ -281,10 +296,11 @@ class RegistrationAccountController extends AbstractController
             ->subject($subject);
 
         // si Format HTML coché pour ce modèle, sinon format texte
-        if ($templates[0]->getPosition() == 1) {
+        if ($formathtml == 1) {
             $message->html($newbody);
-        } else
+        } else {
             $message->text($newbody);
+        }
 
         $mailer->send($message);
 
