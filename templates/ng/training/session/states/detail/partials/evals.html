@@ -2,10 +2,8 @@
     <div class="mb-1">
         <!-- filter -->
         <span><small>Nombre d'évaluations remplies :</small>
-            <!-- stats -->
-            <span class="label"
-                  ng-class="$root.sessionInscriptionStatsClass(totalEvaluatedInscriptions(), totalAcceptedInscriptions)"
-                  tooltip-placement="bottom">{{ totalEvaluatedInscriptions() }} / {{ totalAcceptedInscriptions() }}</span>
+<!-- stats -->
+            <span class="label" ng-class="$root.sessionInscriptionStatsClass(totalEvaluatedInscriptions(), totalAcceptedInscriptions)" tooltip-placement="bottom">{{ totalEvaluatedInscriptions() }} / {{ totalAcceptedInscriptions() }}</span>
         </span>
 
     </div>
@@ -15,10 +13,24 @@
     </div>
 
     <table ng-if="totalEvaluatedInscriptions()" class="table table-hover table-search table-condensed">
+        <thead>
+            <tr>
+                <th>Critère</th>
+                <th>1 étoile</th>
+                <th>2 étoiles</th>
+                <th>3 étoiles</th>
+                <th>4 étoiles</th>
+                <th>Moyenne des notes</th>
+            </tr>
+        </thead>
         <tbody>
         <tr ng-repeat="criter in crit">
-            <td> {{ criter.name }}</td>
-            <td> {{ EvalAverage(criter) }}</td>
+            <td> {{ criter.name }} </td>
+            <td> {{ EvalOccur(1, criter) }} </td>
+            <td> {{ EvalOccur(2, criter) }} </td>
+            <td> {{ EvalOccur(3, criter) }} </td>
+            <td> {{ EvalOccur(4, criter) }} </td>
+            <td> {{ EvalAverage(criter) }} </td>
         </tr>
         </tbody>
     </table>
