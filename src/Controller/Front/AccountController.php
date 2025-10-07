@@ -59,7 +59,7 @@ final class AccountController extends AbstractController
 
         if (isset($userPersitentId)) {
            // dump($arTrainee);
-            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethPersistentId" => $userPersitentId]);
+            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethpersistentid" => $userPersitentId]);
             if ($arTrainee !== null) {
             } elseif (isset($userEmail)) {
                 $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy($userEmail);

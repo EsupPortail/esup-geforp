@@ -57,7 +57,7 @@ trait AccountTrait
 
     #[ORM\Column(name: 'shibboleth_persistent_id', type: 'string', nullable: true)]
     #[Groups(['api.token', 'api.profile'])]
-    private ?string $shibbolethPersistentId;
+    private ?string $shibbolethpersistentid;
 
     /**
      * @ORM\Column(name="data", type="array", nullable=true)
@@ -156,12 +156,12 @@ trait AccountTrait
      */
     public function getShibbolethpersistentid(): ?string
     {
-        return $this->shibbolethPersistentId;
+        return $this->shibbolethpersistentid;
     }
 
-    public function setShibbolethpersistentid(mixed $shibbolethPersistentId): void
+    public function setShibbolethpersistentid(mixed $shibbolethpersistentid): void
     {
-        $this->shibbolethPersistentId = $shibbolethPersistentId;
+        $this->shibbolethpersistentid = $shibbolethpersistentid;
     }
 
     /**

@@ -365,10 +365,10 @@ class ProgramController extends AbstractController
             }
 
 
-            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
+            return $this->redirectToRoute(('program_inscription'),['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
         } else {
             //$this->get('session')->getFlashBag()->add('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
-            return $this->redirectToRoute(('Front/Public/program/inscription.html.twig'),['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
+            return $this->redirectToRoute(('program_inscription'),['user' => $trainee, 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
         }
     }
 
