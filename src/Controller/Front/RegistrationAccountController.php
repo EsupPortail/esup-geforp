@@ -111,7 +111,7 @@ class RegistrationAccountController extends AbstractController
      *
      */
     #[Route(path: '/registration/{id}/desist', name: 'front.account.registration.desist')]
-    public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): array
+    public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
@@ -148,7 +148,7 @@ class RegistrationAccountController extends AbstractController
                 $em->remove($inscription);
                 $em->flush();
                 $this->addFlash('success', 'Votre désistement a bien été enregistré.');
-                return [$this->redirectToRoute('front.account.registrations')];
+                return $this->redirectToRoute('front.account.registrations');
             }
             else {
                 // else set the status to "Desist"
@@ -224,7 +224,10 @@ class RegistrationAccountController extends AbstractController
 
         }
 
-        return ['user' => $trainee, 'registration' => $registration, $this->render('Front/Account/registration/registration-desist.html.twig')];
+        return $this->render('Front/Account/registration/registration-desist.html.twig', [
+            'user' => $trainee,
+            'registration' => $registration,
+        ]);
     }
 
     /**
