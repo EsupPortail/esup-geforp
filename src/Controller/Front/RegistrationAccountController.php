@@ -161,7 +161,18 @@ class RegistrationAccountController extends AbstractController
                 $em = $doctrine->getManager();
                 $repo = $em->getRepository($templateTerm::class);
                 /** @var Emailtemplate $template */
-                $templates = $repo->findBy(['name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                $templates = $repo->findBy([
+                    'name' => "Statut d'inscription : désistement",
+                    'organization' => $registration->getSession()->getTraining()->getOrganization()
+                ]);
+                if (!$templates || count($templates) === 0) {
+                    $status = $this->getDesistInscriptionStatus($doctrine, $trainee);
+                    $inscription->setInscriptionstatus($status);
+                    $em->flush();
+
+                    $this->addFlash('success', 'Votre désistement a bien été enregistré (aucun email envoyé).');
+                    return $this->redirectToRoute('front.account.registrations');
+                }
                 $formathtml = $templates[0]->getPosition();
                 if ($formathtml)
                     $newline = "<br>";
@@ -219,7 +230,7 @@ class RegistrationAccountController extends AbstractController
                 $mailer->send($message);
 
                 $this->addFlash('success', 'Votre désistement a bien été enregistré.');
-                return [$this->redirectToRoute('front.account.registrations')];
+                return $this->redirectToRoute('front.account.registrations');
             }
 
         }
