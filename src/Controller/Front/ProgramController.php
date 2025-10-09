@@ -309,7 +309,14 @@ class ProgramController extends AbstractController
                         $templateTerm = $vocRegistry->getVocabularyById(5);
                         $repo = $em->getRepository($templateTerm::class);
                         /** @var Emailtemplate $template */
-                        $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $inscription->getSession()->getTraining()->getOrganization()]);
+                        $templates = $repo->findBy([
+                            'name' => "Demande de validation d'inscription",
+                            'organization' => $inscription->getSession()->getTraining()->getOrganization()]);
+                        if (!$templates || count($templates) === 0) {
+                            // Aucun modèle d'email trouvé pour cette organisation : on ajoute juste un message flash
+                            $this->addFlash('success', "Votre demande a été enregistrée. Aucun email n'a été envoyé car aucun modèle n'existe pour cette organisation. Merci de contacter un Administrateur.");
+                            return $this->redirectToRoute('front.account.registrations');
+                        }
                         $subject = $templates[0]->getSubject();
                         $body = $templates[0]->getBody();
                         $formathtml = $templates[0]->getPosition();
