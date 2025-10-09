@@ -390,6 +390,10 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(['name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                                if (!$templates || count($templates) === 0) {
+                                    $this->addFlash('success', "Avis favorable du N+1 est accordé mais un mail n'a pas été envoyé, Veuiller contacter un administrateur");
+                                    return $this->redirectToRoute('front.account.team.registrations');
+                                }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();
@@ -454,6 +458,10 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(['name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                                if (!$templates || count($templates) === 0) {
+                                    $this->addFlash('success', "Avis défavorable du N+1 est accordé mais un mail n'a pas été envoyé, Veuiller contacter un administrateur");
+                                    return $this->redirectToRoute('front.account.team.registrations');
+                                }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();
