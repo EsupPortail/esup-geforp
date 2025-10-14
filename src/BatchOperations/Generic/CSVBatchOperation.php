@@ -478,12 +478,12 @@ SQL;
 
                     } elseif ($key == "individualcost") {
                         // Coût total
-                        $totalCost = $accessor->getValue($entity, 'teachingcost')
-                            + $accessor->getValue($entity, 'vacationcost')
-                            + $accessor->getValue($entity, 'accommodationcost')
-                            + $accessor->getValue($entity, 'mealcost')
-                            + $accessor->getValue($entity, 'transportcost')
-                            + $accessor->getValue($entity, 'materialcost');
+                        $totalCost = $propertyAccessor->getValue($entity, 'teachingcost')
+                            + $propertyAccessor->getValue($entity, 'vacationcost')
+                            + $propertyAccessor->getValue($entity, 'accommodationcost')
+                            + $propertyAccessor->getValue($entity, 'mealcost')
+                            + $propertyAccessor->getValue($entity, 'transportcost')
+                            + $propertyAccessor->getValue($entity, 'materialcost');
 
                         // Nombre de stagiaires en présence partielle ou totale
                         $statsPresGlobale = array();
@@ -600,9 +600,14 @@ SQL;
                             $tabAv[$crit->getId()]['sum'] = 0;
                             $tabAv[$crit->getId()]['nb'] = 0;
                             $tabAv[$crit->getId()]['av'] = 0;
+			    $tabAv[$crit->getId()]['1et'] = 0;
+                            $tabAv[$crit->getId()]['2et'] = 0;
+                            $tabAv[$crit->getId()]['3et'] = 0;
+                            $tabAv[$crit->getId()]['4et'] = 0;
                         }
 
                         $evalsMsg = '';
+			$nbEvals=0;
 
                         // On parcourt le tableau des inscriptions
                         foreach ($tabInsc as $insc) {
@@ -614,11 +619,23 @@ SQL;
                                 ->setParameter('inscription', $insc);
                             $tabCritNot = $query->getResult();
 
+			    if (!empty($tabCritNot))
+				$nbEvals++;
+
                             // Pour chaque critère, on calcule le total des notes
                             foreach ($tabCritNot as $critNot) {
                                 if ($critNot->getNote() != 0) {
                                     $tabAv[$critNot->getCriterion()->getId()]['sum'] += $critNot->getNote();
                                     ++$tabAv[$critNot->getCriterion()->getId()]['nb'];
+
+				    if ($critNot->getNote() == 1)
+                                        $tabAv[$critNot->getCriterion()->getId()]['1et']++;
+                                    if ($critNot->getNote() == 2)
+                                        $tabAv[$critNot->getCriterion()->getId()]['2et']++;
+                                    if ($critNot->getNote() == 3)
+                                        $tabAv[$critNot->getCriterion()->getId()]['3et']++;
+                                    if ($critNot->getNote() == 4)
+                                        $tabAv[$critNot->getCriterion()->getId()]['4et']++;
                                 }
                             }
 
@@ -631,7 +648,6 @@ SQL;
 
                         // Calcul moyenne
                         foreach ($tabCrit as $crit) {
-                            $nbEvals = $tabAv[$crit->getId()]['nb'];
                             if ($tabAv[$crit->getId()]['nb']>0){
                                 $tabAv[$crit->getId()]['av'] = $tabAv[$crit->getId()]['sum'] / $tabAv[$crit->getId()]['nb'];
                             } else
@@ -642,13 +658,12 @@ SQL;
                         $rvalue = '';
                         // Moyenne des critères
                         foreach ($tabCrit as $crit) {
-                            $rvalue .= $crit->getName() . ' : ' . $tabAv[$crit->getId()]['av'] . ' | ';
+			    $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
                         }
 
                         // Remarques evals
                         $rvalue .= 'Remarques: ' . $evalsMsg . ' | ';
 
-                        $nbEvals = 0;
                         // Nb d'éval
                         $rvalue .= sprintf('Nb evals : %s ', $nbEvals);
 
@@ -748,7 +763,7 @@ SQL;
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
 
-        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', (string) ($volcanusConfig['responseFilename'] ?? 'default.csv'));
+	$fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
 
         // encodage fichier
         $charsetConverter = (new CharsetConverter())
