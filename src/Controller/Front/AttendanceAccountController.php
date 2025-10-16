@@ -56,7 +56,7 @@ class AttendanceAccountController extends AbstractController
     }
 
     #[Route(path: '/attendance/{session}', name: 'front.account.attendance', methods: ['GET'])]
-    public function attendance($session, ManagerRegistry $doctrine): Response
+    public function attendance($session, ManagerRegistry $doctrine):Response
     {
         // recup trainee
         $user = $this->getUser();
@@ -78,7 +78,10 @@ class AttendanceAccountController extends AbstractController
         }*/
         $attendance->getSession()->setAllMaterials($allMaterials);
 
-        return $this->render('Front/Account/attendance/attendance.html.twig', ['user' => $trainee, 'attendance' => $attendance, 'evalActif' => $evalActif,
+        return $this->render('Front/Account/attendance/attendance.html.twig', [
+            'user' => $trainee,
+            'attendance' => $attendance,
+            'evalActif' => $evalActif,
         ]);
     }
 
@@ -109,12 +112,7 @@ class AttendanceAccountController extends AbstractController
             $tabEvalChoices = [$evalCritere4 => 4, $evalCritere3 => 3, $evalCritere2 => 2, $evalCritere1 => 1];
         }
 
-        if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
-            // Pb : l'évaluation a déjà été remplie
-            $this->addFlash('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
-            return $this->render('Front/Account/attendance/evaluation.html.twig');
 
-        }
 
         $evaluationCriterionsLoc = $doctrine
             ->getRepository('App\Entity\Term\EvaluationCriterion')
@@ -131,6 +129,19 @@ class AttendanceAccountController extends AbstractController
             $attendance->addCriterion($evaluationNotedCriterion);
         }
         $form = $this->createForm(EvaluationType::class, $attendance, ['tab_eval' => $tabEvalChoices, 'message' => $evalMessage]);
+
+        $form = $this->createForm(EvaluationType::class, $attendance, ['tab_eval' => $tabEvalChoices, 'message' => $evalMessage]);
+
+        //un formation déjà évaluée
+        if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
+            $this->addFlash('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
+            return $this->render('Front/Account/attendance/evaluation.html.twig', [
+                'user' => $trainee,
+                'attendance' => $attendance,
+                'form' => $form->createView(),
+            ]);
+        }
+
         if ($request->getMethod() == "POST") {
             $form->handleRequest($request);
             if ($form->isValid()) {
@@ -140,7 +151,12 @@ class AttendanceAccountController extends AbstractController
             }
         }
 
-        return $this->render('Front/Account/attendance/evaluation.html.twig',['user' => $trainee, 'attendance' => $attendance, 'form' => $form->createView()]);
+
+        return $this->render('Front/Account/attendance/evaluation.html.twig', [
+        'user' => $trainee,
+        'attendance' => $attendance,
+        'form' => $form->createView(),
+    ]);
     }
 
 

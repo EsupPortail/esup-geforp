@@ -159,9 +159,9 @@ trait AccountTrait
         return $this->shibbolethpersistentid;
     }
 
-    public function setShibbolethpersistentid(mixed $shibbolethPersistentId): void
+    public function setShibbolethpersistentid(mixed $shibbolethpersistentid): void
     {
-        $this->shibbolethpersistentid = $shibbolethPersistentId;
+        $this->shibbolethpersistentid = $shibbolethpersistentid;
     }
 
     /**

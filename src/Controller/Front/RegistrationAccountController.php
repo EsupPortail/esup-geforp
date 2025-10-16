@@ -71,8 +71,11 @@ class RegistrationAccountController extends AbstractController
         $relanceActif = $this->getParameter('relance_actif');
 
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
-        $trainee = $arTrainee;
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        if (!$arTrainee || count($arTrainee) === 0) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé à cet utilisateur.');
+        }
+        $trainee = $arTrainee[0];
 
         $inscriptions = $trainee->getInscriptions();
         $upcoming = [];
@@ -111,8 +114,11 @@ class RegistrationAccountController extends AbstractController
     public function desist($id, Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocabularyRegistry, MailerInterface $mailer): Response
     {
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
-        $trainee = $arTrainee;
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        if (!$arTrainee || count($arTrainee) === 0) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé à cet utilisateur.');
+        }
+        $trainee = $arTrainee[0];
 
         $registration = $doctrine->getRepository(\App\Entity\Core\AbstractInscription::class)->find($id);
         $registration->pending = $registration->getInscriptionstatus()->getId() === 1;
@@ -155,7 +161,18 @@ class RegistrationAccountController extends AbstractController
                 $em = $doctrine->getManager();
                 $repo = $em->getRepository($templateTerm::class);
                 /** @var Emailtemplate $template */
-                $templates = $repo->findBy(['name' => "Statut d'inscription : désistement", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                $templates = $repo->findBy([
+                    'name' => "Statut d'inscription : désistement",
+                    'organization' => $registration->getSession()->getTraining()->getOrganization()
+                ]);
+                if (!$templates || count($templates) === 0) {
+                    $status = $this->getDesistInscriptionStatus($doctrine, $trainee);
+                    $inscription->setInscriptionstatus($status);
+                    $em->flush();
+
+                    $this->addFlash('success', 'Votre désistement a bien été enregistré (aucun email envoyé).');
+                    return $this->redirectToRoute('front.account.registrations');
+                }
                 $formathtml = $templates[0]->getPosition();
                 if ($formathtml)
                     $newline = "<br>";
@@ -218,7 +235,10 @@ class RegistrationAccountController extends AbstractController
 
         }
 
-        return $this->render('Front/Account/registration/registration-desist.html.twig',['user' => $trainee, 'registration' => $registration]);
+        return $this->render('Front/Account/registration/registration-desist.html.twig', [
+            'user' => $trainee,
+            'registration' => $registration,
+        ]);
     }
 
     /**
@@ -245,13 +265,22 @@ class RegistrationAccountController extends AbstractController
         $repo = $em->getRepository($templateTerm::class);
         /** @var Emailtemplate $template */
         $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
-        $formathtml = $templates[0]->getPosition();
-        if ($formathtml)
-            $newline = "<br>";
-        else
-            $newline = "\n";
-        $subject = $templates[0]->getSubject();
-        $body = $templates[0]->getBody();
+        if (!$templates || count($templates) === 0) {
+            if (!$templates || count($templates) === 0) {
+
+                $subject = "Demande de validation d'inscription";
+                $body = "Bonjour,\nUne demande de relance pour une inscription est en attente de validation.";
+                $formathtml = 0;
+                $newline = "\n";
+            } else {
+                $template = $templates[0];
+                $formathtml = $template->getPosition();
+                $newline = $formathtml ? "<br>" : "\n";
+                $subject = $template->getSubject();
+                $body = $template->getBody();
+            }
+        }
+
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
         $Texte = "";
         foreach ($registration->getSession()->getDates() as $date) {
@@ -281,10 +310,11 @@ class RegistrationAccountController extends AbstractController
             ->subject($subject);
 
         // si Format HTML coché pour ce modèle, sinon format texte
-        if ($templates[0]->getPosition() == 1) {
+        if ($formathtml == 1) {
             $message->html($newbody);
-        } else
+        } else {
             $message->text($newbody);
+        }
 
         $mailer->send($message);
 
@@ -360,6 +390,10 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(['name' => "Statut d'inscription : avis favorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                                if (!$templates || count($templates) === 0) {
+                                    $this->addFlash('success', "Avis favorable du N+1 est accordé mais un mail n'a pas été envoyé, Veuiller contacter un administrateur");
+                                    return $this->redirectToRoute('front.account.team.registrations');
+                                }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();
@@ -424,6 +458,10 @@ class RegistrationAccountController extends AbstractController
                                 $repo = $em->getRepository($templateTerm::class);
                                 /** @var Emailtemplate $template */
                                 $templates = $repo->findBy(['name' => "Statut d'inscription : avis défavorable du N+1", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
+                                if (!$templates || count($templates) === 0) {
+                                    $this->addFlash('success', "Avis défavorable du N+1 est accordé mais un mail n'a pas été envoyé, Veuiller contacter un administrateur");
+                                    return $this->redirectToRoute('front.account.team.registrations');
+                                }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
                                 $body = $templates[0]->getBody();

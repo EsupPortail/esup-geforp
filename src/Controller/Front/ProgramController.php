@@ -27,7 +27,7 @@ use App\Form\Type\InscriptionType;
 
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use http\Client\Response;
+use Symfony\Component\HttpFoundation\Response;
 use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
@@ -112,7 +112,7 @@ class ProgramController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/training/{id}/{sessionId}/{token}', name: 'front.program.training', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null): \Symfony\Component\HttpFoundation\Response
+    public function training(ManagerRegistry $doctrine, int $id, int $sessionId = null, $token = null)
     {
 
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
@@ -188,13 +188,16 @@ class ProgramController extends AbstractController
             if ($training->getDesignatedpublic())
                 $this->addFlash('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
 
+            usort($pastSessions, function($a, $b) {
+                return $b->getDatebegin() <=> $a->getDatebegin();
+            });
             return $this->render('Front/Public/program/training.html.twig', [
                 'user' => $trainee,
                 'training' => $training,
                 'session' => $focusSession,
                 'upcomingSessions' => $upcomingSessions,
                 'pastSessions' => $pastSessions,
-                'token' => $token,
+                'token' => $token
             ]);
         }
     }
@@ -206,7 +209,7 @@ class ProgramController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      */
     #[Route(path: '/training/inscription/{id}/{sessionId}/{token}', name: 'front.program.inscription', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id,int $sessionId, Session $session, $token = null): \Symfony\Component\HttpFoundation\Response
+    public function inscription(Request $request, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, MailerInterface $mailer, AbstractTraining $training, int $id, int $sessionId, $token = null): Response
     {
         $training = $doctrine->getRepository(\App\Entity\Core\AbstractTraining::class)->find($id);
         if (!isset($training)) {
@@ -221,6 +224,9 @@ class ProgramController extends AbstractController
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
         $trainee = $arTrainee;
 
+        if (!$trainee) {
+            throw $this->createAccessDeniedException('Aucun stagiaire associé.');
+        }
         $inscription = $doctrine->getManager()->getRepository(\App\Entity\Core\AbstractInscription::class)->findOneBy(['trainee' => $trainee, 'session'=> $session]);
         if ($inscription) {
             $this->addFlash('warning', "Vous êtes déjà inscrit à cette session.");
@@ -281,7 +287,7 @@ class ProgramController extends AbstractController
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
                 $sup = $trainee->getFirstnamesup() . " " . $trainee->getLastnamesup();
-                $this->addFlash('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
+                $this->addFlash('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
             $form = $this->createForm(InscriptionType::class, $inscription);
@@ -307,7 +313,14 @@ class ProgramController extends AbstractController
                         $templateTerm = $vocRegistry->getVocabularyById(5);
                         $repo = $em->getRepository($templateTerm::class);
                         /** @var Emailtemplate $template */
-                        $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $inscription->getSession()->getTraining()->getOrganization()]);
+                        $templates = $repo->findBy([
+                            'name' => "Demande de validation d'inscription",
+                            'organization' => $inscription->getSession()->getTraining()->getOrganization()]);
+                        if (!$templates || count($templates) === 0) {
+                            // Aucun modèle d'email trouvé pour cette organisation : on ajoute juste un message flash
+                            $this->addFlash('success', "Votre demande a été enregistrée. Aucun email n'a été envoyé car aucun modèle n'existe pour cette organisation. Merci de contacter un Administrateur.");
+                            return $this->redirectToRoute('front.account.registrations');
+                        }
                         $subject = $templates[0]->getSubject();
                         $body = $templates[0]->getBody();
                         $formathtml = $templates[0]->getPosition();
@@ -364,11 +377,25 @@ class ProgramController extends AbstractController
             }
 
 
-            return $this->render('Front/Public/program/inscription.html.twig',['user' => $trainee, 'form' => $form->createView(), 'training' => $training, 'session' => $session, 'token' => $token, 'flag' => $flagInsc]);
-        } else {
-            $this->addFlash('error', "Vous ne pouvez pas vous inscrire à cette session car vous ne faites pas partie des publics cibles autorisés à s'inscrire.");
-            return $this->redirectToRoute('front.program.myprogram');
+
+            return $this->render('Front/Public/program/inscription.html.twig', [
+                'user' => $trainee,
+                'form' => $form->createView(),
+                'training' => $training,
+                'session' => $session,
+                'token' => $token,
+                'flag' => $flagInsc,
+            ]);
         }
+
+
+        return $this->render('Front/Public/program/inscription.html.twig', [
+            'user' => $trainee,
+            'training' => $training,
+            'session' => $session,
+            'token' => $token,
+            'flag' => $flagInsc,
+        ]);
     }
 
     /**
@@ -539,8 +566,7 @@ class ProgramController extends AbstractController
                 }
             }
 
-            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');
-        }
+            $this->addFlash('success', 'Vos modifications ont bien été enregistrées.');}
 
         return $this->render('Front/Public/myprogram.html.twig', [
             'user' => $arTrainee,
