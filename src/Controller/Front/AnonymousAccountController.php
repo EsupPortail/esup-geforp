@@ -16,7 +16,6 @@ use Monolog\Logger;
 use App\Form\Type\ProfileType;
 use App\Entity\Back\Trainee;
 use App\Entity\Back\SupannCodeEntite;
-use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +41,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
      *
      */
     #[Route(path: '/register', name: 'front.account.register')]
-    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): array
+    public function register(Request $request, ManagerRegistry $managerRegistry, AccessRightRegistry $accessRightRegistry): \Symfony\Component\HttpFoundation\Response
     {
         if (!$this->isGranted('IS_AUTHENTICATED_FULLY')) {
             // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
@@ -99,7 +98,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
         }
 
         $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
-        $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
+		$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
         if ($shibbolethAttributes['primary-affiliation'] == "staff") {
             // Transformation de l'attribut 'staff' en 'employee'
             $shibbolethAttributes['primary-affiliation'] = "employee";
@@ -328,11 +327,11 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                     $em->flush();
                     $this->addFlash('success', 'Votre profil a bien été créé.');
 
-                    return [$this->render('Front/Account/profile/account-registration.html.twig')];
+                    return $this->render('Front/Account/profile/account-registration.html.twig');
                 }
             }
         }
-        return ['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()];
+        return $this->render('Front/Account/profile/account-registration.html.twig',['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()]);
     }
 
     /**

@@ -30,7 +30,7 @@ class Inscription extends AbstractInscription implements \Stringable
      * @var Collection<\App\Entity\Back\EvaluationNotedCriterion>
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    #[Type("App\Entity\EvaluationNotedCriterion")]
+
     #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: \App\Entity\Back\EvaluationNotedCriterion::class, cascade: ['persist', 'merge', 'remove'])]
     protected Collection $criteria;
@@ -62,7 +62,7 @@ class Inscription extends AbstractInscription implements \Stringable
      * @var Collection<Presence> $presences
      * @Serializer\Groups({"training", "inscription", "api.attendance", "session"})
      */
-    #[Type("ArrayCollection<Presence::class>")]
+
     #[Groups(['training', 'inscription', 'api.attendance', 'session'])]
     #[ORM\OneToMany(mappedBy: 'inscription', targetEntity: Presence::class, cascade: ['persist', 'remove'])]
     #[ORM\OrderBy(['datebegin' => 'ASC'])]
@@ -139,7 +139,7 @@ class Inscription extends AbstractInscription implements \Stringable
     /**
      * @return ArrayCollection|Collection
      */
-    public function getCriteria(): ArrayCollection|Collection
+    public function getCriteria(): Collection
     {
         return $this->criteria;
     }
@@ -208,9 +208,23 @@ class Inscription extends AbstractInscription implements \Stringable
     /**
      * Add a noted criterion
      */
-    public function addCriterion(EvaluationNotedCriterion $evaluationNotedCriterion): void
+    public function addCriterion(EvaluationNotedCriterion $criterion): self
     {
-        $this->criteria->add($evaluationNotedCriterion);
+        if (!$this->criteria->contains($criterion)) {
+            $this->criteria->add($criterion);
+            $criterion->setInscription($this);
+        }
+        return $this;
+    }
+
+    public function removeCriterion(EvaluationNotedCriterion $criterion): self
+    {
+        if ($this->criteria->removeElement($criterion)) {
+            if ($criterion->getInscription() === $this) {
+                $criterion->setInscription(null);
+            }
+        }
+        return $this;
     }
 
     /**

@@ -65,21 +65,18 @@ final readonly class MenuBuilder
         // Menu administration et sous menus
         $adminMenu = $menu->addChild('administration', ['label' => 'Administration', 'icon' => 'gear', 'uri' => $this->router->generate('core.index')]);
 
-        $organisation = $this->entityManager->getRepository(\App\Entity\Back\Organization::class);
-        if ($organisation && $this->authorizationChecker->isGranted('VIEW', $organisation)) {
+	if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Organisation::class)) {
             $adminMenu->addChild('organizations', ['label' => 'Centres', 'uri' => $this->router->generate('organization.index')]
             );
         }
-        $term = $this->entityManager->getRepository(\App\Entity\Term\AbstractTerm::class);
-        if ($term && $this->authorizationChecker->isGranted('VIEW', $term)) {
+	if(($this->authorizationChecker->isGranted('VIEW', \App\Entity\Term\AbstractTerm::class)) || ($this->authorizationChecker->isGranted('VIEW', \App\Vocabulary\VocabularyInterface::class))) {
             $adminMenu->addChild('taxonomy', [
                 'label' => 'Vocabulaires',
                 'uri' => $this->router->generate('taxonomy.index')
             ]);
         }
 
-        $user = $this->entityManager->getRepository(\App\Entity\Core\User::class);
-        if ($user && $this->authorizationChecker->isGranted('VIEW', $user)) {
+	if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Core\User::class)) {
             $adminMenu->addChild('users', ['label' => 'Utilisateurs', 'uri' => $this->router->generate('user.index')]);
         }
 

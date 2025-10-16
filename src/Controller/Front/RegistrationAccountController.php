@@ -291,10 +291,10 @@ class RegistrationAccountController extends AbstractController
             }
         }
         $newbody = str_replace("[dates]", $Texte, $newbody);
-        $newbody = str_replace("[motivation]", $registration->getMotivation(), $newbody);
+	$newbody = str_replace("[motivation]", $registration->getMotivation(), $newbody);
         $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
         $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
-        $newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
+	$newbody = str_replace("[session.id]", $registration->getSession()->getId(), $newbody);
         $newbody = str_replace("[session.formation.id]", $registration->getSession()->getTraining()->getId(), $newbody);
         $newbody = str_replace("[session.formation.description]", $registration->getSession()->getTraining()->getDescription(), $newbody);
         $newbody = str_replace("[session.formation.prerequis]", $registration->getSession()->getTraining()->getPrerequisites(), $newbody);
@@ -328,13 +328,13 @@ class RegistrationAccountController extends AbstractController
      *
      */
     #[Route(path: '/registration/{id}/valid', name: 'front.account.registration.valid')]
-    public function valid($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer): ?array
+    public function valid($id, ManagerRegistry $doctrine, VocabularyRegistry $vocRegistry, Request $request, MailerInterface $mailer): Response
     {
         // Authentification et récup du mail retourné par Shibboleth
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $traineeUser = $arTraineeUser[0];
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $traineeUser = $arTraineeUser;
 
         $supMail = $user->getCredentials()['mail'];
 
@@ -482,7 +482,6 @@ class RegistrationAccountController extends AbstractController
                                     }
                                 }
                                 $newbody = str_replace("[dates]", $Texte, $newbody);
-                                $newbody = str_replace("[refuse]", $registration->getRefuse(), $newbody);
                                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                                 $newbody = str_replace("[stagiaire.nomComplet]", $registration->getTrainee()->getFullName(), $newbody);
@@ -522,11 +521,11 @@ class RegistrationAccountController extends AbstractController
                 // Sinon, on affiche un message d'erreur
                 $access = "Non autorisé";
             }
-            return ['form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
+            return $this->render('Front/Account/registration/registration-valid.html.twig',['form'=> $form->createView(), 'trainee' => $registration->getTrainee(), 'registration' => $registration, 'access' => $access, 'user' => $traineeUser]);
         } else {
             // Sinon, on affiche un message d'erreur
             $access = "Inscription non trouvée";
-            return ['form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser, $this->render('Front/Account/registration/registration-valid.html.twig')];
+            return $this->render('Front/Account/registration/registration-valid.html.twig',['form'=> '', 'trainee' => '', 'registration' => '', 'access' => $access, 'user' => $traineeUser]);
         }
 
     }

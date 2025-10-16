@@ -48,7 +48,7 @@ final class OwnTrainingViewAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $attribute = null, $object = null): bool
+    public function isGranted(TokenInterface $token, $object = null, $attribute): bool
     {
         if ($attribute !== 'VIEW') return false;
 

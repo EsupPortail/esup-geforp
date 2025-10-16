@@ -1,11 +1,11 @@
-{% use "bootstrap_5_horizontal_layout.html.twig" %}
+{#% use "bootstrap_5_horizontal_layout.html.twig" %#}
 
-{# Surcharge du bloc form_row : gère alignement + évite form-control sur radios/checkboxes #}
+{# Surcharge du bloc form_row : gère alignement #}
 {% block form_row %}
     <div class="form-group row">
         {{ form_label(form, null, { label_attr: { class: 'col-form-label col-sm-2' } }) }}
         <div class="col-sm-10">
-            {% set isExpanded = form.vars.expanded is defined and form.vars.expanded %}
+ 	    {% set isExpanded = form.vars.expanded is defined and form.vars.expanded %}
             {% set isCompound = form.vars.compound is defined and form.vars.compound %}
             {% set attrClass = '' %}
 
@@ -17,6 +17,22 @@
             {{ form_widget(form, { attr: { class: attrClass } }) }}
             {{ form_errors(form) }}
         </div>
+    </div>
+{% endblock %}
+
+{# Surcharge du bloc checkbox_widget : gère alignement #}
+{% block checkbox_widget %}
+    <div class="checkbox">
+	<label>
+        	<input type="checkbox"
+               		{{ block('widget_attributes') }}
+               		{% if value is defined %} value="{{ value }}"{% endif %}
+               		{% if checked %} checked="checked"{% endif %}
+               		class="form-check-input"/>
+        	{% if label is defined %}
+                	{{ label }}
+        	{% endif %}
+	</label>
     </div>
 {% endblock %}
 
@@ -37,34 +53,5 @@
     {% endif %}
 {% endblock %}
 
-{# Surcharge du bloc choice_widget_expanded : supprime <fieldset> et évite double label #}
-{% block choice_widget_expanded %}
-    <div {{ block('widget_container_attributes') }}>
-        {# ⚠️ NE PAS réafficher le label ici (déjà fait via form_label dans form_row) #}
 
-        {% for child in form %}
-            <div class="form-check">
-                {{ form_widget(child, { attr: { class: 'form-check-input' } }) }}
-                {{ form_label(child, null, { label_attr: { class: 'form-check-label' } }) }}
-            </div>
-        {% endfor %}
-    </div>
-{% endblock %}
-
-{# Surcharge du bloc checkbox_widget : stylé avec Bootstrap 5 #}
-{% block checkbox_widget %}
-    <div class="form-check">
-        <input type="checkbox"
-               {{ block('widget_attributes') }}
-               {% if value is defined %} value="{{ value }}"{% endif %}
-               {% if checked %} checked="checked"{% endif %}
-               class="form-check-input"
-        />
-        {% if label is defined %}
-            <label for="{{ id }}" class="form-check-label">
-                {{ label }}
-            </label>
-        {% endif %}
-    </div>
-{% endblock %}
 

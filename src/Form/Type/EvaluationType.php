@@ -19,16 +19,16 @@ use App\Form\Type\EvaluationNotedCriterionType;
 final class EvaluationType extends AbstractType
 {
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $tabEval = $options['tab_eval'];
-        $formBuilder
-            ->add('criteria', CollectionType::class, ['label' => 'Critères d\'évaluation', 'entry_type' => EvaluationNotedCriterionType::class, 'entry_options' =>  ['tab_eval'  => $tabEval]])
+        $builder
+            ->add('criteria', CollectionType::class, ['label' => 'Critères d\'évaluation', 'entry_type' => EvaluationNotedCriterionType::class, 'entry_options' =>  ['tab_eval'  => $tabEval], 'by_reference' => false,])
             ->add('message', null, ['label' => $options['message'], 'required' => false, 'attr' => ['placeholder' => "Vous pouvez éventuellement laisser un message qui accompagnera votre évaluation."]]);
     }
 
-    public function configureOptions(OptionsResolver $optionsResolver): void
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        $optionsResolver->setDefaults(['tab_eval' => ["Tout à fait d'accord" => 4, "Plutôt d'accord" => 3, "Pas vraiment d'accord" => 2, "Pas du tout d'accord" => 1], 'message' => 'Message']);
+        $resolver->setDefaults(['tab_eval' => ["Tout à fait d'accord" => 4, "Plutôt d'accord" => 3, "Pas vraiment d'accord" => 2, "Pas du tout d'accord" => 1], 'message' => 'Message']);
     }
 }

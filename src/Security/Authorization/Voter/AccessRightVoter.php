@@ -51,14 +51,13 @@ final readonly class AccessRightVoter implements VoterInterface
         if (!($token->getUser() instanceof User)) {
             return VoterInterface::ACCESS_ABSTAIN;
         }
-
+	
         // support of Doctrine namespace alias
         if (is_string($object) && strpos($object, ':') && $this->entityManager instanceof \Doctrine\ORM\EntityManager) {
             [$alias, $class] = explode(':', $object);
             $namespace = $this->entityManager->getConfiguration()->getEntityNamespace($alias);
             $object = $namespace . '\\' . $class;
         }
-
         // Run overs user access rights
         foreach ($attributes as $attribute) {
             foreach ($token->getUser()->getAccessRights() as $accessRightId) {

@@ -24,10 +24,3 @@
 ###> bower seulement, on garde les fichier node###
 /bower_components/
 ###< bower ###
-
-###> symfony/webpack-encore-bundle ###
-/node_modules/
-/public/build/
-npm-debug.log
-yarn-error.log
-###< symfony/webpack-encore-bundle ###

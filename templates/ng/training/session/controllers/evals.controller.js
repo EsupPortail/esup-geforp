@@ -12,7 +12,7 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
         var crit = [];
         for (key in criteria) {
             var criterion = criteria[key];
-            if ((criterion.organization_id == $scope.session.training.organization.id) || (criterion.organization_id == null)) {
+            if ((criterion.organization.id == $scope.session.training.organization.id) || (criterion.organization.id == null)) {
                 crit.push(criterion);
             }
         }
@@ -70,6 +70,26 @@ sygeforApp.controller('EvalComputeController', ['$scope', '$dialog', '$filter', 
             average = 0;
         }
         return average;
+
+    }
+
+    /**
+     * Get the number of occurencies for a note of a criterion
+     */
+    $scope.EvalOccur = function(note, criterion) {
+        var nb=0;
+        for (var i=0; i < $scope.session.inscriptions.length; i++) {
+            var insc = $scope.session.inscriptions[i];
+            for (var j=0; j<insc.criteria.length; j++) {
+                var crit = insc.criteria[j];
+                if (crit.criterion.name == criterion.name) {
+                    if ((crit.note != 0) && (crit.note == note)) {
+                        nb++;
+                    }
+                }
+            }
+        }
+        return nb;
 
     }
 

@@ -100,7 +100,6 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session", "inscription", "trainee", "trainer", "api"})
      * @var Collection<AbstractParticipation>
      */
-    #[Type("ArrayCollection<Participation::class>")]
     #[Groups(['session', 'inscription', 'trainee', 'trainer', 'api'])]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Participation::class, cascade: ['remove'])]
     protected Collection $participations ;
@@ -109,7 +108,6 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\AbstractInscription>
      */
-    #[Type("ArrayCollection<Inscription::class>")]
     #[Groups('session')]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Inscription::class, cascade: ['remove'], fetch: 'EXTRA_LAZY')]
     #[ORM\OrderBy(['createdat' => 'DESC'])]
@@ -230,7 +228,6 @@ abstract class AbstractSession implements SerializedAccessRights
      * @Serializer\Groups({"session"})
      * @var Collection<\App\Entity\Core\ParticipantsSummary>
      */
-    #[Type("ArrayCollection<ParticipantsSummary::class>")]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: \App\Entity\Core\ParticipantsSummary::class, cascade: ['persist', 'remove'], fetch: 'EXTRA_LAZY')]
     #[Groups('session')]
     protected Collection $participantsSummaries;
@@ -239,7 +236,6 @@ abstract class AbstractSession implements SerializedAccessRights
      * @var Collection<Material>
      * @Serializer\Groups({"training", "session", "api.attendance"})
      */
-    #[Type("ArrayCollection<Material::class>")]
     #[ORM\OneToMany(mappedBy: 'session', targetEntity: Material::class, cascade: ['remove', 'persist'])]
     #[ORM\JoinColumn(nullable: true)]
     #[Groups(['training', 'session', 'api.attendence'])]

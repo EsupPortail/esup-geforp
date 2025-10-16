@@ -42,8 +42,8 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup param evaluations
         $evalActif = $this->getParameter('eval_actif');
@@ -60,8 +60,8 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup param pour l'activation des evaluations
         $evalActif = $this->getParameter('eval_actif');
@@ -94,8 +94,8 @@ class AttendanceAccountController extends AbstractController
         }
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         // Recup params pour les critères d'évalutation
         $evalCritere0Actif = $this->getParameter('eval_critere_0_actif');
@@ -165,7 +165,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
         $trainee = $arTrainee[0];
 
         $attendance   = $this->getAttendance($doctrine, $session, $trainee);
@@ -200,8 +200,8 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
+        $trainee = $arTrainee;
 
         $attendance = $this->getAttendance($doctrine, $session, $trainee);
         $session = $attendance->getSession();
@@ -257,12 +257,12 @@ class AttendanceAccountController extends AbstractController
         foreach ($images as $img) {
             $fileName = $img->getName();
             if(str_contains($fileName, 'logo')){
-                if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                if ($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileLogo = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }
             if(str_contains($fileName, 'signature')){
-                if ($fs->exists($this->get('parameter_bag')->get('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
+                if ($fs->exists($this->getParameter('kernel.project_dir') . '/public/img/vocabulary/'.$img->getFilepath())) {
                     $fileSignature = 'https://' . $this->getParameter('front_host') . '/img/vocabulary/'.$img->getFilepath();
                 }
             }

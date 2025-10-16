@@ -19,14 +19,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
  */
 final class HumanReadablePropertyAccessor implements \Stringable
 {
-    /**
-     * @var ArrayCollection|mixed|string|null
-     */
-    public mixed $emailCorr;
-    /**
-     * @var ArrayCollection|mixed|string|null
-     */
-    public mixed $emailSup;
     /** @var  HumanReadablePropertyAccessorFactory $accessorFactory */
     private HumanReadablePropertyAccessorFactory $accessorFactory;
 

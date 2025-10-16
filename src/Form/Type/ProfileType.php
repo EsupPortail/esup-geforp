@@ -36,9 +36,9 @@ final class ProfileType extends AbstractType
     {
     }
 
-    public function buildForm(FormBuilderInterface $formBuilder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $formBuilder
+        $builder
             ->add('title', null, ['label' => 'Civilité', 'disabled' => true])
             ->add('lastname', null, ['label' => 'Nom', 'disabled' => true])
             ->add('firstname', null, ['label' => 'Prénom', 'disabled' => true])
@@ -66,7 +66,7 @@ final class ProfileType extends AbstractType
             ->add('fonction', null, ['required' => true, 'label'    => 'Fonction exercée']);
 
         // add listeners to handle conditionals fields
-        $this->addEventListeners($formBuilder);
+        $this->addEventListeners($builder);
 
     }
 
@@ -97,8 +97,8 @@ final class ProfileType extends AbstractType
         });
     }
 
-	public function configureOptions(OptionsResolver $optionsResolver): void
+	public function configureOptions(OptionsResolver $resolver): void
 	{
-		$optionsResolver->setDefaults(['data_class' => Trainee::class, 'validation_groups' => ['Default', 'trainee'], 'enable_security_check' => true]);
+		$resolver->setDefaults(['data_class' => Trainee::class, 'validation_groups' => ['Default', 'trainee'], 'enable_security_check' => true]);
 	}
 }

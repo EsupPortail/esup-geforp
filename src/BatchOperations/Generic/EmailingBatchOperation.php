@@ -60,7 +60,6 @@ EmailingBatchOperation extends AbstractBatchOperation
         }
 
         $targetEntities = $this->getObjectList($idList);
-
         if (isset($options['preview']) && $options['preview']) {
             if (empty($targetEntities)) {
                 return [['error' => 'Aucune entité à prévisualiser.'], Response::HTTP_BAD_REQUEST];
@@ -78,7 +77,7 @@ EmailingBatchOperation extends AbstractBatchOperation
             }
         }
 
-        $this->parseAndSendMail($targetEntities, $options['subject'] ?? '', $options['message'] ?? '', $options['attachment'] ?? [], false, $options['ical'] ?? false, $options['format'] ?? 0);
+	$this->parseAndSendMail($targetEntities, isset($options['subject']) ? $options['subject'] : '', isset($options['message']) ? $options['message'] : '', (isset($options['attachment'])) ? $options['attachment'] : [], false, isset($options['ical']) ? $options['ical'] : false, isset($options['format']) ? $options['format'] : 0, isset($options['sendresp']) ? $options['sendresp'] : 1);
 
         return ['', Response::HTTP_NO_CONTENT];
     }
@@ -121,8 +120,7 @@ EmailingBatchOperation extends AbstractBatchOperation
      *
      * @return array[]
      */
-    public function parseAndSendMail($entities, $subject, $body, array $attachments = [], bool $preview = false, $ical = false, $format = 0,   array|string $publipostTemplates = [],
-                                     array|string $publipostIdList = []): array
+    public function parseAndSendMail($entities, $subject, $body, array $attachments = [], bool $preview = false, $ical = false, $format = 0, $sendresp = 1): array
     {
         $em = null;
         $last = [];
@@ -135,10 +133,6 @@ EmailingBatchOperation extends AbstractBatchOperation
         if ($entities === []) {
             return [];
         }
-
-        //dump($body);
-       // dump($entities);
-        //dump($this->replaceTokens($body, $entities, $format));
 
         if ($preview) {
             return ['email' => ['subject' => $this->replaceTokens($subject, $entities[0]), 'message' => $this->replaceTokens($body, $entities[0])]];
@@ -158,7 +152,6 @@ EmailingBatchOperation extends AbstractBatchOperation
                     $organization = $this->security->getUser()->getOrganization();
 
                 $hrpa = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
-                //dump($hrpa);
 
                 $email = $hrpa->email;
                 if (empty($email)) {
@@ -179,16 +172,6 @@ EmailingBatchOperation extends AbstractBatchOperation
                 } else
                     $msg->text($bodyR);
 
-               //dump($publipostTemplates);
-                //dump($publipostIdList);
-
-                    error_log('Appel de attachPublipostAttachment');
-                    $this->attachPublipostAttachment(
-                        $msg,
-                        $publipostTemplates,
-                        $publipostIdList,
-                        $attachments
-                    );
                 // attachements
                 if (!empty($attachments)) {
                     $attachments = is_array($attachments) ? $attachments : [$attachments];
@@ -214,22 +197,28 @@ EmailingBatchOperation extends AbstractBatchOperation
                     ])
                 ) {
                     $flagSup = 0;
-                    if (isset($hrpa->emailSup)) {
-                        $emailSup = $hrpa->emailSup;
-                        $flagSup = 1;
-                        $msg->cc($emailSup);
-                    }
 
-                    if (isset($hrpa->emailCorr)) {
-                        $emailCorr = $hrpa->emailCorr;
-                        if ($flagSup == 0){
-                            $msg->cc($emailCorr);
-                        } else {
-                            $msg->addCc($emailCorr);
+		    // Envoyer une copie au N+1 et/ou correspondant formation si l'option est activée
+                    if ($sendresp == 0) {
+                        // si option à 'NON', on ne fait rien
+                    } else {
+                        if ($hrpa->emailSup != null) {
+                            $emailSup = $hrpa->emailSup;
+                            $flagSup = 1;
+                            $msg->cc($emailSup);
+                        }
+
+                        if ($hrpa->emailCorr != null) {
+                            $emailCorr = $hrpa->emailCorr;
+                            if ($flagSup == 0){
+                                $msg->cc($emailCorr);
+                            } else {
+                                $msg->addCc($emailCorr);
+                            }
                         }
                     }
-
-                    if ($ical) {
+                    
+		    if ($ical) {
                         // AJOUT ICS CAL
                         $calendar = new Calendar();
                         $calendar->setTimezone(new \DateTimeZone('Europe/Paris'));
@@ -244,15 +233,50 @@ EmailingBatchOperation extends AbstractBatchOperation
                             $id = $tabDate->getId();
                             $tabEvent[$i] = new CalendarEvent();
                             $dateBegin = clone $tabDate->getDatebegin();
-                            $dateBegin->setTime(8, 0);
+                            $dateEnd = clone $tabDate->getDateend(); 
 
-                            $dateEnd = clone $tabDate->getDateend();
-                            $dateEnd->setTime(18, 0);
-                            $startTime = (clone $tabDate->getDatebegin())->setTime(8, 0);
-                            $endTime = (clone $tabDate->getDateend())->setTime(18, 0);
+			    $schedulemorn = $tabDate->getSchedulemorn();
+                            $scheduleafter = $tabDate->getScheduleafter();
 
-                            $tabEvent[$i]->setStart($startTime)
-                                ->setEnd($endTime)
+                            // Par défaut, on fixe les horaires à la journée
+                            $horBegin = '+8 hours';
+                            $horEnd = '+18 hours';
+                            // récupération des horaires pour exploitation avec le calendrier
+                            $j=0;
+                            $horMod1=[];
+                            $horMod2=[];
+                            // Horaires matin
+                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $schedulemorn, $matchesMorn)) {
+                                    foreach ($matchesMorn[0] as $hor) {
+                                        $partsMorn = explode(':', $hor);
+                                        $horMod1[$j] = "$partsMorn[0]h$partsMorn[1]";
+                                        $horMod2[$j] = "$partsMorn[0] hours $partsMorn[1] minutes";
+                                        $j++;
+                                    }
+                            }
+                            // Horaires après-midi
+                            if (preg_match_all('/\b([01]?\d|2[0-3]):[0-5]\d\b/', $scheduleafter, $matchesAfter)) {
+                                    foreach ($matchesAfter[0] as $hor) {
+                                        $partsAfter = explode(':', $hor);
+                                        $horMod1[$j] = "$partsAfter[0]h$partsAfter[1]";
+                                        $horMod2[$j] = "$partsAfter[0] hours $partsAfter[1] minutes";
+                                        $j++;
+                                    }
+                            }
+                            // au moins 2 horaires dans le tableau
+                            if (sizeof($horMod1) >= 2) {
+                                    // Conversion en date pour comparaison
+                                    $heureBegin = \DateTime::createFromFormat('H\hi', $horMod1[0]);
+                                    $heureEnd = \DateTime::createFromFormat('H\hi', end($horMod1));
+                                    // Vérif l'heure de fin est bien > à l'heure de début
+                                    if ($heureBegin<$heureEnd) {
+                                        $horBegin = "+" . $horMod2[0];
+                                        $horEnd = "+" . end($horMod2);
+                                    }
+                            }
+
+                            $tabEvent[$i]->setStart($dateBegin->modify($horBegin))
+                                ->setEnd($dateEnd->modify($horEnd))
                                 ->setSummary($sessionName)
                                 ->setUid('geforp'.$id);
                             $calendar->addEvent($tabEvent[$i]);
@@ -343,8 +367,44 @@ EmailingBatchOperation extends AbstractBatchOperation
     {
         $HRPA = $this->humanReadablePropertyAccessorFactory->getAccessor($entity);
 
-        return preg_replace_callback('#\[(.*?)]#',
-            function ($matches) use ($HRPA, $format) {
+	$newContent = preg_replace_callback('/\[(.*?)\]/',
+            function ($matches) use ($HRPA, $entity, $format) {
+                if ($format)
+                    $newline = "<br>";
+                else
+                    $newline = "\n";
+                $property = $matches[1];
+                if ($property=="dates"){
+                    $session = $entity->getSession();
+                    $tabDatesSessions = $session->getDates();
+                    $Texte = "";
+                    foreach ($tabDatesSessions as $dateSession) {
+                        if ($dateSession->getDateend() == $dateSession->getDatebegin()) {
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace().$newline;
+                        }
+                        else {
+                            $Texte .= $dateSession->getDatebegin()->format('d/m/Y')." au ".$dateSession->getDateend()->format('d/m/Y')."        ".$dateSession->getSchedulemorn()."        ".$dateSession->getScheduleafter()."        ".$dateSession->getPlace().$newline;
+                        }
+                    }
+                    return $Texte;
+                }
+                else {
+                    if ($property=="lien") {
+                        $Texte = "https://" . $this->parameterBag->get('front_url') . "/account/registration/" . $HRPA->id . "/valid";
+                        return $Texte;
+                    }
+                    else {
+                        return $HRPA->$property;
+                    }
+                }
+            },
+            $content);
+
+        return $newContent;
+
+/*
+        return preg_replace_callback('/\[(.*?)\]',
+            function ($matches) use ($HRPA, $entity, $format) {
                 $newline = $format ? "<br>" : "\n";
                 $property = $matches[1];
 
@@ -381,6 +441,6 @@ EmailingBatchOperation extends AbstractBatchOperation
                 return nl2br((string)$value);
             },
             (string) $content
-        );
+        );*/
     }
 }

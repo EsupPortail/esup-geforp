@@ -476,6 +476,57 @@ SQL;
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', '', (string)$data[$key]);
 
+                    } elseif ($key == "individualcost") {
+                        // Coût total
+                        $totalCost = $propertyAccessor->getValue($entity, 'teachingcost')
+                            + $propertyAccessor->getValue($entity, 'vacationcost')
+                            + $propertyAccessor->getValue($entity, 'accommodationcost')
+                            + $propertyAccessor->getValue($entity, 'mealcost')
+                            + $propertyAccessor->getValue($entity, 'transportcost')
+                            + $propertyAccessor->getValue($entity, 'materialcost');
+
+                        // Nombre de stagiaires en présence partielle ou totale
+                        $statsPresGlobale = array();
+                        /** @var EntityManager $em */
+                        $em    = $this->doctrine->getManager();
+                        $session = $entity;
+                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
+                            $query = $em
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Presencestatus s
+                    JOIN App\Entity\Core\AbstractInscription i WITH i.presencestatus = s
+                    WHERE i.session = :session and (s.machinename = :present or s.machinename = :partiel)
+                    GROUP BY s.id')
+                                ->setParameter('session', $session)
+                                ->setParameter('present', "present")
+                                ->setParameter('partiel', "partiel");
+
+                            $result = $query->getResult();
+                            foreach($result as $status) {
+                                $statsPresGlobale[] = array(
+                                    'id'     => $status[0]->getId(),
+                                    'name'   => $status[0]->getName(),
+                                    'status' => $status[0]->getStatus(),
+                                    'count'  => (int) $status[1],
+                                );
+                            }
+                            // On recupere seulement le compteur
+                            if (isset($statsPresGlobale[0]['count']))
+                                $nbPresentsGlob = $statsPresGlobale[0]['count'];
+                            else
+                                $nbPresentsGlob = 0;
+                        } else {
+                            $nbPresentsGlob = 0;
+                        }
+
+                        // si on a des présents, on calcule le coût par stagiare
+                        if (($nbPresentsGlob > 0) && $totalCost) {
+                            $rvalue =  $totalCost/$nbPresentsGlob;
+                        }
+
+                        $data[$key] = ($rvalue) ? $rvalue : '';
+                        // Transformation '.' en ',' pour faciliter Excel
+                        $data[$key] = str_replace('.', ',', $data[$key]);
+
                     }elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
@@ -537,7 +588,10 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-                            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec');
+				->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
+                                WHERE ec.organization = :org')
+                            ->setParameter('org', $session->getTraining()->getOrganization());
+
                         $tabCrit = $query->getResult();
 
                         // On initialise les variables pour la moyenne
@@ -546,9 +600,14 @@ SQL;
                             $tabAv[$crit->getId()]['sum'] = 0;
                             $tabAv[$crit->getId()]['nb'] = 0;
                             $tabAv[$crit->getId()]['av'] = 0;
+			    $tabAv[$crit->getId()]['1et'] = 0;
+                            $tabAv[$crit->getId()]['2et'] = 0;
+                            $tabAv[$crit->getId()]['3et'] = 0;
+                            $tabAv[$crit->getId()]['4et'] = 0;
                         }
 
                         $evalsMsg = '';
+			$nbEvals=0;
 
                         // On parcourt le tableau des inscriptions
                         foreach ($tabInsc as $insc) {
@@ -560,11 +619,23 @@ SQL;
                                 ->setParameter('inscription', $insc);
                             $tabCritNot = $query->getResult();
 
+			    if (!empty($tabCritNot))
+				$nbEvals++;
+
                             // Pour chaque critère, on calcule le total des notes
                             foreach ($tabCritNot as $critNot) {
                                 if ($critNot->getNote() != 0) {
                                     $tabAv[$critNot->getCriterion()->getId()]['sum'] += $critNot->getNote();
                                     ++$tabAv[$critNot->getCriterion()->getId()]['nb'];
+
+				    if ($critNot->getNote() == 1)
+                                        $tabAv[$critNot->getCriterion()->getId()]['1et']++;
+                                    if ($critNot->getNote() == 2)
+                                        $tabAv[$critNot->getCriterion()->getId()]['2et']++;
+                                    if ($critNot->getNote() == 3)
+                                        $tabAv[$critNot->getCriterion()->getId()]['3et']++;
+                                    if ($critNot->getNote() == 4)
+                                        $tabAv[$critNot->getCriterion()->getId()]['4et']++;
                                 }
                             }
 
@@ -577,7 +648,6 @@ SQL;
 
                         // Calcul moyenne
                         foreach ($tabCrit as $crit) {
-                            $nbEvals = $tabAv[$crit->getId()]['nb'];
                             if ($tabAv[$crit->getId()]['nb']>0){
                                 $tabAv[$crit->getId()]['av'] = $tabAv[$crit->getId()]['sum'] / $tabAv[$crit->getId()]['nb'];
                             } else
@@ -588,24 +658,19 @@ SQL;
                         $rvalue = '';
                         // Moyenne des critères
                         foreach ($tabCrit as $crit) {
-                            $rvalue .= $crit->getName() . ' : ' . $tabAv[$crit->getId()]['av'] . ' | ';
+			    $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
                         }
 
                         // Remarques evals
                         $rvalue .= 'Remarques: ' . $evalsMsg . ' | ';
 
-                        $nbEvals = 0;
                         // Nb d'éval
                         $rvalue .= sprintf('Nb evals : %s ', $nbEvals);
 
                         $data[$key] = $rvalue ?: '';
 
                     } else {
-                        try {
-                            $rvalue = $propertyAccessor->getValue($entity, $key);
-                        } catch (\Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException $e) {
-                            $rvalue = null;
-                        }
+                        $rvalue = $propertyAccessor->getValue($entity, $key);
                         // reformat values
                         if (!empty($value['type'])) {
                             if ($value['type'] === 'date') {
@@ -698,7 +763,7 @@ SQL;
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
 
-        $fileName = str_replace('.csv', '_' . uniqid() . '.csv', (string) ($volcanusConfig['responseFilename'] ?? 'default.csv'));
+	$fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
 
         // encodage fichier
         $charsetConverter = (new CharsetConverter())

@@ -134,51 +134,53 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
      */
     public function sendFile(string $fileName, ?string $outputFileName = null, array $options = ['pdf' => false, 'return' => false]): string|Response|File
     {
-        $fullPath = $this->options['tempDir'] . $fileName;
+	if (file_exists($this->options['tempDir'].$fileName)) {
+            //security check first : if requested file path doesn't correspond to temp dir,
+            //triggering error
+            $path_parts = pathinfo($this->options['tempDir'].$fileName);
 
-        if (!file_exists($fullPath)) {
-            return '';
+            $response = new Response();
+            if (realpath($path_parts['dirname']) !== $this->options['tempDir']) {
+                $response->setContent('Accès non autorisé :'.$path_parts['dirname']);
+            }
+
+            // setting output file name
+            $outputFileName = (empty($outputFileName)) ? $fileName : $outputFileName;
+            //if pdf file is asked
+            if (isset($options['pdf']) && $options['pdf']) {
+                $pdfName = $this->toPdf($fileName);
+                $fp = $this->options['tempDir'].$pdfName;
+
+                //renaming output filename (for end user)
+                $tmp = explode('.', $outputFileName);
+                $tmp[count($tmp) - 1] = 'pdf';
+                $outputFileName = implode('.', $tmp);
+            } else {
+                $fp = $this->options['tempDir'].$fileName;
+            }
+            if (isset($options['return']) && $options['return']) {
+                $file = new File($fp);
+
+                return $file->move($file->getFileInfo()->getPath(), $outputFileName);
+            } else {
+                // Set headers
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $response->headers->set('Cache-Control', 'private');
+                $response->headers->set('Content-type', finfo_file($finfo, $fp));
+                $response->headers->set('Content-Disposition', 'attachment; filename="'.$outputFileName.'";');
+                $response->headers->set('Content-length', filesize($fp));
+                $response->sendHeaders();
+                $response->setContent(readfile($fp));
+                $response->sendContent();
+
+                // file is then deleted
+                unlink($fp);
+
+                return $response;
+            }
         }
 
-        // Check directory to avoid arbitrary file access
-        if (realpath(dirname($fullPath)) !== realpath($this->options['tempDir'])) {
-            return new Response('Accès non autorisé : ' . dirname($fullPath), 403);
-        }
-
-        // Determine final path and output name
-        $finalPath = $fullPath;
-        $outputFileName ??= $fileName;
-
-        // Convert to PDF if required
-        if (!empty($options['pdf'])) {
-            $pdfName = $this->toPdf($fileName);
-            $finalPath = $this->options['tempDir'] . $pdfName;
-
-            // Force output file extension to .pdf
-            $outputFileName = preg_replace('/\.[^.]+$/', '.pdf', $outputFileName);
-        }
-
-        // Return the file for internal use (ex: attachment)
-        if (!empty($options['return'])) {
-            return new File($finalPath, false); // false = don't check existence again
-        }
-
-        // Otherwise, send it as a response to browser
-        $mimeType = mime_content_type($finalPath);
-        $response = new Response();
-
-        $response->headers->set('Cache-Control', 'private');
-        $response->headers->set('Content-Type', $mimeType);
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $outputFileName . '"');
-        $response->headers->set('Content-Length', (string) filesize($finalPath));
-
-        $response->setContent(file_get_contents($finalPath));
-        $response->send();
-
-        // Clean up
-        unlink($finalPath);
-
-        return $response;
+        return '';
     }
 
     /**
@@ -243,7 +245,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                 // Cas de la liste des inscrits à une session acceptés
                                 $data = $this->humanReadablePropertyAccessorFactory->getAccessor($entities[0]);
 
-                                $lines[0]['dateDebut'] = $data->dateDebut->format('Y-m-d H:i:s');
+                                $lines[0]['dateDebut'] = $data->dateDebut->format('Y-m-d');
                                 $lines[0]['nom'] = $data->nom;
 
                                 $inscriptions = $entities[0]->getInscriptions();
@@ -268,7 +270,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             $lines[0]['inscriptions'] = [];
                             foreach ($inscriptions as $insc) {
                                 if ($insc->getInscriptionstatus() == 'Accepté') {
-                                    $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction()];
+                                    $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
                                 }
                             }
 
@@ -362,12 +364,22 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             // On crée le tableau de dates correspondant au tableau des présences
                             $tabDates = [];
                             foreach ($session->getDates() as $dateSes) {
+				$dateDeb = $dateSes->getDateBegin();
+                                $dateNewS = $dateDeb->format('d/m/Y');
+                                $tab = explode('/', $dateNewS);
+                                $dateNew = new \DateTime();
+                                $dateNew->setDate($tab[2], $tab[1], $tab[0]);
+
+                                $nbJoursDate2 = date_diff($dateSes->getDateEnd(), $dateSes->getDateBegin());
+                                $nbJoursDate = $nbJoursDate2->format('%a');
+
                                 // Conversion date de début de session
                                 $dateDeb = strtotime(str_replace("/", "-", (string) $dateSes->getDatebegin()->format('d/m/Y')));
-                                // création du tableau des dates suivant le nombre de jours à afficher
-                                for ($j = 0; $j < $session->getDaynumber() + 1; ++$j) {
-                                    $dateNew = date('d/m/Y', $dateDeb + $j * 86400);
-                                    $tabDates[] = ["dateDeb" => $dateNew, "nbHeuresMatin" => $dateSes->getHournumbermorn(), "nbHeuresApr" => $dateSes->getHournumberafter()];
+				// création du tableau des dates suivant le nombre de jours à afficher
+				for ($j = 0; $j < $nbJoursDate + 1; $j++) {
+                                    $tabDates[] = array("dateDeb" => $dateNew->format('d/m/Y'), "nbHeuresMatin" => $dateSes->getHourNumberMorn(), "nbHeuresApr" => $dateSes->getHourNumberAfter());
+                                    $dateNew->modify('+ 1 days');
+
                                 }
                             }
 
@@ -392,8 +404,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             }
 
                             $typAc = $insc->getActiontype() == null ? "" : $insc->getActiontype()->getName();
-
-                            $lines[0]['inscriptions'] = [];
                             $lines[0]['inscriptions'][] = ['dateDebut' => $insc->getSession()->getDatebegin()->format('d/m/Y'), 'nombreHeures' => $insc->getSession()->getHournumber(), 'nombreHeuresPres' => $nbHeuresPresence, 'nom' => $insc->getSession()->getName(), 'domaine' => $insc->getSession()->getTraining()->getTheme(), "formateurs" => $formateurs, "type" => $insc->getSession()->getTraining()->getCategory(), "typeAction" => $typAc];
                         }
                     }
@@ -411,7 +421,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $lines[0]['inscriptions'] = [];
                 foreach ($inscriptions as $insc) {
                     if ($insc->getInscriptionstatus() == 'Convoqué') {
-                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction()];
+                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
                     }
                 }
 
@@ -436,7 +446,6 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 return ($dateDebA < $dateDebA) ? -1 : 1;
             }
 
-            //dump(get_class($entities[0]));
             $session = $entities[0];
             $Dates = $session->getDates();
             $inscriptions = $session->getInscriptions();
@@ -451,12 +460,13 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
 
                 for ($j = 0; $j < $diffJours + 1; ++$j) {
                     $timestampJour = $date->getDatebegin()->getTimestamp() + $j * 86400;
-                    $lines[$i]['dateDebut'] = date('d/m/Y H:m', $timestampJour);
+                    $lines[$i]['dateDebut'] = date('d/m/Y', $timestampJour);
                     $lines[$i]['dateFin'] = date('d/m/Y', $timestampJour);
                     $lines[$i]['horairesMatin'] = $date->getScheduleMorn();
                     $lines[$i]['horairesAprem'] = $date->getScheduleAfter();
                     $lines[$i]['lieu'] = $date->getPlace();
                     $lines[$i]['nom'] = $data->nom;
+		    $lines[$i]['commentaires'] = $data->commentaires;
 
                     $lines[$i]['formateur'] = [];
                     foreach ($formateurs as $formateur) {
@@ -499,11 +509,12 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
             return ['error' => $error];
         }
 
-        if (!$fileName) {
+/*        if (!$fileName) {
             return ['error' => 'Nom de fichier invalide (null ou vide).'];
-        }
+        }*/
 
         $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
+	$clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
 
 
         //do we want the file or just infos about it ?
@@ -556,18 +567,16 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         //renaming output filename (for end user)
         $info = pathinfo((string) $outputFileName);
         $outputFileName = $info['filename'].'.pdf';
-
         // prepare the process
         $unoconvBin = $this->parameterBag->get('unoconv_bin');
         $args = [$unoconvBin, '--output='.$this->options['tempDir'].$outputFileName, $this->options['tempDir'].$fileName];
-        //$process = new Process(implode(' ', $args));
         $process = new Process($args);
 
         // run
         try {
             $process->run();
         } catch (RuntimeException) {
-            // unoconv somtimes returns 8 (SIGFPE) error code but still produces a correct output,
+            // unoconv somtimes returns 8 (SIGFPE) error code but still produces a correct output
         }
 
         return $outputFileName;
@@ -835,7 +844,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $theme = $training->getTheme();
                 $lines[$i] = [
                     'datesString' => $entity->getDatesString(),
-                    'dateDebut' => $entity->getDatebegin()?->format('d/m/Y H:M'),
+                    'dateDebut' => $entity->getDatebegin()?->format('d/m/Y'),
                     'name' => $entity->getName(),
                     'centre.nom' => $organization?->getName(),
                     'domaine' => $theme?->getName(),

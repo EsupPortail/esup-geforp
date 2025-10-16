@@ -32,7 +32,7 @@ final class AllOrganizationUserAccessRight extends AbstractAccessRight
     /**
      * Returns the vote for the given parameters.
      */
-    public function isGranted(TokenInterface $token, $attribute = null, $object = null): true
+    public function isGranted(TokenInterface $token, $object = null, $attribute): true
     {
         return true;
     }

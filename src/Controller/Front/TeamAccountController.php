@@ -46,12 +46,12 @@ class TeamAccountController extends AbstractController
     }
 
     #[Route(path: '/registrations', name: 'front.account.team.registrations', methods: ['GET'])]
-    public function teamregistrations(ManagerRegistry $doctrine): array
+    public function teamregistrations(ManagerRegistry $doctrine): Response
     {
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $traineeUser = $arTraineeUser[0];
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $traineeUser = $arTraineeUser;
 
         // Recupération des agents dont on est responsable
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findBy(['emailsup' => $user->getCredentials()['mail'], 'isactive' => true]);
@@ -85,33 +85,36 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return ['user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), $this->render('Front/Account/team/registrations.html.twig')];
+        return $this->render('Front/Account/team/registrations.html.twig',['user' => $traineeUser, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds)]);
     }
 
     #[Route(path: '/trainees', name: 'front.account.team.trainees', methods: 'GET')]
-    public function teamtrainees(ManagerRegistry $doctrine): array
+    public function teamtrainees(ManagerRegistry $doctrine): Response
     {
         $user = $this->getUser();
         // Récupération du user avec le format trainee
-        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $traineeUser = $arTraineeUser[0];
+        $arTraineeUser = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $traineeUser = $arTraineeUser;
 
         // Recupération des agents dont on est responsable
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findBy(['emailsup' => $user->getCredentials()['mail'], 'isactive' => true]);
 
-        return ['user' => $traineeUser, 'trainees' => $arTrainee, $this->render('Front/Account/team/trainees.html.twig')];
+        return $this->render('Front/Account/team/trainees.html.twig',['user' => $traineeUser, 'trainees' => $arTrainee]);
     }
 
 
     #[Route(path: '/trainee/{id}/registrations', name: 'front.account.team.trainee.registrations', methods: 'GET')]
-    public function traineeregistrations(ManagerRegistry $doctrine, $id): array
+    public function traineeregistrations(ManagerRegistry $doctrine, $id): Response
     {
         $user = $this->getUser();
-        $arSup = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findByEmail($user->getCredentials()['mail']);
-        $sup = $arSup[0];
+        $arSup = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        $sup = $arSup;
 
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findById($id);
-        $trainee = $arTrainee[0];
+        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->find($id);
+        $trainee = $arTrainee;
+        if (!$trainee) {
+            throw $this->createNotFoundException('Le stagiaire demandé n’existe pas.');
+        }
 
         $inscriptions = $trainee->getInscriptions();
         $upcoming = [];
@@ -138,7 +141,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return ['user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee, $this->render('Front/Account/team/trainee-registrations.html.twig')];
+        return $this->render('Front/Account/team/trainee-registrations.html.twig', ['user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee]);
     }
 
 }

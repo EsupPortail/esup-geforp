@@ -24,7 +24,7 @@ abstract class AbstractAccessRight implements AccessRightInterface
     /**
      * Returns the vote for the given parameters.
      */
-    public abstract function isGranted(TokenInterface $token, $attribute = null, $object = null);
+    public abstract function isGranted(TokenInterface $token, $object = null, $attribute);
 
     public function setId(int $id): void
     {
