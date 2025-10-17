@@ -112,7 +112,11 @@ class AttendanceAccountController extends AbstractController
             $tabEvalChoices = [$evalCritere4 => 4, $evalCritere3 => 3, $evalCritere2 => 2, $evalCritere1 => 1];
         }
 
-
+	// test evaluation deja remplie
+	$flagEval = 0;
+	if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
+		$flagEval = 1;
+        }
 
         $evaluationCriterionsLoc = $doctrine
             ->getRepository('App\Entity\Term\EvaluationCriterion')
@@ -130,10 +134,8 @@ class AttendanceAccountController extends AbstractController
         }
         $form = $this->createForm(EvaluationType::class, $attendance, ['tab_eval' => $tabEvalChoices, 'message' => $evalMessage]);
 
-        $form = $this->createForm(EvaluationType::class, $attendance, ['tab_eval' => $tabEvalChoices, 'message' => $evalMessage]);
-
-        //un formation déjà évaluée
-        if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
+        //formation déjà évaluée
+        if ($flagEval) {
             $this->addFlash('error', 'Vous avez déjà évalué cette formation. Vous ne pouvez pas renseigner l\'évaluation à nouveau.');
             return $this->render('Front/Account/attendance/evaluation.html.twig', [
                 'user' => $trainee,
