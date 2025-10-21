@@ -1,5 +1,12 @@
 # Geforp changelog :
 
+## 3.0 (2025-10-21)
+
+- Passage en Symfony 6.4
+
+### Corrections
+- Prise en compte de la casse dans la remontée LDAP du type de personnel
+
 ## 2.3.21 (2025-07-21)
 
 ### Ajouts
