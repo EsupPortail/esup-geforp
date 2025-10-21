@@ -617,7 +617,7 @@ class ProgramController extends AbstractController
 
                 $sessionExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Session::class)->findOneBy(['id' => $session->getId()]);
                 // on regarde s'il existe déjà une alerte
-                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee[0], 'session'=> $sessionExiste]);
+                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee, 'session'=> $sessionExiste]);
                 if ($alertExiste) {
                     // si l'alerte existe, on coche la case de présence
                     $alert->setAlert(true);
@@ -626,7 +626,7 @@ class ProgramController extends AbstractController
                 }
 
                 $alert->setSessionId($session->getId());
-                $alert->setTraineeId($arTrainee[0]);
+                $alert->setTraineeId($arTrainee->getId());
                 $alerts->getAlerts()->add($alert);
             }
         }
@@ -642,7 +642,7 @@ class ProgramController extends AbstractController
                 // On verifie si la session et l'alerte existent déjà
                 $sessionExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Session::class)->findOneBy(['id' => $alert->getSessionId()]);
 
-                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee[0], 'session'=> $sessionExiste]);
+                $alertExiste = $doctrine->getManager()->getRepository(\App\Entity\Back\Alert::class)->findOneBy(['trainee' => $arTrainee, 'session'=> $sessionExiste]);
 
                 // Si la case est cochée
                 if ($alert->getAlert() == true) {
