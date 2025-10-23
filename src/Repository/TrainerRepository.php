@@ -26,130 +26,107 @@ final class TrainerRepository extends ServiceEntityRepository
     public function getTrainersList($keyword, $filters, $page, $pageSize, $sorts, $fields): array
     {
 
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
+        $qb = $this->createQueryBuilder('trainer');
+        $qb
+            ->select('trainer')
 
-        $isExport = isset($filters['_export']) && $filters['_export'] === true;
+            // FILTRE KEYWORD
+            ->where('trainer.firstname LIKE :keyword')
+            ->orWhere('trainer.lastname LIKE :keyword')
+            /* addcslashes empêchera des manipulations malveillantes éventuelles */
+            ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
-        $pageSize = max(1, (int) $pageSize);
-        $pageSize = $isExport
-            ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : min($pageSize, $MAX_PAGE_SIZE);
 
-
-        $qb = $this->createQueryBuilder('trainer')
-            ->select('trainer');
-
-        $keyword = trim((string) $keyword);
-
-        if ($keyword !== '') {
-            $parts = preg_split('/\s+/', $keyword, 2);
-
-            if (count($parts) === 2) {
-                $p1 = '%' . addcslashes(mb_strtolower($parts[0], 'UTF-8'), '%_') . '%';
-                $p2 = '%' . addcslashes(mb_strtolower($parts[1], 'UTF-8'), '%_') . '%';
-
-                $qb->andWhere(
-                    '(LOWER(trainer.firstname) LIKE :p1 AND LOWER(trainer.lastname) LIKE :p2)
-             OR (LOWER(trainer.firstname) LIKE :p2 AND LOWER(trainer.lastname) LIKE :p1)'
-                )
-                    ->setParameter('p1', $p1)
-                    ->setParameter('p2', $p2);
-            } else {
-                $k = '%' . addcslashes(mb_strtolower($keyword, 'UTF-8'), '%_') . '%';
-                $qb->andWhere('LOWER(trainer.firstname) LIKE :k OR LOWER(trainer.lastname) LIKE :k')
-                    ->setParameter('k', $k);
-            }
-        }
-
-        // Join & Filter: Organization
-        $joinedOrg = false;
-        if (!empty($filters['organization.name.source'])) {
-            $qb->innerJoin('trainer.organization', 'o')
-                ->andWhere('o.name IN (:centers)')
+        // FILTRE CENTRE
+        if (isset($filters['organization.name.source'])) {
+            $qb
+                ->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization')
+                ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['organization.name.source']);
-            $joinedOrg = true;
         }
 
-        // Join & Filter: Institution
-        if (!empty($filters['institution.name.source'])) {
-            $qb->innerJoin('trainer.institution', 'i')
-                ->andWhere('i.name IN (:institutions)')
-                ->setParameter('institutions', $filters['institution.name.source']);
+        //FILTRE ETABLISSEMENT
+        if( isset($filters['institution.name.source'])) {
+            $qb
+                ->innerJoin('trainer.institution', 'i', 'WITH', 'trainer.institution = i')
+                ->andWhere('i.name in (:inst)')
+                ->setParameter('inst', $filters['institution.name.source']);
         }
 
-        // Other filters
-        foreach (['isorganization', 'ispublic', 'isarchived'] as $filter) {
-            if (isset($filters[$filter])) {
-                $param = lcfirst($filter);
-                $qb->andWhere("trainer.$param = :$param")
-                    ->setParameter($param, $filters[$filter]);
-            }
+        //FILTRE STATUT (true,false) = (0,1)
+        if (isset($filters['isOrganization'])) {
+            $qb
+                ->andWhere('trainer.isorganization = :isOrg')
+                ->setParameter('isOrg', $filters['isOrganization']);
         }
 
-        // Sorting
-        if (is_array($sorts)) {
-            foreach ($sorts as $field => $direction) {
-                switch ($field) {
-                    case 'lastname':
-                        $qb->addOrderBy('trainer.lastname', $direction);
-                        break;
-                    case 'organization.name':
-                        if (!$joinedOrg) {
-                            $qb->leftJoin('trainer.organization', 'o');
-                            }
-                        $qb->addOrderBy('o.name', $direction);
-                        break;
-                    case 'institution.name':
-                        $qb->leftJoin('trainer.institution', 'i')
-                            ->addOrderBy('i.name', $direction);
-                        break;
-                    default:
-                        if (property_exists(Trainer::class, $field)) {
-                            $qb->addOrderBy("trainer.$field", $direction);
-                        }
-                        break;
-                }
-            }
-        } else {
-            $qb->addOrderBy('trainer.lastname', 'ASC');
+        //FILTRE PUBLIE (true,false) = (0,1)
+        if (isset($filters['isPublic'])) {
+            $qb
+                ->andWhere('trainer.ispublic = :isPub')
+                ->setParameter('isPub', $filters['isPublic']);
         }
 
-        $qb->setFirstResult(($page - 1) * $pageSize)
+        //FILTRE ARCHIVE (true,false) = (0,1)
+        if (isset($filters['isArchived'])) {
+            $qb
+                ->andWhere('trainer.isarchived = :isArch')
+                ->setParameter('isArch', $filters['isArchived']);
+        }
+
+        if ((is_array($sorts)) && (array_key_exists('lastname', $sorts)))
+            $qb->addOrderBy('trainer.lastname', $sorts['lastname']);
+        elseif ((is_array($sorts)) && (array_key_exists('organization.name', $sorts))) {
+            if(!isset($filters['organization.name.source']))
+                $qb->innerJoin('trainer.organization', 'o', 'WITH', 'o = trainer.organization');
+            $qb->addOrderBy('o.name', $sorts['organization.name']);
+        } elseif ((is_array($sorts)) && (array_key_exists('institution.name', $sorts))) {
+            if(!isset($filters['institution.name.source']))
+                $qb->innerJoin('trainer.institution', 'i', 'WITH', 'i = trainer.institution');
+            $qb->addOrderBy('i.name', $sorts['institution.name']);
+        } elseif ((is_array($sorts)) && (array_key_exists('isOrganization', $sorts)))
+            $qb->addOrderBy('trainer.isorganization', $sorts['isOrganization']);
+        elseif ((is_array($sorts)) && (array_key_exists('isPublic', $sorts)))
+            $qb->addOrderBy('trainer.ispublic', $sorts['isPublic']);
+        elseif ((is_array($sorts)) && (array_key_exists('isArchived', $sorts)))
+            $qb->addOrderBy('trainer.isarchived', $sorts['isArchived']);
+        elseif ((is_array($sorts)) && (array_key_exists('service', $sorts)))
+            $qb->addOrderBy('trainer.service', $sorts['service']);
+        else
+            $qb->addOrderBy('trainer.lastname');
+
+
+        // PAGINATION
+        if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
+            // on met une valeur par défaut (pour l'autocompletion)
+            $page = 1;
+            $pageSize = 50;
+        }
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
-        $paginator = new Paginator($qb);
+        $query = $qb->getQuery();
 
-        $items = [];
-        foreach ($paginator as $trainer) {
-            $items[] = [
-                'id' => $trainer->getId(),
-                'firstname' => $trainer->getFirstname(),
-                'lastname' => $trainer->getLastname(),
-                'fullname' => $trainer->getFirstname() . ' ' . $trainer->getLastname(),
-                'ispublic' => $trainer->isIspublic(),
-                'trainertype' => $trainer->getTrainertype(),
-                'isarchived' => $trainer->isIsarchived(),
-                'service' => $trainer->getService(),
-                'organization' => $trainer->getOrganization()
-                    ? [
-                        'id' => $trainer->getOrganization()->getId(),
-                        'name' => $trainer->getOrganization()->getName(),
-                    ] : null,
-                'institution' => $trainer->getInstitution()
-                    ? [
-                        'id' => $trainer->getInstitution()->getId(),
-                        'name' => $trainer->getInstitution()->getName(),
-                    ] : null,
-            ];
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
+        $c = count($paginator);
+        $tabTrainers = array();
+        foreach($paginator as $tr) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabTrainers[]['id'] = $tr->getId();
+            } else {
+                $tabTrainers[] = $tr;
+            }
         }
 
 
-        return [
-            'total' => count($paginator),
+        $res = array('total' => $c,
             'pageSize' => $pageSize,
-            'items' => $items,
-        ];
+            'items' => $tabTrainers);
+
+        return $res;
+
     }
 
     public function getNbTrainers($query_filters, $keyword, $aggs, $name): array

@@ -34,34 +34,15 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                                         array $fields = []): array
     {
 
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
-
-        $isExport = isset($filters['_export']) && $filters['_export'] === true;
-
-        $pageSize = max(1, (int) $pageSize);
-        $pageSize = $isExport
-            ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : min($pageSize, $MAX_PAGE_SIZE);
-
         $qb = $this->createQueryBuilder('i');
         $qb
-            ->select('i', 'trainee', 's', 'tr', 'tag', 'theme', 'org', 'inst', 'publictype', 'istatus', 'pstatus')
-            // Jointures obligatoires
-            ->innerJoin('i.trainee', 'trainee')
-            ->innerJoin('i.session', 's')
-            ->innerJoin('s.training', 'tr')
+            ->select(' i')
+            // join sur trainee et session car toujours vrai
+            ->innerJoin('i.trainee', 'trainee', 'WITH', 'trainee = i.trainee')
+            ->innerJoin('i.session', 's', 'WITH', 's = i.session')
+            ->innerJoin('s.training', 'tr', 'WITH', 'tr = s.training')
 
-            // Jointures optionnelles pour éviter les requêtes N+1
-            ->leftJoin('tr.tags', 'tag')
-            ->leftJoin('tr.theme', 'theme')
-            ->leftJoin('tr.organization', 'org')
-            ->leftJoin('trainee.institution', 'inst')
-            ->leftJoin('trainee.publictype', 'publictype')
-            ->leftJoin('i.inscriptionstatus', 'istatus')
-            ->leftJoin('i.presencestatus', 'pstatus')
-
-            // Filtre keyword amélioré avec gestion des cas NULL
+            // FILTRE KEYWORD
             ->where('trainee.firstname LIKE :keyword OR trainee.lastname LIKE :keyword OR tr.name LIKE :keyword')
             ->andWhere('i.trainee = trainee.id')
             ->andWhere('s.training = tr.id')
@@ -70,17 +51,24 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             /* addcslashes empêchera des manipulations malveillantes éventuelles */
             ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
 
+        // Filtre keyword sur les tags
+        $qb
+            ->leftJoin('tr.tags', 'tag')
+            ->orWhere('tag.name LIKE :tagName')
+            ->setParameter('tagName', '%' . addcslashes($keyword, '%_') . '%');
+
         // FILTRE CENTRE
         if (isset($filters['session.training.organization.name.source'])) {
-            // Utiliser l'alias 'org' déjà défini au lieu de créer une nouvelle jointure
             $qb
-                ->andWhere('org.name in (:centers)')
+                ->innerJoin('tr.organization', 'o', 'WITH', 'o = tr.organization')
+                ->andWhere('o.name in (:centers)')
                 ->setParameter('centers', $filters['session.training.organization.name.source']);
         }
 
         // FILTRE ANNEE
         if (isset($filters['session.year'])) {
             $qb
+                /* On récupère l'année du dateBegin (à l'aide d'une doctrine extension) */
                 ->andWhere('YEAR(s.datebegin) in (:years)')
                 ->setParameter('years', $filters['session.year']);
         }
@@ -92,7 +80,6 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
             } else {
                 $monthFrom = 7; $monthTo = 12;
             }
-
             $qb
                 ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
                 ->setParameter('monthFrom', $monthFrom)
@@ -101,45 +88,50 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
 
         //FILTRE DATE
         if( isset($filters['session.datebegin']) ) {
-            $dates = explode('-', (string) $filters["session.datebegin"]);
-            $dateFrom = date('d/m/y 00:00:00' ,strtotime(trim($dates[0])));
-            $dateTo = date('d/m/y 00:00:00',strtotime(trim($dates[1])));
+            /* La date envoyée par le formulaire en JS a un format : "dd/mm/yy - dd/mm/yy" il faut donc séparer les 2 dates */
+            $dates = explode('-', $filters["session.datebegin"]);
+            /* on retire les caractères non utiles */
+            $from = str_replace('/','-', $dates[0]);
+            $to = str_replace('/', '-', $dates[1]);
+            /* on convertit au même format qu'en base de données */
+            $dateFrom = date('Y/m/d 00:00:00' ,strtotime($from));
+            $dateTo = date('Y/m/d 00:00:00',strtotime($to));
 
             $qb
+                /* si la date de début d'une session est entre les 2 dates envoyées dans le formulaire */
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
-                ->addOrderBy('i.createdat', 'DESC')
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
         }
 
         //FILTRE STATUT D'INSCRIPTION
         if( isset($filters['inscriptionStatus.name.source'])) {
-            // Utiliser l'alias 'istatus' déjà défini
             $qb
-                ->andWhere('istatus.name in (:inscStatus)')
-                ->setParameter('inscStatus', $filters['inscriptionStatus.name.source']);
+                ->innerJoin('i.inscriptionstatus', 'istatus', 'WITH', 'istatus = i.inscriptionstatus')
+                ->andWhere('istatus.name in (:status)')
+                ->setParameter('status', $filters['inscriptionStatus.name.source']);
         }
 
         //FILTRE STATUT DE PRESENCE
         if( isset($filters['presenceStatus.name.source'])) {
-            // Utiliser l'alias 'pstatus' déjà défini
             $qb
-                ->andWhere('pstatus.name in (:presStatus)')
-                ->setParameter('presStatus', $filters['presenceStatus.name.source']);
+                ->innerJoin('i.presencestatus', 'pstatus', 'WITH', 'pstatus = i.presencestatus')
+                ->andWhere('pstatus.name in (:status)')
+                ->setParameter('status', $filters['presenceStatus.name.source']);
         }
 
         //FILTRE ETABLISSEMENT
         if( isset($filters['institution.name.source'])) {
-            // Utiliser l'alias 'inst' déjà défini
             $qb
-                ->andWhere('inst.name in (:institutions)')
+                ->innerJoin('trainee.institution', 'inst', 'WITH', 'trainee.institution = inst')
+                ->andWhere('institution.name in (:institutions)')
                 ->setParameter('institutions', $filters['institution.name.source']);
         }
 
         //FILTRE CATEGORIE DE PERSONNEL
         if( isset($filters['publicType.source'])) {
-            // Utiliser l'alias 'publictype' déjà défini
             $qb
+                ->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype')
                 ->andWhere('publictype.name in (:publictypes)')
                 ->setParameter('publictypes', $filters['publicType.source']);
         }
@@ -147,140 +139,67 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
         // FILTRE SESSION
         if (isset($filters['session.id'])) {
             $qb
-                ->andWhere('s.id in (:sessionId)')
-                ->setParameter('sessionId', $filters['session.id']);
+                ->andWhere('s.id in (:id)')
+                ->setParameter('id', $filters['session.id']);
         }
 
         //FILTRE THEME
         if( isset($filters['session.training.theme.name'])) {
-            // Utiliser l'alias 'theme' déjà défini
             $qb
-                ->andWhere('theme.name in (:themes)')
+                ->innerJoin('tr.theme', 'th', 'WITH', 'th = tr.theme')
+                ->andWhere('th.name in (:themes)')
                 ->setParameter('themes', $filters['session.training.theme.name']);
         }
 
-        $qb->addOrderBy('i.createdat', 'DESC');
         // TRI DES RESULTATS
-        $sortableFields = [
-            'createdat' => 'i.createdat',
-            'trainee.fullname' => 'trainee.lastname',
-            'session.datebegin' => 's.datebegin',
-            'trainee.publictype.name' => 'publictype.name',
-            'session.training.name' => 'org.name',
-            'trainee.institution' => 'inst.name',
-        ];
-
-        foreach ($sorts as $key => $direction) {
-            if (isset($sortableFields[$key])) {
-                $qb->addOrderBy($sortableFields[$key], $direction);
+        if ((is_array($sorts)) && (array_key_exists('createdat', $sorts)))
+            $qb->addOrderBy('i.createdat', $sorts['createdat']);
+        elseif ((is_array($sorts)) && (array_key_exists('trainee.fullname', $sorts)))
+            $qb->addOrderBy('trainee.lastname', $sorts['trainee.fullname']);
+        elseif ((is_array($sorts)) && (array_key_exists('session.datebegin', $sorts)))
+            $qb->addOrderBy('s.datebegin', $sorts['session.datebegin']);
+        elseif ((is_array($sorts)) && (array_key_exists('trainee.publictype.name', $sorts))){
+            if(!isset($filters['publicType.source']))
+                $qb->innerJoin('trainee.publictype', 'publictype', 'WITH', 'trainee.publictype = publictype');
+            $qb->addOrderBy('publictype.name', $sorts['trainee.publictype.name']);
+        } else {
+            //FILTRE MODIFICATION DU STATUT D'INSCRIPTION
+            if( isset($filters['inscriptionStatusUpdatedAt'])) {
+                // Tri par date de modification
+                $qb->addOrderBy('i.updatedat', 'DESC');
+            } else {
+                // TRI DES RESULTATS
+                $qb->addOrderBy('i.createdat', 'DESC');
             }
         }
 
-        // Pagination
-        $qb->setFirstResult(($page - 1) * $pageSize)
+        // PAGINATION
+        $offset = ($page-1) * $pageSize;
+        $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
-        $paginator = new Paginator($qb, true);
+        $query = $qb->getQuery();
 
-        $items = [];
-        foreach ($paginator as $insc) {
-            $trainee = $insc->getTrainee();
-            $session = $insc->getSession();
-            $training = $session?->getTraining();
-            $theme = $training?->getTheme();
-            $trainingOrg = $training?->getOrganization();
-            $institution = $trainee?->getInstitution();
-            $publicType = $trainee?->getPublictype();
-            $firstname = trim($trainee?->getFirstname() ?? '');
-            $lastname = trim($trainee?->getLastname() ?? '');
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
 
-            $fullname = trim(" $firstname $lastname");
-            if ($fullname === '') {
-                $fullname = 'Non renseigné';
+        $c = count($paginator);
+        $tabIns = array();
+        foreach($paginator as $insc) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabIns[]['id'] = $insc->getId();
+            } else {
+                $tabIns[] = $insc;
             }
-
-            $items[] = [
-                'id' => $insc->getId(),
-                'createdat' => $insc->getCreatedAt()?->format($formatCreatedAt ),
-                'isPaying' => $insc?->getPrice(),
-                'presencestatus' => $insc->getPresencestatus(),
-                'inscriptionstatus' => $insc->getInscriptionstatus(),
-                'type' => $insc->getType(),
-                'organization' => $trainingOrg  ? [
-                    'id' => $trainingOrg?->getId(),
-                    'name' => $trainingOrg?->getName() ?? 'Non précisée',
-                ] : null,
-
-                //inscription.trainee.organization.name
-
-                // Entités séparées
-                'trainee' => [
-                    'id' => $trainee?->getId(),
-                    'firstname' => $trainee?->getFirstname() ?? 'Non renseigné',
-                    'lastname' => $trainee?->getLastname() ?? 'Non renseigné',
-                    'fullname' => $fullname,
-                    'email' => $trainee?->getEmail(),
-                    'publictype' => $publicType,
-                    'institution' => [
-                        'id' => $institution?->getId(),
-                        'name' => $institution?->getName() ?? 'Non renseignée',
-                        'city' => $institution?->getCity() ?? 'Non renseignée',
-                    ],
-                ],
-                'session' => [
-                    'id' => $session?->getId(),
-                    'datebegin' => $session?->getDatebegin()?->format('d/m/y'),
-                    'dateend' => $session?->getDateend()?->format('d/m/y'),
-                    'maximumnumberofregistrations' => $session?->getMaximumNumberOfRegistrations(),
-                    'price' => $session?->getPrice(),
-                    'fullname' => $fullname,
-                    'training' => [
-                        'id' => $training?->getId(),
-                        'name' => $training?->getName() ?? 'Non renseigné',
-                    ],
-                ],
-                'training' => [
-                    'id' => $training?->getId(),
-                    'name' => $training?->getName() ?? 'Non renseigné',
-                    'description' => $training?->getDescription(),
-                    'fullname' => $fullname,
-                ],
-                'theme' => $theme ? [
-                    'id' => $theme->getId(),
-                    'name' => $theme->getName() ?? 'Non renseigné',
-                ] : [],
-
-                // Pour compatibilité avec le code existant
-                'inscription_obj' => $insc,
-                'training_obj' => $training,
-                'session_obj' => $session,
-                'trainee_obj' => $trainee,
-            ];
         }
 
-        return [
-            'total' => count($paginator),
+        $res = array('total' => $c,
             'pageSize' => $pageSize,
-            'currentPage' => $page,
-            'totalPages' => ceil(count($paginator) / $pageSize),
-            'items' => $items,
-        ];
+            'items' => $tabIns);
+
+        return $res;
+
     }
-
-    private function serializeInstitution($institution): array
-    {
-        if (!$institution) {
-            return [];
-        }
-
-        return [
-            'id' => $institution->getId(),
-            'name' => $institution->getName() ?? '',
-            'city' => $institution->getCity() ?? '',
-        ];
-    }
-
-
+    
     public function getNbInscriptions($query_filters, $keyword, $aggs, $name, ?string $facet = null): array
     {
         $qb = $this->createQueryBuilder('i');
