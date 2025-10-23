@@ -12,7 +12,7 @@ Configuration requise
 
 ### PHP
 
-* version 7.4 minimum 
+* version 8.3 minimum 
 * extensions :
     * json
     * ctype

@@ -1,17 +1,19 @@
 # Geforp changelog :
 
+## 3.0.1 (2025-10-23)
+
+### Corrections
+- Correction tri et pagination recherche de sessions
+
 ## 3.0 (2025-10-21)
 
 - Passage en Symfony 6.4
-
-### Corrections
-- Prise en compte de la casse dans la remontée LDAP du type de personnel
 
 ## 2.3.21 (2025-07-21)
 
 ### Ajouts
 - Affichage motif d'avis défavorable côté stagiaire et côté espace agent du N+1
-- Ajout coû individuel dans les exports des sessions
+- Ajout coût individuel dans les exports des sessions
 
 ### Corrections
 - Prise en compte de la casse dans la remontée LDAP du type de personnel
