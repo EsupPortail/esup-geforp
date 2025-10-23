@@ -42,49 +42,30 @@ final class TraineeSearchRepository extends ServiceEntityRepository
                                             array $fields = []): array
     {
         // Mise en forme en cas de recherche nom + prénom
+        $tabKey = explode(" ", $keyword, 2);
 
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
+        $qb = $this->createQueryBuilder('trainee');
 
-        $isExport = isset($filters['_export']) && $filters['_export'] === true;
+        if (count($tabKey) == 2) {
+            $qb
+                ->select(' trainee')
 
-        $pageSize = max(1, $pageSize);
-        $pageSize = $isExport
-            ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : $MAX_PAGE_SIZE;
+                // FILTRE KEYWORD
+                ->andWhere('(trainee.firstname LIKE :keyword1 AND trainee.lastname LIKE :keyword2) OR (trainee.lastname LIKE :keyword)')
+                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                ->setParameter('keyword1', '%' . addcslashes($tabKey[0], '%_') . '%')
+                ->setParameter('keyword2', '%' . addcslashes($tabKey[1], '%_') . '%')
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
+        } else {
+            $qb
+                ->select(' trainee')
 
-        $qb = $this->createQueryBuilder('trainee')
-            ->leftJoin('trainee.inscriptions', 'inscription')
-            ->addSelect('inscription')
-            ->leftJoin('inscription.session', 'session')
-            ->addSelect('session');
-
-        $qb->select('trainee');
-
-        $keyword = trim($keyword);
-
-        if ($keyword !== '') {
-            $parts = preg_split('/\s+/', $keyword, 2);
-
-            if (count($parts) === 2) {
-                $p1 = '%' . addcslashes(mb_strtolower($parts[0], 'UTF-8'), '%_') . '%';
-                $p2 = '%' . addcslashes(mb_strtolower($parts[1], 'UTF-8'), '%_') . '%';
-
-                $qb->andWhere('
-            (LOWER(trainee.firstname) LIKE :p1 AND LOWER(trainee.lastname) LIKE :p2)
-            OR (LOWER(trainee.firstname) LIKE :p2 AND LOWER(trainee.lastname) LIKE :p1)
-        ')
-                    ->setParameter('p1', $p1)
-                    ->setParameter('p2', $p2);
-            } else {
-                $k = '%' . addcslashes(mb_strtolower($keyword, 'UTF-8'), '%_') . '%';
-                $qb->andWhere('
-            LOWER(trainee.firstname) LIKE :k
-            OR LOWER(trainee.lastname) LIKE :k
-            OR LOWER(trainee.email) LIKE :k
-        ')
-                    ->setParameter('k', $k);
-            }
+                // FILTRE KEYWORD
+                ->where('trainee.firstname LIKE :keyword')
+                ->orWhere('trainee.lastname LIKE :keyword')
+                ->orWhere('trainee.email LIKE :keyword')
+                /* addcslashes empêchera des manipulations malveillantes éventuelles */
+                ->setParameter('keyword', '%' . addcslashes($keyword, '%_') . '%');
         }
 
         // Filtres
@@ -145,47 +126,35 @@ final class TraineeSearchRepository extends ServiceEntityRepository
             $qb->addOrderBy('trainee.createdat', 'desc');
 
         // Pagination
+        if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
+            // on met une valeur par défaut (pour l'autocompletion)
+            $page = 1;
+            $pageSize = 50;
+        }
         $offset = ($page - 1) * $pageSize;
         $qb->setFirstResult($offset)
             ->setMaxResults($pageSize);
 
-        $paginator = new Paginator($qb, true);
+        $query = $qb->getQuery();
+
+        $paginator = new Paginator($query, $fetchJoinCollection = true);
+
         $c = count($paginator);
-
-        $items = [];
-        foreach ($paginator as $trainee) {
-            $fullname = $trainee->getFirstname() . ' ' . $trainee->getLastname();
-
-            $inscriptions = [];
-            foreach ($trainee->getInscriptions() as $inscription) {
-                $inscriptions[] = [
-                    'id' => $inscription->getId(),
-                    'session' => $inscription->getSession() ? $inscription->getSession()->getName() : null,
-                    'status' => $inscription->getPresencestatus() ?? null,
-                ];
+        $tabTrainees = array();
+        foreach($paginator as $tr) {
+            if ((is_array($fields)) && (in_array("_id", $fields))) {
+                $tabTrainees[]['id'] = $tr->getId();
+            } else {
+                $tabTrainees[] = $tr;
             }
-
-            $items[] = [
-                'id' => $trainee->getId(),
-                'firstname' => $trainee->getFirstname(),
-                'lastname' => $trainee->getLastname(),
-                'fullname' => $fullname,
-                'name' => $fullname,
-                'institution' => $trainee->getInstitution(),
-                'title' => $trainee->getTitle(),
-                'createdat' => $trainee->getCreatedAt()->format('c'),
-                'publictype' => $trainee->getPublictype(),
-                'email' => $trainee->getEmail(),
-                'shibbolethpersistentid' => $trainee->getShibbolethpersistentid(),
-                'inscriptions' => $inscriptions,
-            ];
         }
 
-        return [
-            'total' => $c,
+        $res = array('total' => $c,
             'pageSize' => $pageSize,
-            'items' => $items,
-        ];
+            'items' => $tabTrainees);
+
+        return $res;
+
     }
 
     /**
