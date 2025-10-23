@@ -93,17 +93,6 @@ final class SessionRepository extends ServiceEntityRepository
      */
     public function getSessionsList($keyword, $filters, $page, $pageSize, $sorts, $fields): array
     {
-
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
-
-        $isExport = isset($filters['_export']) && $filters['_export'] === true;
-
-        $pageSize = max(1, (int) $pageSize);
-        $pageSize = $isExport
-            ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : $MAX_PAGE_SIZE;
-
         $qb = $this->createQueryBuilder('s');
         $qb
             ->select(' s');
@@ -244,15 +233,17 @@ final class SessionRepository extends ServiceEntityRepository
             ->setParameter('now', $now);
         }
 
-
         // TRI DES RESULTATS
         if (isset($sorts['training.name.source']))
             $qb->addOrderBy('s.name', $sorts['training.name.source']);
         elseif (isset($sorts['datebegin']))
-            $qb->addOrderBy('s.datebegin', $sorts['datebegin']);
-        else
-            $qb->addOrderBy('s.datebegin', 'DESC')
+            $qb->orderBy('s.datebegin', $sorts['datebegin']);
+	elseif (isset($sorts['dateend']))
+            $qb->orderBy('s.dateend', $sorts['dateend']);
+        else {
+            $qb->addOrderBy('s.datebegin')
                 ->addOrderBy('s.name');
+	}
 
         // PAGINATION
         $offset = ($page - 1) * $pageSize;
@@ -326,38 +317,32 @@ final class SessionRepository extends ServiceEntityRepository
                     //item.training.TypeLabel
                 ];
 
-                $lastSession = null;
-                $sessions = $training->getSessions()->toArray();
+		$statsInsc = array();
+                foreach ($session->getInscriptions() as $insc) {
+                    $sessionES['inscriptions'][]['id'] = $insc->getId();
 
-                if (!empty($sessions)) {
-                    usort($sessions, function ($a, $b) {
-                        return $a->getDatebegin() <= $b->getDatebegin();
-                    });
-                    $lastSession = $sessions[0];
-                }
-                $trainingStats = [];
-
-                if ($lastSession) {
-                    foreach ($lastSession->getInscriptions() as $insc) {
-                        $status = $insc->getInscriptionStatus();
-                        $statusId = $status->getId();
-
-                        if (!isset($trainingStats[$statusId])) {
-                            $trainingStats[$statusId] = [
-                                'id' => $statusId,
-                                'name' => $status->getName(),
-                                'status' => $status->getStatus(),
-                                'count' => 0,
-                                'participations' => [],
-                            ];
+                    // création des stats de statut d'inscription
+                    $flagExiste = 0;
+                    $i=0;
+                    // On parcourt le tableau des stats
+                    foreach ($statsInsc as $stat) {
+                        // si le statut de l'inscription est trouvé dans le tableau
+                        if ($stat['id'] == $insc->getInscriptionStatus()->getId()) {
+                            // on incrémente le compteur
+                            $statsInsc[$i]['count']++;
+                            $flagExiste = 1;
                         }
-
-                        $trainingStats[$statusId]['count']++;
+                        $i++;
+                    }
+                    // si on n'a pas trouvé le statut de l'inscription dans le tableau, on l'ajoute
+                    if ($flagExiste == 0) {
+                        $statsInsc [] = array( 'id' => $insc->getInscriptionStatus()->getId(),
+                            'name' => $insc->getInscriptionStatus()->getName(),
+                            'status' => $insc->getInscriptionStatus()->getStatus(),
+                            'count' => 1);
                     }
                 }
-
-                $sessionES['inscriptionStats'] = array_values($trainingStats);
-
+		$sessionES['inscriptionStats'] = $statsInsc;
 
                 // Trainers
                 $participations = [];
