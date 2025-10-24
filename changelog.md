@@ -1,5 +1,11 @@
 # Geforp changelog :
 
+## 3.0.3 (2025-10-24)
+
+### Corrections
+- Ajustement de toutes les fonctions de recherche (stage, stagiaire, session...)
+- Correction autocomplétion lors de l'ajout d'une inscription sur une session
+
 ## 3.0.2 (2025-10-23)
 
 ### Corrections
