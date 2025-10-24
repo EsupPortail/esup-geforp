@@ -31,17 +31,6 @@ final class TrainingRepository extends ServiceEntityRepository
                                      int $pageSize = 1,
                                      array $sorts = ['createdat' => 'DESC']): array
     {
-
-        $MAX_EXPORT_LIMIT = 10000; // Limite sécurisée
-        $MAX_PAGE_SIZE = 50; // Limite "normale" pour la navigation
-
-        $isExport = isset($filters['_export']) && $filters['_export'] === true;
-
-        $pageSize = max(1, (int) $pageSize);
-        $pageSize = $isExport
-            ? min($pageSize, $MAX_EXPORT_LIMIT)
-            : min($pageSize, $MAX_PAGE_SIZE);
-
         /* addcslashes empêchera des manipulations malveillantes éventuelles */
         $keywordPr = '%' . addcslashes((string) $keyword, '%_') . '%';
         $qb = $this->createQueryBuilder('training');
