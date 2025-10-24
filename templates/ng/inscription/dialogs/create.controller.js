@@ -41,7 +41,7 @@ sygeforApp.controller('InscriptionCreate', ['$scope', '$modalInstance', '$dialog
             var adresses = [];
             angular.forEach(res.data.items, function (item) {
                 adresses.push({
-                    label: item.name,
+                    label: item.fullname,
                     value: item.id,
                     institution: (item.institution !== null && item.institution !== undefined) ? item.institution.name : '',
                     contracted: (((item.institution !== null && item.institution !== undefined) && item.institution.contracted) ? item.institution.contracted : false)
