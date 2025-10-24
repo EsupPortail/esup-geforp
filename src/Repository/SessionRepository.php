@@ -65,7 +65,6 @@ final class SessionRepository extends ServiceEntityRepository
             $qb
                 // si la date de début d'une session est entre les 2 dates envoyées dans le formulaire 
                 ->andWhere("s.datebegin BETWEEN :dateFrom AND :dateTo")
-                ->orderBy('s.datebegin', 'DESC')
                 ->setParameter('dateFrom', $dateFrom)
                 ->setParameter('dateTo', $dateTo);
         }
