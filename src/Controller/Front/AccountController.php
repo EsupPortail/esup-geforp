@@ -49,23 +49,23 @@ final class AccountController extends AbstractController
 
         // Récupération des attributs Shibboleth pour mise à jour du profil
         $shibbolethAttributes = $this->getUser()->getCredentials();
-//dump($this->getUser());
-        //$trainee = $this->getUser();
+
         $userEmail = $this->getUser()->getCredentials()['mail'];
         // on utilise l'eppn comme persistent-id
         //$userPersitentId = $this->getUser()->getCredentials()['persistent-id'];
         $userPersitentId = $this->getUser()->getCredentials()['eppn'];
+        $flagUpdatePersistentId = 0;
 
         if (isset($userPersitentId)) {
-           // dump($arTrainee);
             $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethpersistentid" => $userPersitentId]);
             if ($arTrainee !== null) {
+                // Si on a un stagiaire en base, on ne fait rien et on mettra à jour dans la suite du code
             } elseif (isset($userEmail)) {
+                // si on ne trouve pas de stagiaire en base avec eppn, on regarde s'il y en a un avec le mail
                 $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["email" =>$userEmail]);
-                if (!empty($arTrainee)) {
+                if (isset($arTrainee)) {
                     // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on met à jour le persistent id
-                    $trainee = $arTrainee[0];
-                    $trainee->setShibbolethpersistentid($userPersitentId);
+                    $flagUpdatePersistentId = 1;
                 }
             }
         } elseif (isset($userEmail)) {
@@ -74,6 +74,10 @@ final class AccountController extends AbstractController
 
         if (isset($arTrainee)) {
             $trainee = $arTrainee;
+
+            // Si identification avec le mail, on met à jour l'eppn
+            if ($flagUpdatePersistentId)
+                $trainee->setShibbolethpersistentid($shibbolethAttributes['eppn']);
 
             // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
             if ($shibbolethAttributes['supannCivilite']=='')
