@@ -191,14 +191,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
      */
     public function getModalConfig($options = []): array
     {
-        $token = $this->Security->getToken();
-        $user = $token?->getUser();
-        $userOrg = null;
-
-        if ($user && method_exists($user, 'getOrganization')) {
-            $userOrg = $user->getOrganization()->getId();
-        }
-
+        $userOrg = $this->Security->getUser()->getOrganization();
         $templateTerm = $this->vocabularyRegistry->getVocabularyById(5); // vocabulary_email_template
         $attachmentTerm = $this->vocabularyRegistry->getVocabularyById(1); //vocabulary_publipost_template
 
@@ -211,7 +204,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
 
         if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
-            $inscriptionStatus = $repoInscriptionStatus->find($options['inscriptionstatus']);
+            $inscriptionStatus = $repoInscriptionStatus->findBy([['id'] => $options['inscriptionstatus']]);
             $findCriteria = ['inscriptionstatus' => $inscriptionStatus];
             if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
@@ -220,7 +213,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
             $templates = $repo->findBy($findCriteria);
         } elseif (!empty($options['presencestatus'])) {
             $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
-            $presenceStatus = $repoInscriptionStatus->find($options['presencestatus']);
+            $presenceStatus = $repoInscriptionStatus->findBy([['id'] => $options['presencestatus']]);
             $findCriteria = ['presencestatus' => $presenceStatus];
             if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
