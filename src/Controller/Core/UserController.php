@@ -190,12 +190,8 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $keyword = $form['nom']->getData();
                 $filters['institution.name.source'] = $etab;
 
-                $resSearch = $traineeSearchRepository->getTraineesList($keyword = "", $filters, self::PAGE, self::PAGE_SIZE, self::SORT, (array)self::FIELDS);
+                $resSearch = $traineeSearchRepository->getTraineesList($keyword, $filters, self::PAGE, self::PAGE_SIZE, self::SORT, (array)self::FIELDS);
                 $trainees = $resSearch['items'];
-
-                if (!is_string($keyword)) {
-                    return $keyword;
-                }
 
                 // Tableau pour test si trainee est deja gestionnaire
                 $tabTrainees = [];
@@ -205,7 +201,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
                 $repository = $em->getRepository(User::class);
                foreach ($trainees as $trainee) {
                    // On teste si le trainee est dejà gestionnaire
-                   $email = $trainee['email'] ?? null;
+                   $email = $trainee->getEmail()?? null;
                    $rUser = $email ? $repository->findOneBy(['email' => $email]) : null;
                     $tabTrainees[] = $rUser ? 1 : 0;
                 }
