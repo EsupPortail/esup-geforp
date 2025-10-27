@@ -204,7 +204,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
 
         if (!empty($options['inscriptionstatus'])) {
             $repoInscriptionStatus = $em->getRepository(Inscriptionstatus::class);
-            $inscriptionStatus = $repoInscriptionStatus->findBy([['id'] => $options['inscriptionstatus']]);
+            $inscriptionStatus = $repoInscriptionStatus->findBy(['id' => $options['inscriptionstatus']]);
             $findCriteria = ['inscriptionstatus' => $inscriptionStatus];
             if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
@@ -213,7 +213,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
             $templates = $repo->findBy($findCriteria);
         } elseif (!empty($options['presencestatus'])) {
             $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
-            $presenceStatus = $repoInscriptionStatus->findBy([['id'] => $options['presencestatus']]);
+            $presenceStatus = $repoInscriptionStatus->findBy(['id' => $options['presencestatus']]);
             $findCriteria = ['presencestatus' => $presenceStatus];
             if (!isEmpty($userOrg)) {
                 $findCriteria['organization'] = $userOrg;
