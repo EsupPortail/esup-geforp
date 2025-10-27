@@ -303,7 +303,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;
             $newRights[]= $accessReg->getByName($right);
         }
         $user->setAccessRights($newRights);
-dump($user);
+
         $formBuilder = $this->createFormBuilder($user);
         $formBuilder->add('accessRights', AccessRightType::class, ['label' => 'Droits d\'accès']);
 
