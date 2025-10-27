@@ -52,10 +52,10 @@ final class AccountController extends AbstractController
 
         $userEmail = $this->getUser()->getCredentials()['mail'];
         // on utilise l'eppn comme persistent-id
-        //$userPersitentId = $this->getUser()->getCredentials()['persistent-id'];
         $userPersitentId = $this->getUser()->getCredentials()['eppn'];
         $flagUpdatePersistentId = 0;
 
+        // On teste l'eppn
         if (isset($userPersitentId)) {
             $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethpersistentid" => $userPersitentId]);
             if ($arTrainee !== null) {
@@ -64,7 +64,7 @@ final class AccountController extends AbstractController
                 // si on ne trouve pas de stagiaire en base avec eppn, on regarde s'il y en a un avec le mail
                 $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["email" =>$userEmail]);
                 if (isset($arTrainee)) {
-                    // Il y a bien un stagiaire en base, mais il ne s'est jamais connecté par Shibboleth -> on met à jour le persistent id
+                    // Il y a bien un stagiaire en base, mais il n'a pas été retrouvé avec l'eppn -> on met à jour le persistent id
                     $flagUpdatePersistentId = 1;
                 }
             }
