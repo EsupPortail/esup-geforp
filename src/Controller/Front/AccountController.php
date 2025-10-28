@@ -118,7 +118,7 @@ final class AccountController extends AbstractController
                     $trainee->setZip($codepostal);
                 }
             }
-            $this->logger->debug('Shibboleth attributes: ' . json_encode($shibbolethAttributes, JSON_PRETTY_PRINT));
+
             $trainee->setPhoneNumber($shibbolethAttributes['telephoneNumber']);
 			$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
             if ($shibbolethAttributes['primary-affiliation'] == "staff") {
