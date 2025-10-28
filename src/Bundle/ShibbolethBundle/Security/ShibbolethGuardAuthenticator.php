@@ -109,8 +109,19 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
         if(empty($credentials['username']))
             throw new UserNotFoundException("The username attribute is empty");
 
-        if ($userProvider instanceof  UserProviderInterface) {
-            return($userProvider->loadUser($credentials));
+        if($userProvider instanceof ShibbolethUserProviderInterface) {
+            $us =  $userProvider->loadUser($credentials);
+
+            // test responsable N+1 et ajout role
+            $tabUs = $this->doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $us->getCredentials()['mail']));
+            if (!empty($tabUs))
+                $us->setRoles('ROLE_RESP');
+
+            return($us);
+        }
+        else if($userProvider instanceof  UserProviderInterface) {
+            $us = $userProvider->loadUserByUsername($credentials['username']);
+            return($us);
         }
 
         return null;
