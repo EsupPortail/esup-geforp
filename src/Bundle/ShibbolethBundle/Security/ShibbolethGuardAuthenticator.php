@@ -57,10 +57,12 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
 
     private $request;
 
+    private $doctrine;
+
     /**
      * ShibbolethGuardAuthenticator constructor.
      */
-    public function __construct(array $config, private readonly Router $router, private readonly ShibbolethUserProvider $shibUserProvider)
+    public function __construct(array $config, private readonly Router $router, ManagerRegistry $doctrine, private readonly ShibbolethUserProvider $shibUserProvider)
     {
         $this->login_path = $config['login_path'];
         $this->login_target = $config['login_target'];
@@ -69,6 +71,7 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
         $this->attributes = $config['attributes'];
         if(!in_array($this->username, $this->attributes))
             throw new InvalidConfigurationException("Shibboleth configuration error : the value of username parameter must be in attributes list parameter");
+        $this->doctrine = $doctrine;
     }
 
     public function supports(Request $request): bool{
@@ -176,22 +179,26 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
     public function authenticate(Request $request): Passport
     {
         $credentials = $this->getCredentials($request);
-	$this->request = $request;
+	    $this->request = $request;
         if (empty($credentials ['username'])) {
             throw new UserNotFoundException("The username attribute is empty");
         }
         $userBadge = new UserBadge($credentials['username'],  
-		function ($username) {
-			$credentials = $this->getCredentials($this->request);
-                	$user = $this->shibUserProvider->loadUser($credentials);
-	                if (!$user) {
-        	            throw new UserNotFoundException();
-                	}
-	                return $user;
-		}
-            );
+		    function ($username) {
+			    $credentials = $this->getCredentials($this->request);
+                $user = $this->shibUserProvider->loadUser($credentials);
+                if (!$user)
+                    throw new UserNotFoundException();
 
-	$pass = new Passport($userBadge, new CustomCredentials(fn($credentials, $user) => true, $credentials['username']));
+                $tabUs = $this->doctrine->getRepository('App\Entity\Back\Trainee')->findBy(array('emailsup' => $credentials['mail']));
+                // test responsable N+1 et ajout role
+                if (!empty($tabUs))
+                    $user->setRoles('ROLE_RESP');
+
+	            return $user;
+		    });
+
+	    $pass = new Passport($userBadge, new CustomCredentials(fn($credentials, $user) => true, $credentials['username']));
         return $pass;
     }
 }

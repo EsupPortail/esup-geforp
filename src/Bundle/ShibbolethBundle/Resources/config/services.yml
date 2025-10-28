@@ -1,7 +1,7 @@
 services:
   shibboleth_authenticator:
     class: App\Bundle\ShibbolethBundle\Security\ShibbolethGuardAuthenticator
-    arguments: ['%shibboleth%', "@router", '@App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider']
+    arguments: ['%shibboleth%', "@router", "@doctrine", '@App\Bundle\ShibbolethBundle\Security\User\ShibbolethUserProvider']
 
   shibboleth_logout_event:
     class: App\Bundle\ShibbolethBundle\Event\LogoutSuccessHandler
