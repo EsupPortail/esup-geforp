@@ -215,7 +215,7 @@ final class InscriptionStatusChangeBatchOperation extends AbstractBatchOperation
             $repoInscriptionStatus = $em->getRepository(Presencestatus::class);
             $presenceStatus = $repoInscriptionStatus->findBy(['id' => $options['presencestatus']]);
             $findCriteria = ['presencestatus' => $presenceStatus];
-            if (!isEmpty($userOrg)) {
+            if ($userOrg) {
                 $findCriteria['organization'] = $userOrg;
             }
 

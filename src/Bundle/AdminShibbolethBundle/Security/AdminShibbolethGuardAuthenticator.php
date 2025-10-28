@@ -92,7 +92,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
         foreach($this->attributes as $attribute){
             $credentials[$attribute] = $this->getAttribute($request, $attribute);
         }
-        error_log(print_r($credentials, true));
+
         return $credentials;
     }
 
