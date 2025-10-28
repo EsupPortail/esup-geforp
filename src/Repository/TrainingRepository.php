@@ -15,11 +15,9 @@ use Doctrine\Persistence\ManagerRegistry;
 
 final class TrainingRepository extends ServiceEntityRepository
 {
-    private ManagerRegistry $managerRegistry;
     public function __construct(ManagerRegistry $managerRegistry)
     {
         parent::__construct($managerRegistry, Internship::class);
-        $this->managerRegistry = $managerRegistry;
     }
 
     /**
@@ -69,20 +67,11 @@ final class TrainingRepository extends ServiceEntityRepository
 
             // FILTRE SEMESTRE
             if( isset($filters['semester']) && isset($filters['year']) ) {
-                $sessionDate = new \DateTime($filters['year']);
-                $month = (int) $sessionDate->format('m');
-
-                if ($month > 1 && $month < 12) {
-                    $semester = 1;
-                    $monthFrom = 0;
-                    $monthTo = 6;
+                if ($filters['semester']  == 1) {
+                    $monthFrom = 1; $monthTo = 6;
                 } else {
-                    $semester = 2;
-                    $monthFrom = 7;
-                    $monthTo = 12;
+                    $monthFrom = 7; $monthTo = 12;
                 }
-
-                $filters['semester'] = $semester;
 
                 $qb
                     ->andWhere('MONTH(s.datebegin) BETWEEN :monthFrom and :monthTo')
