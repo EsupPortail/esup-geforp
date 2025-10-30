@@ -31,7 +31,8 @@ class CSVBatchOperation extends AbstractBatchOperation
     /**
      * @var array
      */
-    protected array $options = ['volcanus_config' => ['delimiter' => ';', 'enclose' => true, 'enclosure' => '"', 'escape' => '"', 'inputEncoding' => 'UTF-8', 'outputEncoding' => 'ISO-8859-1', 'writeHeaderLine' => true, 'responseFilename' => 'export.csv']];
+    protected array $options;
+
     // Création de la requête de récupération des tags
     /**
      * @var string
@@ -47,6 +48,7 @@ SQL;
     public function __construct(protected Security $security)
     {
         parent::__construct();
+        $this->options['volcanus_config'] = ['delimiter' => ';', 'enclose' => true, 'enclosure' => '"', 'escape' => '"', 'inputEncoding' => 'UTF-8', 'outputEncoding' => 'ISO-8859-1', 'writeHeaderLine' => true, 'responseFilename' => 'export.csv'];
         $this->options['tempDir'] = sys_get_temp_dir() . '/sygefor/';
         if (!file_exists($this->options['tempDir'])) {
             mkdir($this->options['tempDir'], 0777);
@@ -456,7 +458,7 @@ SQL;
                         $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', ',', $data[$key]);
-                    }elseif ($key == "session.totalCost") {
+                    } elseif ($key == "session.totalCost") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
 
@@ -527,7 +529,7 @@ SQL;
                         // Transformation '.' en ',' pour faciliter Excel
                         $data[$key] = str_replace('.', ',', $data[$key]);
 
-                    }elseif ($key == "training.tags") {
+                    } elseif ($key == "training.tags") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
 
@@ -607,7 +609,7 @@ SQL;
                         }
 
                         $evalsMsg = '';
-			$nbEvals=0;
+			            $nbEvals=0;
 
                         // On parcourt le tableau des inscriptions
                         foreach ($tabInsc as $insc) {
@@ -619,8 +621,8 @@ SQL;
                                 ->setParameter('inscription', $insc);
                             $tabCritNot = $query->getResult();
 
-			    if (!empty($tabCritNot))
-				$nbEvals++;
+                            if (!empty($tabCritNot))
+                            $nbEvals++;
 
                             // Pour chaque critère, on calcule le total des notes
                             foreach ($tabCritNot as $critNot) {
@@ -628,7 +630,7 @@ SQL;
                                     $tabAv[$critNot->getCriterion()->getId()]['sum'] += $critNot->getNote();
                                     ++$tabAv[$critNot->getCriterion()->getId()]['nb'];
 
-				    if ($critNot->getNote() == 1)
+				                    if ($critNot->getNote() == 1)
                                         $tabAv[$critNot->getCriterion()->getId()]['1et']++;
                                     if ($critNot->getNote() == 2)
                                         $tabAv[$critNot->getCriterion()->getId()]['2et']++;
@@ -658,7 +660,7 @@ SQL;
                         $rvalue = '';
                         // Moyenne des critères
                         foreach ($tabCrit as $crit) {
-			    $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
+			                $rvalue .= $crit->getName() . ' : 1*:' . $tabAv[$crit->getId()]['1et'] . ' -2*:' . $tabAv[$crit->getId()]['2et'] . ' -3*:' . $tabAv[$crit->getId()]['3et'] . ' -4*:' . $tabAv[$crit->getId()]['4et'] . ' -moy:' . $tabAv[$crit->getId()]['av'] . ' | ';
                         }
 
                         // Remarques evals
@@ -733,14 +735,11 @@ SQL;
                     $data[$key] = '';
                 }
             }
-           // dump($data);
+
             $lines[$entity->getId()] = $data;
 //            }
         }
-
-        // reorder
-//        $this->reorderByKeys($lines, $idList);
-
+        
         // fields
         $fields = [];
         $heads = [];
@@ -763,18 +762,19 @@ SQL;
             $this->options['volcanus_config']['responseFilename'] = $this->options['filename'];
         }
 
-	$fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
+	    $fileName = str_replace('.csv', '_' . uniqid() . '.csv', $this->options['volcanus_config']['responseFilename']);
 
+        $volcanusConfig = $this->options['volcanus_config'];
         // encodage fichier
         $charsetConverter = (new CharsetConverter())
-            ->inputEncoding($volcanusConfig['inputEncoding'] ?? 'UTF-8')
-            ->outputEncoding($volcanusConfig['outputEncoding'] ?? 'UTF-8');
+            ->inputEncoding($volcanusConfig['inputEncoding'] )
+            ->outputEncoding($volcanusConfig['outputEncoding'] );
 
         $writer = Writer::createFromPath($this->options['tempDir'] . $fileName, 'w+');
         // Mise en forme fichier
-        $writer->setDelimiter($volcanusConfig['delimiter'] ?? ';');
-        $writer->setEnclosure($volcanusConfig['enclosure'] ?? '"');
-        $writer->setEscape($volcanusConfig['escape'] ?? '\\');
+        $writer->setDelimiter($volcanusConfig['delimiter'] );
+        $writer->setEnclosure($volcanusConfig['enclosure'] );
+        $writer->setEscape($volcanusConfig['escape'] );
         $writer->addFormatter($charsetConverter);
 
         $writer->getInputBOM();
