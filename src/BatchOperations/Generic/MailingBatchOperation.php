@@ -466,11 +466,11 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     $lines[$i]['horairesAprem'] = $date->getScheduleAfter();
                     $lines[$i]['lieu'] = $date->getPlace();
                     $lines[$i]['nom'] = $data->nom;
-		    $lines[$i]['commentaires'] = $data->commentaires;
+		            $lines[$i]['commentaires'] = $data->commentaires;
 
-                    $lines[$i]['formateur'] = [];
+                    $lines[$i]['formateurs'] = [];
                     foreach ($formateurs as $formateur) {
-                        $lines[$i]['formateur'][] = ['nom' => $formateur->getLastname(), 'prenom' => $formateur->getFirstname()];
+                        $lines[$i]['formateurs'][] = ['nom' => $formateur->getLastname(), 'prenom' => $formateur->getFirstname()];
                     }
 
                     $lines[$i]['inscriptions'] = [];
