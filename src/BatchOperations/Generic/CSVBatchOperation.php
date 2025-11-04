@@ -568,7 +568,7 @@ SQL;
                         // On recupere le tableau des dates de la session avec le nombre d'heures matin et après-midi
                         $query = $em
                             ->createQuery('SELECT d FROM App\Entity\Back\DateSession d
-                WHERE d.session = :session')
+                                WHERE d.session = :session')
                             ->setParameter('session', $session);
                         $tabDatesSes = $query->getResult();
 
@@ -590,8 +590,8 @@ SQL;
 
                         // On recupere les critères d'évaluations
                         $query = $em
-				->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
-                                WHERE ec.organization = :org')
+				            ->createQuery('SELECT ec FROM App\Entity\Term\Evaluationcriterion ec
+                                WHERE ec.organization is NULL or ec.organization = :org')
                             ->setParameter('org', $session->getTraining()->getOrganization());
 
                         $tabCrit = $query->getResult();
@@ -602,7 +602,7 @@ SQL;
                             $tabAv[$crit->getId()]['sum'] = 0;
                             $tabAv[$crit->getId()]['nb'] = 0;
                             $tabAv[$crit->getId()]['av'] = 0;
-			    $tabAv[$crit->getId()]['1et'] = 0;
+			                $tabAv[$crit->getId()]['1et'] = 0;
                             $tabAv[$crit->getId()]['2et'] = 0;
                             $tabAv[$crit->getId()]['3et'] = 0;
                             $tabAv[$crit->getId()]['4et'] = 0;
@@ -616,8 +616,8 @@ SQL;
                             // On recupere le tableau des critères d'évaluation et intitulés
                             $query = $em
                                 ->createQuery('SELECT s FROM App\Entity\Back\EvaluationNotedCriterion s
-                    WHERE s.inscription = :inscription 
-                    GROUP BY s.id')
+                                    WHERE s.inscription = :inscription 
+                                    GROUP BY s.id')
                                 ->setParameter('inscription', $insc);
                             $tabCritNot = $query->getResult();
 
