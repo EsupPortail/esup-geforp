@@ -283,6 +283,7 @@ class ProgramController extends AbstractController
             $flagInsc = 2;
         }
 
+        $form = $this->createForm(InscriptionType::class, $inscription);
         if ($flagInsc==1) {
             // Ajout affichage supérieur hiérarchique s'il existe
             if (($trainee->getFirstnamesup() !== null) && ($trainee->getLastnamesup())) {
@@ -290,7 +291,6 @@ class ProgramController extends AbstractController
                 $this->addFlash('warning', 'Le supérieur hiérarchique que vous avez renseigné est ' . $sup . ' dont l\'email est '. $trainee->getEmailsup() . '. Si ce n\'est pas la bonne personne, merci de mettre à jour la donnée dans le menu "Mon compte", onglet "Mon profil".');
             }
 
-            $form = $this->createForm(InscriptionType::class, $inscription);
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
                 if (($form->isSubmitted())&&($form->isValid())) {
@@ -391,6 +391,7 @@ class ProgramController extends AbstractController
 
         return $this->render('Front/Public/program/inscription.html.twig', [
             'user' => $trainee,
+            'form' => $form->createView(),
             'training' => $training,
             'session' => $session,
             'token' => $token,
