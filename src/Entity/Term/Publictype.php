@@ -33,11 +33,6 @@ class Publictype extends AbstractTerm implements VocabularyInterface
         return $this->machinename;
     }
 
-    public function __toString(): string
-    {
-        return $this->machinename;
-    }
-
     public static function getVocabularyStatus(): int
     {
         return VocabularyInterface::VOCABULARY_NATIONAL;
