@@ -455,11 +455,11 @@ class ProgramController extends AbstractController
     #[Route(path: '/training/alertremove/{id}/{sessionId}', name: 'front.program.alertremove', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
     public function alertRemove(ManagerRegistry $doctrine, AbstractTraining $training, Session $sessionId, int $id, $token = null): RedirectResponse
     {
-        $session = $doctrine->getRepository(Session::class)->find($id);
+        $session = $doctrine->getRepository(Session::class)->find($sessionId);
         if (!$session){
             throw new Exception('Session not found');
         }
-        $training = $doctrine->getRepository(AbstractTraining::class)->find($sessionId);
+        $training = $doctrine->getRepository(AbstractTraining::class)->find($id);
         if (!$training){
             throw new Exception('Training not found');
         }
