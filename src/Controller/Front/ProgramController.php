@@ -407,13 +407,13 @@ class ProgramController extends AbstractController
      * @return RedirectResponse
      */
     #[Route(path: '/training/alert/{id}/{sessionId}', name: 'front.program.alert', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function alert(ManagerRegistry $doctrine, AbstractTraining $training, int $id, Session $session, $token = null): RedirectResponse
+    public function alert(ManagerRegistry $doctrine, AbstractTraining $training, int $id, Session $sessionId, $token = null): RedirectResponse
     {
         $training = $doctrine->getRepository(AbstractTraining::class)->find($id);
         if (!$training){
             throw new Exception('Training not found');
         }
-        $session = $doctrine->getRepository(Session::class)->find($id);
+        $session = $doctrine->getRepository(Session::class)->find($sessionId);
         if (!$session){
             throw new Exception('Session not found');
         }
@@ -442,7 +442,7 @@ class ProgramController extends AbstractController
             $this->addFlash('success', 'Votre alerte a bien été enregistrée.');
         }
 
-        return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
+        return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token]);
     }
 
     /**
@@ -453,13 +453,13 @@ class ProgramController extends AbstractController
      * @return RedirectResponse
      */
     #[Route(path: '/training/alertremove/{id}/{sessionId}', name: 'front.program.alertremove', requirements: ['id' => '\d+', 'sessionId' => '\d+'])]
-    public function alertRemove(ManagerRegistry $doctrine, AbstractTraining $training, Session $session, int $id, $token = null): RedirectResponse
+    public function alertRemove(ManagerRegistry $doctrine, AbstractTraining $training, Session $sessionId, int $id, $token = null): RedirectResponse
     {
         $session = $doctrine->getRepository(Session::class)->find($id);
         if (!$session){
             throw new Exception('Session not found');
         }
-        $training = $doctrine->getRepository(AbstractTraining::class)->find($id);
+        $training = $doctrine->getRepository(AbstractTraining::class)->find($sessionId);
         if (!$training){
             throw new Exception('Training not found');
         }
@@ -482,7 +482,7 @@ class ProgramController extends AbstractController
 
         $this->addFlash('success', 'Vous vous êtes bien désinscrit de l\'alerte.');
 
-        return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token, $this->render('Front/Public/program/inscription.html.twig')]);
+        return $this->redirectToRoute('front.program.training', ['id' => $training->getId(), 'sessionId' => $session->getId(), 'token' => $token]);
     }
 
     /**
