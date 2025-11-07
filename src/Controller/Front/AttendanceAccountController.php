@@ -86,7 +86,7 @@ class AttendanceAccountController extends AbstractController
     }
 
     #[Route(path: '/attendance/{id}/evaluation', name: 'front.account.attendance.evaluation')]
-    public function evaluation(Request $request, ManagerRegistry $doctrine, Inscription $attendance, int $id): Response
+    public function evaluation(Request $request, ManagerRegistry $doctrine, int $id): Response
     {
         $attendance = $doctrine->getRepository(\App\Entity\Back\Inscription::class)->find($id);
         if (!$attendance) {
