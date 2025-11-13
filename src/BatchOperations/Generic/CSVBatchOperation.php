@@ -476,7 +476,7 @@ SQL;
 
                         $data[$key] = $rvalue ?: '';
                         // Transformation '.' en ',' pour faciliter Excel
-                        $data[$key] = str_replace('.', '', (string)$data[$key]);
+                        $data[$key] = str_replace('.', ',', (string)$data[$key]);
 
                     } elseif ($key == "individualcost") {
                         // Coût total
