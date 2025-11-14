@@ -142,12 +142,14 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
      * @param $name
      * @return mixed
      */
-    private function getAttribute(Request $request, string $name){
-        $attributes = [$name, strtoupper($name), "HTTP_".strtoupper($name), sprintf('REDIRECT_%s', $name)];
-        foreach($attributes as $attribute)
-            if(!empty($request->server->has($attribute))) return $request->server->get($attribute);
-
-            return null;
+    private function getAttribute(Request $request, string $name)
+    {
+        if ($name != null) {
+            $attributes = [$name, strtoupper($name), "HTTP_".strtoupper($name), sprintf('REDIRECT_%s', $name)];
+            foreach($attributes as $attribute)
+                if(!empty($request->server->has($attribute))) return $request->server->get($attribute);
+        }
+        return null;
     }
 
     public function authenticate(Request $request): Passport

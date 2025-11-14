@@ -166,10 +166,13 @@ final class ShibbolethGuardAuthenticator extends AbstractAuthenticator
      */
     private function getAttribute(Request $request, $name): mixed
     {
-        $attributes = [$name, strtoupper((string) $name), "HTTP_" . strtoupper((string) $name), sprintf('REDIRECT_%s', $name)];
-        foreach ($attributes as $attribute)
-            if ($request->server->has($attribute))
-                return $request->server->get($attribute);
+        if ($name != null) {
+            $attributes = [$name, strtoupper((string) $name), "HTTP_" . strtoupper((string) $name), sprintf('REDIRECT_%s', $name)];
+            foreach ($attributes as $attribute)
+                if ($request->server->has($attribute))
+                    return $request->server->get($attribute);
+        }
+
         return null;
     }
 
