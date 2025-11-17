@@ -265,20 +265,19 @@ class RegistrationAccountController extends AbstractController
         $repo = $em->getRepository($templateTerm::class);
         /** @var Emailtemplate $template */
         $templates = $repo->findBy(['name' => "Demande de validation d'inscription", 'organization' => $registration->getSession()->getTraining()->getOrganization()]);
-        if (!$templates || count($templates) === 0) {
-            if (!$templates || count($templates) === 0) {
 
-                $subject = "Demande de validation d'inscription";
-                $body = "Bonjour,\nUne demande de relance pour une inscription est en attente de validation.";
-                $formathtml = 0;
-                $newline = "\n";
-            } else {
-                $template = $templates[0];
-                $formathtml = $template->getPosition();
-                $newline = $formathtml ? "<br>" : "\n";
-                $subject = $template->getSubject();
-                $body = $template->getBody();
-            }
+        if (!$templates || count($templates) === 0) {
+
+            $subject = "Demande de validation d'inscription";
+            $body = "Bonjour,\nUne demande de relance pour une inscription est en attente de validation.";
+            $formathtml = 0;
+            $newline = "\n";
+        } else {
+            $template = $templates[0];
+            $formathtml = $template->getPosition();
+            $newline = $formathtml ? "<br>" : "\n";
+            $subject = $template->getSubject();
+            $body = $template->getBody();
         }
 
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
