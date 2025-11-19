@@ -112,10 +112,10 @@ class AttendanceAccountController extends AbstractController
             $tabEvalChoices = [$evalCritere4 => 4, $evalCritere3 => 3, $evalCritere2 => 2, $evalCritere1 => 1];
         }
 
-	// test evaluation deja remplie
-	$flagEval = 0;
-	if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
-		$flagEval = 1;
+        // test evaluation deja remplie
+        $flagEval = 0;
+        if ($attendance->getCriteria() && $attendance->getCriteria()->count() > 0) {
+            $flagEval = 1;
         }
 
         $evaluationCriterionsLoc = $doctrine
@@ -155,10 +155,10 @@ class AttendanceAccountController extends AbstractController
 
 
         return $this->render('Front/Account/attendance/evaluation.html.twig', [
-        'user' => $trainee,
-        'attendance' => $attendance,
-        'form' => $form->createView(),
-    ]);
+            'user' => $trainee,
+            'attendance' => $attendance,
+            'form' => $form->createView(),
+            ]);
     }
 
 

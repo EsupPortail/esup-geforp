@@ -18,6 +18,7 @@ use App\Entity\Back\Trainee;
 use App\Entity\Back\SupannCodeEntite;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
@@ -47,291 +48,327 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
             // Si l'utilisateur n'est pas authentifié pleinement, on redirige ou on lève une exception
             throw new AccessDeniedException('Vous devez être pleinement authentifié pour accéder à cette page.');
         }
-        $trainee = new Trainee();
 
-        // Recuperation paramétrage des champs du formulaire
-        $adresseFromLdap = $this->getParameter('adresse_from_ldap');
-        $corrFormActif = $this->getParameter('corresp_form_actif');
+        // Test : la personne authentifiée a t elle un compte en base ?
+        // Récupération mail
+        $userEmail = $this->getUser()->getCredentials()['mail'];
+        // on utilise l'eppn comme persistent-id
+        $userPersitentId = $this->getUser()->getCredentials()['eppn'];
+        $flagBase = 0;
 
-        $shibbolethAttributes = $this->getUser()->getCredentials();
-
-        if (!is_array($shibbolethAttributes)) {
-            throw new AuthenticationException('Les attributs Shibboleth ne sont pas un tableau.');
-        }
-
-        // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
-        if ($shibbolethAttributes['supannCivilite']=='')
-            $shibbolethAttributes['supannCivilite'] = 'M.';
-
-        $trainee->setTitle($managerRegistry->getRepository(\App\Entity\Term\Title::class)->findOneBy(
-            ['name' => $shibbolethAttributes['supannCivilite']]
-        ));
-        $trainee->setLastname($shibbolethAttributes['sn']);
-        $trainee->setFirstname($shibbolethAttributes['givenName']);
-        $trainee->setEmail($shibbolethAttributes['mail']);
-
-        $datenaiss = str_replace("-", "", (string) $shibbolethAttributes['supannOIDCDateDeNaissance']);
-        $trainee->setBirthdate($datenaiss);
-        // Mise en forme adresse au cas où il y en a une
-        if ($adresseFromLdap && ($shibbolethAttributes['postalAddress'] != "")) {
-            $address = $shibbolethAttributes['postalAddress'];
-            // Recupération du code postal
-            preg_match('#\$\d{5}#', (string) $address, $result, PREG_OFFSET_CAPTURE, 3);
-            $codepostal = substr($result[0][0], 1);
-            // Récupération position du dernier $ dans la chaine
-            $posLast = strripos((string) $address, "$");
-            // Adresse = début de la chaîne jusqu'au code postal
-            $addressPro = substr((string) $address, 0, $result[0][1]);
-            // On retire les '$' restants dans l'adresse
-            $addressPro = str_replace("$", " / ", $addressPro);
-            if ($posLast == $result[0][1]) {
-                // Si il n'y a pas de pays renseigné
-                $city = substr((string) $address, $result[0][1] + 6);
-            } else {
-                // Si il y a un pays, on recupère seulement la partie ville
-                $city = substr((string) $address, $result[0][1] + 6, $posLast - $result[0][1] - 6);
-            }
-
-            $trainee->setAddress($addressPro);
-            $trainee->setCity($city);
-            $trainee->setZip($codepostal);
-        }
-
-        $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
-		$shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
-        if ($shibbolethAttributes['primary-affiliation'] == "staff") {
-            // Transformation de l'attribut 'staff' en 'employee'
-            $shibbolethAttributes['primary-affiliation'] = "employee";
-        }
-
-        $publictype = $managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
-            ['machinename' => $shibbolethAttributes['primary-affiliation']]
-        );
-
-        if ($publictype != null) {
-            // cas general
-            $trainee->setPublictype($publictype);
-        } elseif ($shibbolethAttributes['primary-affiliation'] == 'student') {
-            // cas des etudiants doctorants
-            $flagDoc = 0;
-            if ($shibbolethAttributes['supannEtuCursusAnnee'] != "") {
-                // Test si doctorant sur supannEtuCursusAnnee
-                $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
-                if (is_array($tabCursus)) {
-                    foreach ($tabCursus as $tabCursu) {
-                        if (str_contains((string) $tabCursu, '{SUPANN}D')) {
-                            // c'est un doctorant
-                            $flagDoc = 1;
-                            $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
-                                ['name' => 'enseignant']
-                            ));
-                            break;
-                        }
-                    }
-                } elseif (str_contains((string) $tabCursus, 'D')) {
-                    // c'est un doctorant
-                    $flagDoc = 1;
-                    $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
-                        ['name' => 'enseignant']
-                    ));
+        // On teste l'eppn
+        if (isset($userPersitentId)) {
+            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["shibbolethpersistentid" => $userPersitentId]);
+            if ($arTrainee !== null) {
+                // Si on a un stagiaire en base
+                $flagBase = 1;
+            } elseif (isset($userEmail)) {
+                // si on ne trouve pas de stagiaire en base avec eppn, on regarde s'il y en a un avec le mail
+                $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(["email" =>$userEmail]);
+                if (isset($arTrainee)) {
+                    // Il y a bien un stagiaire en base, mais il n'a pas été retrouvé avec l'eppn -> on met à jour le persistent id
+                    $flagBase = 1;
                 }
             }
-            // si pas trouvé sur supannEtuCursusAnnee, test sur unscoped-affiliation
-            if ($flagDoc == 0) {
-                // si etudiant, on regarde aussi edupersonaffiliation pour détecter les doctorants
-                $affiliation = explode(';', (string) $shibbolethAttributes['unscoped-affiliation']);
-                // Recup des types de public possibles
-                $allPublictypes = $managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findAll();
-                foreach ($affiliation as $aff) {
-                    foreach ($allPublictypes as $allPublictype) {
-                        if ($aff == $allPublictype->getMachinename()) {
-                            $flagDoc = 1;
-                            $trainee->setPublictype($allPublictype);
+        } elseif (isset($userEmail)) {
+            $arTrainee = $managerRegistry->getRepository(\App\Entity\Back\Trainee::class)->findOneBy($userEmail);
+            if ($arTrainee !== null) {
+                $flagBase = 1;
+            }
+        }
+
+        if ($flagBase) {
+            // si on a déjà un stagiaire en base, on renvoie vers le profil
+            return new RedirectResponse($this->generateUrl('front.account.profile'));
+
+        } else {
+            // Sinon, on crée le stagiaire
+            $trainee = new Trainee();
+
+            // Recuperation paramétrage des champs du formulaire
+            $adresseFromLdap = $this->getParameter('adresse_from_ldap');
+            $corrFormActif = $this->getParameter('corresp_form_actif');
+
+            $shibbolethAttributes = $this->getUser()->getCredentials();
+
+            if (!is_array($shibbolethAttributes)) {
+                throw new AuthenticationException('Les attributs Shibboleth ne sont pas un tableau.');
+            }
+
+            // Gestion du cas où la civilité n'est pas renseignée : on met à M. par défaut
+            if ($shibbolethAttributes['supannCivilite']=='')
+                $shibbolethAttributes['supannCivilite'] = 'M.';
+
+            $trainee->setTitle($managerRegistry->getRepository(\App\Entity\Term\Title::class)->findOneBy(
+                ['name' => $shibbolethAttributes['supannCivilite']]
+            ));
+            $trainee->setLastname($shibbolethAttributes['sn']);
+            $trainee->setFirstname($shibbolethAttributes['givenName']);
+            $trainee->setEmail($shibbolethAttributes['mail']);
+
+            $datenaiss = str_replace("-", "", (string) $shibbolethAttributes['supannOIDCDateDeNaissance']);
+            $trainee->setBirthdate($datenaiss);
+            // Mise en forme adresse au cas où il y en a une
+            if ($adresseFromLdap && ($shibbolethAttributes['postalAddress'] != "")) {
+                $address = $shibbolethAttributes['postalAddress'];
+                // Recupération du code postal
+                preg_match('#\$\d{5}#', (string) $address, $result, PREG_OFFSET_CAPTURE, 3);
+                $codepostal = substr($result[0][0], 1);
+                // Récupération position du dernier $ dans la chaine
+                $posLast = strripos((string) $address, "$");
+                // Adresse = début de la chaîne jusqu'au code postal
+                $addressPro = substr((string) $address, 0, $result[0][1]);
+                // On retire les '$' restants dans l'adresse
+                $addressPro = str_replace("$", " / ", $addressPro);
+                if ($posLast == $result[0][1]) {
+                    // Si il n'y a pas de pays renseigné
+                    $city = substr((string) $address, $result[0][1] + 6);
+                } else {
+                    // Si il y a un pays, on recupère seulement la partie ville
+                    $city = substr((string) $address, $result[0][1] + 6, $posLast - $result[0][1] - 6);
+                }
+
+                $trainee->setAddress($addressPro);
+                $trainee->setCity($city);
+                $trainee->setZip($codepostal);
+            }
+
+            $trainee->setPhonenumber($shibbolethAttributes['telephoneNumber']);
+            $shibbolethAttributes['primary-affiliation'] = strtolower($shibbolethAttributes['primary-affiliation']);
+            if ($shibbolethAttributes['primary-affiliation'] == "staff") {
+                // Transformation de l'attribut 'staff' en 'employee'
+                $shibbolethAttributes['primary-affiliation'] = "employee";
+            }
+
+            $publictype = $managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
+                ['machinename' => $shibbolethAttributes['primary-affiliation']]
+            );
+
+            if ($publictype != null) {
+                // cas general
+                $trainee->setPublictype($publictype);
+            } elseif ($shibbolethAttributes['primary-affiliation'] == 'student') {
+                // cas des etudiants doctorants
+                $flagDoc = 0;
+                if ($shibbolethAttributes['supannEtuCursusAnnee'] != "") {
+                    // Test si doctorant sur supannEtuCursusAnnee
+                    $tabCursus = $shibbolethAttributes['supannEtuCursusAnnee'];
+                    if (is_array($tabCursus)) {
+                        foreach ($tabCursus as $tabCursu) {
+                            if (str_contains((string) $tabCursu, '{SUPANN}D')) {
+                                // c'est un doctorant
+                                $flagDoc = 1;
+                                $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
+                                    ['name' => 'enseignant']
+                                ));
+                                break;
+                            }
+                        }
+                    } elseif (str_contains((string) $tabCursus, 'D')) {
+                        // c'est un doctorant
+                        $flagDoc = 1;
+                        $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
+                            ['name' => 'enseignant']
+                        ));
+                    }
+                }
+                // si pas trouvé sur supannEtuCursusAnnee, test sur unscoped-affiliation
+                if ($flagDoc == 0) {
+                    // si etudiant, on regarde aussi edupersonaffiliation pour détecter les doctorants
+                    $affiliation = explode(';', (string) $shibbolethAttributes['unscoped-affiliation']);
+                    // Recup des types de public possibles
+                    $allPublictypes = $managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findAll();
+                    foreach ($affiliation as $aff) {
+                        foreach ($allPublictypes as $allPublictype) {
+                            if ($aff == $allPublictype->getMachinename()) {
+                                $flagDoc = 1;
+                                $trainee->setPublictype($allPublictype);
+                                break 2;
+                            }
+                        }
+                    }
+                }
+                if ($flagDoc == 0) {
+                    // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
+                    $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+                    return $this->redirectToRoute('front.public.index');
+                }
+            } else {
+                $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
+                    ['machinename' => 'other']
+                ));
+            }
+
+            // Etablissement
+            $flagEtab = 0;
+            $listeEtab = $managerRegistry->getRepository(\App\Entity\Back\Institution::class)->findAll();
+            $eppn = $shibbolethAttributes['eppn'];
+            if (stripos((string) $eppn , "@")>0) {
+                // recup domaine dans l'eppn
+                $domaine = substr((string) $eppn, stripos((string) $eppn, "@") + 1);
+                foreach ($listeEtab as $etab) {
+                    $domaines = $etab->getDomains();
+                    foreach ($domaines as $dom) {
+                        // test domaine de l'eppn et domaines renseignés pour les établissements définis en BDD
+                        if (strtolower((string) $dom->getName()) === strtolower($domaine)) {
+                            $trainee->setInstitution($etab);
+                            $flagEtab = 1;
                             break 2;
                         }
                     }
                 }
             }
-            if ($flagDoc == 0) {
-                // Etudiant 'simple', pas doctorant -> n'a pas accès à l'application
-                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. La plate-forme n\'est pas accessible aux étudiants.');
+
+            if ($flagEtab !== 1) {
+                // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
+                $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
                 return $this->redirectToRoute('front.public.index');
-            }
-        } else {
-            $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
-                ['machinename' => 'other']
-            ));
-        }
 
-        // Etablissement
-        $flagEtab = 0;
-        $listeEtab = $managerRegistry->getRepository(\App\Entity\Back\Institution::class)->findAll();
-        $eppn = $shibbolethAttributes['eppn'];
-        if (stripos((string) $eppn , "@")>0) {
-            // recup domaine dans l'eppn
-            $domaine = substr((string) $eppn, stripos((string) $eppn, "@") + 1);
-            foreach ($listeEtab as $etab) {
-                $domaines = $etab->getDomains();
-                foreach ($domaines as $dom) {
-                    // test domaine de l'eppn et domaines renseignés pour les établissements définis en BDD
-                    if (strtolower((string) $dom->getName()) === strtolower($domaine)) {
-                        $trainee->setInstitution($etab);
-                        $flagEtab = 1;
-                        break 2;
+            }
+
+            $flagAMU = 0;
+            // Attributs AMU
+            if ($trainee->getInstitution()->getName() == "AMU") {
+                // tag de l'utilisateur comme étant AMU
+                $flagAMU = 1;
+
+                $trainee->setService($shibbolethAttributes['amuAffectationLib']);
+                $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
+                $bap = "";
+                $activites = explode(";", (string) $shibbolethAttributes['supannActivite']);
+                foreach($activites as $activite) {
+                    $pos = stripos($activite, "{BAP}");
+                    if ($pos !== false) {
+                        $bap = ltrim($activite, "{BAP}");
+                        // si {BAP} est trouvé, on arrête
+                        break;
                     }
                 }
-            }
-        }
 
-        if ($flagEtab !== 1) {
-            // Pb pas d'etablissement defini -> message d'erreur pour le stagiaire
-            $this->addFlash('error', 'Vous ne pouvez pas vous inscrire sur Geforp. Votre établissement n\'a pas accès à la plate-forme.');
-            return $this->redirectToRoute('front.public.index');
+                $trainee->setBap($bap);
+                $spCorps = explode(";", (string) $shibbolethAttributes['supannEmpCorps']);
+                foreach($spCorps as $spCorp) {
+                    $pos = stripos($spCorp, "{NCORPS}");
+                    if ($pos !== false) {
+                        $corps = ltrim($spCorp, "{NCORPS}");
+                        if (ctype_digit($corps))
+                            $corps = (int)$corps;
 
-        }
-
-        $flagAMU = 0;
-        // Attributs AMU
-        if ($trainee->getInstitution()->getName() == "AMU") {
-            // tag de l'utilisateur comme étant AMU
-            $flagAMU = 1;
-
-            $trainee->setService($shibbolethAttributes['amuAffectationLib']);
-            $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
-            $bap = "";
-            $activites = explode(";", (string) $shibbolethAttributes['supannActivite']);
-            foreach($activites as $activite) {
-                $pos = stripos($activite, "{BAP}");
-                if ($pos !== false) {
-                    $bap = ltrim($activite, "{BAP}");
-                    // si {BAP} est trouvé, on arrête
-                    break;
-                }
-            }
-
-            $trainee->setBap($bap);
-            $spCorps = explode(";", (string) $shibbolethAttributes['supannEmpCorps']);
-            foreach($spCorps as $spCorp) {
-                $pos = stripos($spCorp, "{NCORPS}");
-                if ($pos !== false) {
-                    $corps = ltrim($spCorp, "{NCORPS}");
-                    if (ctype_digit($corps))
-                        $corps = (int)$corps;
-
-                    $n_corps = $this->managerRegistry->getRepository(\App\Entity\Back\Corps::class)->findOneBy(
-                        ['corps' => $corps]
-                    );
-                    if ($n_corps != null) {
-                        $trainee->setCorps($n_corps->getLibelleLong());
-                        $trainee->setCategory($n_corps->getCategory());
-                    }
-
-                    // si {NCORPS} est trouvé, on arrête
-                    break;
-                }
-            }
-        } else {
-            $libAff = $this->getParameter('lib_affectation');
-            // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
-            if ($libAff === false) {
-                $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);
-            } elseif (isset($shibbolethAttributes[$libAff])) {
-                $trainee->setService($shibbolethAttributes[$libAff]);
-            } else
-                $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);
-
-            $bap = "";
-            $activites = explode(";", (string) $shibbolethAttributes['supannActivite']);
-            foreach($activites as $activite) {
-                $pos = stripos($activite, "{BAP}");
-                if ($pos !== false) {
-                    $bap = ltrim($activite, "{BAP}");
-                    // si {BAP} est trouvé, on arrête
-                    break;
-                }
-            }
-
-            $trainee->setBap($bap);
-            $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
-
-            $spCorps = explode(";", (string) $shibbolethAttributes['supannEmpCorps']);
-            foreach($spCorps as $spCorp) {
-                $pos = stripos($spCorp, "{NCORPS}");
-                if ($pos !== false) {
-                    $corps = ltrim($spCorp, "{NCORPS}");
-                    if (ctype_digit($corps))
-                        $corps = (int)$corps;
-
-                    $n_corps = $this->managerRegistry->getRepository(\App\Entity\Back\Corps::class)->findOneBy(
-                        ['corps' => $corps]
-                    );
-                    if ($n_corps != null) {
-                        $trainee->setCorps($n_corps->getLibelleLong());
-                        $trainee->setCategory($n_corps->getCategory());
-                    }
-
-                    // si {NCORPS} est trouvé, on arrête
-                    break;
-                }
-            }
-        }
-
-        $form = $this->createForm(ProfileType::class, $trainee);
-
-        if ($request->getMethod() == 'POST') {
-            $form->handleRequest($request);
-            if ($form->isValid()) {
-                // TEST sur le responsable
-                if ($trainee->getEmailsup() !== '' && $trainee->getEmailsup() !== '0') {
-                    // Vérification du mail qui doit être institutionnel
-                    if (stripos($trainee->getEmailsup() , "@")>0) {
-                        $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
-                        $domaines = $trainee->getInstitution()->getDomains();
-                        $listeDomaines = [];
-                        foreach ($domaines as $dom) {
-                            $listeDomaines[$dom->getName()] = $dom;
+                        $n_corps = $this->managerRegistry->getRepository(\App\Entity\Back\Corps::class)->findOneBy(
+                            ['corps' => $corps]
+                        );
+                        if ($n_corps != null) {
+                            $trainee->setCorps($n_corps->getLibelleLong());
+                            $trainee->setCategory($n_corps->getCategory());
                         }
 
-                        // Association nom de domaine et établissement
-                        if (array_key_exists($domaine, $listeDomaines)){
-                            // ok : c'est bien une adresse institutionnelle qui a été renseignée
-                            // Mail institutionel ok
-                            // on vérifie que le mail du responsable est différent de celui du stagiaire
-                            if (strtolower($trainee->getEmailsup()) === strtolower((string) $trainee->getEmail())) {
-                                $this->addFlash('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
-                            } else {
-                                $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee);
-                                $trainee->setCreatedAt(new \DateTime('now'));
-                                $trainee->setUpdatedAt(new \DateTime('now'));
+                        // si {NCORPS} est trouvé, on arrête
+                        break;
+                    }
+                }
+            } else {
+                $libAff = $this->getParameter('lib_affectation');
+                // si le libellé pour l'affection principale n'est pas précisé, on prend supannEntiteAffectationPrincipale
+                if ($libAff === false) {
+                    $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);
+                } elseif (isset($shibbolethAttributes[$libAff])) {
+                    $trainee->setService($shibbolethAttributes[$libAff]);
+                } else
+                    $trainee->setService($shibbolethAttributes['supannEntiteAffectationPrincipale']);
 
-                                $em = $managerRegistry->getManager();
-                                $em->persist($trainee);
-                                $em->flush();
-                                $this->addFlash('success', 'Votre profil a bien été créé.');
+                $bap = "";
+                $activites = explode(";", (string) $shibbolethAttributes['supannActivite']);
+                foreach($activites as $activite) {
+                    $pos = stripos($activite, "{BAP}");
+                    if ($pos !== false) {
+                        $bap = ltrim($activite, "{BAP}");
+                        // si {BAP} est trouvé, on arrête
+                        break;
+                    }
+                }
 
-                                return $this->redirectToRoute('front.program.myprogram');
+                $trainee->setBap($bap);
+                $trainee->setAmustatut($shibbolethAttributes['supannCodePopulation']);
 
+                $spCorps = explode(";", (string) $shibbolethAttributes['supannEmpCorps']);
+                foreach($spCorps as $spCorp) {
+                    $pos = stripos($spCorp, "{NCORPS}");
+                    if ($pos !== false) {
+                        $corps = ltrim($spCorp, "{NCORPS}");
+                        if (ctype_digit($corps))
+                            $corps = (int)$corps;
+
+                        $n_corps = $this->managerRegistry->getRepository(\App\Entity\Back\Corps::class)->findOneBy(
+                            ['corps' => $corps]
+                        );
+                        if ($n_corps != null) {
+                            $trainee->setCorps($n_corps->getLibelleLong());
+                            $trainee->setCategory($n_corps->getCategory());
+                        }
+
+                        // si {NCORPS} est trouvé, on arrête
+                        break;
+                    }
+                }
+            }
+
+            $form = $this->createForm(ProfileType::class, $trainee);
+
+            if ($request->getMethod() == 'POST') {
+                $form->handleRequest($request);
+                if ($form->isValid()) {
+                    // TEST sur le responsable
+                    if ($trainee->getEmailsup() !== '' && $trainee->getEmailsup() !== '0') {
+                        // Vérification du mail qui doit être institutionnel
+                        if (stripos($trainee->getEmailsup() , "@")>0) {
+                            $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
+                            $domaines = $trainee->getInstitution()->getDomains();
+                            $listeDomaines = [];
+                            foreach ($domaines as $dom) {
+                                $listeDomaines[$dom->getName()] = $dom;
                             }
-                        }else {
-                            $this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+
+                            // Association nom de domaine et établissement
+                            if (array_key_exists($domaine, $listeDomaines)){
+                                // ok : c'est bien une adresse institutionnelle qui a été renseignée
+                                // Mail institutionel ok
+                                // on vérifie que le mail du responsable est différent de celui du stagiaire
+                                if (strtolower($trainee->getEmailsup()) === strtolower((string) $trainee->getEmail())) {
+                                    $this->addFlash('error', 'Vous devez rentrer une adresse mail différente de la vôtre pour le responsable hiérarchique');
+                                } else {
+                                    $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee);
+                                    $trainee->setCreatedAt(new \DateTime('now'));
+                                    $trainee->setUpdatedAt(new \DateTime('now'));
+
+                                    $em = $managerRegistry->getManager();
+                                    $em->persist($trainee);
+                                    $em->flush();
+                                    $this->addFlash('success', 'Votre profil a bien été créé.');
+
+                                    return $this->redirectToRoute('front.program.myprogram');
+
+                                }
+                            }else {
+                                $this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+                            }
+
                         }
+                    } else {
+                        $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee);
+                        $trainee->setCreatedAt(new \DateTime('now'));
+                        $trainee->setUpdatedAt(new \DateTime('now'));
 
+                        $em = $managerRegistry->getManager();
+                        $em->persist($trainee);
+                        $em->flush();
+                        $this->addFlash('success', 'Votre profil a bien été créé.');
+
+                        return $this->render('Front/Account/profile/account-registration.html.twig');
                     }
-                } else {
-                    $this->registerShibbolethTrainee($this->getUser()->getCredentials(), $trainee);
-                    $trainee->setCreatedAt(new \DateTime('now'));
-                    $trainee->setUpdatedAt(new \DateTime('now'));
-
-                    $em = $managerRegistry->getManager();
-                    $em->persist($trainee);
-                    $em->flush();
-                    $this->addFlash('success', 'Votre profil a bien été créé.');
-
-                    return $this->render('Front/Account/profile/account-registration.html.twig');
                 }
             }
+            return $this->render('Front/Account/profile/account-registration.html.twig',['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()]);
         }
-        return $this->render('Front/Account/profile/account-registration.html.twig',['user' => $this->getUser(), 'form' => $form->createView(), 'disableAddress' => $adresseFromLdap, 'flagAMU' => $flagAMU, 'activeCorrForm' => $corrFormActif, 'etablissement' => $trainee->getInstitution()->getName()]);
     }
 
     /**
