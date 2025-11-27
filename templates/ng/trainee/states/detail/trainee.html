@@ -5,7 +5,7 @@
             <div class="btn-group pull-right">
                 <a class="btn btn-fa" href=""
                    tooltip="{{ trainee.isactive ? 'Désactiver le compte' : 'Activer le compte' }}"
-                   ng-if="trainee._accessRights.edit" ng-click="toggleActivation()">
+                   ng-click="toggleActivation()">
                     <span class="fa"
                           ng-class="{'fa-thumbs-o-up': !trainee.isactive, 'fa-thumbs-o-down': trainee.isactive }"></span>
                 </a>
