@@ -587,7 +587,7 @@ final class AccountController extends AbstractController
                                 $this->addFlash('success', 'Votre profil a été mis à jour.');
                             }
                         } else {
-                            $request->$this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
+                            $this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
                         }
                     }
                 } else {
