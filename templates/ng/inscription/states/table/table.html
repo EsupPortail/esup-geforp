@@ -11,6 +11,7 @@
                     <th ng-hide="$stateParams.trainee" search-table-th field="trainee.fullname">Stagiaire</th>
                     <th ng-hide="$stateParams.session" search-table-th field="session.datebegin">Session</th>
                     <th search-table-th field="trainee.publictype.name">Type de personnel</th>
+                    <th search-table-th field="trainee.amustatut">Statut</th>
                     <th search-table-th field="trainee.institution.name">Établissement</th>
                     <th search-table-th field="sessionPrice.price">Tarif</th>
                     <th search-table-th field="inscriptionstatus.name.source">Inscription</th>
@@ -31,6 +32,7 @@
                                                           ui-sref="session.detail.view({ id: item.session.id })">{{
                         item.session.datebegin|date: 'dd/MM/yyyy' }} - {{ item.session.training.name }}</a></td>
                     <td>{{ item.trainee.publictype.name }}</td>
+                    <td>{{ item.trainee.amustatut }}</td>
                     <td>{{ item.trainee.institution.name }}</td>
                     <td>{{ item.price | number: 2 }} &euro;</td>
                     <td><span class="label label-lg"
