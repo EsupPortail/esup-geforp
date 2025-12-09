@@ -494,6 +494,12 @@ class ProgramController extends AbstractController
         $codes = [];
         $user = $this->getUser();
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+        if (!$arTrainee) {
+            // si compte stagiaire n'existe pas, on renvoie vers la création de compte
+            $url = $this->generateUrl('front.account.register');
+            return new RedirectResponse($url);
+        }
+
         $etablissement = $arTrainee->getInstitution()->getName();
 
         // Recup param pour l'activation du multi établissement
