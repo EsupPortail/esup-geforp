@@ -395,6 +395,7 @@ class RegistrationAccountController extends AbstractController
                                 }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
+                                $subject = str_replace("[session.nom]", $registration->getSession()->getName(), $subject);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)
@@ -463,6 +464,7 @@ class RegistrationAccountController extends AbstractController
                                 }
                                 $subject1 = $templates[0]->getSubject();
                                 $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
+                                $subject = str_replace("[session.nom]", $registration->getSession()->getName(), $subject);
                                 $body = $templates[0]->getBody();
                                 $formathtml = $templates[0]->getPosition();
                                 if ($formathtml)
