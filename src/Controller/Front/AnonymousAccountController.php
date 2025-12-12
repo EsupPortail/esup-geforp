@@ -102,8 +102,12 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
             $trainee->setTitle($managerRegistry->getRepository(\App\Entity\Term\Title::class)->findOneBy(
                 ['name' => $shibbolethAttributes['supannCivilite']]
             ));
-            $trainee->setLastname($shibbolethAttributes['sn']);
-            $trainee->setFirstname($shibbolethAttributes['givenName']);
+
+            // Gestion du sn et du givenname multivalués
+            $sn = explode(";", $shibbolethAttributes['sn']);
+            $givenName = explode(";", $shibbolethAttributes['givenName']);
+            $trainee->setLastName($sn[0]);
+            $trainee->setFirstName($givenName[0]);
             $trainee->setEmail($shibbolethAttributes['mail']);
 
             $datenaiss = str_replace("-", "", (string) $shibbolethAttributes['supannOIDCDateDeNaissance']);

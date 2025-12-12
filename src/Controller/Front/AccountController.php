@@ -86,8 +86,12 @@ final class AccountController extends AbstractController
             $trainee->setTitle($managerRegistry->getRepository(\App\Entity\Term\Title::class)->findOneBy(
                 ['name' => $shibbolethAttributes['supannCivilite']]
             ));
-            $trainee->setLastName($shibbolethAttributes['sn']);
-            $trainee->setFirstName($shibbolethAttributes['givenName']);
+
+            // Gestion du sn et du givenname multivalués
+            $sn = explode(";", $shibbolethAttributes['sn']);
+            $givenName = explode(";", $shibbolethAttributes['givenName']);
+            $trainee->setLastName($sn[0]);
+            $trainee->setFirstName($givenName[0]);
             $trainee->setEmail($shibbolethAttributes['mail']);
             $datenaiss = str_replace("-", "", (string) $shibbolethAttributes['supannOIDCDateDeNaissance']);
             $trainee->setBirthDate($datenaiss);
@@ -339,8 +343,12 @@ final class AccountController extends AbstractController
         $trainee->setTitle($managerRegistry->getRepository(\App\Entity\Term\Title::class)->findOneBy(
             ['name' => $shibbolethAttributes['supannCivilite']]
         ));
-        $trainee->setLastName($shibbolethAttributes['sn']);
-        $trainee->setFirstName($shibbolethAttributes['givenName']);
+
+        // Gestion du sn et du givenname multivalués
+        $sn = explode(";", $shibbolethAttributes['sn']);
+        $givenName = explode(";", $shibbolethAttributes['givenName']);
+        $trainee->setLastName($sn[0]);
+        $trainee->setFirstName($givenName[0]);
         $trainee->setEmail($shibbolethAttributes['mail']);
         //$trainee->setBirthDate($shibbolethAttributes['schacDateOfBirth']);
         $datenaiss = str_replace("-", "", (string) $shibbolethAttributes['supannOIDCDateDeNaissance']);
