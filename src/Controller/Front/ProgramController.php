@@ -142,6 +142,16 @@ class ProgramController extends AbstractController
             $pastSessions = [];
             $upcomingSessions = [];
 
+            // Mise en forme lien hypertexte dans programme du stage
+            $programme = $training->getProgram();
+            $programme = htmlspecialchars($programme, ENT_QUOTES, 'UTF-8');
+            $programmeLien = preg_replace(
+                '#(https://[^\s]+)#',
+                '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>',
+                $programme
+            );
+            $programmeLien = nl2br($programmeLien);
+
             /** @var Session $session */
             foreach ($training->getSessions() as $session) {
 
@@ -194,6 +204,7 @@ class ProgramController extends AbstractController
             return $this->render('Front/Public/program/training.html.twig', [
                 'user' => $trainee,
                 'training' => $training,
+                'programme' => $programmeLien,
                 'session' => $focusSession,
                 'upcomingSessions' => $upcomingSessions,
                 'pastSessions' => $pastSessions,

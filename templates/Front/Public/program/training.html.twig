@@ -35,9 +35,9 @@
                         <p>{{ training.description | nl2br }}</p>
                     {% endif %}
 
-                    {% if training.program is defined %}
+                    {% if programme is defined %}
                         <h4>Programme</h4>
-                        <p>{{ training.program | nl2br }}</p>
+                        <p>{{ programme | raw }}</p>
                     {% endif %}
 
                     {% if training.teachingMethods is defined and training.teachingMethods | length > 0 %}
