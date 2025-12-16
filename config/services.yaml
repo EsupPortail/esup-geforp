@@ -104,6 +104,9 @@ parameters:
                     semester: { label: 'Semestre' }
                     training.name: { label: 'Intitulé' }
                     training.theme.name: { label: 'Thématique' }
+                    training.program: { label: 'Programme' }
+                    training.description: { label: 'Description' }
+                    training.teachingmethods: { label: 'Méthodes pédagogiques' }
                     sessionsCount: { label: 'nombre de sessions' }
                     nextSession.dateBegin: { label: 'Prochaine', type: 'date' }
                     lastSession.dateBegin: { label: 'Dernière', type: 'date' }
