@@ -268,7 +268,7 @@ class RegistrationAccountController extends AbstractController
 
         if (!$templates || count($templates) === 0) {
 
-            $subject = "Demande de validation d'inscription";
+            $subject1 = "Demande de validation d'inscription";
             $body = "Bonjour,\nUne demande de relance pour une inscription est en attente de validation.";
             $formathtml = 0;
             $newline = "\n";
@@ -276,9 +276,14 @@ class RegistrationAccountController extends AbstractController
             $template = $templates[0];
             $formathtml = $template->getPosition();
             $newline = $formathtml ? "<br>" : "\n";
-            $subject = $template->getSubject();
+            $subject1 = $template->getSubject();
             $body = $template->getBody();
         }
+
+        $subject = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $subject1);
+        $subject = str_replace("[session.nom]", $registration->getSession()->getName(), $subject);
+        $subject = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $subject);
+        $subject = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $subject);
 
         $newbody = str_replace("[session.formation.nom]", $registration->getSession()->getTraining()->getName(), (string) $body);
         $Texte = "";
