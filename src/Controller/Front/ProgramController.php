@@ -332,7 +332,12 @@ class ProgramController extends AbstractController
                             $this->addFlash('success', "Votre demande a été enregistrée. Aucun email n'a été envoyé car aucun modèle n'existe pour cette organisation. Merci de contacter un Administrateur.");
                             return $this->redirectToRoute('front.account.registrations');
                         }
-                        $subject = $templates[0]->getSubject();
+                        $subject1 = $templates[0]->getSubject();
+                        $subject = str_replace("[session.formation.nom]", $inscription->getSession()->getTraining()->getName(), (string) $subject1);
+                        $subject = str_replace("[session.nom]", $inscription->getSession()->getName(), $subject);
+                        $subject = str_replace("[stagiaire.prenom]", $inscription->getTrainee()->getFirstname(), $subject);
+                        $subject = str_replace("[stagiaire.nom]", $inscription->getTrainee()->getLastname(), $subject);
+
                         $body = $templates[0]->getBody();
                         $formathtml = $templates[0]->getPosition();
                         if ($formathtml)
