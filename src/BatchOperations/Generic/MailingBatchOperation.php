@@ -252,7 +252,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                                 $lines[0]['inscriptions'] = [];
                                 foreach ($inscriptions as $insc) {
                                     if ($insc->getInscriptionstatus() == "Liste d'attente") {
-                                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
+                                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'civilite' => $insc->getTrainee()->getTitle(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
                                     }
                                 }
 
@@ -270,7 +270,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                             $lines[0]['inscriptions'] = [];
                             foreach ($inscriptions as $insc) {
                                 if ($insc->getInscriptionstatus() == 'Accepté') {
-                                    $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
+                                    $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'civilite' => $insc->getTrainee()->getTitle(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
                                 }
                             }
 
@@ -421,7 +421,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                 $lines[0]['inscriptions'] = [];
                 foreach ($inscriptions as $insc) {
                     if ($insc->getInscriptionstatus() == 'Convoqué') {
-                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
+                        $lines[0]['inscriptions'][] = ['nom' => $insc->getTrainee()->getLastname(), 'prenom' => $insc->getTrainee()->getFirstname(), 'nomComplet' => $insc->getTrainee()->getFullname(), 'mail' => $insc->getTrainee()->getEmail(), 'civilite' => $insc->getTrainee()->getTitle(), 'unite' => $insc->getTrainee()->getInstitution() ? $insc->getTrainee()->getInstitution()->getName() : '', 'service' => $insc->getTrainee()->getService(), 'corps' => $insc->getTrainee()->getCorps(), 'bap' => $insc->getTrainee()->getBap(), 'fonction' => $insc->getTrainee()->getFonction(), 'motivation' => $insc->getMotivation()];
                     }
                 }
 
@@ -477,7 +477,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                     foreach ($inscriptions as $inscription) {
                         if ($inscription->getInscriptionstatus() == 'Convoqué') {
                             $trainee = $inscription->getTrainee();
-                            $lines[$i]['inscriptions'][] = ['nom' => $trainee->getLastname(), 'prenom' => $trainee->getFirstname(), 'nomComplet' => $trainee->getFullname(), 'mail' => $trainee->getEmail(), 'unite' => $trainee->getInstitution() ? $trainee->getInstitution()->getName() : '', 'service' => $trainee->getService()];
+                            $lines[$i]['inscriptions'][] = ['nom' => $trainee->getLastname(), 'prenom' => $trainee->getFirstname(), 'nomComplet' => $trainee->getFullname(), 'mail' => $trainee->getEmail(), 'civilite' => $trainee->getTitle(), 'unite' => $trainee->getInstitution() ? $trainee->getInstitution()->getName() : '', 'service' => $trainee->getService()];
                         }
                     }
 
