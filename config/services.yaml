@@ -181,6 +181,7 @@ parameters:
                     presence.nbheures: "Nombre d'heures de présence"
                     actiontype.name: "Type d'inscription"
                     dif: { label: "CPF", type: "boolean" }
+                    motivation: "Motivation"
             institution:
                 class: 'App\Entity\Core\AbstractInstitution'
                 filename: 'test.csv'
