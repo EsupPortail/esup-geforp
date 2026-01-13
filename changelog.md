@@ -1,5 +1,20 @@
 # Geforp changelog :
 
+## 3.1 (2026-01-13)
+
+### Ajouts
+- Visibilité du statut du stagiaire sur les inscriptions à une session côté admin
+- Ajout controles stagiaire connecté sur les pages coté stagiaire
+- Gestion multivaluation possible du sn et givenname du stagiaire
+- Possibilité d'ajouter des liens hypertextes dans le programme d'un stage
+
+### Corrections
+- Correction connexion stagiaire et mise a jour eppn/mail
+- Corrections cote admin : user et centre
+- Corrections et ajouts exports
+- Corrections et ajouts publipostage et modèles de mails
+- Corrections evaluations
+
 ## 3.0.3 (2025-10-24)
 
 ### Corrections
