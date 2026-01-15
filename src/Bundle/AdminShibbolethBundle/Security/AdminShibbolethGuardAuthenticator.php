@@ -142,7 +142,7 @@ final class AdminShibbolethGuardAuthenticator extends  AbstractAuthenticator
      * @param $name
      * @return mixed
      */
-    private function getAttribute(Request $request, string $name)
+    private function getAttribute(Request $request, $name)
     {
         if ($name != null) {
             $attributes = [$name, strtoupper($name), "HTTP_".strtoupper($name), sprintf('REDIRECT_%s', $name)];
