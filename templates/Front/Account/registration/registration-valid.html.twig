@@ -1,5 +1,7 @@
 {% extends "Front/base.html.twig" %}
+{% if access == "Formulaire" %}
 {% form_theme form 'Front/fields.html.twig' %}
+{% endif %}
 
 {% block header %}
     <header xmlns="http://www.w3.org/1999/html">
