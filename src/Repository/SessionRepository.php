@@ -222,14 +222,14 @@ final class SessionRepository extends ServiceEntityRepository
                 ->setParameter('trainerFirstName', $firstName);
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime('today');
 
         if (isset($filters['dateend'])){
             $qb->andWhere('s.dateend < :now')
-                ->setParameter('now', $now);
+                ->setParameter('now', $now, \Doctrine\DBAL\Types\Types::DATE_MUTABLE);
         } elseif (isset($filters['datebegin'])){
             $qb->andWhere('s.datebegin >= :now')
-            ->setParameter('now', $now);
+                ->setParameter('now', $now, \Doctrine\DBAL\Types\Types::DATE_MUTABLE);
         }
 
         // TRI DES RESULTATS
