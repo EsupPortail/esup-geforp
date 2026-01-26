@@ -113,7 +113,7 @@ use App\Entity\Core\AbstractInscription;
 	    if (isset($chgSet['inscriptionstatus'])) {
 		    $inscriptionstatus = $object->getInscriptionstatus();
 
-		    if ($inscriptionstatus->getNotify() !== 0) {
+		    if ($inscriptionstatus->getNotify() != 0) {
                 $Dates = $object->getSession()->getDates();
                 $Texte = "";
                 foreach ($Dates as $date) {
