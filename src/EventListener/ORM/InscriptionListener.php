@@ -68,7 +68,7 @@ use App\Entity\Core\AbstractInscription;
      */
     public function postUpdate(PostUpdateEventArgs $postUpdateEventArgs): void
     {
-        $this->postProcess($postUpdateEventArgs, true);
+        $this->postProcess($postUpdateEventArgs, false);
     }
 
     /**
@@ -102,7 +102,7 @@ use App\Entity\Core\AbstractInscription;
      *
      * @throws TransportExceptionInterface
      */
-    private function sendMailDisclaimerInscriptionStatusMail(PostPersistEventArgs  $postPersistEventArgs): void
+    private function sendMailDisclaimerInscriptionStatusMail(PostPersistEventArgs|PostUpdateEventArgs  $postPersistEventArgs): void
     {
 	    /** @var AbstractInscription $object */
      $object = $postPersistEventArgs->getObject();
