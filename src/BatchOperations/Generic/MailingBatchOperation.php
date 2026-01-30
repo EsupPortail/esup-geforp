@@ -514,7 +514,7 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
         }*/
 
         $clsTinyButStrong->Show(OPENTBS_FILE, $this->options['tempDir'] . $fileName);
-	$clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
+	    $clsTinyButStrong->_PlugIns[OPENTBS_PLUGIN]->Close();
 
 
         //do we want the file or just infos about it ?

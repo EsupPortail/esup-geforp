@@ -175,16 +175,20 @@ EmailingBatchOperation extends AbstractBatchOperation
                 // attachements
                 if (!empty($attachments)) {
                     $attachments = is_array($attachments) ? $attachments : [$attachments];
-                    $validAttachments = array_filter($attachments, fn($item) => $item instanceof File);
-                    foreach ($validAttachments as $attachment) {
-                        $path = $attachment->getPathname();
+                    foreach ($attachments as $attachment) {
+                        if (is_array($attachment) && isset($attachment['file']))
+                            $attachment = $attachment['file'];
 
-                        $originalName = $attachment instanceof UploadedFile
-                            ? $attachment->getClientOriginalName()
-                            : $attachment->getFilename();
+                        if ($attachment instanceof File) {
+                            $path = $attachment->getPathname();
+                            $originalName = $attachment instanceof UploadedFile
+                                ? $attachment->getClientOriginalName()
+                                : $attachment->getFilename();
 
-                        $msg->attachFromPath($path, $originalName);
+                            $msg->attachFromPath($path, $originalName);
+                        }
                     }
+
                 }
 
 
