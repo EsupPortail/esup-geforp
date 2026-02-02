@@ -65,70 +65,56 @@ final readonly class MenuBuilder
         // Menu administration et sous menus
         $adminMenu = $menu->addChild('administration', ['label' => 'Administration', 'icon' => 'gear', 'uri' => $this->router->generate('core.index')]);
 
-	if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Organisation::class)) {
-            $adminMenu->addChild('organizations', ['label' => 'Centres', 'uri' => $this->router->generate('organization.index')]
-            );
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Organisation::class)) {
+                $adminMenu->addChild('organizations', ['label' => 'Centres', 'uri' => $this->router->generate('organization.index')]
+                );
+            }
+        if(($this->authorizationChecker->isGranted('VIEW', \App\Entity\Term\AbstractTerm::class)) || ($this->authorizationChecker->isGranted('VIEW', \App\Vocabulary\VocabularyInterface::class))) {
+                $adminMenu->addChild('taxonomy', [
+                    'label' => 'Vocabulaires',
+                    'uri' => $this->router->generate('taxonomy.index')
+                ]);
+            }
+
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Core\User::class)) {
+                $adminMenu->addChild('users', ['label' => 'Utilisateurs', 'uri' => $this->router->generate('user.index')]);
+            }
+
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Internship::class)) {
+            $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training', 'attributes' => ['class' => 'dropdown-toggle']]);
+
+            $item->addChild('internships', ['label' => 'Stages', 'uri'   => $this->router->generate('core.index') . '#/training?type=internship']);
+
+            $item->addChild('sessions', ['label' => 'Toutes les sessions', 'uri'   => $this->router->generate('core.index') . '#/training/session'])->setAttribute('divider_prepend', true);
+
         }
-	if(($this->authorizationChecker->isGranted('VIEW', \App\Entity\Term\AbstractTerm::class)) || ($this->authorizationChecker->isGranted('VIEW', \App\Vocabulary\VocabularyInterface::class))) {
-            $adminMenu->addChild('taxonomy', [
-                'label' => 'Vocabulaires',
-                'uri' => $this->router->generate('taxonomy.index')
-            ]);
+
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainee::class)) {
+            $menu->addChild('trainees', ['label' => 'Publics', 'icon'  => 'group', 'uri'   => $this->router->generate('core.index') . '#/trainee']);
         }
 
-	if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Core\User::class)) {
-            $adminMenu->addChild('users', ['label' => 'Utilisateurs', 'uri' => $this->router->generate('user.index')]);
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Inscription::class)) {
+            $menu->addChild('inscriptions', ['label' => 'Inscriptions', 'icon'  => 'graduation-cap', 'uri'   => $this->router->generate('core.index') . '#/inscription']);
         }
 
-        try {
-            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Internship::class)) {
-                $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training', 'attributes' => ['class' => 'dropdown-toggle']]);
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Institution::class)) {
+            $menu->addChild('institutions', ['label' => 'Etablissements', 'icon'  => 'university', 'uri'   => $this->router->generate('core.index') . '#/institution']);
+        }
 
-                $item->addChild('internships', ['label' => 'Stages', 'uri'   => $this->router->generate('core.index') . '#/training?type=internship']);
+        // Vocabulary id=6 => menuitem
+        $menuitemTerm = $this->vocabularyRegistry->getVocabularyById(6);
 
-                $item->addChild('sessions', ['label' => 'Toutes les sessions', 'uri'   => $this->router->generate('core.index') . '#/training/session'])->setAttribute('divider_prepend', true);
+        $entityRepository = $this->managerRegistry->getManager()->getRepository(get_class($menuitemTerm));
 
+        if (($entityRepository->findAll() !== null) && (count($entityRepository->findAll()) > 0)) {
+            $item = $menu->addChild('menuitems', ['label' => 'Liens externes', 'icon' => 'external-link', 'uri' => $this->router->generate('core.index')]);
+            foreach ($entityRepository->findAll() as $menuitem) {
+                $item->addChild($menuitem->getName(), ['label' => $menuitem->getName(), 'uri' => $menuitem->getLink()]);
             }
+        }
 
-            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainee::class)) {
-                $menu->addChild('trainees', ['label' => 'Publics', 'icon'  => 'group', 'uri'   => $this->router->generate('core.index') . '#/trainee']);
-            }
-
-            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Inscription::class)) {
-                $menu->addChild('inscriptions', ['label' => 'Inscriptions', 'icon'  => 'graduation-cap', 'uri'   => $this->router->generate('core.index') . '#/inscription']);
-            }
-
-            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Institution::class)) {
-                $menu->addChild('institutions', ['label' => 'Etablissements', 'icon'  => 'university', 'uri'   => $this->router->generate('core.index') . '#/institution']);
-            }
-
-            // Vocabulary id=6 => menuitem
-            $menuitemTerm = $this->vocabularyRegistry->getVocabularyById(6);
-
-            if ($menuitemTerm instanceof VocabularyInterface) {
-                // Assurez-vous que c'est un objet de type `VocabularyInterface`
-                $entityRepository = $this->managerRegistry->getManager()->getRepository(get_class($menuitemTerm));
-
-                if (($entityRepository->findAll() !== null) && (count($entityRepository->findAll()) > 0)) {
-                    $item = $menu->addChild('menuitems', ['label' => 'Liens externes', 'icon' => 'external-link', 'uri' => '']);
-                    foreach ($entityRepository->findAll() as $menuitem) {
-                        $item->addChild($menuitem->getName(), ['label' => $menuitem->getName(), 'uri' => $menuitem->getLink()]);
-                    }
-                }
-            } else {
-                // Log ou var_dump pour examiner la valeur retournée
-                  // ou $this->logger->error("Erreur : l'objet retourné n'est pas une instance de VocabularyInterface");
-            }
-
-            if (!$menuitemTerm instanceof VocabularyInterface) {
-              $this->logger->info("L'objet retourné n'est pas une instance de VocabularyInterface", ['vocabulary_id' => 6]);
-            }
-
-            if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainer::class)) {
-                $menu->addChild('trainers', ['label' => 'Intervenants', 'icon'  => 'user', 'uri'   => $this->router->generate('core.index') . '#/trainer']);
-            }
-
-        } catch (AuthenticationCredentialsNotFoundException) {
+        if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Trainer::class)) {
+            $menu->addChild('trainers', ['label' => 'Intervenants', 'icon'  => 'user', 'uri'   => $this->router->generate('core.index') . '#/trainer']);
         }
 
         if (!isset($adminMenu)) {
