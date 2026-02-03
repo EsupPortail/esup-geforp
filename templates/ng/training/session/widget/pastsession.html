@@ -15,7 +15,7 @@
                 <td>{{ item.training.TypeLabel }}</td>
                 <td><span class="fa fa-star fa-highlight" ng-if="item.promote" title="Session promue"></span> <a href="" ui-sref="training.detail.view({ id: item.training.id })">{{ item.training.name }}</a></td>
                 <td>
-                    <span ng-repeat="stat in item.inscriptionStats |filter:{status:'!2'}| orderBy:'count':1">
+                    <span ng-repeat="stat in item.inscriptionStats | orderBy:'count':1">
                         <a href="" ui-sref="inscription.table({session: item.id, status: stat.id})" class="label label-default" tooltip="{{ stat.name }} : {{ stat.count }}" tooltip-placement="bottom" ng-class="$root.inscriptionStatusClass(stat.status)">{{ stat.count }}</a>
                     </span>
                 </td>

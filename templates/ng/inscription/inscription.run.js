@@ -19,11 +19,11 @@ sygeforApp.run(['$rootScope', function ($rootScope) {
             case 1:
                 return prefix + 'warning';
             case 2:
-                return prefix + 'success';
+                return prefix + 'info';
             case 3:
                 return prefix + 'danger';
             case 4:
-                return prefix + 'success';
+                return prefix + 'info';
         }
     }
 
