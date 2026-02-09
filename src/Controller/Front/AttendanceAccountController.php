@@ -167,8 +167,7 @@ class AttendanceAccountController extends AbstractController
     {
         // recup trainee
         $user = $this->getUser();
-        $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
-        $trainee = $arTrainee[0];
+        $trainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
 
         $attendance   = $this->getAttendance($doctrine, $session, $trainee);
         $allMaterials = [];
