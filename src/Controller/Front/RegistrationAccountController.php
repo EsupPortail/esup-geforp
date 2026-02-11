@@ -443,6 +443,9 @@ class RegistrationAccountController extends AbstractController
 
                                 $mailer->send($message);
 
+                                // On met le message en base
+                                $this->saveEmailDb($em, $registration, $subject, $newbody);
+
                                 $this->addFlash('success', 'L\'avis favorable a bien été émis.');
 
                             } else {
@@ -494,6 +497,7 @@ class RegistrationAccountController extends AbstractController
                                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
                                 $newbody = str_replace("[session.dateDebut]", $registration->getSession()->getDatebegin()->format('d/m/Y'), $newbody);
                                 $newbody = str_replace("[session.dateFin]", $registration->getSession()->getDateend()->format('d/m/Y'), $newbody);
+                                $newbody = str_replace("[refuse]", $registration->getRefuse(), $newbody);
 
                                 // Envoyer un mail au stagiaire
                                 $message = (new Email())
@@ -511,6 +515,9 @@ class RegistrationAccountController extends AbstractController
                                     $message->text($newbody);
 
                                 $mailer->send($message);
+
+                                // On met le message en base
+                                $this->saveEmailDb($em, $registration, $subject, $newbody);
 
                                 $this->addFlash('success', 'L\'avis défavorable a bien été émis.');
 
@@ -620,5 +627,41 @@ class RegistrationAccountController extends AbstractController
         }
 
         return $forms;
+    }
+
+    protected function saveEmailDb($em, $entity, $subject, $body): array
+    {
+        // Authentification et récup du mail retourné par Shibboleth
+        $user = $this->getUser();
+        // Récupération du user avec le format trainee
+        $traineeUser = $em->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' => $user->getCredentials()['mail']]);
+
+        // save email in db
+        $email = new \App\Entity\Core\Email();
+        $email->setUserFrom($em->getRepository(\App\Entity\Core\User::class)->findOneBy(['email' => 'interface-resp-hier@geforp.fr']));
+        $email->setEmailFrom($entity->getOrganization());
+        if (get_parent_class($entity) === \App\Entity\Core\AbstractTrainee::class) {
+            $email->setTrainee($entity);
+        } elseif (get_parent_class($entity) === \App\Entity\Core\AbstractTrainer::class) {
+            $email->setTrainer($entity);
+        } elseif (get_parent_class($entity) === \App\Entity\Core\AbstractInscription::class) {
+            $email->setTrainee($entity->getTrainee());
+            $email->setSession($entity->getSession());
+        } elseif ($entity::class === \App\Entity\Back\Alert::class) {
+            $email->setTrainee($entity->getTrainee());
+            $email->setSession($entity->getSession());
+        } elseif (get_parent_class($entity) === \App\Entity\Core\AbstractParticipation::class) {
+            $email->setTrainer($entity->getTrainer());
+            $email->setSession($entity->getSession());
+        }
+
+        $email->setSubject($subject);
+        $email->setBody($body);
+        $email->setSendAt(new \DateTime('now', new \DateTimeZone('Europe/Paris')));
+        $em->persist($email);
+        $em->flush();
+        $em->clear();
+
+        return [];
     }
 }
