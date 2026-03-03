@@ -1,5 +1,17 @@
 # Geforp changelog :
 
+## 3.2 (2026-02-11)
+
+### Ajouts
+- Ajout en BD des mails avis favorable/défavorable envoyés par le N+1
+- Modification étiquette couleur statut convoqué/accepté côté gestionnaire
+
+### Corrections
+- Correction envoi mail lors du changement de statut
+- Correction bug envoi mail avec pièce jointe publipostage
+- Correction affichage onglet 'liens externes'
+- Correction download support de formation côté stagiaire
+
 ## 3.1 (2026-01-13)
 
 ### Ajouts
