@@ -330,11 +330,11 @@ class Trainee extends AbstractTrainee
     /**
      * Set lastnameCorr
      *
-     * @param string $lastNameCorr
+     * @param $lastNameCorr
      *
      * @return Trainee
      */
-    public function setLastnamecorr(string $lastNameCorr): static
+    public function setLastnamecorr($lastNameCorr): static
     {
         $this->lastnamecorr = $lastNameCorr;
 
