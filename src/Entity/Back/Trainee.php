@@ -287,7 +287,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setEmailsup(string $emailSup): static
+    public function setEmailsup(?string $emailSup): static
     {
         $this->emailsup = $emailSup;
 
@@ -358,7 +358,7 @@ class Trainee extends AbstractTrainee
      *
      * @return Trainee
      */
-    public function setEmailcorr(string $emailCorr): static
+    public function setEmailcorr(?string $emailCorr): static
     {
         $this->emailcorr = $emailCorr;
 
