@@ -375,7 +375,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $program
      */
-    public function setProgram(string $program): void
+    public function setProgram(?string $program): void
     {
         $this->program = $program;
     }
@@ -391,7 +391,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $description
      */
-    public function setDescription(string $description): void
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
     }
@@ -503,7 +503,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $interventiontype
      */
-    public function setInterventiontype(string $interventiontype): void
+    public function setInterventiontype(?string $interventiontype): void
     {
         $this->interventiontype = $interventiontype;
     }
@@ -535,7 +535,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     /**
      * @param string $comments
      */
-    public function setComments(string $comments): void
+    public function setComments(?string $comments): void
     {
         $this->comments = $comments;
     }
