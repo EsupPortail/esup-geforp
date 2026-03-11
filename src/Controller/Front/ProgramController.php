@@ -517,6 +517,11 @@ class ProgramController extends AbstractController
         }
 
         $etablissement = $arTrainee->getInstitution()->getName();
+        if ($etablissement == "Extérieur") {
+            // si le compte stagiaire existe avec l'établissement 'Extérieur', on renvoie vers la mise à jour de la fiche stagiaire
+            $url = $this->generateUrl('front.account.register');
+            return new RedirectResponse($url);
+        }
 
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->isMultiEtab($arTrainee);
