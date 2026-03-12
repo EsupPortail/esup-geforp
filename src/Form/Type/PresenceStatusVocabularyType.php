@@ -13,7 +13,7 @@ final class PresenceStatusVocabularyType extends VocabularyType
         parent::buildForm($formBuilder, $options);
 
         $formBuilder->add('status', ChoiceType::class, ['label' => 'Statut élémentaire', 'expanded' => true, 'multiple' => false, 'required' => true, 'choices' => ['Présent' => Presencestatus::STATUS_PRESENT, 'Absent' => Presencestatus::STATUS_ABSENT]]);
-        $formBuilder->add('machinename', null, ['label' => 'Libellé court']);
+        $formBuilder->add('machinename', null, ['label' => 'Libellé court', 'required' => true]);
     }
 
     public function getParent(): ?string

@@ -19,7 +19,7 @@ final class InscriptionStatusVocabularyType extends VocabularyType
 
         $formBuilder->add('notify', CheckboxType::class, ['label' => "Pour les gestionnaires : notification de changement de statut", 'required' => false]);
         $formBuilder->add('status', ChoiceType::class, ['label' => 'Statut élémentaire', 'expanded' => true, 'multiple' => false, 'required' => true, 'choices' => ['Convoqué' => Inscriptionstatus::STATUS_CONVOKED, 'Accepté' => Inscriptionstatus::STATUS_ACCEPTED, 'En attente' => Inscriptionstatus::STATUS_WAITING, 'En attente de traitement' => Inscriptionstatus::STATUS_PENDING, 'Rejeté' => Inscriptionstatus::STATUS_REJECTED]]);
-        $formBuilder->add('machinename', null, ['label' => 'Libellé court']);
+        $formBuilder->add('machinename', null, ['required' => true, 'label' => 'Libellé court']);
     }
 
     public function getParent(): ?string
