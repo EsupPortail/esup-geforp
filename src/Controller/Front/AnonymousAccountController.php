@@ -322,7 +322,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                 $form->handleRequest($request);
                 if ($form->isValid()) {
                     // TEST sur le responsable
-                    if ($trainee->getEmailsup() !== '' && $trainee->getEmailsup() !== '0') {
+                    if ($trainee->getEmailsup() !== null && $trainee->getEmailsup() !== '' && $trainee->getEmailsup() !== '0') {
                         // Vérification du mail qui doit être institutionnel
                         if (stripos($trainee->getEmailsup() , "@")>0) {
                             $domaine = substr($trainee->getEmailsup(), stripos($trainee->getEmailsup(), "@") + 1);
@@ -350,7 +350,6 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                                     $this->addFlash('success', 'Votre profil a bien été créé.');
 
                                     return $this->redirectToRoute('front.program.myprogram');
-
                                 }
                             }else {
                                 $this->addFlash('error', 'Vous devez rentrer une adresse mail INSTITUTIONNELLE pour le responsable hiérarchique');
@@ -367,7 +366,7 @@ use Symfony\Component\Security\Core\Exception\AuthenticationException;
                         $em->flush();
                         $this->addFlash('success', 'Votre profil a bien été créé.');
 
-                        return $this->render('Front/Account/profile/account-registration.html.twig');
+                        return $this->redirectToRoute('front.program.myprogram');
                     }
                 }
             }
