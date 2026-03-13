@@ -42,7 +42,7 @@ sygeforApp.directive('registrationStatsLabel', ['$compile', function ($compile) 
         scope.classes = [];
 
         const datedebut = moment(session.datebegin, "DD/MM/YYYY");
-        if (!moment().isAfter(datedebut)) {
+        if (!moment().isAfter(datedebut, "day")) {
             // future session
             if (session.registration) {
                 // inscription gérée individuellement
