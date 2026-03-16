@@ -46,7 +46,7 @@ final class OwnTraineeViewAccessRight extends AbstractAccessRight
                 return true;
 
             $visuInst = $token->getUser()->getOrganization()->getInstitution()->getVisuinstitutions();
-            return in_array($object->getInstitution(), $visuInst, true);
+            return($visuInst->contains($object->getInstitution()));
         }
         return true;
     }
