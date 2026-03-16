@@ -166,6 +166,8 @@ parameters:
                     trainee.city: "Ville"
                     trainee.lastNameSup: "Nom du supérieur hiérarchique"
                     trainee.firstNameSup: "Prénom du supérieur hiérarchique"
+                    trainee.lastNameCorr: "Nom du correspondant formation"
+                    trainee.firstNameCorr: "Prénom du correspondant formation"
                     session.training.name: "Intitulé du stage"
                     session.name: "Intitulé de la session"
                     session.id: "Numéro de la session"
