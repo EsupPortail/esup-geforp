@@ -34,7 +34,8 @@ final class SessionType extends AbstractSessionType
             ->add('transportcost', TextType::class, ['label'    => "Frais de mission : transports", 'required' => false])
             ->add('materialcost', TextType::class, ['label'    => "Frais de supports", 'required' => false])
             ->add('taking', TextType::class, ['label'    => "Frais de supports", 'required' => false])
-            ->add('price', TextType::class, ['label'    => "Prix", 'required' => false]);
+            ->add('price', TextType::class, ['label'    => "Prix", 'required' => false])
+            ->add('modality', ChoiceType::class, ['label' => 'Type de session', 'choices' => ['Présentiel' => Session::MODALITY_PRESENT, 'Hybride' => Session::MODALITY_HYBRIDE, 'Distanciel' => Session::MODALITY_DISTANCE, 'E-learning' => Session::MODALITY_ELEARNING], 'required' => false]);
 
         parent::buildForm($formBuilder, $options);
     }

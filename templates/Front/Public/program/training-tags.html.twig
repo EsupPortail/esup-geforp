@@ -1,8 +1,15 @@
 <ul class="list-inline training-detail-info">
 
-    <!--training type-->
-    <li class="training-detail title-sup session__type" title="Type de formation"><span
-                class="label radius">{{ training.typeLabel }}</span></li>
+    <!--type de session / modalité-->
+    {% if session.modality == session.MODALITY_ELEARNING %}
+        <li class="training-detail title-sup session__elearning" title="Type de session"><span class="label radius">E-learning </span></li>
+    {% elseif session.modality == session.MODALITY_DISTANCE %}
+        <li class="training-detail title-sup session__distanciel" title="Type de session"><span class="label radius">Distanciel </span></li>
+    {% elseif session.modality == session.MODALITY_HYBRIDE %}
+        <li class="training-detail title-sup session__hybride" title="Type de session"><span class="label radius">Hybride </span></li>
+    {% else %}
+        <li class="training-detail title-sup session__presentiel" title="Type de session"><span class="label radius">Présentiel </span></li>
+    {% endif %}
 
     {% if training.category is defined and training.category.name is defined %}
         <li class="training-detail-info" title="Type d'événement"><i class="glyphicon glyphicon-comment"></i>&nbsp;&nbsp;{{ training.category.name }}

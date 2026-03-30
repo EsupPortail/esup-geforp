@@ -41,6 +41,7 @@
                         </li>
                         <li><label>Date</label> <span>{{ session.datebegin|date: 'dd/MM/yyyy' }}</span></li>
                         <li><label>Date de fin</label> <span>{{ session.dateend|date: 'dd/MM/yyyy' }}</span></li>
+                        <li><label>Type de session</label> <span sf-xeditable="form.children.modality">{{ $trainingBundle.modalityStates[session.modality] }}</span></li>
                         <li><label>Programmation</label> <span sf-xeditable="form.children.sessiontype">{{ session.sessiontype.name }}</span>
                         </li>
                         <li ng-if="session.sessiontype.name == 'A venir'"><a class="btn btn-xs btn-default" href=""

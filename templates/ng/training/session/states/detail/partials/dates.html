@@ -5,7 +5,7 @@
         <br><br>
 
         <div ng-if="!session.dates.length" class="well well-empty well-sm">
-            Il n'y a aucune date pour cette session.
+            <i class="fa fa-warning"></i> Il n'y a aucune date pour cette session. Merci de saisir le calendrier.
         </div>
 
         <table ng-if="session.dates.length" class="table table-hover table-search table-condensed">

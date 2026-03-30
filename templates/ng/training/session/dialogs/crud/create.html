@@ -99,19 +99,28 @@
             </div>
         </div>
 
-        <div ng-repeat="key in ['daynumber', 'hournumber']">
-            <div class="form-group" ng-if="form.children[key]"
-                 ng-class="{'has-error': form.children[key].errors.length }">
-                <label class="col-sm-3 control-label" for="{{ form.children[key].id }}">{{ form.children[key].label
-                    }}</label>
-                <div class="col-sm-9">
-                    <span sf-form-widget="form.children[key]" class="form-control"/>
-                    <div ng-if="error.length" ng-if="error.length" ng-repeat="error in form.children[key].errors"
-                         class="help-block">{{ error }}
-                    </div>
+        <div class="form-group" ng-init="childMod = form.children.modality"
+             ng-class="{'has-error': childMod.errors.length }">
+            <label class="col-sm-3 control-label" for="{{ childMod.id }}">{{ childMod.label }}</label>
+            <div class="col-sm-9">
+                <div ng-repeat="(key,choice) in childMod.choices">
+                    <label>
+                        <input type="radio" name="{{ childMod.name }}" value="{{ choice.v }}"
+                               ng-model="form.children.modality.value"> {{ choice.l }}
+                    </label>
+                </div>
+                <div ng-if="error.length" ng-repeat="error in childMod.errors" class="help-block">{{ error }}</div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-sm-12">
+                <div class="alert alert-danger" >
+                    <i class="fa fa-warning"></i> <strong> Merci de saisir le tableau des dates à la page suivante </strong>
                 </div>
             </div>
         </div>
+
     </div>
     <div class="modal-footer">
         <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>

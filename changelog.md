@@ -1,5 +1,20 @@
 # Geforp changelog :
 
+## 3.3 (2026-03-24)
+
+### Ajouts
+- Ajout modalité de session : prise en compte du e-learning côté gestionnaire et stagiaire
+- Ajout correspondant formation dans les exports d'inscriptions
+- Ajout libellé court obligatoire dans le formulaire de personnalisation des statuts d'inscription/présence
+- Ajout garde-fou accès au programme des formations pour les stagiaires 'Extérieur'
+
+### Corrections
+- Correction suppression N+1/correspondant formation dans formulaire profil stagaire
+- Correction suppression de champs dans formulaire session
+- Correction affichage des stats inscriptions pour une session
+- Correction gestion des droits sur les stagiaires des autres établissements visibles
+- Correction chemin upload des fichiers images
+
 ## 3.2 (2026-02-11)
 
 ### Ajouts

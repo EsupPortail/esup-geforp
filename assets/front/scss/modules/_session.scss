@@ -30,7 +30,7 @@
     margin-bottom: 0.5em;
   }
 
-  .session__date, .session__type, .session__organization, .session__avenir {
+  .session__date, .session__type, .session__organization, .session__avenir, .session__elearning, .session__distanciel, .session__hybride, .session__presentiel  {
     @media (max-width: $screen-md-min) {
       display: inline-block;
       line-height: 1;
@@ -40,7 +40,7 @@
   }
 
   .list-item__bottom {
-    .session__date, .session__type, .session__organization, .session__place, .session__duration, .session__trainer, .session__avenir, .session__alert {
+    .session__date, .session__type, .session__organization, .session__place, .session__duration, .session__trainer, .session__avenir, .session__alert, .session__elearning, .session__distanciel, .session.session__hybride, .session__presentiel {
       display: inline-block;
       margin-right: $padding-base-horizontal;
     }

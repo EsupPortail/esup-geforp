@@ -329,7 +329,7 @@ class ProgramController extends AbstractController
                             'organization' => $inscription->getSession()->getTraining()->getOrganization()]);
                         if (!$templates || count($templates) === 0) {
                             // Aucun modèle d'email trouvé pour cette organisation : on ajoute juste un message flash
-                            $this->addFlash('success', "Votre demande a été enregistrée. Aucun email n'a été envoyé car aucun modèle n'existe pour cette organisation. Merci de contacter un Administrateur.");
+                            $this->addFlash('success', "Votre demande a été enregistrée. Aucun email n'a été envoyé car aucun modèle n'existe pour cette organisation.");
                             return $this->redirectToRoute('front.account.registrations');
                         }
                         $subject1 = $templates[0]->getSubject();

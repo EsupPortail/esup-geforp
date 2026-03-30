@@ -18,6 +18,28 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
 #[ORM\Entity]
 class Session extends AbstractSession
 {
+    // modality
+    /**
+     * @var int
+     */
+    final public const int MODALITY_PRESENT = 0;
+
+    /**
+     * @var int
+     */
+    final public const int MODALITY_HYBRIDE = 1;
+
+    /**
+     * @var int
+     */
+    final public const int MODALITY_DISTANCE = 2;
+
+    /**
+     * @var int
+     */
+    final public const int MODALITY_ELEARNING = 3;
+
+
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
@@ -80,6 +102,12 @@ class Session extends AbstractSession
     #[Groups(['session', 'inscription', 'api'])]
     #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
     protected ?float $taking = null;
+
+    /**
+     * @Serializer\Groups({"session", "inscription", "api"})
+     */
+    #[ORM\Column(name: 'modality', type: \Doctrine\DBAL\Types\Types::INTEGER)]
+    protected ?int $modality = self::MODALITY_PRESENT;
 
     /**
      * @var \Doctrine\Common\Collections\Collection<\App\Entity\Back\DateSession> $dates
@@ -216,6 +244,19 @@ class Session extends AbstractSession
     public function setTaking(mixed $taking): void
     {
         $this->taking = $taking;
+    }
+
+    /**
+     * @return int
+     */
+    public function getModality(): ?int
+    {
+        return $this->modality;
+    }
+
+    public function setModality(?int $modality): void
+    {
+        $this->modality = $modality;
     }
 
     public function getTrainees(): array

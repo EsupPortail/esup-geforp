@@ -24,7 +24,11 @@
                     <td>
                         <a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a>
                     </td>
-                    <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    {% if registration.session.modality == registration.session.MODALITY_ELEARNING %}
+                        <td>{{ registration.session.name }} E-learning</td>
+                    {% else %}
+                        <td>{{ registration.session.name }} {{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    {% endif %}
                     {% if user is defined and user.isPaying == true %}
                         <td title="Tarif de la formation"> {{ registration.session.price ? registration.session.price : '0' }}
                             €

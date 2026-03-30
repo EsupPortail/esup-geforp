@@ -53,10 +53,17 @@
                                 </div>
 
                                 <!-- Date(s) -->
-                                <div title="Date de la session">
-                                    <i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;
-                                    <span>{{ attendance.session.dateBegin | date('l') | trans }} {{ attendance.session.dateBegin | date('d') }} {{ attendance.session.dateBegin | date('F') | trans }} {{ attendance.session.dateBegin | date('Y') }}</span>
-                                </div>
+                                {% if attendance.session.modality == attendance.session.MODALITY_ELEARNING %}
+                                    <div title="Date de la session">
+                                        <i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;
+                                        <span>E-learning</span>
+                                    </div>
+                                {% else %}
+                                    <div title="Date de la session">
+                                        <i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;
+                                        <span>{{ attendance.session.dateBegin | date('l') | trans }} {{ attendance.session.dateBegin | date('d') }} {{ attendance.session.dateBegin | date('F') | trans }} {{ attendance.session.dateBegin | date('Y') }}</span>
+                                    </div>
+                                {% endif %}
 
                                 <!-- Formateur(s) -->
                                 <div title="Formateurs">

@@ -46,6 +46,17 @@ sygeforApp.provider('$trainingBundle', [function () {
             ],
 
             /**
+             * return modality states
+             * @returns {*}
+             */
+            modalityStates: [
+                'Présentiel',
+                'Hybride',
+                'Distanciel',
+                'E-learning'
+            ],
+
+            /**
              * return registration states
              * @returns {*}
              */

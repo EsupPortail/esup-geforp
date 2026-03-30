@@ -80,6 +80,7 @@ final class SessionRepository extends ServiceEntityRepository
         
 		// TRI DES RESULTATS
         $qb->addOrderBy('th.name')
+            ->addOrderBy('CASE WHEN s.modality = 3 THEN 0 ELSE 1 END', 'DESC')
             ->addOrderBy('s.datebegin')
             ->addOrderBy('s.name');
 

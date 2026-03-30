@@ -5,6 +5,18 @@
   & .session__avenir .label {
     background-color: $a-venir;
   }
+  & .session__elearning .label {
+    background-color: $elearning;
+  }
+  & .session__distanciel .label {
+    background-color: $distanciel;
+  }
+  & .session__hybride .label {
+    background-color: $hybride;
+  }
+  & .session__presentiel .label {
+    background-color: $presentiel;
+  }
 }
 .training-detail-view {
   h4 {

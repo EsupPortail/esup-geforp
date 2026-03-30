@@ -7,10 +7,13 @@
                     {% if session.sessiontype == "A venir" %}
                         {{ session.datebegin | date('F') | trans }} {{ session.datebegin | date('Y') }}
                     {% else %}
-                        {{ session.datebegin | date('l') | trans }} {{ session.datebegin | date('d') }} {{ session.datebegin | date('F') | trans }} {{ session.datebegin | date('Y') }}
+                        {% if session.modality == session.MODALITY_ELEARNING %}
+                        {% else %}
+                            {{ session.datebegin | date('l') | trans }} {{ session.datebegin | date('d') }} {{ session.datebegin | date('F') | trans }} {{ session.datebegin | date('Y') }}
                         {#                     <br><span class="session__moment">
                         {{ session.datebegin | time_diff }}
                     </span> #}
+                        {% endif %}
                     {% endif %}
                 </time>
                 <!-- organization  -->
@@ -19,11 +22,18 @@
                 {% endif %}
                 <!-- label  -->
                 <div>
-                    <div style="float: left" class="session__type"><span
-                                class="label radius">{{ session.training.typeLabel }}</span></div>
+                    {% if session.modality == session.MODALITY_ELEARNING %}
+                        <div style="float: left" class="session__elearning"><span class="label radius">E-learning </span></div>
+                    {% elseif session.modality == session.MODALITY_DISTANCE %}
+                        <div style="float: left" class="session__distanciel"><span class="label radius">Distanciel </span></div>
+                    {% elseif session.modality == session.MODALITY_HYBRIDE %}
+                        <div style="float: left" class="session__hybride"><span class="label radius">Hybride </span></div>
+                    {% else %}
+                        <div style="float: left" class="session__presentiel"><span class="label radius">Présentiel </span></div>
+                    {% endif %}
+
                     {% if session.sessiontype == "A venir" %}
-                        <div style="float: right" class="session__avenir"><span class="label radius">Programmation à venir</span>
-                        </div>
+                        <div style="float: right" class="session__avenir"><span class="label radius">Programmation à venir</span></div>
                     {% endif %}
                 </div>
             </small>
@@ -53,10 +63,16 @@
                                     {{ session.place }}
                                 </div>
                             {% endif %}
-                            <div class="session__duration" ng-if="session" title="Durée de la formation"><i
-                                        class="glyphicon glyphicon-calendar"></i>&nbsp;{{ session.hourNumber }} heure(s)
-                                sur {{ session.dayNumber }} jour(s)
-                            </div>
+                            {% if session.modality == session.MODALITY_ELEARNING %}
+                                <div class="session__duration" ng-if="session" title="Durée de la formation"><i
+                                            class="glyphicon glyphicon-calendar"></i>&nbsp;{{ session.hourNumber }} heure(s)
+                                </div>
+                            {% else %}
+                                <div class="session__duration" ng-if="session" title="Durée de la formation"><i
+                                            class="glyphicon glyphicon-calendar"></i>&nbsp;{{ session.hourNumber }} heure(s)
+                                    sur {{ session.dayNumber }} jour(s)
+                                </div>
+                            {% endif %}
                             {% if session.participations is defined and session.participations | length > 0 %}
                                 <div class="session__trainer" title="Intervenant(s) de la formation">
                                     <i class="glyphicon glyphicon-info-sign"></i>&nbsp;

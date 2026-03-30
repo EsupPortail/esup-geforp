@@ -64,10 +64,14 @@
                                     <div class="panel-heading" role="tab" id="headingOne">
                                         <p class="panel-title text-center">
                                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ upcomingSession.id }}" aria-expanded="true" aria-controls="collapseOne">
-                                                {% if upcomingSession.sessionType != "A venir" %}
-                                                    {{ upcomingSession.dateBegin | date('l') | trans }} {{ upcomingSession.dateBegin | date('d') }} {{ upcomingSession.dateBegin | date('F') | trans }} {{ upcomingSession.dateBegin | date('Y') }}
-                                                {%  else %}
+                                                {% if upcomingSession.sessionType == "A venir" %}
                                                     {{ upcomingSession.dateBegin | date('F') | trans }} {{ upcomingSession.dateBegin | date('Y') }}
+                                                {%  else %}
+                                                    {% if upcomingSession.modality == upcomingSession.MODALITY_ELEARNING %}
+                                                        E-learning
+                                                    {%  else %}
+                                                        {{ upcomingSession.dateBegin | date('l') | trans }} {{ upcomingSession.dateBegin | date('d') }} {{ upcomingSession.dateBegin | date('F') | trans }} {{ upcomingSession.dateBegin | date('Y') }}
+                                                    {% endif %}
                                                 {% endif %}
                                             </a>
                                         </p>
@@ -79,7 +83,15 @@
                                                     <li title="Intitulé de la session"><h4>{{ upcomingSession.name }}</h4></li>
                                                 {% endif %}
 
-                                                {% if upcomingSession.sessionType != "A venir" %}
+                                                {% if upcomingSession.sessionType == "A venir" %}
+                                                    <li title="Dates">
+                                                        <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
+                                                    </li>
+                                                {% elseif upcomingSession.modality == upcomingSession.MODALITY_ELEARNING %}
+                                                    <li title="Dates">
+                                                        <div class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;Nombre d'heures : {{ upcomingSession.hournumber }}</div>
+                                                    </li>
+                                                {% else %}
                                                     {% if upcomingSession.dates | length >0 %}
                                                         <li title="Dates">
                                                             <table style="margin: auto">
@@ -95,9 +107,9 @@
                                                                     <tr >
                                                                         {% if date.dateEnd is defined and date.dateEnd is not null %}
                                                                             {%  if date.dateEnd != date.dateBegin %}
-                                                                            <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                                                                <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
                                                                             {% else %}
-                                                                            <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                                <td>{{ date.dateBegin | date('d/m/y') }} </td>
                                                                             {% endif %}
                                                                         {% else %}
                                                                             <td>{{ date.dateBegin | date('d/m/y') }} </td>
@@ -123,10 +135,6 @@
                                                             </table>
                                                         </li>
                                                     {% endif %}
-                                                {% else %}
-                                                    <li title="Dates">
-                                                        <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
-                                                    </li>
                                                 {% endif %}
 
                                                {% if upcomingSession.maximumNumberOfRegistrations is defined and upcomingSession.maximumNumberOfRegistrations > 0 and upcomingSession.availablePlaces is defined %}

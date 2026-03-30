@@ -46,7 +46,11 @@
                                 <tbody>
                                 {% for attendance in attendances | sort((a, b) => a.session.datebegin <=> b.session.datebegin) %}
                                     <tr>
-                                        <td>{{ attendance.session.dateBegin | date('d/m/Y') }}</td>
+                                        {% if attendance.session.modality == attendance.session.MODALITY_ELEARNING %}
+                                            <td>E-learning</td>
+                                        {% else %}
+                                            <td>{{ attendance.session.dateBegin | date('d/m/Y') }}</td>
+                                        {% endif %}
                                         <td>
                                             <a href="{{ path('front.program.training', {id: attendance.session.training.id}) }}">{{ attendance.session.training.name }}</a>
                                             <br>

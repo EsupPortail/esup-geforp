@@ -21,7 +21,11 @@
                     <td>
                         <a href="{{ path('front.program.training', {id: registration.session.training.id, sessionId: registration.session.id}) }}">{{ registration.session.training.name }}</a>
                     </td>
-                    <td data-order="{{ registration.session.dateBegin|date('U') }}">{{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    {% if registration.session.modality == registration.session.MODALITY_ELEARNING %}
+                        <td>E-learning</td>
+                    {% else %}
+                        <td data-order="{{ registration.session.dateBegin|date('U') }}">{{ registration.session.dateBegin | date('d/m/Y') }}</td>
+                    {% endif %}
                     <td>
                         {% include 'Front/Account/team/inscription-status-label.html.twig' %}
                     </td>
