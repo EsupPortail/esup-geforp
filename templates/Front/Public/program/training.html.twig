@@ -60,7 +60,7 @@
                         {% for upcomingSession in (upcomingSessions ) %}
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
-                                    {# % if upcomingSession.displayOnline == true % #}
+                                    {% if upcomingSession.displayOnline == true or upcomingSession.registration == upcomingSession.REGISTRATION_PRIVATE %}
                                     <div class="panel-heading" role="tab" id="headingOne">
                                         <p class="panel-title text-center">
                                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ upcomingSession.id }}" aria-expanded="true" aria-controls="collapseOne">
@@ -179,7 +179,7 @@
 
                                         </div>
                                     </div>
-                                    {# % endif %#}
+                                    {% endif %}
                                 </div>
                             </div>
                             {% set cpt = cpt + 1 %}

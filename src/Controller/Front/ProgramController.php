@@ -152,10 +152,8 @@ class ProgramController extends AbstractController
             );
             $programmeLien = nl2br($programmeLien);
 
-            /** @var Session $session */
-            foreach ($training->getSessions() as $session) {
-
-                $sesId = $session->getId();
+            if ($focusSession->getRegistration() == $focusSession::REGISTRATION_PRIVATE){
+                $sesId = $focusSession->getId();
                 $inscription = null;
 
                 /** @var EntityManager $em */
@@ -179,19 +177,63 @@ class ProgramController extends AbstractController
                     ->getQuery()->execute();
 
 
-                $session->isRegistered = !empty($inscription);
+                $focusSession->isRegistered = !empty($inscription);
 
-                $session->getDatebegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
+                $focusSession->getDatebegin() > $now ? $upcomingSessions[] = $focusSession : $pastSessions[] = $focusSession;
+
                 // Gestion des alertes existantes pour les sessions à venir
-                if ($session->getDatebegin() > $now) {
-                    $session->isAlerted = !empty($alert);
+                if ($focusSession->getDatebegin() > $now) {
+                    $focusSession->isAlerted = !empty($alert);
                 }
-                if ($session->getRegistration() === $session::REGISTRATION_PRIVATE) {
-                    $session->availablePrivateSession = true;
+                if ($focusSession->getRegistration() === $focusSession::REGISTRATION_PRIVATE) {
+                    $focusSession->availablePrivateSession = true;
                 } else {
-                    $session->availablePrivateSession = false;
+                    $focusSession->availablePrivateSession = false;
                 }
 
+            } else {
+                /** @var Session $session */
+                foreach ($training->getSessions() as $session) {
+
+                    $sesId = $session->getId();
+                    $inscription = null;
+
+                    /** @var EntityManager $em */
+                    $em = $doctrine->getManager();
+                    $inscription = $em->getRepository(\App\Entity\Core\AbstractInscription::class)->createQueryBuilder('inscription')
+                        ->leftJoin(\App\Entity\Core\AbstractSession::class, 'session', 'WITH', 'inscription.session = session.id')
+                        ->leftJoin(\App\Entity\Core\AbstractTrainee::class, 'trainee', 'WITH', 'inscription.trainee = trainee.id')
+                        ->where('session.id = :sessionId')
+                        ->andWhere('trainee.id = :traineeId')
+                        ->setParameter('sessionId', $sesId)
+                        ->setParameter('traineeId', $trainee->getId())
+                        ->getQuery()->execute();
+
+                    $alert = $em->getRepository(\App\Entity\Back\Alert::class)->createQueryBuilder('alert')
+                        ->leftJoin(\App\Entity\Core\AbstractSession::class, 'session', 'WITH', 'alert.session = session.id')
+                        ->leftJoin(\App\Entity\Core\AbstractTrainee::class, 'trainee', 'WITH', 'alert.trainee = trainee.id')
+                        ->where('session.id = :sessionId')
+                        ->andWhere('trainee.id = :traineeId')
+                        ->setParameter('sessionId', $sesId)
+                        ->setParameter('traineeId', $trainee->getId())
+                        ->getQuery()->execute();
+
+
+                    $session->isRegistered = !empty($inscription);
+
+                    $session->getDatebegin() > $now ? $upcomingSessions[] = $session : $pastSessions[] = $session;
+
+                    // Gestion des alertes existantes pour les sessions à venir
+                    if ($session->getDatebegin() > $now) {
+                        $session->isAlerted = !empty($alert);
+                    }
+                    if ($session->getRegistration() === $session::REGISTRATION_PRIVATE) {
+                        $session->availablePrivateSession = true;
+                    } else {
+                        $session->availablePrivateSession = false;
+                    }
+
+                }
             }
 
             // Affichage d'un flag si le stage en public désigné

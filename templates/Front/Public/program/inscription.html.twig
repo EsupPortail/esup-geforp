@@ -11,7 +11,8 @@
                         {% if session.name is defined %}
                             {{ session.name }}
                         {% endif %}
-                        {% if session.sessionType != "A venir" %}
+                        {% if session.modality == session.MODALITY_ELEARNING %}
+                        {% elseif session.sessionType != "A venir" %}
                             du {{ session.dateBegin | date('d/m/Y') }}
                         {% else %}
                             de {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
@@ -94,10 +95,14 @@
                                 <p class="panel-title text-center">
                                     <a role="button" data-toggle="collapse" data-parent="#accordion"
                                        href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
-                                        {% if session.sessionType != "A venir" %}
-                                            {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
-                                        {% else %}
+                                        {% if session.sessionType == "A venir" %}
                                             {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
+                                        {%  else %}
+                                            {% if session.modality == session.MODALITY_ELEARNING %}
+                                                E-learning
+                                            {%  else %}
+                                                {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
+                                            {% endif %}
                                         {% endif %}
                                     </a>
                                 </p>
@@ -106,7 +111,7 @@
                                  aria-labelledby="headingOne">
                                 <div class="panel-body">
                                     <ul class="list-unstyled text-center">
-                                        {% if session.displayOnline == true %}
+                                        {% if session.displayOnline == true or session.registration == session.REGISTRATION_PRIVATE %}
                                             {% if session.name is defined and session.name != "" %}
                                                 <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
                                             {% endif %}
@@ -119,67 +124,71 @@
                                             {% if session.schedule is defined and session.schedule | length > 0 %}
                                                 <li title="Horaires de la session"><i class="glyphicon glyphicon-time"></i>&nbsp;&nbsp;{{ session.schedule }}</li>
                                             {% endif %} #}
-                                            {% if session.sessionType != "A venir" %}
-                                                {% if session.dates | length >0 %}
-                                                    <li title="Dates">
-                                                        <table style="margin: auto">
-                                                            <thead>
-                                                            <tr>
-                                                                <th class="text-center"><i
-                                                                            class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;
-                                                                </th>
-                                                                <th class="text-center"><i
-                                                                            class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;
-                                                                </th>
-                                                                <th class="text-center"><i
-                                                                            class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;
-                                                                </th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            {% for date in session.dates %}
-                                                                <tr>
-                                                                    {% if date.dateEnd is defined and date.dateEnd is not null %}
-                                                                        {% if date.dateEnd != date.dateBegin %}
-                                                                            <td>{{ date.dateBegin | date('d/m/y') }}
-                                                                                -> {{ date.dateEnd | date('d/m/y') }}</td>
-                                                                        {% else %}
-                                                                            <td>{{ date.dateBegin | date('d/m/y') }} </td>
-                                                                        {% endif %}
-                                                                    {% else %}
-                                                                        <td>{{ date.dateBegin | date('d/m/y') }} </td>
-                                                                    {% endif %}
-                                                                    {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
-                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
-                                                                            <td>{{ date.scheduleMorn }}
-                                                                                , {{ date.scheduleAfter }}</td>
-                                                                        {% else %}
-                                                                            <td>{{ date.scheduleMorn }}</td>
-                                                                        {% endif %}
-                                                                    {% else %}
-                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
-                                                                            <td>{{ date.scheduleAfter }}</td>
-                                                                        {% else %}
-                                                                            <td></td>
-                                                                        {% endif %}
-                                                                    {% endif %}
-                                                                    <td>{{ date.place }}</td>
-                                                                </tr>
-                                                            {% endfor %}
-                                                            </tbody>
-                                                        </table>
-                                                    </li>
-                                                {% endif %}
-                                            {% else %}
+
+                                            {% if session.sessionType == "A venir" %}
                                                 <li title="Dates">
                                                     <div class="session__avenir"><span class="label radius">Programmation à venir</span>
                                                     </div>
                                                 </li>
-                                            {% endif %}
-                                            {% if user.isPaying is defined and user.isPaying and session.price is defined %}
-                                                <li title="Tarif de la formation">
-                                                    <strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;
-                                                </li>
+                                            {% else %}
+                                                {% if session.modality == session.MODALITY_ELEARNING %}
+                                                {% else %}
+                                                    {% if session.dates | length >0 %}
+                                                        <li title="Dates">
+                                                            <table style="margin: auto">
+                                                                <thead>
+                                                                <tr>
+                                                                    <th class="text-center"><i
+                                                                                class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;
+                                                                    </th>
+                                                                    <th class="text-center"><i
+                                                                                class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;
+                                                                    </th>
+                                                                    <th class="text-center"><i
+                                                                                class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;
+                                                                    </th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {% for date in session.dates %}
+                                                                    <tr>
+                                                                        {% if date.dateEnd is defined and date.dateEnd is not null %}
+                                                                            {% if date.dateEnd != date.dateBegin %}
+                                                                                <td>{{ date.dateBegin | date('d/m/y') }}
+                                                                                    -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                                                            {% else %}
+                                                                                <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                        {% endif %}
+                                                                        {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
+                                                                            {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                                <td>{{ date.scheduleMorn }}
+                                                                                    , {{ date.scheduleAfter }}</td>
+                                                                            {% else %}
+                                                                                <td>{{ date.scheduleMorn }}</td>
+                                                                            {% endif %}
+                                                                        {% else %}
+                                                                            {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                                <td>{{ date.scheduleAfter }}</td>
+                                                                            {% else %}
+                                                                                <td></td>
+                                                                            {% endif %}
+                                                                        {% endif %}
+                                                                        <td>{{ date.place }}</td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                                </tbody>
+                                                            </table>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endif %}
+                                                {% if user.isPaying is defined and user.isPaying and session.price is defined %}
+                                                    <li title="Tarif de la formation">
+                                                        <strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;
+                                                    </li>
+                                                {% endif %}
                                             {% endif %}
                                         {% endif %}
                                     </ul>
