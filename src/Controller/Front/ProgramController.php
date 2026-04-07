@@ -152,7 +152,7 @@ class ProgramController extends AbstractController
             );
             $programmeLien = nl2br($programmeLien);
 
-            if ($focusSession->getRegistration() == $focusSession::REGISTRATION_PRIVATE){
+            if (($focusSession !== null) && ($focusSession->getRegistration() == $focusSession::REGISTRATION_PRIVATE)){
                 $sesId = $focusSession->getId();
                 $inscription = null;
 
