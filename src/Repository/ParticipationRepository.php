@@ -47,6 +47,9 @@ final class ParticipationRepository extends ServiceEntityRepository
                 ->setParameter('id', $filters['trainer.id']);
         }
 
+        // TRI DES RESULTATS
+        $qb->addOrderBy('s.datebegin', 'DESC');
+
         return $qb->getQuery()->getResult();
     }
 

@@ -304,7 +304,8 @@ class MailingBatchOperation extends AbstractBatchOperation implements BatchOpera
                         $newSessions = array_values($b);
 
                         foreach ($newSessions as $newSession) {
-                            $lines[0]['sessions'][] = ['dateDebut' => $newSession->getDatebegin()->format('d/m/Y'), 'nombreHeures' => $newSession->getHournumber(), 'nom' => $newSession->getName(), 'domaine' => $newSession->getTraining()->getTheme()];
+                            if (($newSession->getStatus() != $newSession::STATUS_CANCELED) && ($newSession->getStatus() != $newSession::STATUS_REPORTED))
+                                $lines[0]['sessions'][] = ['dateDebut' => $newSession->getDatebegin()->format('d/m/Y'), 'nombreHeures' => $newSession->getHournumber(), 'nom' => $newSession->getName(), 'domaine' => $newSession->getTraining()->getTheme()];
                         }
 
                         $entityName = 'formateur';
