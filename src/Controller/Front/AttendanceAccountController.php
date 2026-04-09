@@ -97,6 +97,16 @@ class AttendanceAccountController extends AbstractController
         $arTrainee = $doctrine->getRepository(\App\Entity\Back\Trainee::class)->findOneBy(['email' =>$user->getCredentials()['mail']]);
         $trainee = $arTrainee;
 
+        //  on vérifie que le stagiaire accède bien à son évaluation
+        if ($trainee != $attendance->getTrainee()) {
+            $this->addFlash('error', "Vous ne pouvez pas accéder à l'évaluation de cette formation.");
+            return $this->render('Front/Account/attendance/evaluation.html.twig', [
+                'user' => $trainee,
+                'attendance' => $attendance,
+                'access' => 'no'
+            ]);
+        }
+
         // Recup params pour les critères d'évalutation
         $evalCritere0Actif = $this->getParameter('eval_critere_0_actif');
         $evalCritere1 = $this->getParameter('eval_critere_1');
@@ -140,7 +150,7 @@ class AttendanceAccountController extends AbstractController
             return $this->render('Front/Account/attendance/evaluation.html.twig', [
                 'user' => $trainee,
                 'attendance' => $attendance,
-                'form' => $form->createView(),
+                'access' => 'no'
             ]);
         }
 
@@ -158,6 +168,7 @@ class AttendanceAccountController extends AbstractController
             'user' => $trainee,
             'attendance' => $attendance,
             'form' => $form->createView(),
+            'access' => 'yes'
             ]);
     }
 

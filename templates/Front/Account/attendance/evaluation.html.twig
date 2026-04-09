@@ -1,5 +1,7 @@
 {% extends "Front/base.html.twig" %}
-{% form_theme form 'Front/fields.html.twig' %}
+{% if access != 'no' %}
+    {% form_theme form 'Front/fields.html.twig' %}
+{% endif %}
 
 {% block header %}
     <header>
@@ -45,30 +47,33 @@
             <div class="row">
                 <div class="col-md-12 columns">
                     <section>
-                        <div class="attendances {{ attendance.session.training.type }}">
-                            {{ form_start(form) }}
+                        {% if access == 'no' %}
+                        {% else %}
+                            <div class="attendances {{ attendance.session.training.type }}">
+                                {{ form_start(form) }}
 
-                            {% for criteria in form.children.criteria %}
-                                {{ form_row(criteria.children.inscription) }}
-                                {{ form_errors(criteria.children.inscription) }}
-                                {{ form_row(criteria.children.criterion) }}
-                                {{ form_errors(criteria.children.criterion) }}
-                                {{ form_row(criteria.children.note) }}
-                                {{ form_errors(criteria.children.note) }}
-                            {% endfor %}
+                                {% for criteria in form.children.criteria %}
+                                    {{ form_row(criteria.children.inscription) }}
+                                    {{ form_errors(criteria.children.inscription) }}
+                                    {{ form_row(criteria.children.criterion) }}
+                                    {{ form_errors(criteria.children.criterion) }}
+                                    {{ form_row(criteria.children.note) }}
+                                    {{ form_errors(criteria.children.note) }}
+                                {% endfor %}
 
-                            {{ form_row(form.message) }}
-                            {{ form_errors(form.message) }}
+                                {{ form_row(form.message) }}
+                                {{ form_errors(form.message) }}
 
-                            {{ form_errors(form) }}
+                                {{ form_errors(form) }}
 
-                            <div class="form-group">
-                                <div class="col-md-12">
-                                    <button type="submit" class="btn btn-primary btn-block">Evaluer</button>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <button type="submit" class="btn btn-primary btn-block">Evaluer</button>
+                                    </div>
                                 </div>
+                                {{ form_end(form) }}
                             </div>
-                            {{ form_end(form) }}
-                        </div>
+                        {% endif %}
                     </section>
                 </div>
             </div>
