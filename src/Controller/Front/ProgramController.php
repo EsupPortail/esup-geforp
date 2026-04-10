@@ -179,7 +179,8 @@ class ProgramController extends AbstractController
 
                 $focusSession->isRegistered = !empty($inscription);
 
-                $focusSession->getDatebegin() > $now ? $upcomingSessions[] = $focusSession : $pastSessions[] = $focusSession;
+                // si inscription privée, on n'affiche pas les autres sessions
+                //$focusSession->getDatebegin() > $now ? $upcomingSessions[] = $focusSession : $pastSessions[] = $focusSession;
 
                 // Gestion des alertes existantes pour les sessions à venir
                 if ($focusSession->getDatebegin() > $now) {
@@ -235,7 +236,8 @@ class ProgramController extends AbstractController
 
                 }
             }
-
+dump($focusSession);
+            dump($upcomingSessions);
             // Affichage d'un flag si le stage en public désigné
             if ($training->getDesignatedpublic())
                 $this->addFlash('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');

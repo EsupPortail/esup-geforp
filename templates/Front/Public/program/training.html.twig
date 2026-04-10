@@ -60,7 +60,7 @@
                         {% for upcomingSession in (upcomingSessions ) %}
                             <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                                 <div class="panel panel-default">
-                                    {% if upcomingSession.displayOnline == true or upcomingSession.registration == upcomingSession.REGISTRATION_PRIVATE %}
+                                    {% if upcomingSession.displayOnline == true %}
                                     <div class="panel-heading" role="tab" id="headingOne">
                                         <p class="panel-title text-center">
                                             <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ upcomingSession.id }}" aria-expanded="true" aria-controls="collapseOne">
@@ -184,6 +184,133 @@
                             </div>
                             {% set cpt = cpt + 1 %}
                         {% endfor %}
+                    {% endif %}
+
+                    {% if session is defined and session.registration == session.REGISTRATION_PRIVATE %}
+                        <h4>Sessions à venir <span class="label secondary radius no-mb pull-right"></span></h4>
+
+                        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+                            <div class="panel panel-default">
+                                <div class="panel-heading" role="tab" id="headingOne">
+                                    <p class="panel-title text-center">
+                                        <a role="button" data-toggle="collapse" data-parent="#accordion" href="#session{{ session.id }}" aria-expanded="true" aria-controls="collapseOne">
+                                            {% if session.sessionType == "A venir" %}
+                                                {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
+                                            {%  else %}
+                                                {% if session.modality == session.MODALITY_ELEARNING %}
+                                                    E-learning
+                                                {%  else %}
+                                                    {{ session.dateBegin | date('l') | trans }} {{ session.dateBegin | date('d') }} {{ session.dateBegin | date('F') | trans }} {{ session.dateBegin | date('Y') }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </a>
+                                    </p>
+                                </div>
+                                <div id="session{{ session.id }}" class="panel-collapse collapse {{ session | length > 0 and session.id == session.id ? 'in' : '' }}" role="tabpanel" aria-labelledby="headingOne">
+                                    <div class="panel-body">
+                                        <ul class="list-unstyled text-center">
+                                            {% if session.name is defined and session.name != "" %}
+                                                <li title="Intitulé de la session"><h4>{{ session.name }}</h4></li>
+                                            {% endif %}
+
+                                            {% if session.sessionType == "A venir" %}
+                                                <li title="Dates">
+                                                    <div class="session__avenir"><span class="label radius">Programmation à venir</span></div>
+                                                </li>
+                                            {% elseif session.modality == session.MODALITY_ELEARNING %}
+                                                <li title="Dates">
+                                                    <div class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;&nbsp;Nombre d'heures : {{ session.hournumber }}</div>
+                                                </li>
+                                            {% else %}
+                                                {% if session.dates | length >0 %}
+                                                    <li title="Dates">
+                                                        <table style="margin: auto">
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-calendar"></i>&nbsp;Dates&nbsp;&nbsp;</th>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-time"></i>&nbsp;Horaires&nbsp;&nbsp;</th>
+                                                                <th class="text-center"><i class="glyphicon glyphicon-map-marker"></i>&nbsp;Lieu&nbsp;&nbsp;</th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                            {% for date in (session.dates)  %}
+                                                                <tr >
+                                                                    {% if date.dateEnd is defined and date.dateEnd is not null %}
+                                                                        {%  if date.dateEnd != date.dateBegin %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }} -> {{ date.dateEnd | date('d/m/y') }}</td>
+                                                                        {% else %}
+                                                                            <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        <td>{{ date.dateBegin | date('d/m/y') }} </td>
+                                                                    {% endif %}
+                                                                    {% if date.scheduleMorn is defined and date.scheduleMorn is not null %}
+                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                            <td>{{ date.scheduleMorn }}, {{ date.scheduleAfter }}</td>
+                                                                        {% else %}
+                                                                            <td>{{ date.scheduleMorn }}</td>
+                                                                        {% endif %}
+                                                                    {% else %}
+                                                                        {% if date.scheduleAfter is defined and date.scheduleAfter is not null %}
+                                                                            <td>{{ date.scheduleAfter }}</td>
+                                                                        {% else %}
+                                                                            <td></td>
+                                                                        {% endif %}
+                                                                    {% endif %}
+
+                                                                    <td>{{ date.place }}</td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </li>
+                                                {% endif %}
+                                            {% endif %}
+
+                                            {% if session.maximumNumberOfRegistrations is defined and session.maximumNumberOfRegistrations > 0 and session.availablePlaces is defined %}
+                                                <li title="Nombre maximum d'inscrits ({{ session.availablePlaces }} places disponibles)"><i class="glyphicon glyphicon-user"></i>&nbsp;&nbsp;{{ session.maximumNumberOfRegistrations }} inscriptions max.</li>
+                                            {% endif %}
+                                            {% if user.isPaying is defined and user.isPaying and session.price is defined %}
+                                                <li title="Tarif de la formation"><strong>&euro;</strong>&nbsp;&nbsp;{{ session.price }} &euro;</li>
+                                                <!--prices-->
+                                            {% endif %}
+                                            {% if session.limitRegistrationDate is defined and session.isPublic and session.availablePlaces > 0 and session.limitRegistrationDate %}
+                                                <li title="Le {{ session.limitRegistrationDate | date('l') | trans }} {{ session.limitRegistrationDate | date('d') }} {{ session.limitRegistrationDate | date('F') | trans }} {{ session.limitRegistrationDate | date('Y') }}" class="text-center">
+                                                    <div class="alert-danger">
+                                                        <span class="label radius text-center">Clôture des inscriptions {{ session.limitRegistrationDate | date('d/m/Y') }}</span>
+                                                    </div>
+                                                </li>
+                                            {% endif %}
+                                            {% if session.isPublic and session.availablePlaces <= 0 %}
+                                                <li class="text-center">
+                                                    <div class="alert-danger">
+                                                        <span class="label radius">Il n'y plus de place disponible</span>
+                                                    </div>
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+
+                                        <!--infos-->
+                                        {% if session.registrable and not session.isRegistered and (session.availablePrivateSession or session.isPublic) %}
+                                            <a href="{{ path('front.program.inscription', {'id': training.id, 'sessionId': session.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">S'inscrire à cette session</a>
+                                        {% elseif upcomingSession.isRegistered %}
+                                            <a href="{{ path('front.account.registrations') }}" class="btn btn-primary btn-lg btn-group-justified radius" >Voir l'état de mon inscription</a>
+                                        {% elseif not session.registrable and not session.isRegistered %}
+                                            {% if session.sessionType != "A venir" %}
+                                                <a href="" class="btn btn-primary btn-lg disabled btn-group-justified radius">Inscriptions closes</a>
+                                            {% else %}
+                                                {% if session.isAlerted %}
+                                                    <a href="{{ path('front.program.alertremove', {'id': training.id, 'sessionId': session.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">Se désincrire de l'alerte</a>
+                                                {% else %}
+                                                    <a href="{{ path('front.program.alert', {'id': training.id, 'sessionId': session.id, token: token}) }}" class="btn btn-primary btn-lg btn-group-justified radius">M'alerter de l'ouverture de la session</a>
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endif %}
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     {% endif %}
 
                     {% if pastSessions is defined and pastSessions | length > 0 %}
