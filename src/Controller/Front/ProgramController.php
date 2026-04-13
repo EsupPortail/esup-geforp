@@ -348,6 +348,15 @@ class ProgramController extends AbstractController
             if ($request->getMethod() === 'POST') {
                 $form->handleRequest($request);
                 if (($form->isSubmitted())&&($form->isValid())) {
+                    // Reprise données de l'inscription
+                    $inscription->setTrainee($trainee);
+                    $inscription->setSession($session);
+                    $inscription->setInscriptionstatus(
+                        $doctrine->getRepository(\App\Entity\Term\Inscriptionstatus::class)->findOneBy(
+                            ['machinename' => 'waiting']
+                        )
+                    );
+
                     $inscription->setCreatedat(new \DateTime('now'));
                     $inscription->setUpdatedat(new \DateTime('now'));
                     $em = $doctrine->getManager();
