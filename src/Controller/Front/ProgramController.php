@@ -236,8 +236,7 @@ class ProgramController extends AbstractController
 
                 }
             }
-dump($focusSession);
-            dump($upcomingSessions);
+
             // Affichage d'un flag si le stage en public désigné
             if ($training->getDesignatedpublic())
                 $this->addFlash('warning', 'Ce stage est réservé à un public désigné. Vous devez faire partie de la liste des personnes autorisées à s\'inscrire.');
@@ -761,7 +760,7 @@ dump($focusSession);
         // Recup param pour l'activation du multi établissement
         $multiEtab = $this->isMultiEtab($arTrainee);
 
-        if ($centreCode=="tous") {
+        if (($centreCode=="tous") || ($centreCode==null)) {
             $centreCodes = [];
             // Recup allProgram = toutes les formations des centres et établissements liés
             // Récupération des centres de l'établissement du stagiaire
@@ -787,7 +786,7 @@ dump($focusSession);
             $organizations[0] = $doctrine->getRepository(\App\Entity\Back\Organization::class)->findBy(['code' => $centreCodes]);
         }
 
-        if ($theme=="tous") {
+        if (($theme=="tous") || ($theme==null)) {
             $themeName = [];
             // recuperation theme des centres associés
             foreach($organizations as $org) {
