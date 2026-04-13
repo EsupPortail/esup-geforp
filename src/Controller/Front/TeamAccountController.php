@@ -116,6 +116,14 @@ class TeamAccountController extends AbstractController
             throw $this->createNotFoundException('Le stagiaire demandé n’existe pas.');
         }
 
+        $access = 'OK';
+        // On verifie que la personne connectée est bien le N+1 du stagiaire
+        if ($sup->getEmail() != $trainee->getEmailsup()) {
+            // Erreur : accès non autorisé
+            $access = 'NOK';
+        }
+
+
         $inscriptions = $trainee->getInscriptions();
         $upcoming = [];
         $upcomingIds = [];
@@ -141,7 +149,7 @@ class TeamAccountController extends AbstractController
             }
         }
 
-        return $this->render('Front/Account/team/trainee-registrations.html.twig', ['user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee]);
+        return $this->render('Front/Account/team/trainee-registrations.html.twig', ['user' => $sup, 'upcoming' => $upcoming, 'past' => $past, 'pastEffective' => $pastEffective, 'pastOther' => $pastOther, 'upcomingIds' => implode(',', $upcomingIds), 'trainee' => $trainee, 'access' => $access]);
     }
 
 }
