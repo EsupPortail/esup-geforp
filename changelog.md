@@ -1,5 +1,11 @@
 # Geforp changelog :
 
+## 3.4 (2026-04-14)
+### Corrections
+- Correction visibilité des liens privés pour les stagiaires
+- Correction valeur par défaut du nombre d'heures et de jours d'une session 
+- Corrections visibilités côté stagiaire
+
 ## 3.3 (2026-03-24)
 
 ### Ajouts

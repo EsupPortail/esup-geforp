@@ -97,6 +97,9 @@ abstract class AbstractSessionController extends AbstractController
         $session = new $this->sessionClass();
         $session->setTraining($training);
         $session->setName($training->getName());
+        // Nombre de jours et heures par défaut
+        $session->setDaynumber(1);
+        $session->setHournumber(1);
 
         $form = $this->createForm($session::getFormType(), $session);
 
