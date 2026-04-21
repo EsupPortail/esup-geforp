@@ -155,7 +155,7 @@ final class AccountController extends AbstractController
                                 break;
                             }
                         }
-                    } elseif (str_contains((string) $tabCursus, 'D')) {
+                    } elseif (str_contains((string) $tabCursus, '{SUPANN}D')) {
                         // c'est un doctorant
                         $flagDoc = 1;
                         $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
@@ -419,7 +419,7 @@ final class AccountController extends AbstractController
                             break;
                         }
                     }
-                } elseif (str_contains((string) $tabCursus, 'D')) {
+                } elseif (str_contains((string) $tabCursus, '{SUPANN}D')) {
                     // c'est un doctorant
                     $flagDoc = 1;
                     $trainee->setPublictype($managerRegistry->getRepository(\App\Entity\Term\Publictype::class)->findOneBy(
