@@ -195,7 +195,7 @@ class RegistrationAccountController extends AbstractController
                         $Texte .= $date->getDatebegin()->format('d/m/Y') . " au " . $date->getDateend()->format('d/m/Y') . "        " . $date->getSchedulemorn() . "        " . $date->getScheduleafter() . "        " . $date->getPlace() . $newline;
                     }
                 }
-                $newbody = str_replace("[date]", $Texte, $newbody);
+                $newbody = str_replace("[dates]", $Texte, $newbody);
                 $newbody = str_replace("[stagiaire.prenom]", $registration->getTrainee()->getFirstname(), $newbody);
                 $newbody = str_replace("[stagiaire.nom]", $registration->getTrainee()->getLastname(), $newbody);
                 $newbody = str_replace("[stagiaire.civilite]", $registration->getTrainee()->getTitle(), $newbody);
