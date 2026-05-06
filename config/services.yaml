@@ -74,6 +74,7 @@ parameters:
                     inscription.refus: "nombre d'inscription refusées"
                     inscription.desist: "Nombre d'inscriptions en désistement"
                     inscription.convoke: "Nombre de convoqués"
+                    inscription.accepted: "Nombre d'acceptés"
                     inscription.presence.nbheures: "Nombre d'heures de présence effective"
                     maximumnumberofregistrations: 'Nombre de places'
                     numberofregistrations: "Nombre d'inscrits"
@@ -194,6 +195,16 @@ parameters:
                     address: "Adresse"
                     zip: "Code postal"
                     city: "Ville"
+            inscription.cpf:
+                class: 'App\Entity\Back\Inscription'
+                filename: 'cpf.csv'
+                fields:
+                    trainee.institution.siret: "N° SIRET de l'établissement"
+                    trainee.institution.rs: "Raison sociale"
+                    trainee.ss: "N° SS de l'agent"
+                    trainee.lastName: "Nom de l'agent"
+                    trainee.firstName: "Prénom de l'agent"
+                    presence.nbheures: "Nombre d'heures à décrémenter"
         mailing:
             organization:
                 class: 'App\Entity\Back\Organization'

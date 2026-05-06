@@ -106,6 +106,13 @@ class Session extends AbstractSession
     /**
      * @Serializer\Groups({"session", "inscription", "api"})
      */
+    #[Groups(['session', 'inscription', 'api'])]
+    #[ORM\Column(type: \Doctrine\DBAL\Types\Types::FLOAT, nullable: true)]
+    protected ?float $cofinance = null;
+
+    /**
+     * @Serializer\Groups({"session", "inscription", "api"})
+     */
     #[ORM\Column(name: 'modality', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected ?int $modality = self::MODALITY_PRESENT;
 
@@ -244,6 +251,19 @@ class Session extends AbstractSession
     public function setTaking(mixed $taking): void
     {
         $this->taking = $taking;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getCofinance(): ?float
+    {
+        return $this->cofinance;
+    }
+
+    public function setCofinance(mixed $cofinance): void
+    {
+        $this->cofinance = $cofinance;
     }
 
     /**

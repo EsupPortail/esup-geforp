@@ -435,6 +435,24 @@ abstract class AbstractInscriptionController extends AbstractController
             $tabAggs['session.training.theme.name']['buckets'] = $tabTh;
         }
 
+        // CONSTRUCTION CPF
+        $tabAggs['cpf'] = ['buckets' => []];
+
+        if (isset($aggs['cpf'])) {
+            $tabCPF= [0 => 'F', 1 => 'T'];
+            $i = 0; $tab = [];
+            //Pour chaque Formation on teste la requête
+            foreach($tabCPF as $key => $cpf){
+                $nbInscCPF= $inscriptionSearchRepository->getNbInscriptions($query_filters, $keyword, $aggs, $key);
+                if ($nbInscCPF > 0) {
+                    $tab[$i] = [ 'key' => $cpf, 'doc_count' => (int)$nbInscCPF['total']];
+                    ++$i;
+                }
+            }
+
+            $tabAggs['cpf']['buckets'] = $tab;
+        }
+
         if (empty($aggs)) {
             return [
                 // Renvoie quand même une structure vide attendue par le front
@@ -449,6 +467,7 @@ abstract class AbstractInscriptionController extends AbstractController
                 'session.training.typeLabel.source' => ['buckets' => []],
                 'session.training.name.source' => ['buckets' => []],
                 'session.training.theme.name' => ['buckets' => []],
+                'cpf' => ['buckets' => []]
             ];
         }
         //dump($aggs);

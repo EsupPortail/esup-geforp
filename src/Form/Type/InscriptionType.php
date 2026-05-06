@@ -8,6 +8,7 @@ use App\Entity\Term\ActionType;
 use App\Form\Type\EntityHiddenType;
 use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractSession;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -25,6 +26,7 @@ final class InscriptionType extends AbstractType
             ->add('motivation', TextareaType::class, ['label' => 'Motivation', 'attr' => ['placeholder' => 'Expliquez les raisons pour lesquelles vous souhaitez vous inscrire à cette session.']])
             ->add('actiontype', EntityType::class, ['label' => 'Type de formation', 'class' => ActionType::class])
             ->add('dif', CheckboxType::class, ['label' => 'Compte personnel de formation', 'required' => false])
+            ->add('dispositifs', ChoiceType::class, ['label' => 'Type de session', 'choices' => ['CFP' => Inscription::DIS_CFP, 'VAE' => Inscription::DIS_VAE, 'BC' => Inscription::DIS_BC, 'CRCT' => Inscription::DIS_CRCT, 'CPP' => Inscription::DIS_CPP], 'required' => false])
             ->add('authorization', CheckboxType::class, ['label' => 'Envoyer une demande d\'autorisation à mon supérieur hiérarchique', 'mapped' => false, 'required' => false, 'disabled' => true, 'attr' => ['checked'   => 'checked']]);
     }
 

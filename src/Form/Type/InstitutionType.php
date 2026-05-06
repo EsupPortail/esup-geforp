@@ -23,7 +23,9 @@ final class InstitutionType extends BaseInstitutionType
             ->add('visuinstitutions', EntityType::class, ['label' => 'Autres établissements visibles', 'class' => AbstractInstitution::class, 'choice_label' => 'name', 'multiple' => true, 'required' => false, 'query_builder' => static fn(EntityRepository $entityRepository): \Doctrine\ORM\QueryBuilder => $entityRepository->createQueryBuilder('i')
                 ->where('i != :institution')
                 ->setParameter('institution', $object)
-                ->orderBy('i.name', 'ASC')]);
+                ->orderBy('i.name', 'ASC')])
+            ->add('siret', TextType::class, ['label' => 'SIRET', 'required' => false])
+            ->add('rs', TextType::class, ['label' => 'Raison sociale', 'required' => false]);
 
 
 

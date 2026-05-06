@@ -105,6 +105,11 @@
                                                                             data-type="select">{{ inscription.actiontype.name }}</span>
                         </li>
                         <li><label>Compte personnel de formation</label> <span sf-xeditable="form.children.dif">{{inscription.dif ? 'Oui' : 'Non' }}</span>
+                            <a class="btn btn-fa" href="" tooltip="Export caisse de dépôts" ng-if="inscription.dif == 1"
+                               ng-click="$dialog.open('batch.export.csv', { items: [inscription.id], service: 'inscription.cpf' })"><span class="fa fa-file-excel-o"></span>&nbsp;Export caisse des dépôts</a>
+                        </li>
+                        <li><label>Dispositifs spécifiques</label> <span sf-xeditable="form.children.dispositifs"
+                                                                            data-type="select">{{ dispositifsMap[inscription.dispositifs] }}</span>
                         </li>
                         <li><label>Motif de refus (si statut refusé par N+1)</label> {{inscription.refuse }}</li>
                     </ul>

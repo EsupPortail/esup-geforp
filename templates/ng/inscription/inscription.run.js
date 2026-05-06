@@ -45,4 +45,12 @@ sygeforApp.run(['$rootScope', function ($rootScope) {
         }
     }
 
+    $rootScope.dispositifsMap = {
+        0: 'CFP',
+        1: 'VAE',
+        2: 'BC',
+        3: 'CRCT',
+        4: 'CPP'
+    };
+
 }]);

@@ -186,7 +186,13 @@ final class BatchOperationRegistry
         $this->addBatchOperation($pdfBatchTraining, $i);
         ++$i;
 
-
+        // operation batch : export CSV pour les inscriptions CPF
+        $CSVBatchInscriptionCpf = new CSVBatchOperation($security);
+        $CSVBatchInscriptionCpf->setDoctrine($managerRegistry);
+        $CSVBatchInscriptionCpf->setTargetClass(\App\Entity\Back\Inscription::class);
+        $CSVBatchInscriptionCpf->setOptions($confCSV['inscription.cpf']);
+        $this->addBatchOperation($CSVBatchInscriptionCpf, $i);
+        ++$i;
     }
 
     /**
@@ -244,11 +250,12 @@ final class BatchOperationRegistry
             'sygefor_core.batch.pdf.inscription.attestation' => 14,
             'sygefor_training.batch.session_registration_change' => 15,
             'sygefor_core.batch.pdf.training' => 16,
+            'sygefor_core.batch.csv.inscription.cpf' => 17,
         ];
 
-            if (isset($map[$servicename]) && isset($this->operations[$map[$servicename]])) {
-                return $this->operations[$map[$servicename]];
-            }
-    return null;
+        if (isset($map[$servicename]) && isset($this->operations[$map[$servicename]])) {
+            return $this->operations[$map[$servicename]];
+        }
+        return null;
     }
 }

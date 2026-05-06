@@ -150,6 +150,14 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ->andWhere('th.name in (:themes)')
                 ->setParameter('themes', $filters['session.training.theme.name']);
         }
+dump($filters);
+        // FILTRE CPF
+        if (isset($filters['cpf'])) {
+            $tabCPF = ['T' => 1, 'F' => 0];
+            $qb
+                ->andWhere('i.dif =:dif')
+                ->setParameter('dif', $tabCPF[$filters['cpf']]);
+        }
 
         // TRI DES RESULTATS
         if ((is_array($sorts)) && (array_key_exists('createdat', $sorts)))
@@ -348,6 +356,16 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ->setParameter('themes', (array) $query_filters['session.training.theme.name.source']);
         }
 
+        // FILTRE CPF
+        if (isset($aggs['cpf'])) {
+            $qb
+                ->andWhere('i.dif = :cpf')
+                ->setParameter('cpf', $name);
+        } elseif (isset($query_filters['cpf'])) {
+            $qb
+                ->andWhere('i.dif = :cpf')
+                ->setParameter('cpf', $query_filters['cpf']);
+        }
 
         // Autres filtres... (je garde la même logique que votre code original)
         // mais en utilisant les alias cohérents

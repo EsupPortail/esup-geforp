@@ -240,6 +240,24 @@
             </div>
 
             <!--
+             Cofinancement
+             -->
+            <div class="block block-costs">
+                <div class="block-title">
+                    <span class="pull-right">{{ session.totalTaking | currency }}</span>
+                    <span class="fa fa-euro"></span> Cofinancement
+                </div>
+                <div class="block-body">
+                    <ul class="list-unstyled text-small text-gray-light">
+                        <li><label>Cofinancement</label> <span class="pull-right inline-block"
+                                                          sf-xeditable="form.children.cofinance"
+                                                          data-placement="left">{{ session.cofinance | currency }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--
              Comments
             -->
             <div class="block block-comments">

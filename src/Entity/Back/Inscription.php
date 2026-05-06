@@ -19,6 +19,33 @@ class Inscription extends AbstractInscription implements \Stringable
 {
 
     public bool $isPaying = false;
+
+    // dispositifs spécifiques
+    /**
+     * @var int
+     */
+    final public const int DIS_CFP = 0;
+
+    /**
+     * @var int
+     */
+    final public const int DIS_VAE = 1;
+
+    /**
+     * @var int
+     */
+    final public const int DIS_BC = 2;
+
+    /**
+     * @var int
+     */
+    final public const int DIS_CRCT = 3;
+
+    /**
+     * @var int
+     */
+    final public const int DIS_CPP = 4;
+
     /**
      * @Serializer\Groups({"Default", "api"})
      */
@@ -75,6 +102,12 @@ class Inscription extends AbstractInscription implements \Stringable
     #[ORM\Column(name: 'dif', type: \Doctrine\DBAL\Types\Types::BOOLEAN, options: ['default' => false])]
     protected ?bool $dif = null;
 
+    /**
+     * @Serializer\Groups({"Default", "api"})
+     */
+    #[Groups(['Default', 'api', 'training', 'inscription', 'api.attendance', 'session'])]
+    #[ORM\Column(name: 'dispositifs', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: true)]
+    protected ?int $dispositifs = null;
 
     /**
      *
@@ -203,6 +236,19 @@ class Inscription extends AbstractInscription implements \Stringable
     public function setDif(mixed $dif): void
     {
         $this->dif = $dif;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDispositifs(): ?int
+    {
+        return $this->dispositifs;
+    }
+
+    public function setDispositifs(?int $dispositifs): void
+    {
+        $this->dispositifs = $dispositifs;
     }
 
     /**

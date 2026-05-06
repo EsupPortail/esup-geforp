@@ -115,7 +115,13 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
                     execute: function (items, $dialog) {
                         return $dialog.open('batch.publipost', {items: items, service: 'inscription'})
                     }
-                }
+                }, {
+                    icon: 'fa-file-excel-o',
+                    label: 'Caisse des dépôts',
+                    execute: function (items, $dialog) {
+                        return $dialog.open('batch.export.csv', {items: items, service: 'inscription.cpf'})
+                    }
+                },
             ]
         }
     ];
@@ -193,6 +199,13 @@ sygeforApp.controller('InscriptionListController', ['$scope', '$user', '$injecto
         },
         'session.training.theme.name': {
             label: 'Domaine de formation'
-        }
+        },
+        'cpf': {
+            label: 'CPF',
+            values: {
+                'T': 'Oui',
+                'F': 'Non'
+            }
+        },
     };
 }]);

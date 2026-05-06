@@ -19,6 +19,48 @@ use App\Form\Type\InstitutionType;
 #[ORM\Entity]
 class Institution extends AbstractInstitution
 {
+    // Siret établissement (ajouté pour générer le fichier pour le CPF)
+    #[Groups(['Default', 'api', 'institution'])]
+    #[ORM\Column(name: 'siret', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $siret = null;
+
+    // Raison sociale établissement (ajoutée pour générer le fichier pour le CPF)
+    #[Groups(['Default', 'api', 'institution'])]
+    #[ORM\Column(name: 'rs', type: \Doctrine\DBAL\Types\Types::STRING, length: 512, nullable: true)]
+    protected ?string $rs = null;
+
+    /**
+     * @return string
+     */
+    public function getSiret(): ?string
+    {
+        return $this->siret ;
+    }
+
+    /**
+     * @param string $siret
+     */
+    public function setSiret(?string $siret): void
+    {
+        $this->siret = $siret;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRs(): ?string
+    {
+        return $this->rs ;
+    }
+
+    /**
+     * @param string $rs
+     */
+    public function setRs(?string $rs): void
+    {
+        $this->rs = $rs;
+    }
+
     public static function getFormType(): string
     {
         return InstitutionType::class;
