@@ -1,5 +1,14 @@
 # Geforp changelog :
 
+## 3.5 (2026-05-12)
+### Ajouts
+- Fonctionnalités liées au CPF
+- Liste des acceptés dans les exports de sessions
+
+### Corrections
+- Correction condition supannEtuCursusAnnee pour les doctorants
+- Correction tableau des dates dans mail de desistement stagiaire 
+
 ## 3.4 (2026-04-14)
 ### Corrections
 - Correction visibilité des liens privés pour les stagiaires
