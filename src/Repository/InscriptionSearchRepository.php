@@ -150,7 +150,7 @@ final class InscriptionSearchRepository extends ServiceEntityRepository
                 ->andWhere('th.name in (:themes)')
                 ->setParameter('themes', $filters['session.training.theme.name']);
         }
-dump($filters);
+
         // FILTRE CPF
         if (isset($filters['cpf'])) {
             $tabCPF = ['T' => 1, 'F' => 0];
