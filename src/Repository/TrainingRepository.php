@@ -135,7 +135,7 @@ final class TrainingRepository extends ServiceEntityRepository
             $pageSize = 50;
             
         }
-                $page = max(1, (int)$page);
+        $page = max(1, (int)$page);
         $pageSize = max(1, (int)$pageSize);
         $offset = ($page - 1) * $pageSize;
 
@@ -221,6 +221,7 @@ final class TrainingRepository extends ServiceEntityRepository
                 'description' => $training->getDescription(),
                 'program' => $training->getProgram(),
                 'tags' => $training->getTags(),
+                'organization' => $training->getOrganization(),
                 'training' => [
                     'id' => $training->getId(),
                     'type' => $training->getType(),
@@ -242,10 +243,7 @@ final class TrainingRepository extends ServiceEntityRepository
                     'trainers' => implode(', ', $trainerNames),
                 ],
             ];
-
-
-    }
-
+        }
 
         return ['total' => $c, 'pageSize' => $pageSize, 'items' => $items];
     }

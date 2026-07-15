@@ -12,6 +12,7 @@ use App\Entity\Core\Material;
 use App\Entity\Term\Supervisor;
 use App\Entity\Term\Tag;
 use App\Entity\Term\Trainingcategory;
+use App\Entity\Core\AbstractCareer;
 use JMS\Serializer\Annotation\VirtualProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -160,7 +161,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
-    #[Groups(["training", "api"])]
+    #[Groups(["training", "api", 'career'])]
     #[ORM\Column(name: 'firstSessionPeriodSemester', type: \Doctrine\DBAL\Types\Types::INTEGER)]
     protected int $firstsessionperiodsemester = 1;
 
@@ -168,7 +169,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
      *
      * @Serializer\Groups({"training", "api"})
      */
-    #[Groups(['training', 'api'])]
+    #[Groups(['training', 'api', 'career'])]
     #[ORM\Column(name: 'firstSessionPeriodYear', type: \Doctrine\DBAL\Types\Types::INTEGER, nullable: false)]
     protected int $firstsessionperiodyear = 0;
 
@@ -188,6 +189,15 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     #[ORM\OneToMany(mappedBy: 'training', targetEntity: \App\Entity\Core\Material::class, cascade: ['remove', 'persist'])]
     #[ORM\JoinColumn]
     protected \Doctrine\Common\Collections\Collection $materials;
+
+    /**
+     * @var AbstractCareer
+     * @Serializer\Groups({"training", "session", "inscription", "trainee", "trainer", "api", "career"})
+     */
+    #[Groups(['training', 'session', 'inscription', 'trainee', 'trainer', 'api', 'career'])]
+    #[ORM\ManyToOne(targetEntity: AbstractCareer::class, inversedBy: 'trainings')]
+    #[ORM\JoinColumn(onDelete: 'CASCADE')]
+    protected ?AbstractCareer $career;
 
     /**
      * Constructor.
@@ -717,4 +727,21 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
 
         return $trainers;
     }
+
+    /**
+     * @return AbstractCareer
+     */
+    public function getCareer(): ?AbstractCareer
+    {
+        return $this->career;
+    }
+
+    /**
+     * @param AbstractCareer $career
+     */
+    public function setCareer(?AbstractCareer $career): void
+    {
+        $this->career = $career;
+    }
+
 }

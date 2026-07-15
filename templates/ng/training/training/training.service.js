@@ -28,11 +28,12 @@ sygeforApp.provider('$trainingBundle', [function () {
             getType: function (type) {
                 // JMS Serializer bug !!
                 // return types[type];
-                for (key in types) {
+                return types["internship"];
+/*                for (key in types) {
                     if (key.replace('_', '') == type.replace('_', '')) {
                         return types[key];
                     }
-                }
+                }*/
             },
 
             /**

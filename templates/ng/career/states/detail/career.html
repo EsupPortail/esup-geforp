@@ -1,0 +1,61 @@
+<form ng-if="career.id" sf-xeditable-form="form"  sf-href='career.view({id: career.id})' on-success="onSuccess(data)">
+    <div class="col-md-8">
+
+        <div class="btn-group pull-right">
+            <a class="btn btn-fa" href="" tooltip="Supprimer"
+               ng-click="delete()"><span class="fa fa-trash-o"></span></a>
+        </div>
+
+        <div class="pre-title">Créé le {{ career.createdat|date: 'dd/MM/yyyy' }} - {{
+            career.organization.name }}
+        </div>
+        <h2><span sf-xeditable="form.children.name">{{ career.name }}</span></h2>
+
+        <h3>Description</h3>
+        <hr>
+        <p><span sf-xeditable="form.children.description" data-type="textarea">{{ career.description }}</span></p>
+
+        <h3>Ressources</h3>
+        <hr>
+        <p><span sf-xeditable="form.children.resources" data-type="textarea">{{ career.resources }}</span></p>
+    </div>
+
+    <div class="col-md-4 sidebar">
+        <div class="block block-trainings">
+            <div class="block-title">
+                <div class="full-width">
+                    <a ui-sref="training.table({career: career.id})" class="btn btn-link h4"><span
+                            class="fa fa-calendar-o"></span>Stages</a>
+                    <div class="pull-right">
+                        <a class="btn btn-fa btn-sm" href="" tooltip="Ajouter un stage"
+                           ng-click="addTraining()"><span class="fa fa-plus"></span></a>
+                        <span class="badge">{{ career.trainings.length}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="block-body">
+                <div class="well well-empty well-sm" ng-if="!career.trainings.length">
+                    Il n'y a aucun stage lié à ce parcours.
+                </div>
+                <ul class="list-unstyled list-padded">
+                    <li ng-repeat="training in career.trainings">
+                        <button type="button" class="close close-inline" ng-click="detachTraining(training)"><span
+                                aria-hidden="true">&times;</span></button>
+                        <a ui-sref="training.detail.view({career: career.id, id: training.id})">{{ training.name }} </a>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="block block-comments">
+            <div class="block-title">
+                <span class="fa fa-comment-o"></span> Commentaires
+            </div>
+            <div class="block-body">
+                <span sf-xeditable="form.children.comments" data-type="textarea">{{ career.comments }}</span>
+            </div>
+        </div>
+    </div>
+    </div>
+</form>

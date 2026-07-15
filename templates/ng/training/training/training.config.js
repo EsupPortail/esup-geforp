@@ -117,16 +117,16 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
                 $scope.dialog.close(data);
             };
         },
-        template: '<div training-template="create" type="dialog.params.type" default="training/dialogs/create/internship.html"></div>',
+        template: '<div training-template="create" type="dialog.params.type" career="dialog.params.career" default="training/dialogs/create/internship.html"></div>',
         resolve: {
             form: function ($http, $dialogParams) {
-                return $http.get(Routing.generate('training.create', {type: $dialogParams.type})).then(function (response) {
+                return $http.get(Routing.generate('training.create', {type: $dialogParams.type, career: $dialogParams.career})).then(function (response) {
                     var form = response.data.form;
                     // pre-fill some fields with search filters
-                    if (form.children.firstsessionperiodyear) {
+                    if ((form.children.firstsessionperiodyear) && ($dialogParams.filters) && ($dialogParams.filters.year)) {
                         form.children.firstsessionperiodyear.value = $dialogParams.filters.year;
                     }
-                    if (form.children.firstsessionperiodsemester) {
+                    if ((form.children.firstsessionperiodsemester) && ($dialogParams.filters) && ($dialogParams.filters.semester)) {
                         form.children.firstsessionperiodsemester.value = $dialogParams.filters.semester + "";
                     }
                     return form;
@@ -228,6 +228,39 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
             }
         },
         templateUrl: 'training/training/dialogs/module/edit-module.html'
+    });
+
+    /**
+     * career.attach: modal for adding a career
+     */
+    $dialogProvider.dialog('career.attach', /* @ngInject */ {
+        templateUrl: 'career/dialogs/attach.html',
+        controller: 'CareerAttachController',
+        resolve:{
+            form: function ($http, $dialogParams){
+                return $http.get(Routing.generate('career.attach', {'training': $dialogParams.training.id})).then(function (response) {
+                    return response.data.form;
+                });
+            }
+        }
+    });
+
+    /**
+     * career.detach: modal for removing a career
+     */
+    $dialogProvider.dialog('career.detach', /* @ngInject */ {
+        templateUrl: 'career/dialogs/detach.html',
+        controller: function ($scope, $modalInstance, $dialogParams, $state, $trainingBundle, $http, growl) {
+            $scope.dialog = $modalInstance;
+            $scope.dialog.params = $dialogParams;
+            $scope.ok = function () {
+                var url = Routing.generate('career.detach', {training: $dialogParams.training.id});
+                $http.post(url).then(function (response) {
+                    growl.addSuccessMessage("Le parcours a bien été supprimé.");
+                    $scope.dialog.close(response.data);
+                });
+            };
+        }
     });
 
     /**

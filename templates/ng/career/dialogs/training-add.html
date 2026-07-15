@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="dialog.dismiss()" aria-hidden="true">×</button>
+    <h4 class="modal-title"><i class="fa fa-user"></i> Associer un stage à un parcours</h4>
+</div>
+
+<form sf-href="training.attach({career: dialog.params.career})" sf-form="form" json-path="form"
+      on-success="onSuccess(data)" class="form-horizontal" novalidate>
+    <div class="modal-body">
+        <div class="form-group"
+             ng-class="{'has-error': form.children.training.errors.length || form.training.errors.length }">
+            <label class="col-sm-3 control-label" for="{{ form.children.training.id }}">{{ form.children.training.label }}</label>
+            <div class="col-sm-9">
+                <input placeholder="Cliquez pour rechercher un stage..." type="text"
+                       typeahead-template-url="training/training/dialogs/typeahead-training.html" typeahead-wait-ms="200"
+                       typeahead="choice as choice.label for choice in getTrainingList($viewValue)"
+                       typeahead-editable="false" typeahead-on-select="setTraining($item)" class="form-control"
+                       ng-model="$parent.selectedTraining"/>
+                </div>
+                <div ng-if="error.length" ng-repeat="error in form.children.training.errors" class="help-block">{{ error }}
+                </div>
+                <div ng-if="error.length" ng-repeat="error in form.training.errors" class="help-block">{{ error }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>
+        <input class="btn btn-primary" type="submit" value="Ajouter"/>
+    </div>
+</form>

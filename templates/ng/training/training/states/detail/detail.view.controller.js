@@ -159,6 +159,26 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
     };
 
     /**
+     * Attach a career
+     */
+    $scope.attachCareer = function () {
+        $dialog.open('career.attach', {training: $scope.training}).then(function (data) {
+            $scope.training.career = data.career;
+        });
+    };
+
+    /**
+     * Remove an associated career
+     */
+    $scope.detachCareer = function (career) {
+        $dialog.open('career.detach', {
+            training: $scope.training,
+        }).then(function () {
+            $scope.training.career = undefined;
+        });
+    };
+
+    /**
      * Add material modal
      */
     $scope.addMaterial = function () {

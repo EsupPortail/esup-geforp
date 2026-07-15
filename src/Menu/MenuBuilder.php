@@ -83,6 +83,8 @@ final readonly class MenuBuilder
         if($this->authorizationChecker->isGranted('VIEW', \App\Entity\Back\Internship::class)) {
             $item = $menu->addChild('trainings', ['label' => 'Événements', 'icon'  => 'calendar', 'uri'   => $this->router->generate('core.index') . '#/training', 'attributes' => ['class' => 'dropdown-toggle']]);
 
+            $item->addChild('careers', ['label' => 'Parcours', 'uri'   => $this->router->generate('core.index') . '#/career']);
+
             $item->addChild('internships', ['label' => 'Stages', 'uri'   => $this->router->generate('core.index') . '#/training?type=internship']);
 
             $item->addChild('sessions', ['label' => 'Toutes les sessions', 'uri'   => $this->router->generate('core.index') . '#/training/session'])->setAttribute('divider_prepend', true);

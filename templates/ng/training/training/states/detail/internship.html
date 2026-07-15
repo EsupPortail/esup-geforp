@@ -57,6 +57,33 @@
     -->
     <div class="col-md-4 sidebar">
         <ng-include src="'training/training/states/detail/partials/sessions.block.html'"></ng-include>
+
+        <div class="block block-career">
+            <div class="block-title">
+                <div class="full-width">
+                    <a ui-sref="career.table({training: training.id})" class="btn btn-link h4"><span
+                            class="fa fa-folder-o"></span>Parcours</a>
+                    <div class="pull-right">
+                        <a ng-if="!training.career" class="btn btn-fa btn-sm" href="" tooltip="Rattacher à un parcours"
+                           ng-click="attachCareer()"><span class="fa fa-plus"></span></a>
+                    </div>
+                </div>
+            </div>
+            <div class="block-body">
+                <div class="well well-empty well-sm" ng-if="!training.career">
+                    Ce stage n'est pas rattaché à un parcours.
+                </div>
+                <ul class="list-unstyled list-padded" ng-if="training.career">
+                    <li>
+                        <button type="button" class="close close-inline" ng-click="detachCareer(training)"><span
+                                aria-hidden="true">&times;</span></button>
+                        <a ui-sref="career.detail.view({training: training.id, id: training.career.id})">{{ training.career.name }} </a>
+
+                    </li>
+                </ul>
+            </div>
+        </div>
+
         <!--        <div materials-block="training" entity-type="training.type"></div> -->
         <ng-include src="'training/training/states/detail/partials/comments.block.html'"></ng-include>
     </div>

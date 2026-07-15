@@ -4,14 +4,12 @@ namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
 use App\Entity\Back\Session;
-use App\Entity\Core\AbstractTrainee;
-use App\Entity\Term\Sessiontype;
+use App\Entity\Core\AbstractCareer;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
-use App\Entity\Term\Trainingcategory;
-use App\Form\Type\AbstractTrainingType;
+use App\Form\Type\TrainingSearchType;
 use App\Service\TrainingBalanceSheet;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
@@ -35,11 +33,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Form\FormError;
 
 #[Route(path: '/training')]
 abstract class AbstractTrainingController extends AbstractController
 {
     protected $sessionClass = AbstractSession::class;
+
+    protected $trainingClass = Internship::class;
 
     private TrainingBalanceSheet $trainingBalanceSheet;
     /**
@@ -66,6 +67,7 @@ abstract class AbstractTrainingController extends AbstractController
         $page = $request->request->get('page', 1);
         $size = $request->request->get('size', 10);
         $sorts = $request->request->all('sorts') ?: [];
+        $query = $request->request->all('query') ?:[];
 
 
         // security check : training : 'sygefor_training.rights.inscription.all.view' -> id=9
@@ -78,6 +80,13 @@ abstract class AbstractTrainingController extends AbstractController
         $ret = $trainingRepository->getTrainingsList(keyword: $keywords, filters: $filters, page: (int)$page, pageSize: (int)$size, sorts: $sorts);
         $tabAggs = $this->constructAggs($aggs, $keywords, $query_filters, $managerRegistry, $trainingRepository);
 
+        // Recherche avec query (pour autocompletion)
+        // on transforme le champ 'query' en 'keywords'
+        if (isset($query) && isset($query['match']['name.autocomplete']['query'])) {
+            $keywords = $query['match']['name.autocomplete']['query'];
+            $ret = $trainingRepository->getTrainingsList($keywords, $filters, $page, $size, $sorts);
+        }
+
         // Concatenation des resultats
         $ret['aggs'] = $tabAggs;
 
@@ -86,8 +95,8 @@ abstract class AbstractTrainingController extends AbstractController
 
     #[Groups(['Default', 'training'])]
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
-    #[Route(path: '/create/{type}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry): array
+    #[Route(path: '/create/{type}/{career}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
+    public function create(Request $request, ManagerRegistry $managerRegistry, $type, ?AbstractCareer $career): array
     {
         $class = Internship::class;
         /** @var AbstractTraining $training */
@@ -99,6 +108,9 @@ abstract class AbstractTrainingController extends AbstractController
         catch (\Exception $exception) {
             return [$exception->getMessage()];
         }
+
+        if ($career !== null)
+            $training->setCareer($career);
 
         //training can't be created if user has no rights for it
         if (!$this->isGranted('CREATE', $training)) {
@@ -177,6 +189,61 @@ abstract class AbstractTrainingController extends AbstractController
 //        $this->get('fos_elastica.index')->refresh();
 
         return $this->redirectToRoute('training.search');
+    }
+
+    #[Groups(['Default', 'training', 'career'])]
+    #[Route(path: '/attach/{career}', name: 'training.attach', requirements: ['career' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
+    #[Rest\View(serializerGroups: ["Default", "career"] ,serializerEnableMaxDepthChecks: true)]
+    public function attach(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractCareer $career): array
+    {
+        $training = new $this->trainingClass();
+        $training->setOrganization($career->getOrganization());
+
+        // Droits
+        if (!$this->isGranted('EDIT', $training)) {
+            if ($this->isGranted('VIEW', $training)) {
+                return ['career' => $career];
+            }
+
+            throw new AccessDeniedException('Action non autorisée');
+        }
+
+        $form = $this->createForm(TrainingSearchType::class);
+        if ($request->getMethod() === 'POST') {
+            $form->handleRequest($request);
+            if ($form->isSubmitted() && $form->isValid()) {
+                $data = $form->getData();
+
+                $training = $data['training'];
+
+                if (!$training) {
+                    $form->get('training')->addError(new FormError('Erreur avec la récupération du stage'));
+                } else {
+                    /** @var AbstractCareer $existingCareer */
+                    foreach ($career->getTrainings() as $existingtraining) {
+                        if ($existingtraining === $training) {
+                            $form->get('training')->addError(new FormError('Ce stage est déjà associé à ce parcours.'));
+                            break;
+                        }
+                    }
+
+                    // on teste si le stage est déjà associé à un parcours
+                    if ($training->getCareer())
+                        $form->get('training')->addError(new FormError('Ce stage est déjà associé à un parcours et ne peut être rattaché à un autre.'));
+
+                    $career->addTraining($training);
+                    $career->setUpdatedAt(New \DateTime('now'));
+                    $training->setCareer($career);
+                    $objectManager = $managerRegistry->getManager();
+                    $objectManager->persist($career);
+                    $objectManager->persist($training);
+                    $objectManager->flush();
+                }
+            }
+        }
+
+        return ['form' => $form->createView(), 'training' => $training];
+
     }
 
     #[Route(path: '/choosetypeduplicate', name: 'training.choosetypeduplicate', options: ['expose' => true], defaults: ['_format' => 'json'])]

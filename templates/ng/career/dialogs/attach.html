@@ -1,0 +1,29 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="dialog.dismiss()" aria-hidden="true">×</button>
+    <h4 class="modal-title"><i class="fa fa-folder-o"></i> Attacher à un parcours</h4>
+</div>
+
+<form sf-href="career.attach({training: dialog.params.training.id})" sf-form="form" json-path="form"
+      on-success="onSuccess(data)" class="form-horizontal" novalidate>
+    <div class="modal-body">
+        <div class="form-group" ng-class="{'has-error': form.children.errors.length }">
+            <label class="col-sm-3 control-label" for="{{ form.children.career.id }}">{{ form.children.career.label }}</label>
+            <div class="col-sm-9">
+                <div class="input-group" >
+                    <input placeholder="Cliquez pour rechercher un parcours..." type="text"
+                           typeahead-template-url="career/dialogs/typeahead-career.html" required="required"
+                           typeahead-wait-ms="200"
+                           typeahead="choice as choice.label for choice in getCareerList($viewValue)"
+                           typeahead-editable="false" class="form-control" typeahead-on-select="setCareer($item)"
+                           ng-model="$parent.selectedCareer"/>
+                </div>
+                <div ng-if="error.length" ng-repeat="error in form.children.errors" class="help-block">{{ error }}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="btn btn-default" ng-click="dialog.dismiss()">Annuler</a>
+        <input class="btn btn-primary" type="submit" value="Attacher"/>
+    </div>
+</form>
