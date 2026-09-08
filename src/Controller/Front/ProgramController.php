@@ -729,7 +729,7 @@ class ProgramController extends AbstractController
                     // Si l'alerte existe déjà, on ne touche à rien, sinon, on la crée
                     if (!$alertExiste) {
                         $alertNew = new Alert();
-                        $alertNew->setTrainee($arTrainee[0]);
+                        $alertNew->setTrainee($arTrainee);
                         $alertNew->setSession($sessionExiste);
                         $now = new \DateTime();
                         $alertNew->setCreatedAt($now);
