@@ -38,7 +38,7 @@
                     Il n'y a aucun stage lié à ce parcours.
                 </div>
                 <ul class="list-unstyled list-padded" ng-if="career.careertrainings.length">
-                    <li ng-repeat="careertraining in career.careertrainings">
+                    <li ng-repeat="careertraining in career.careertrainings | orderBy: 'training.name' ">
                         <button type="button" class="close close-inline" ng-click="detachTraining(careertraining)"><span
                                 aria-hidden="true">&times;</span></button>
                         <a ui-sref="training.detail.view({id: careertraining.training.id})">{{ careertraining.training.name }} </a>
