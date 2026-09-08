@@ -16,20 +16,20 @@ sygeforApp.controller('CareerDetailViewController', ['$scope', '$taxonomy', '$di
      */
     $scope.addTraining = function () {
         $dialog.open('training.add', {career: $scope.career.id}).then(function (data) {
-            $scope.career.trainings.push(data.training);
+            $scope.career.careertrainings.push(data.careertraining);
         });
     };
 
     /**
      * Remove an associated training
      */
-    $scope.detachTraining = function (training) {
+    $scope.detachTraining = function (careertraining) {
         $dialog.open('training.remove', {
-            training: training,
+            careertraining: careertraining,
         }).then(function () {
-            var index = $scope.career.trainings.indexOf(training);
+            var index = $scope.career.careertrainings.indexOf(careertraining);
             if (index > -1) {
-                $scope.career.trainings.splice(index, 1);
+                $scope.career.careertrainings.splice(index, 1);
             }
         });
     };
@@ -42,5 +42,20 @@ sygeforApp.controller('CareerDetailViewController', ['$scope', '$taxonomy', '$di
             $state.go('career.table', null, {reload: true});
         });
     };
+
+    /**
+     * Open the mandatory status dialog
+     *
+     * @param careertraining
+     * @param status
+     */
+    $scope.updateMandatoryCareer = function (careertraining, status) {
+        return $dialog.open('careertraining.changeMandatory', {
+            items: [careertraining.id],
+            mandatory: status
+        }).then(function () {
+            careertraining.mandatory = status;
+        });
+    }
 
 }]);

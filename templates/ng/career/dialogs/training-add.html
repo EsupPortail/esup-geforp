@@ -19,6 +19,16 @@
                 <div ng-if="error.length" ng-repeat="error in form.children.training.errors" class="help-block">{{ error }}
                 </div>
                 <div ng-if="error.length" ng-repeat="error in form.training.errors" class="help-block">{{ error }}</div>
+                <div class="form-group" ng-init="childMandatory = form.children.mandatory"
+                     ng-class="{'has-error': childMandatory.errors.length }">
+                    <label class="col-sm-3 control-label" for="{{ childMandatory.id }}">{{ childMandatory.label }}</label>
+                    <div class="col-sm-9">
+                        <label ng-repeat="(key,choice) in childMandatory.choices">
+                            <input type="radio" name="{{ childMandatory.name }}" value="{{ choice.v }}"
+                                   ng-model="form.children.mandatory.value"> {{ choice.l }}
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

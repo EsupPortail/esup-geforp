@@ -86,20 +86,15 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function ($listState
         }
     });
 
+    /**
+     * career.attach: modal for adding a career
+     */
     $dialogProvider.dialog('career.attach', /* @ngInject */ {
         templateUrl: 'career/dialogs/attach.html',
-        controller: function ($scope, $modalInstance, $dialogParams, $state, $http, form, growl) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.form = form;
-            $scope.onSuccess = function (data) {
-                growl.addSuccessMessage("Le parcours a bien été rattaché.");
-                $scope.dialog.close(data);
-            };
-        },
-        resolve: {
-            form: function ($http) {
-                return $http.get(Routing.generate('career.attach')).then(function (response) {
+        controller: 'CareerAttachController',
+        resolve:{
+            form: function ($http, $dialogParams){
+                return $http.get(Routing.generate('career.attach', {'training': $dialogParams.training})).then(function (response) {
                     return response.data.form;
                 });
             }
@@ -146,4 +141,24 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function ($listState
             }
         }
     });
+
+    // update mandatory dialog
+    $dialogProvider.dialog("careertraining.changeMandatory", /* @ngInject */ {
+        controller: 'CareerMandatoryChange',
+        templateUrl: 'career/batch/careerMandatoryChange.html',
+        size: 'lg',
+        resolve: {
+            config: function ($http, $dialogParams) {
+                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_career.batch.mandatory_change'});
+                var optionsArray = {targetClass: 'App\\Entity\\Core\\AbstractCareerTraining'};
+                if (typeof $dialogParams.mandatory != 'undefined') {
+                    optionsArray['mandatory'] = $dialogParams.mandatory;
+                }
+                return $http.get(url, {params: {options: optionsArray}}).then(function (response) {
+                    return response.data;
+                });
+            }
+        }
+    });
+
 }]);

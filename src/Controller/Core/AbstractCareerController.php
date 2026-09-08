@@ -3,8 +3,10 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Back\CareerTraining;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Session;
+use App\Entity\Core\AbstractCareerTraining;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Organization;
 use App\Entity\Back\Trainer;
@@ -18,6 +20,7 @@ use Doctrine\ORM\Repository\RepositoryFactory;
 use Doctrine\Persistence\ManagerRegistry;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use FOS\RestBundle\View\View;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -39,6 +42,8 @@ abstract class AbstractCareerController extends AbstractController
 {
     protected $careerClass = AbstractCareer::class;
     protected $trainingClass = Internship::class;
+
+    protected $careertrainingClass = CareerTraining::class;
 
     public function __construct(private readonly \Doctrine\Persistence\ManagerRegistry $managerRegistry)
     {
@@ -124,7 +129,7 @@ abstract class AbstractCareerController extends AbstractController
     }
     #[Groups(['Default', 'career'])]
     #[Route(path: '/{id}/view', name: 'career.view', requirements: ['id' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
-    #[Rest\View(serializerGroups: ["Default", "career"] ,serializerEnableMaxDepthChecks: true)]
+    #[Rest\View(serializerGroups: ['Default', 'career'] ,serializerEnableMaxDepthChecks: true)]
     public function view(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractCareer $career,int $id): view|array
     {
         $career = $managerRegistry->getRepository(AbstractCareer::class)->find($id);
@@ -177,6 +182,7 @@ abstract class AbstractCareerController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
+        $careerTrain = null;
         $form = $this->createForm(CareerSearchType::class);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -184,42 +190,46 @@ abstract class AbstractCareerController extends AbstractController
                 $data = $form->getData();
 
                 $career = $data['career'];
-                /** @var AbstractCareer $existingCareer */
-                foreach ($career->getTrainings() as $existingtraining) {
-                    if ($existingtraining === $training) {
-                        $form->get('career')->addError(new FormError('Ce parcours est déjà associé à ce stage.'));
-                        break;
+
+                if (!$career) {
+                    $form->get('career')->addError(new FormError('Erreur avec la récupération du parcours'));
+                } else {
+                    /** @var AbstractCareer $existingCareer */
+                    $careerTrain = $managerRegistry->getRepository(AbstractCareerTraining::class)->findBy(['career' => $career, 'training' => $training]);
+
+                    if ($careerTrain != null) {
+                        $form->get('career')->addError(new FormError('Ce parcours contient déjà ce stage.'));
+                    } else {
+                        $careerTrain = new $this->careertrainingClass();
+                        $careerTrain->setCreatedAt(new \DateTime('now'));
+                        $careerTrain->setUpdatedAt(new \DateTime('now'));
+                        $careerTrain->setCareer($career);
+                        $careerTrain->setTraining($training);
+                        $careerTrain->setMandatory($data['mandatory']);
+
+                        $objectManager = $managerRegistry->getManager();
+                        $objectManager->persist($careerTrain);
+                        $objectManager->flush();
                     }
                 }
-
-                $career->addTraining($training);
-                $career->setUpdatedAt(New \DateTime('now'));
-                $training->setCareer($career);
-                $objectManager = $managerRegistry->getManager();
-                $objectManager->persist($career);
-                $objectManager->persist($training);
-                $objectManager->flush();
             }
         }
 
-        return ['form' => $form->createView(), 'career' => $career];
+        return ['form' => $form->createView(), 'careertraining' => $careerTrain,'career' => $career];
 
     }
 
     #[Groups(['Default', 'career', 'training'])]
-    #[Route(path: '/detach/{training}', name: 'career.detach', requirements: ['training' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
-    #[IsGranted('VIEW', subject: 'training')]
+    #[Route(path: '/detach/{careertraining}', name: 'career.detach', requirements: ['careertraining' => '\d+'], options: ['expose' => true], defaults: ['_format' => 'json'])]
     #[Rest\View(serializerGroups: ["Default", "career"] ,serializerEnableMaxDepthChecks: true)]
-    public function detach(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractTraining $training): void
+    public function detach(SerializerInterface $serializer, Request $request,ManagerRegistry $managerRegistry, AbstractCareerTraining $careertraining): void
     {
-        $career = $training->getCareer();
-        if (!$career) {
+        if (!$careertraining) {
             throw new NotFoundHttpException();
         }
 
-        $career->removeTraining($training);
-        $training->setCareer(null);
         $objectManager = $managerRegistry->getManager();
+        $objectManager->remove($careertraining);
         $objectManager->flush();
     }
 
@@ -423,6 +433,15 @@ abstract class AbstractCareerController extends AbstractController
 
 
         return $tabAggs;
+    }
+
+    protected function createCareerTraining(AbstractCareer $career, $doctrine): AbstractCareerTraining
+    {
+        $em = $doctrine->getManager();
+        $careerTrain = new AbstractCareerTraining();
+        $careerTrain->setCareer($career);
+
+        return $careerTrain;
     }
 
 }

@@ -238,7 +238,7 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
         controller: 'CareerAttachController',
         resolve:{
             form: function ($http, $dialogParams){
-                return $http.get(Routing.generate('career.attach', {'training': $dialogParams.training.id})).then(function (response) {
+                return $http.get(Routing.generate('career.attach', {'training': $dialogParams.training})).then(function (response) {
                     return response.data.form;
                 });
             }
@@ -248,18 +248,27 @@ sygeforApp.config(["$trainingBundleProvider", "$listStateProvider", "$dialogProv
     /**
      * career.detach: modal for removing a career
      */
-    $dialogProvider.dialog('career.detach', /* @ngInject */ {
-        templateUrl: 'career/dialogs/detach.html',
-        controller: function ($scope, $modalInstance, $dialogParams, $state, $trainingBundle, $http, growl) {
-            $scope.dialog = $modalInstance;
-            $scope.dialog.params = $dialogParams;
-            $scope.ok = function () {
-                var url = Routing.generate('career.detach', {training: $dialogParams.training.id});
-                $http.post(url).then(function (response) {
-                    growl.addSuccessMessage("Le parcours a bien été supprimé.");
-                    $scope.dialog.close(response.data);
+    $dialogProvider.dialog('career.remove', /* @ngInject */ {
+        templateUrl: 'training/training/dialogs/career/career-remove.html',
+        controller: 'CareerRemoveController'
+    });
+
+    // update mandatory dialog
+    $dialogProvider.dialog("careertraining.changeMandatory", /* @ngInject */ {
+        controller: 'CareerMandatoryChange',
+        templateUrl: 'career/batch/careerMandatoryChange.html',
+        size: 'lg',
+        resolve: {
+            config: function ($http, $dialogParams) {
+                var url = Routing.generate('sygefor_core.batch_operation.modal_config', {service: 'sygefor_career.batch.mandatory_change'});
+                var optionsArray = {targetClass: 'App\\Entity\\Core\\AbstractCareerTraining'};
+                if (typeof $dialogParams.mandatory != 'undefined') {
+                    optionsArray['mandatory'] = $dialogParams.mandatory;
+                }
+                return $http.get(url, {params: {options: optionsArray}}).then(function (response) {
+                    return response.data;
                 });
-            };
+            }
         }
     });
 

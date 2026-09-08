@@ -3,8 +3,10 @@
 namespace App\Controller\Core;
 
 use App\AccessRight\AccessRightRegistry;
+use App\Entity\Back\CareerTraining;
 use App\Entity\Back\Session;
 use App\Entity\Core\AbstractCareer;
+use App\Entity\Core\AbstractCareerTraining;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Internship;
 use App\Entity\Back\Organization;
@@ -41,6 +43,8 @@ abstract class AbstractTrainingController extends AbstractController
     protected $sessionClass = AbstractSession::class;
 
     protected $trainingClass = Internship::class;
+
+    protected $careertrainingClass = CareerTraining::class;
 
     private TrainingBalanceSheet $trainingBalanceSheet;
     /**
@@ -96,7 +100,7 @@ abstract class AbstractTrainingController extends AbstractController
     #[Groups(['Default', 'training'])]
     #[Rest\View(serializerGroups: ['Default', 'training'], serializerEnableMaxDepthChecks: true)]
     #[Route(path: '/create/{type}/{career}', name: 'training.create', options: ['expose' => true], defaults: ['_format' => 'json'])]
-    public function create(Request $request, ManagerRegistry $managerRegistry, $type, ?AbstractCareer $career): array
+    public function create(Request $request, ManagerRegistry $managerRegistry, $type): array
     {
         $class = Internship::class;
         /** @var AbstractTraining $training */
@@ -108,9 +112,6 @@ abstract class AbstractTrainingController extends AbstractController
         catch (\Exception $exception) {
             return [$exception->getMessage()];
         }
-
-        if ($career !== null)
-            $training->setCareer($career);
 
         //training can't be created if user has no rights for it
         if (!$this->isGranted('CREATE', $training)) {
@@ -208,6 +209,7 @@ abstract class AbstractTrainingController extends AbstractController
             throw new AccessDeniedException('Action non autorisée');
         }
 
+        $careerTrain = null;
         $form = $this->createForm(TrainingSearchType::class);
         if ($request->getMethod() === 'POST') {
             $form->handleRequest($request);
@@ -220,29 +222,27 @@ abstract class AbstractTrainingController extends AbstractController
                     $form->get('training')->addError(new FormError('Erreur avec la récupération du stage'));
                 } else {
                     /** @var AbstractCareer $existingCareer */
-                    foreach ($career->getTrainings() as $existingtraining) {
-                        if ($existingtraining === $training) {
-                            $form->get('training')->addError(new FormError('Ce stage est déjà associé à ce parcours.'));
-                            break;
-                        }
+                    $careerTrain = $managerRegistry->getRepository(AbstractCareerTraining::class)->findBy(['career' => $career, 'training' => $training]);
+
+                    if ($careerTrain != null) {
+                        $form->get('training')->addError(new FormError('Ce stage est déjà associé à ce parcours.'));
+                    } else {
+                        $careerTrain = new $this->careertrainingClass();
+                        $careerTrain->setCreatedAt(new \DateTime('now'));
+                        $careerTrain->setUpdatedAt(new \DateTime('now'));
+                        $careerTrain->setCareer($career);
+                        $careerTrain->setTraining($training);
+                        $careerTrain->setMandatory($data['mandatory']);
+
+                        $objectManager = $managerRegistry->getManager();
+                        $objectManager->persist($careerTrain);
+                        $objectManager->flush();
                     }
-
-                    // on teste si le stage est déjà associé à un parcours
-                    if ($training->getCareer())
-                        $form->get('training')->addError(new FormError('Ce stage est déjà associé à un parcours et ne peut être rattaché à un autre.'));
-
-                    $career->addTraining($training);
-                    $career->setUpdatedAt(New \DateTime('now'));
-                    $training->setCareer($career);
-                    $objectManager = $managerRegistry->getManager();
-                    $objectManager->persist($career);
-                    $objectManager->persist($training);
-                    $objectManager->flush();
                 }
             }
         }
 
-        return ['form' => $form->createView(), 'training' => $training];
+        return ['form' => $form->createView(), 'careertraining' => $careerTrain, 'training' => $training];
 
     }
 

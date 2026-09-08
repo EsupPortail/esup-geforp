@@ -162,21 +162,39 @@ sygeforApp.controller('TrainingDetailViewController', ['$scope', '$taxonomy', '$
      * Attach a career
      */
     $scope.attachCareer = function () {
-        $dialog.open('career.attach', {training: $scope.training}).then(function (data) {
-            $scope.training.career = data.career;
+        $dialog.open('career.attach', {training: $scope.training.id}).then(function (data) {
+            $scope.training.careertrainings.push(data.careertraining);
         });
     };
 
     /**
      * Remove an associated career
      */
-    $scope.detachCareer = function (career) {
-        $dialog.open('career.detach', {
-            training: $scope.training,
+    $scope.detachCareer = function (careertraining) {
+        $dialog.open('career.remove', {
+            careertraining: careertraining,
         }).then(function () {
-            $scope.training.career = undefined;
+            var index = $scope.training.careertrainings.indexOf(careertraining);
+            if (index > -1) {
+                $scope.training.careertrainings.splice(index, 1);
+            }
         });
     };
+
+    /**
+     * Open the mandatory status dialog
+     *
+     * @param careertraining
+     * @param status
+     */
+    $scope.updateMandatoryCareer = function (careertraining, status) {
+        return $dialog.open('careertraining.changeMandatory', {
+            items: [careertraining.id],
+            mandatory: status
+        }).then(function () {
+            careertraining.mandatory = status;
+        });
+    }
 
     /**
      * Add material modal

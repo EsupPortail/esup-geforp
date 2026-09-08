@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use App\Utils\HumanReadable\HumanReadablePropertyAccessorFactory;
-use App\BatchOperations\Session\SessionRegistrationChangeBatchOperation;
+use App\BatchOperations\Career\CareerMandatoryChangeBatchOperation;
 use Twig\Environment;
 
 /**
@@ -171,7 +171,7 @@ final class BatchOperationRegistry
         $this->addBatchOperation($pdfBatchOperation, $i);
         ++$i;
 
-        $sessionRegistrationChange = new SessionRegistrationChangeBatchOperation($managerRegistry, $security, /* autres params si besoin */);
+        $sessionRegistrationChange = new CareerMandatoryChangeBatchOperation($managerRegistry, $security, /* autres params si besoin */);
         $sessionRegistrationChange->setDoctrine($managerRegistry);
         $this->addBatchOperation($sessionRegistrationChange, $i);
         ++$i;
@@ -192,6 +192,11 @@ final class BatchOperationRegistry
         $CSVBatchInscriptionCpf->setTargetClass(\App\Entity\Back\Inscription::class);
         $CSVBatchInscriptionCpf->setOptions($confCSV['inscription.cpf']);
         $this->addBatchOperation($CSVBatchInscriptionCpf, $i);
+        ++$i;
+
+        $careerMandatoryChange = new CareerMandatoryChangeBatchOperation($managerRegistry, $security, /* autres params si besoin */);
+        $careerMandatoryChange->setDoctrine($managerRegistry);
+        $this->addBatchOperation($careerMandatoryChange, $i);
         ++$i;
     }
 
@@ -251,6 +256,7 @@ final class BatchOperationRegistry
             'sygefor_training.batch.session_registration_change' => 15,
             'sygefor_core.batch.pdf.training' => 16,
             'sygefor_core.batch.csv.inscription.cpf' => 17,
+            'sygefor_career.batch.mandatory_change' => 18,
         ];
 
         if (isset($map[$servicename]) && isset($this->operations[$map[$servicename]])) {

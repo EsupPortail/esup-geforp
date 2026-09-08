@@ -191,13 +191,12 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     protected \Doctrine\Common\Collections\Collection $materials;
 
     /**
-     * @var AbstractCareer
-     * @Serializer\Groups({"training", "session", "inscription", "trainee", "trainer", "api", "career"})
+     * @var \Doctrine\Common\Collections\Collection<\App\Entity\Core\AbstractCareerTraining>
+     * @Serializer\Groups({"training", "api.training"})
      */
-    #[Groups(['training', 'session', 'inscription', 'trainee', 'trainer', 'api', 'career'])]
-    #[ORM\ManyToOne(targetEntity: AbstractCareer::class, inversedBy: 'trainings')]
-    #[ORM\JoinColumn(onDelete: 'CASCADE')]
-    protected ?AbstractCareer $career;
+    #[Groups(["api.training", "training"])]
+    #[ORM\OneToMany(mappedBy: 'training', targetEntity: AbstractCareerTraining::class, cascade: ['persist', 'remove'])]
+    protected \Doctrine\Common\Collections\Collection $careertrainings;
 
     /**
      * Constructor.
@@ -209,6 +208,7 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
         $this->sessions = new ArrayCollection();
         $this->materials = new ArrayCollection();
         $this->tags     = new ArrayCollection();
+        $this->careertrainings = new ArrayCollection();
     }
 
     /**
@@ -729,19 +729,48 @@ abstract class AbstractTraining implements SerializedAccessRights, \Stringable
     }
 
     /**
-     * @return AbstractCareer
+     * @return Collection
      */
-    public function getCareer(): ?AbstractCareer
+    public function getCareertrainings(): Collection
     {
-        return $this->career;
+        return $this->careertrainings;
+    }
+
+    public function setCareertraining(mixed $careertrainings): void
+    {
+        $this->careertrainings = $careertrainings;
     }
 
     /**
-     * @param AbstractCareer $career
+     * @param AbstractCareerTraining $careertraining
+     *
+     * @return bool
      */
-    public function setCareer(?AbstractCareer $career): void
+    public function addCareertraining(\App\Entity\Core\AbstractCareerTraining $careertraining): bool
     {
-        $this->career = $career;
+        if (!$this->careertrainings->contains($careertraining)) {
+            $this->careertrainings->add($careertraining);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param AbstractCareerTraining $careertraining
+     *
+     * @return bool
+     */
+    public function removeCareertraining(\App\Entity\Core\AbstractCareerTraining $careertraining): bool
+    {
+        if ($this->careertrainings->contains($careertraining)) {
+            $this->careertrainings->removeElement($careertraining);
+
+            return true;
+        }
+
+        return false;
     }
 
 }

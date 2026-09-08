@@ -14,7 +14,7 @@ sygeforApp.controller('TrainingRemoveController', ['$scope', '$modalInstance', '
      */
     $scope.ok = function () {
         var url = Routing.generate('career.detach', {
-            training: $scope.dialog.params.training.id,
+            careertraining: $scope.dialog.params.careertraining.id,
         });
         $http({method: 'POST', url: url}).success(function (data) {
             growl.addSuccessMessage("Le stage a bien été retiré du parcours.");

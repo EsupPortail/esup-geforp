@@ -64,21 +64,36 @@
                     <a ui-sref="career.table({training: training.id})" class="btn btn-link h4"><span
                             class="fa fa-folder-o"></span>Parcours</a>
                     <div class="pull-right">
-                        <a ng-if="!training.career" class="btn btn-fa btn-sm" href="" tooltip="Rattacher à un parcours"
+                        <a class="btn btn-fa btn-sm" href="" tooltip="Rattacher à un parcours"
                            ng-click="attachCareer()"><span class="fa fa-plus"></span></a>
                     </div>
                 </div>
             </div>
             <div class="block-body">
-                <div class="well well-empty well-sm" ng-if="!training.career">
+                <div class="well well-empty well-sm" ng-if="!training.careertrainings.length">
                     Ce stage n'est pas rattaché à un parcours.
                 </div>
-                <ul class="list-unstyled list-padded" ng-if="training.career">
-                    <li>
-                        <button type="button" class="close close-inline" ng-click="detachCareer(training)"><span
+                <ul class="list-unstyled list-padded" ng-if="training.careertrainings.length">
+                    <li ng-repeat="careertraining in training.careertrainings">
+                        <button type="button" class="close close-inline" ng-click="detachCareer(careertraining)"><span
                                 aria-hidden="true">&times;</span></button>
-                        <a ui-sref="career.detail.view({training: training.id, id: training.career.id})">{{ training.career.name }} </a>
-
+                        <a ui-sref="career.detail.view({id: careertraining.career.id})">{{ careertraining.career.name }} </a>
+                        <!-- span class="badge">{{ careertraining.mandatory ? 'Obligatoire' : 'Non obligatoire'}}</span-->
+                        <!-- editable -->
+                        <div class="btn-group dropdown pull-right">
+                            <button class="btn btn-xs dropdown-toggle" data-toggle="dropdown">
+                                {{ careertraining.mandatory ? 'Obligatoire' : 'Facultatif' }}
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu text-small" role="menu">
+                                <li ng-repeat="status in [0, 1]"
+                                    ng-class="{disabled : careertraining.mandatory == status}">
+                                    <a href="" ng-click="updateMandatoryCareer(careertraining, status)">
+                                        <i class="fa fa-check" ng-if="careertraining.mandatory == status"></i> {{ status ? 'Obligatoire' : 'Facultatif' }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
                     </li>
                 </ul>
             </div>

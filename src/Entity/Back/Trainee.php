@@ -21,8 +21,7 @@ use App\Entity\Core\User;
 #[UniqueEntity(fields: ['email', 'institution'], message: 'Cette adresse email est déjà utilisée.', ignoreNull: true, groups: ['Default', 'trainee'])]
 class Trainee extends AbstractTrainee
 {
-    
-    use PersonTrait;
+
     #[Groups(['Default', 'trainee', 'api'])]
     #[ORM\Column(name: 'birth_date', type: \Doctrine\DBAL\Types\Types::STRING, length: 255)]
     protected ?string $birthdate = null;

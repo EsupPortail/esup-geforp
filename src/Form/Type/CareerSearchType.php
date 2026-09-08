@@ -13,6 +13,7 @@ use App\Entity\Core\AbstractTrainee;
 use App\Entity\Core\AbstractSession;
 use App\Entity\Term\Theme;
 use App\Entity\Back\Organization;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
@@ -33,7 +34,9 @@ final class CareerSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $formBuilder, array $options): void
     {
         $formBuilder
+            ->add('mandatory', ChoiceType::class, ['label' => 'Stage obligatoire', 'choices' => ['Non' => 0, 'Oui' => 1], 'data' => 0])
             ->add('career', EntityHiddenType::class, ['label' => 'Nom de parcours', 'class' => AbstractCareer::class]);
+
     }
 
 

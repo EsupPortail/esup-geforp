@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <button type="button" class="close" ng-click="cancel()">×</button>
+    <h4 class="modal-title">Modification du caractère obligatoire lié au parcours</h4>
+</div>
+<div class="modal-body">
+    <form novalidate class="form-horizontal" role="form">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">Rattachement au parcours</label>
+            <div class="col-sm-9">
+                <select class="form-control" ng-model="mandatory"
+                        ng-options="opt.id as opt.label for opt in mandatoryOpts"></select>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <a class="btn btn-default" ng-click="cancel()">Annuler</a>
+    <a class="btn btn-primary" ng-click="ok()">Valider</a>
+</div>
