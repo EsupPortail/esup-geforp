@@ -154,7 +154,7 @@
                                                 {% if upcomingSession.isPublic and upcomingSession.availablePlaces <= 0 %}
                                                     <li class="text-center">
                                                         <div class="alert-danger">
-                                                            <span class="label radius">Il n'y a plus de place disponible</span>
+                                                            <span class="label radius" style="margin-top: 0px; white-space: normal">La session est complète, vous pouvez vous inscrire en liste d'attente</span>
                                                         </div>
                                                     </li>
                                                 {% endif %}
@@ -284,7 +284,7 @@
                                             {% if session.isPublic and session.availablePlaces <= 0 %}
                                                 <li class="text-center">
                                                     <div class="alert-danger">
-                                                        <span class="label radius">Il n'y plus de place disponible</span>
+                                                        <span class="label radius" style="margin-top: 0px; white-space: normal">La session est complète, vous pouvez vous inscrire en liste d'attente</span>
                                                     </div>
                                                 </li>
                                             {% endif %}
