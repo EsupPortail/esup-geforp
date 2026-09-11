@@ -1,5 +1,21 @@
 # Geforp changelog :
 
+## 3.6 (2026-09-11)
+### Ajouts
+- Fonctionnalités liées aux parcours côté gestionnaire
+
+### Corrections
+- Correction libellés affichés côté stagiaire
+- Correction inscription aux alertes côté stagiaire (onglet recherche et tous les établissements)
+- Correction affichage des modèles de mails par ordre alphabétique lors du changement de statut d'inscription
+
+
+## 3.4 (2026-04-14)
+### Corrections
+- Correction visibilité des liens privés pour les stagiaires
+- Correction valeur par défaut du nombre d'heures et de jours d'une session
+- Corrections visibilités côté stagiaire
+
 ## 3.5 (2026-05-12)
 ### Ajouts
 - Fonctionnalités liées au CPF
