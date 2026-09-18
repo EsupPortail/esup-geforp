@@ -67,6 +67,7 @@ parameters:
                     training.tags: "Tags du stage"
                     date.lieu: "Lieu de formation"
                     status: { label: "Statut de la session", type: "statut" }
+                    sessiontype: "Programmation"
                     training.supervisor.name: "Nom du responsable pédagogique"
                     training.supervisor.first_name: "Prénom du responsable pédagogique"
                     trainers.fullName: "Formateur(s)"
@@ -75,6 +76,8 @@ parameters:
                     inscription.desist: "Nombre d'inscriptions en désistement"
                     inscription.convoke: "Nombre de convoqués"
                     inscription.accepted: "Nombre d'acceptés"
+                    inscription.favorable: "Nombre d'avis favorables"
+                    inscription.defavorable: "Nombre d'avis défavorables"
                     inscription.presence.nbheures: "Nombre d'heures de présence effective"
                     maximumnumberofregistrations: 'Nombre de places'
                     numberofregistrations: "Nombre d'inscrits"

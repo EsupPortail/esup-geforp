@@ -207,6 +207,60 @@ SQL;
                         } else {
                             $data[$key] = '';
                         }
+                    } elseif ($key == "inscription.favorable") {
+                        ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
+                        $key = str_replace('.', '', (string) $key);
+
+                        $statsRefus = [];
+                        /** @var EntityManager $em */
+                        $em    = $this->doctrine->getManager();
+                        $session = $entity;
+                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
+                            $query = $em
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
+                    JOIN App\Entity\Back\Inscription i WITH i.inscriptionstatus = s
+                    WHERE i.session = :session and s.machinename = :status
+                    GROUP BY s.id')
+                                ->setParameter('session', $session)
+                                ->setParameter('status', "favorable");
+
+                            $result = $query->getResult();
+
+                            foreach($result as $status) {
+                                $statsRefus[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
+                            }
+
+                            $data[$key] = $statsRefus[0]['count'] ?? '';
+                        } else {
+                            $data[$key] = '';
+                        }
+                    } elseif ($key == "inscription.defavorable") {
+                        ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
+                        $key = str_replace('.', '', (string) $key);
+
+                        $statsRefus = [];
+                        /** @var EntityManager $em */
+                        $em    = $this->doctrine->getManager();
+                        $session = $entity;
+                        if($session->getRegistration() > AbstractSession::REGISTRATION_DEACTIVATED) {
+                            $query = $em
+                                ->createQuery('SELECT s, count(i) FROM App\Entity\Term\Inscriptionstatus s
+                    JOIN App\Entity\Back\Inscription i WITH i.inscriptionstatus = s
+                    WHERE i.session = :session and s.machinename = :status
+                    GROUP BY s.id')
+                                ->setParameter('session', $session)
+                                ->setParameter('status', "defavorable");
+
+                            $result = $query->getResult();
+
+                            foreach($result as $status) {
+                                $statsRefus[] = ['id'     => $status[0]->getId(), 'name'   => $status[0]->getName(), 'status' => $status[0]->getStatus(), 'count'  => (int) $status[1]];
+                            }
+
+                            $data[$key] = $statsRefus[0]['count'] ?? '';
+                        } else {
+                            $data[$key] = '';
+                        }
                     } elseif ($key == "inscription.presence.nbheures") {
                         ///// PATCH : modif nom des labels car ne fonctionne plus avec '.'
                         $key = str_replace('.', '', (string) $key);
