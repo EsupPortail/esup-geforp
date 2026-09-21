@@ -1,5 +1,9 @@
 # Geforp changelog :
 
+## 3.7 (2026-09-18)
+### Ajouts
+- Ajout paramètres supplémentaires dans export des sessions
+
 ## 3.6 (2026-09-11)
 ### Ajouts
 - Fonctionnalités liées aux parcours côté gestionnaire
