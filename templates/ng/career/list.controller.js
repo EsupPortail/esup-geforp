@@ -37,8 +37,8 @@ sygeforApp.controller('CareerListController', ['$scope', '$user', '$injector', '
 
     // facets
     $scope.facets = {
-        'city.source': {
-            label: 'Ville'
-        }
+        'career.organization.name.source': {
+            label: 'Centre'
+        },
     };
 }]);

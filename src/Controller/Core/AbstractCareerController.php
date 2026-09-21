@@ -62,7 +62,6 @@ abstract class AbstractCareerController extends AbstractController
         $size = $request->request->get('size', 10);
         $sorts = $request->request->all('sorts') ?: [];
 
-
         // security check : career : 'sygefor_training.rights.training.all.view' -> id=9
         if(!$accessRightRegistry->hasAccessRight(9)) {
             // restriction to user's organization

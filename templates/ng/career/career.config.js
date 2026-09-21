@@ -15,6 +15,9 @@ sygeforApp.config(["$listStateProvider", "$dialogProvider", function ($listState
         resolve: {
             search: function ($searchFactory, $stateParams, $user) {
                 var search = $searchFactory('career.search');
+                search.query.filters = {
+                    'career.organization.name.source': $user.organization.name
+                };
                 search.query.sorts = {'name.source': 'asc'};
                 search.extendQueryFromJson($stateParams.q);
                 return search.search().then(function () {

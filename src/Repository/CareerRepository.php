@@ -34,7 +34,7 @@ final class CareerRepository extends ServiceEntityRepository
             ->setParameter('keywordPr', $keywordPr);
 
         // FILTRE CENTRE
-/*        if (isset($filters['career.organization.name.source'])) {
+        if (isset($filters['career.organization.name.source'])) {
             $qb
                 ->innerJoin('career.organization', 'o', 'WITH', 'o = career.organization')
                 ->andWhere('o.name in (:centers)')
@@ -45,7 +45,7 @@ final class CareerRepository extends ServiceEntityRepository
         if ((is_array($sorts)) && (array_key_exists('career.name.source', $sorts)))
             $qb->addOrderBy('career.name', $sorts['career.name.source']);
         else
-            $qb->addOrderBy('career.name'); */
+            $qb->addOrderBy('career.name');
 
         // PAGINATION
         if (($page == 'NO PAGE') && ($pageSize == 'NO SIZE')) {
