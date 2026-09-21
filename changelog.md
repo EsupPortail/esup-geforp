@@ -1,5 +1,9 @@
 # Geforp changelog :
 
+## 3.8 (2026-09-21)
+### Corrections
+- Correction prise en compte des filtres par centre pour les parcours
+
 ## 3.7 (2026-09-18)
 ### Ajouts
 - Ajout paramètres supplémentaires dans export des sessions
